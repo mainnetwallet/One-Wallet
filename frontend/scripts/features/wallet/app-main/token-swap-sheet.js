@@ -10,100 +10,44 @@ function showTokenSwapSheet(t) {
 
   const overlay = document.createElement('div');
   overlay.id = 'token-action-sheet';
-  overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:calc(var(--nav-height) + env(safe-area-inset-bottom, 0px));z-index:980;background:rgba(0,0,0,0.82);display:flex;align-items:flex-end;justify-content:center;opacity:0;transition:opacity 0.2s ease;';
+  overlay.className = 'tas-overlay';
 
   overlay.innerHTML = `
-    <div id="token-action-inner" style="width:100%;max-width: 100%;background:linear-gradient(170deg,rgba(13,13,26,0.99) 0%,rgba(8,8,18,1) 100%);backdrop-filter:blur(40px);-webkit-backdrop-filter:blur(40px);border-radius:36px 36px 0 0;border:1px solid rgba(99,102,241,0.28);border-bottom:none;padding:22px 18px calc(28px + env(safe-area-inset-bottom,0px));transform:translateY(100%);transition:transform 0.35s cubic-bezier(0.34,1.2,0.64,1);box-shadow:0 -12px 60px rgba(99,102,241,0.18),0 -4px 24px rgba(0,0,0,0.7),inset 0 1px 0 rgba(255,255,255,0.06);position:relative;overflow:hidden;">
+    <div id="token-action-inner" class="tas-sheet">
+      <div class="tas-grab"></div>
 
-      <!-- Ambient glow blobs -->
-      <div style="position:absolute;top:-60px;left:50%;transform:translateX(-50%);width:280px;height:100px;background:radial-gradient(ellipse,rgba(99,102,241,0.22) 0%,transparent 70%);pointer-events:none;"></div>
-      <div style="position:absolute;bottom:0;left:-40px;width:160px;height:160px;background:radial-gradient(circle,rgba(139,92,246,0.08),transparent 70%);pointer-events:none;"></div>
-      <div style="position:absolute;bottom:0;right:-40px;width:140px;height:140px;background:radial-gradient(circle,rgba(6,182,212,0.07),transparent 70%);pointer-events:none;"></div>
-
-      <!-- Drag handle -->
-      <div style="width:48px;height:5px;background:linear-gradient(90deg,rgba(99,102,241,0.6),rgba(139,92,246,0.7),rgba(99,102,241,0.6));border-radius:3px;margin:0 auto 20px;box-shadow:0 0 12px rgba(99,102,241,0.4);"></div>
-
-      <!-- Token header card -->
-      <div style="display:flex;align-items:center;gap:13px;margin-bottom:20px;padding:14px 16px;background:linear-gradient(135deg,rgba(99,102,241,0.12),rgba(139,92,246,0.07));border:1px solid rgba(99,102,241,0.25);border-radius:24px;position:relative;overflow:hidden;box-shadow:0 4px 24px rgba(99,102,241,0.1),inset 0 1px 0 rgba(255,255,255,0.06);">
-        <div style="position:absolute;inset:0;background:linear-gradient(135deg,rgba(99,102,241,0.05),transparent);pointer-events:none;border-radius:24px;"></div>
-        <!-- Token icon — fully round -->
-        <div id="tas-token-icon" style="width:48px;height:48px;border-radius:50%;background:${t.color || '#6366f1'}22;overflow:hidden;flex-shrink:0;box-shadow:0 0 18px ${t.color || '#6366f1'}55,0 3px 10px rgba(0,0,0,0.5);border:2px solid rgba(255,255,255,0.1);"></div>
-        <div style="flex:1;min-width:0;">
-          <div style="font-size:16px;font-weight:800;letter-spacing:0.3px;">${t.name}</div>
-          <div style="font-size:10px;color:var(--text-muted);font-family:var(--font-mono);margin-top:4px;display:flex;align-items:center;gap:6px;">
-            <span style="background:linear-gradient(90deg,var(--accent-primary),var(--accent-secondary));-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-weight:800;">${t.sub}</span>
-            <span style="width:3px;height:3px;border-radius:50%;background:var(--text-muted);flex-shrink:0;"></span>
-            <span>${chainName}</span>
-          </div>
+      <div class="tas-head">
+        <div id="tas-token-icon" class="tas-icon"></div>
+        <div class="tas-title">
+          <div class="tas-name">${t.name}</div>
+          <div class="tas-sub"><span class="tas-sym">${t.sub}</span><span>·</span><span class="tas-chain-dot"></span><span>${chainName}</span></div>
         </div>
-        <!-- Chart btn — pill shaped -->
-        <div id="tas-header-chart-btn" style="display:flex;align-items:center;gap:6px;padding:8px 14px;background:linear-gradient(135deg,rgba(6,182,212,0.18),rgba(34,211,238,0.1));border:1px solid rgba(6,182,212,0.4);border-radius:50px;cursor:pointer;transition:all 0.18s;flex-shrink:0;box-shadow:0 0 14px rgba(6,182,212,0.15);" onmousedown="this.style.transform='scale(0.92)';this.style.boxShadow='0 0 20px rgba(6,182,212,0.3)'" onmouseup="this.style.transform='';this.style.boxShadow='0 0 14px rgba(6,182,212,0.15)'" ontouchstart="this.style.transform='scale(0.92)';this.style.boxShadow='0 0 20px rgba(6,182,212,0.3)'" ontouchend="this.style.transform='';this.style.boxShadow='0 0 14px rgba(6,182,212,0.15)'">
-          <span class="material-icons-round" style="font-size:14px;color:var(--neon-cyan);">show_chart</span>
-          <span style="font-size:10px;font-weight:800;color:var(--neon-cyan);font-family:var(--font-mono);letter-spacing:1px;">CHART</span>
-        </div>
-        <!-- Close btn — round -->
-        <div onclick="" style="width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;margin-left:4px;transition:all 0.2s;" onmousedown="this.style.background='rgba(255,255,255,0.12)'" onmouseup="this.style.background='rgba(255,255,255,0.06)'" ontouchstart="this.style.background='rgba(255,255,255,0.12)'" ontouchend="this.style.background='rgba(255,255,255,0.06)'">
-          <span class="material-icons-round" id="tas-close-x" style="font-size:16px;color:var(--text-muted);">close</span>
-        </div>
+        <button type="button" id="tas-header-chart-btn" class="tas-ib" aria-label="Price chart"><span class="material-icons-round">show_chart</span></button>
+        <button type="button" id="tas-close-x" class="tas-ib" aria-label="Close"><span class="material-icons-round">close</span></button>
       </div>
 
-      <!-- Section label -->
-      <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;padding-left:2px;">
-        <div style="width:16px;height:2px;background:linear-gradient(90deg,var(--accent-primary),var(--accent-secondary));border-radius:1px;"></div>
-        <div style="font-family:var(--font-mono);font-size:8px;color:var(--text-muted);letter-spacing:3px;font-weight:700;">QUICK ACTIONS</div>
-        <div style="flex:1;height:1px;background:linear-gradient(90deg,rgba(99,102,241,0.15),transparent);"></div>
+      <div class="tas-bal" id="tas-bal" style="display:none;">
+        <span class="tas-bal-label">Balance</span>
+        <span class="tas-bal-right"><span class="tas-bal-amt" id="tas-bal-amt"></span><span class="tas-bal-usd" id="tas-bal-usd"></span></span>
       </div>
 
-      <div style="display:flex;flex-direction:column;gap:10px;">
-
-        <!-- SWAP + BRIDGE row -->
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-
-          <!-- SWAP button — rounded box -->
-          <div id="tas-swap-btn" style="display:flex;flex-direction:column;align-items:center;gap:12px;padding:18px 12px 16px;background:linear-gradient(155deg,rgba(99,102,241,0.16),rgba(139,92,246,0.1));border:1px solid rgba(99,102,241,0.32);border-radius:24px;cursor:pointer;transition:all 0.22s cubic-bezier(0.34,1.4,0.64,1);position:relative;overflow:hidden;box-shadow:0 4px 20px rgba(99,102,241,0.1),inset 0 1px 0 rgba(255,255,255,0.06);" onmousedown="this.style.transform='scale(0.95)';this.style.borderColor='rgba(99,102,241,0.6)';this.style.boxShadow='0 0 28px rgba(99,102,241,0.3)'" onmouseup="this.style.transform='';this.style.borderColor='rgba(99,102,241,0.32)';this.style.boxShadow='0 4px 20px rgba(99,102,241,0.1)'" ontouchstart="this.style.transform='scale(0.95)';this.style.borderColor='rgba(99,102,241,0.6)';this.style.boxShadow='0 0 28px rgba(99,102,241,0.3)'" ontouchend="this.style.transform='';this.style.borderColor='rgba(99,102,241,0.32)';this.style.boxShadow='0 4px 20px rgba(99,102,241,0.1)'">
-            <div style="position:absolute;top:-20px;right:-20px;width:80px;height:80px;border-radius:50%;background:radial-gradient(circle,rgba(99,102,241,0.18),transparent 70%);pointer-events:none;"></div>
-            <div style="position:absolute;bottom:-15px;left:-15px;width:60px;height:60px;border-radius:50%;background:radial-gradient(circle,rgba(139,92,246,0.12),transparent 70%);pointer-events:none;"></div>
-            <!-- Fully round icon -->
-            <div style="width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,var(--accent-primary),var(--accent-secondary));display:flex;align-items:center;justify-content:center;box-shadow:0 0 22px rgba(99,102,241,0.55),0 6px 16px rgba(0,0,0,0.4);border:2px solid rgba(255,255,255,0.15);">
-              <span class="material-icons-round" style="font-size:24px;color:#fff;">swap_horiz</span>
-            </div>
-            <div style="text-align:center;position:relative;z-index:1;">
-              <div style="font-size:13px;font-weight:800;letter-spacing:1px;background:linear-gradient(90deg,#a5b4fc,#c4b5fd);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">SWAP</div>
-              <div style="font-size:9px;color:var(--text-muted);font-family:var(--font-mono);margin-top:3px;">${t.sub} → token</div>
-            </div>
-          </div>
-
-          <!-- BRIDGE button — rounded box -->
-          <div id="tas-bridge-btn" style="display:flex;flex-direction:column;align-items:center;gap:12px;padding:18px 12px 16px;background:linear-gradient(155deg,rgba(6,182,212,0.14),rgba(34,211,238,0.08));border:1px solid rgba(6,182,212,0.28);border-radius:24px;cursor:pointer;transition:all 0.22s cubic-bezier(0.34,1.4,0.64,1);position:relative;overflow:hidden;box-shadow:0 4px 20px rgba(6,182,212,0.09),inset 0 1px 0 rgba(255,255,255,0.06);" onmousedown="this.style.transform='scale(0.95)';this.style.borderColor='rgba(6,182,212,0.58)';this.style.boxShadow='0 0 28px rgba(6,182,212,0.28)'" onmouseup="this.style.transform='';this.style.borderColor='rgba(6,182,212,0.28)';this.style.boxShadow='0 4px 20px rgba(6,182,212,0.09)'" ontouchstart="this.style.transform='scale(0.95)';this.style.borderColor='rgba(6,182,212,0.58)';this.style.boxShadow='0 0 28px rgba(6,182,212,0.28)'" ontouchend="this.style.transform='';this.style.borderColor='rgba(6,182,212,0.28)';this.style.boxShadow='0 4px 20px rgba(6,182,212,0.09)'">
-            <div style="position:absolute;top:-20px;right:-20px;width:80px;height:80px;border-radius:50%;background:radial-gradient(circle,rgba(6,182,212,0.15),transparent 70%);pointer-events:none;"></div>
-            <div style="position:absolute;bottom:-15px;left:-15px;width:60px;height:60px;border-radius:50%;background:radial-gradient(circle,rgba(34,211,238,0.1),transparent 70%);pointer-events:none;"></div>
-            <!-- Fully round icon -->
-            <div style="width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,var(--accent-tertiary),var(--neon-cyan));display:flex;align-items:center;justify-content:center;box-shadow:0 0 22px rgba(6,182,212,0.5),0 6px 16px rgba(0,0,0,0.4);border:2px solid rgba(255,255,255,0.15);">
-              <span class="material-icons-round" style="font-size:24px;color:#fff;">alt_route</span>
-            </div>
-            <div style="text-align:center;position:relative;z-index:1;">
-              <div style="font-size:13px;font-weight:800;letter-spacing:1px;background:linear-gradient(90deg,#67e8f9,#a5f3fc);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">BRIDGE</div>
-              <div style="font-size:9px;color:var(--text-muted);font-family:var(--font-mono);margin-top:3px;">${t.sub} → chain</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- SEND button — rounded wide box -->
-        <div id="tas-send-btn" style="display:flex;align-items:center;gap:16px;padding:16px 18px;background:linear-gradient(155deg,rgba(245,158,11,0.13),rgba(217,119,6,0.08));border:1px solid rgba(245,158,11,0.28);border-radius:24px;cursor:pointer;transition:all 0.22s cubic-bezier(0.34,1.4,0.64,1);position:relative;overflow:hidden;box-shadow:0 4px 20px rgba(245,158,11,0.09),inset 0 1px 0 rgba(255,255,255,0.06);" onmousedown="this.style.transform='scale(0.97)';this.style.borderColor='rgba(245,158,11,0.55)';this.style.boxShadow='0 0 28px rgba(245,158,11,0.25)'" onmouseup="this.style.transform='';this.style.borderColor='rgba(245,158,11,0.28)';this.style.boxShadow='0 4px 20px rgba(245,158,11,0.09)'" ontouchstart="this.style.transform='scale(0.97)';this.style.borderColor='rgba(245,158,11,0.55)';this.style.boxShadow='0 0 28px rgba(245,158,11,0.25)'" ontouchend="this.style.transform='';this.style.borderColor='rgba(245,158,11,0.28)';this.style.boxShadow='0 4px 20px rgba(245,158,11,0.09)'">
-          <div style="position:absolute;top:-24px;right:-24px;width:100px;height:100px;border-radius:50%;background:radial-gradient(circle,rgba(245,158,11,0.12),transparent 70%);pointer-events:none;"></div>
-          <!-- Fully round icon -->
-          <div style="width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,#f59e0b,#d97706);display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 0 22px rgba(245,158,11,0.5),0 6px 16px rgba(0,0,0,0.4);border:2px solid rgba(255,255,255,0.15);">
-            <span class="material-icons-round" style="font-size:24px;color:#fff;">send</span>
-          </div>
-          <div style="flex:1;position:relative;z-index:1;">
-            <div style="font-size:14px;font-weight:800;letter-spacing:0.8px;background:linear-gradient(90deg,#fcd34d,#fbbf24);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">SEND</div>
-            <div style="font-size:10px;color:var(--text-muted);font-family:var(--font-mono);margin-top:3px;">${t.sub} on ${chainName} pre-selected</div>
-          </div>
-          <!-- Arrow chip -->
-          <div style="width:34px;height:34px;border-radius:50%;background:rgba(245,158,11,0.15);border:1px solid rgba(245,158,11,0.3);display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 0 10px rgba(245,158,11,0.15);">
-            <span class="material-icons-round" style="font-size:18px;color:var(--accent-amber);">arrow_forward</span>
-          </div>
-        </div>
+      <div class="tas-label">Actions</div>
+      <div class="tas-list">
+        <button type="button" id="tas-send-btn" class="tas-item">
+          <span class="tas-ic send"><span class="material-icons-round">send</span></span>
+          <span class="tas-txt"><span class="tas-t">Send</span><span class="tas-s">${t.sub} on ${chainName} pre-selected</span></span>
+          <span class="material-icons-round tas-chev">chevron_right</span>
+        </button>
+        <button type="button" id="tas-swap-btn" class="tas-item">
+          <span class="tas-ic swap"><span class="material-icons-round">swap_horiz</span></span>
+          <span class="tas-txt"><span class="tas-t">Swap</span><span class="tas-s">${t.sub} to another token</span></span>
+          <span class="material-icons-round tas-chev">chevron_right</span>
+        </button>
+        <button type="button" id="tas-bridge-btn" class="tas-item">
+          <span class="tas-ic bridge"><span class="material-icons-round">alt_route</span></span>
+          <span class="tas-txt"><span class="tas-t">Bridge</span><span class="tas-s">${t.sub} to another network</span></span>
+          <span class="material-icons-round tas-chev">chevron_right</span>
+        </button>
       </div>
     </div>`;
 
@@ -117,6 +61,17 @@ function showTokenSwapSheet(t) {
     logoEl.style.height = '100%';
     tasIcon.appendChild(logoEl);
   }
+
+  // Balance row: read the live values already shown on the home token card
+  (function() {
+    const card = document.getElementById('token-card-' + t.id);
+    const amt = ((card && card.querySelector('.token-amount')) || {}).textContent || '';
+    const usd = ((card && card.querySelector('.token-usd')) || {}).textContent || '';
+    if (!amt.trim()) return;
+    overlay.querySelector('#tas-bal-amt').textContent = amt.trim() + ' ' + t.sub;
+    overlay.querySelector('#tas-bal-usd').textContent = usd.trim();
+    overlay.querySelector('#tas-bal').style.display = 'flex';
+  })();
 
   requestAnimationFrame(() => requestAnimationFrame(() => {
     overlay.style.opacity = '1';

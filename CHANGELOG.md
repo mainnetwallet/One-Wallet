@@ -10,6 +10,11 @@ Per-build release notes are published on the [Releases](../../releases) page.
   `data-no-swipe`); leave with the header back arrow or the hardware back button. Hardware back now closes the
   top layer first: Confirm transaction sheet, then Select token sheet, then the Send screen, then returns to the
   previous page. The bottom nav stays visible while Send is open.
+- **Token action sheet redesign:** tapping a token now opens a calm bottom sheet: token header with chain dot, round
+  chart and close buttons, a **Balance** row (read from the home token card), and Send / Swap / Bridge as one grouped
+  list with a short subtitle each (no gradients or glow). Handlers unchanged (Send pre-selects token and chain, Swap and
+  Bridge pass the token, Chart opens the full chart); swipe-down still closes this sheet. Styles moved from inline to
+  `.tas-*` classes in `home-header-portfolio-and-token-list.css`.
 - **Receive screen polish:** Group and Wallet stay as two dropdowns (taller, rounder, same field style as Send),
   larger QR with soft glow, balanced address card, COPY / SHARE buttons with a green "COPIED" state (now a CSS
   class instead of inline colors), and a note that the same address works on all EVM networks. Logic unchanged.
