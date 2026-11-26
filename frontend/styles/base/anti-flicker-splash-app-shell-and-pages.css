@@ -57,10 +57,11 @@
   }
 
   .splash-wordmark {
-    font-size: 32px; font-weight: 800;
-    letter-spacing: 8px;
-    background: linear-gradient(90deg, var(--neon-purple), var(--accent-tertiary));
-    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    font-family: var(--font-ui);
+    font-size: 24px; font-weight: 500;
+    letter-spacing: 3px;
+    color: var(--text-primary);
+    white-space: nowrap;
   }
   .splash-tagline {
     font-family: var(--font-mono); font-size: 11px;
@@ -68,14 +69,14 @@
     animation: fadeUp 0.8s ease 0.5s both;
   }
   .splash-loader {
-    width: 120px; height: 2px;
+    width: 56px; height: 2px;
     background: var(--border-subtle);
     border-radius: 2px; overflow: hidden;
-    margin-top: 20px;
+    margin-top: 6px;
   }
   .splash-loader-bar {
     height: 100%;
-    background: linear-gradient(90deg, var(--accent-primary), var(--neon-cyan));
+    background: var(--accent-primary);
     border-radius: 2px;
     animation: splashLoad 1.4s cubic-bezier(0.22,1,0.36,1) forwards;
   }

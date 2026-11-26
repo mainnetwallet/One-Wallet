@@ -1,8 +1,8 @@
 <!-- ── ONE APP LOCK SCREEN ── -->
-<div id="one-lock-overlay" style="display:flex;position:fixed;inset:0;z-index:99999;background:var(--bg-void);flex-direction:column;align-items:center;justify-content:center;font-family:var(--font-display);">
+<div id="one-lock-overlay" style="display:flex;position:fixed;inset:0;z-index:99999;background:var(--bg-void);flex-direction:column;align-items:center;justify-content:flex-start;padding-top:calc(env(safe-area-inset-top,0px) + 14vh);box-sizing:border-box;font-family:var(--font-ui);">
 
-  <div style="font-size:22px;font-weight:700;color:var(--text-primary);margin-bottom:6px;">Welcome back</div>
-  <div style="font-size:13px;color:var(--text-secondary);margin-bottom:28px;">Unlock to continue</div>
+  <div style="font-size:24px;font-weight:500;letter-spacing:-0.2px;color:var(--text-primary);margin-bottom:8px;">Welcome back</div>
+  <div id="nlk-sub" style="font-size:14px;color:var(--text-secondary);margin-bottom:28px;">Unlock to continue</div>
 
   <!-- ═══ BIOMETRIC PANEL ═══ -->
   <div id="nlk-bio-panel" style="display:none;flex-direction:column;align-items:center;gap:16px;width:100%;max-width:320px;padding:0 24px;">
@@ -15,7 +15,7 @@
 
   <!-- ═══ PIN PANEL ═══ -->
   <div id="nlk-pin-panel" style="display:none;flex-direction:column;align-items:center;gap:0;width:100%;max-width:340px;padding:0 20px;">
-    <div id="nlk-pin-dots" style="display:flex;gap:20px;margin-bottom:32px;align-items:center;">
+    <div id="nlk-pin-dots" style="display:flex;gap:16px;margin-bottom:28px;align-items:center;">
       <div class="nlk-dot" id="nlk-dot-0"></div>
       <div class="nlk-dot" id="nlk-dot-1"></div>
       <div class="nlk-dot" id="nlk-dot-2"></div>
@@ -23,7 +23,7 @@
       <div class="nlk-dot" id="nlk-dot-4"></div>
       <div class="nlk-dot" id="nlk-dot-5"></div>
     </div>
-    <div id="nlk-keypad" style="display:grid;grid-template-columns:repeat(3,72px);row-gap:14px;column-gap:22px;width:fit-content;margin:0 auto;">
+    <div id="nlk-keypad" style="display:grid;grid-template-columns:repeat(3,72px);row-gap:8px;column-gap:18px;width:fit-content;margin:0 auto;">
       <button class="nlk-key" onclick="oneLock._pinKey('1')">1</button>
       <button class="nlk-key" onclick="oneLock._pinKey('2')">2</button>
       <button class="nlk-key" onclick="oneLock._pinKey('3')">3</button>
@@ -35,15 +35,14 @@
       <button class="nlk-key" onclick="oneLock._pinKey('9')">9</button>
       <button class="nlk-key nlk-key-alt" id="nlk-pin-alt1-btn" style="visibility:hidden;"></button>
       <button class="nlk-key" onclick="oneLock._pinKey('0')">0</button>
-      <button class="nlk-key nlk-key-alt" onclick="oneLock._pinBackspace()"><span class="material-icons-round" style="font-size:22px;">backspace</span></button>
+      <button class="nlk-key nlk-key-alt" onclick="oneLock._pinBackspace()"><span class="material-icons-round" style="font-size:24px;">backspace</span></button>
     </div>
     <div id="nlk-pin-err" style="margin-top:16px;font-size:12px;color:var(--accent-red);min-height:16px;text-align:center;"></div>
     <div id="nlk-pin-alt-btns" style="display:flex;gap:10px;margin-top:12px;flex-wrap:wrap;justify-content:center;"></div>
   </div>
 
   <!-- ═══ PATTERN PANEL ═══ -->
-  <div id="nlk-pattern-panel" style="display:none;flex-direction:column;align-items:center;gap:0;width:100%;max-width:320px;padding:0 24px;">
-    <div style="font-size:13px;color:var(--text-secondary);margin-bottom:16px;">Draw your pattern</div>
+  <div id="nlk-pattern-panel" style="display:none;flex-direction:column;align-items:center;gap:0;width:100%;max-width:320px;padding:0 24px;margin-top:max(24px,12vh);">
     <canvas id="nlk-pattern-canvas" width="270" height="270" style="touch-action:none;cursor:crosshair;border-radius:16px;"></canvas>
     <div id="nlk-pat-err" style="margin-top:12px;font-size:12px;color:var(--accent-red);min-height:16px;"></div>
     <div id="nlk-pat-alt-btns" style="display:flex;gap:10px;margin-top:10px;flex-wrap:wrap;justify-content:center;"></div>

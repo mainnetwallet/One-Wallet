@@ -98,6 +98,8 @@ window.oneLock = (function() {
     ov.style.display='flex';
     ['bio','pin','pattern'].forEach(function(p){var el=document.getElementById('nlk-'+p+'-panel');if(el)el.style.display='none';});
     var t=document.getElementById('nlk-'+panel+'-panel');if(t)t.style.display='flex';
+    var sub=document.getElementById('nlk-sub');
+    if(sub)sub.textContent=panel==='pin'?'Enter your PIN to unlock':panel==='pattern'?'Draw your pattern to unlock':'Use biometrics to unlock';
     _renderAltBtns(panel);
   }
 
@@ -157,9 +159,9 @@ window.oneLock = (function() {
   function _renderAltBtns(cur){
     // Show ONLY methods that are SET (excluding current panel)
     var all=[
-      {id:'bio',     label:'Biometric', icon:'fingerprint'},
-      {id:'pin',     label:'PIN',       icon:'dialpad'},
-      {id:'pattern', label:'Pattern',   icon:'pattern'},
+      {id:'bio',     label:'biometric'},
+      {id:'pin',     label:'PIN'},
+      {id:'pattern', label:'pattern'},
     ];
     var others=all.filter(function(m){
       if(m.id===cur)return false;
@@ -168,28 +170,27 @@ window.oneLock = (function() {
       if(m.id==='pattern')return _hasPat();
       return false;
     });
-    var s='padding:8px 16px;background:var(--bg-glass);border:1px solid var(--border-subtle);border-radius:10px;color:var(--text-secondary);font-size:12px;cursor:pointer;font-family:var(--font-display);display:inline-flex;align-items:center;gap:5px;margin:4px;transition:all 0.15s;';
-    var html=others.map(function(m){
-      // All shown methods are already set — directly switch to them
+    var hasBioAlt=others.some(function(m){return m.id==='bio';});
+    // On the PIN keypad biometric is the fingerprint key, so no text link for it there
+    var links=others.filter(function(m){return !(cur==='pin'&&m.id==='bio');});
+    var s='padding:10px 14px;background:none;border:none;color:#8b8df5;font-size:14px;cursor:pointer;font-family:var(--font-ui);margin:2px;';
+    var html=links.map(function(m){
       var action='oneLock._showPanel(\''+m.id+'\')';
-      return '<button onclick="'+action+'" style="'+s+'">'
-           + '<span class="material-icons-round" style="font-size:14px;">'+m.icon+'</span>'
-           + m.label+'</button>';
+      return '<button onclick="'+action+'" style="'+s+'">Use '+m.label+' instead</button>';
     }).join('');
     [['bio','bio'],['pin','pin'],['pattern','pat']].forEach(function(pair){
       var el=document.getElementById('nlk-'+pair[1]+'-alt-btns');
       if(el){ el.innerHTML=html; el.style.display='flex'; }
     });
-    // PIN keypad bottom-left slot
+    // PIN keypad bottom-left slot = fingerprint key (only when biometric is set up)
     var slot=document.getElementById('nlk-pin-alt1-btn');
     if(slot){
-      var o=others[0];
-      if(o){
+      if(hasBioAlt&&cur==='pin'){
         slot.style.display='';
         slot.style.visibility='visible';
-        if(o.id==='bio'){slot.innerHTML='<span class="material-icons-round" style="font-size:28px;color:var(--accent-tertiary);">fingerprint</span>';slot.setAttribute('aria-label','Use biometric');}
-        else{slot.textContent=o.label;}
-        (function(id){slot.onclick=function(){oneLock._showPanel(id);};})(o.id);
+        slot.innerHTML='<span class="material-icons-round" style="font-size:28px;color:var(--accent-tertiary);">fingerprint</span>';
+        slot.setAttribute('aria-label','Use biometric');
+        slot.onclick=function(){oneLock._showPanel('bio');};
       } else {
         slot.style.visibility='hidden';
         slot.onclick=null;
@@ -660,8 +661,8 @@ window.oneLock = (function() {
 
     function draw(){
       ctx.clearRect(0,0,SIZE,SIZE);
-      // Draw lines
-      ctx.strokeStyle='rgba(99,102,241,0.5)';ctx.lineWidth=3;ctx.lineCap='round';
+      // Lines between touched dots
+      ctx.strokeStyle='rgba(99,102,241,0.85)';ctx.lineWidth=3;ctx.lineCap='round';ctx.lineJoin='round';
       for(var i=1;i<path.length;i++){
         ctx.beginPath();ctx.moveTo(dots[path[i-1]].x,dots[path[i-1]].y);
         ctx.lineTo(dots[path[i]].x,dots[path[i]].y);ctx.stroke();
@@ -670,15 +671,17 @@ window.oneLock = (function() {
         ctx.beginPath();ctx.moveTo(dots[path[path.length-1]].x,dots[path[path.length-1]].y);
         ctx.lineTo(mx,my);ctx.stroke();
       }
-      // Draw dots
+      // Dots: small and quiet when idle, solid accent + thin ring when touched
       dots.forEach(function(d){
         var active=path.indexOf(d.idx)>=0;
-        ctx.beginPath();ctx.arc(d.x,d.y,R,0,Math.PI*2);
-        ctx.fillStyle=active?'rgba(99,102,241,0.9)':'rgba(99,102,241,0.18)';ctx.fill();
-        ctx.strokeStyle=active?'rgba(99,102,241,1)':'rgba(99,102,241,0.35)';ctx.lineWidth=2;ctx.stroke();
         if(active){
+          ctx.beginPath();ctx.arc(d.x,d.y,R-5,0,Math.PI*2);
+          ctx.strokeStyle='rgba(99,102,241,0.35)';ctx.lineWidth=1;ctx.stroke();
           ctx.beginPath();ctx.arc(d.x,d.y,8,0,Math.PI*2);
-          ctx.fillStyle='#fff';ctx.fill();
+          ctx.fillStyle='#6366f1';ctx.fill();
+        } else {
+          ctx.beginPath();ctx.arc(d.x,d.y,6,0,Math.PI*2);
+          ctx.fillStyle='rgba(255,255,255,0.2)';ctx.fill();
         }
       });
     }
