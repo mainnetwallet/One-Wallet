@@ -1,0 +1,61 @@
+        <!-- STEP 2: Keys & Settings -->
+        <div class="bsb-panel" id="bsb-step2" style="display:block;">
+
+          <div style="background:var(--bg-raised);border:1px solid var(--border-subtle);border-radius:var(--radius-md);padding:14px;margin-bottom:12px;">
+            <div style="font-size:11px;color:var(--accent-tertiary);font-weight:700;margin-bottom:12px;text-transform:uppercase;letter-spacing:1px;display:flex;align-items:center;gap:8px;font-family:var(--font-mono);">🔑 Private Keys</div>
+            <!-- Wallet Panel Picker Button -->
+            <button onclick="bsbOpenWalletPicker()" style="width:100%;display:flex;align-items:center;justify-content:center;gap:8px;padding:10px 14px;border-radius:10px;border:1px dashed rgba(99,102,241,0.4);background:rgba(99,102,241,0.06);color:var(--neon-purple);font-family:var(--font-mono);font-size:11px;font-weight:700;cursor:pointer;margin-bottom:10px;transition:all .18s;letter-spacing:.5px;" onmousedown="this.style.background='rgba(99,102,241,0.14)'" onmouseup="this.style.background='rgba(99,102,241,0.06)'" ontouchstart="this.style.background='rgba(99,102,241,0.14)'" ontouchend="this.style.background='rgba(99,102,241,0.06)'">
+              <span class="material-icons-round" style="font-size:15px;">account_balance_wallet</span>
+              Select Wallet
+            </button>
+            <label style="font-size:11px;color:var(--text-muted);display:block;margin-bottom:3px;font-family:var(--font-mono);">One per line (0x...)</label>
+            <div class="bsb-sk-wrapper" id="bsbKeysWrapper">
+              <textarea id="bsb-keys" placeholder="0xabc...&#10;0xdef..." class="bsb-sk-textarea sk-masked" autocomplete="off" spellcheck="false"></textarea>
+              <button type="button" class="bsb-sk-toggle-btn" id="bsbKeysToggleBtn" onclick="bsbToggleKeyVisibility()" title="Show/Hide Keys">
+                <span class="material-icons-round bsb-sk-eye-icon" id="bsbKeysEyeIcon">visibility_off</span>
+              </button>
+            </div>
+            <button onclick="bsbLoadKeys()" style="width:100%;padding:10px;border-radius:8px;border:none;cursor:pointer;font-size:13px;font-family:var(--font-mono);font-weight:bold;background:var(--accent-primary);color:#fff;display:flex;align-items:center;justify-content:center;gap:6px;">📂 Load Keys</button>
+            <div id="bsb-keyList" style="margin-top:10px;max-height:200px;overflow-y:auto;"></div>
+          </div>
+
+          <div style="background:var(--bg-raised);border:1px solid var(--border-subtle);border-radius:var(--radius-md);padding:14px;margin-bottom:12px;">
+            <div onclick="(function(){var b=document.getElementById('bsb-settings-body');var a=document.getElementById('bsb-settings-arrow');var open=b.style.display!=='none';b.style.display=open?'none':'block';a.style.transform=open?'rotate(-90deg)':'rotate(0deg)';a.style.transition='transform 0.25s ease';})()" style="font-size:11px;color:var(--accent-tertiary);font-weight:700;margin-bottom:0;text-transform:uppercase;letter-spacing:1px;display:flex;align-items:center;gap:8px;font-family:var(--font-mono);cursor:pointer;user-select:none;-webkit-user-select:none;">🎛️ Bot Settings<span id="bsb-settings-arrow" style="margin-left:auto;font-size:14px;color:var(--text-muted);transition:transform 0.25s ease;">▾</span></div>
+            <div id="bsb-settings-body" style="display:none;margin-top:12px;">
+            <label style="font-size:11px;color:var(--text-muted);display:block;margin-bottom:3px;font-family:var(--font-mono);">Swaps per Key (min – max)</label>
+            <div style="display:flex;gap:8px;margin-bottom:0;">
+              <input id="bsb-swMin" type="number" value="20" placeholder="min" style="flex:1;background:var(--bg-surface);border:1px solid var(--border-subtle);color:var(--text-primary);border-radius:8px;padding:7px 10px;font-size:11px;font-family:var(--font-mono);margin-bottom:8px;outline:none;"/>
+              <input id="bsb-swMax" type="number" value="30" placeholder="max" style="flex:1;background:var(--bg-surface);border:1px solid var(--border-subtle);color:var(--text-primary);border-radius:8px;padding:7px 10px;font-size:11px;font-family:var(--font-mono);margin-bottom:8px;outline:none;"/>
+            </div>
+            <label style="font-size:11px;color:var(--text-muted);display:block;margin-bottom:3px;font-family:var(--font-mono);">Swap Amount per Txn (tokens)</label>
+            <div style="display:flex;gap:8px;">
+              <input id="bsb-amMin" type="number" value="1000" placeholder="min" style="flex:1;background:var(--bg-surface);border:1px solid var(--border-subtle);color:var(--text-primary);border-radius:8px;padding:7px 10px;font-size:11px;font-family:var(--font-mono);margin-bottom:8px;outline:none;"/>
+              <input id="bsb-amMax" type="number" value="5000" placeholder="max" style="flex:1;background:var(--bg-surface);border:1px solid var(--border-subtle);color:var(--text-primary);border-radius:8px;padding:7px 10px;font-size:11px;font-family:var(--font-mono);margin-bottom:8px;outline:none;"/>
+            </div>
+            <label style="font-size:11px;color:var(--text-muted);display:block;margin-bottom:3px;font-family:var(--font-mono);">Liquidity % of Balance</label>
+            <div style="display:flex;gap:8px;">
+              <input id="bsb-lqMin" type="number" value="5" placeholder="min" style="flex:1;background:var(--bg-surface);border:1px solid var(--border-subtle);color:var(--text-primary);border-radius:8px;padding:7px 10px;font-size:11px;font-family:var(--font-mono);margin-bottom:8px;outline:none;"/>
+              <input id="bsb-lqMax" type="number" value="10" placeholder="max" style="flex:1;background:var(--bg-surface);border:1px solid var(--border-subtle);color:var(--text-primary);border-radius:8px;padding:7px 10px;font-size:11px;font-family:var(--font-mono);margin-bottom:8px;outline:none;"/>
+            </div>
+            <label style="font-size:11px;color:var(--text-muted);display:block;margin-bottom:3px;font-family:var(--font-mono);">Delay Between Ops (ms)</label>
+            <div style="display:flex;gap:8px;">
+              <input id="bsb-dlMin" type="number" value="2000" placeholder="min" style="flex:1;background:var(--bg-surface);border:1px solid var(--border-subtle);color:var(--text-primary);border-radius:8px;padding:7px 10px;font-size:11px;font-family:var(--font-mono);margin-bottom:8px;outline:none;"/>
+              <input id="bsb-dlMax" type="number" value="5000" placeholder="max" style="flex:1;background:var(--bg-surface);border:1px solid var(--border-subtle);color:var(--text-primary);border-radius:8px;padding:7px 10px;font-size:11px;font-family:var(--font-mono);margin-bottom:8px;outline:none;"/>
+            </div>
+            <label style="font-size:11px;color:var(--text-muted);display:block;margin-bottom:6px;font-family:var(--font-mono);">Swap Slippage</label>
+            <div style="display:flex;gap:6px;margin-bottom:4px;">
+              <div id="bsb-slip-01" onclick="bsbSelectSlip(0.1)" style="flex:1;text-align:center;padding:6px 0;border-radius:7px;font-size:11px;font-family:var(--font-mono);font-weight:700;cursor:pointer;background:var(--bg-surface);color:var(--text-secondary);border:1px solid var(--border-subtle);">0.1%</div>
+              <div id="bsb-slip-05" onclick="bsbSelectSlip(0.5)" style="flex:1;text-align:center;padding:6px 0;border-radius:7px;font-size:11px;font-family:var(--font-mono);font-weight:700;cursor:pointer;background:var(--bg-surface);color:var(--text-secondary);border:1px solid var(--border-subtle);">0.5%</div>
+              <div id="bsb-slip-10" onclick="bsbSelectSlip(1.0)" style="flex:1;text-align:center;padding:6px 0;border-radius:7px;font-size:11px;font-family:var(--font-mono);font-weight:700;cursor:pointer;background:var(--bg-surface);color:var(--text-secondary);border:1px solid var(--border-subtle);">1.0%</div>
+              <div id="bsb-slip-30" onclick="bsbSelectSlip(3.0)" style="flex:1;text-align:center;padding:6px 0;border-radius:7px;font-size:11px;font-family:var(--font-mono);font-weight:700;cursor:pointer;background:var(--bg-surface);color:var(--text-secondary);border:1px solid var(--border-subtle);">3.0%</div>
+              <div id="bsb-slip-15" onclick="bsbSelectSlip(15)" style="flex:1;text-align:center;padding:6px 0;border-radius:7px;font-size:11px;font-family:var(--font-mono);font-weight:700;cursor:pointer;background:var(--accent-primary);color:#fff;border:1px solid var(--accent-primary);">15%</div>
+            </div>
+            <input id="bsb-slip-custom" type="number" placeholder="Custom %" min="0.01" max="50" step="0.1" oninput="bsbSelectSlipCustom(this.value)" style="width:100%;background:var(--bg-surface);border:1px solid var(--border-subtle);color:var(--text-primary);border-radius:8px;padding:7px 10px;font-size:11px;font-family:var(--font-mono);margin-top:4px;margin-bottom:4px;outline:none;box-sizing:border-box;"/>
+            <input type="hidden" id="bsb-slip-val" value="15"/>
+            </div><!-- /bsb-settings-body -->
+          </div>
+
+          <!-- Go to Run button -->
+          <button onclick="bsbGoStep(3)" style="width:100%;padding:13px;border-radius:8px;border:none;cursor:pointer;font-size:14px;font-family:var(--font-mono);font-weight:bold;background:linear-gradient(135deg,#3b82f6,#8b5cf6);color:#fff;display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:12px;">🚀 Go to Run →</button>
+
+        </div><!-- /bsb-step2 -->

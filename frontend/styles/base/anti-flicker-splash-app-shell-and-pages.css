@@ -1,0 +1,181 @@
+  /* ── WebView Anti-Flicker ── */
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+  /* Prevent white flash on page transitions in Android WebView */
+  html, body {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  /* GPU-accelerated layers for all overlay/modal elements */
+  [style*="position:fixed"], [style*="position: fixed"],
+  .modal, .overlay, .drawer, .toast {
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+  }
+  
+  html, body {
+    width:100%; height:100%;
+    background: var(--bg-void);
+    overflow: hidden;
+    font-family: var(--font-display);
+    color: var(--text-primary);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ── SPLASH SCREEN ── */
+  #splash {
+    position: fixed; inset: 0; z-index: 1000;
+    background: var(--bg-void);
+    display: none; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 20px;
+    transition: opacity 0.25s ease, transform 0.25s ease;
+    will-change: opacity, transform;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
+  }
+  #splash.hide { opacity: 0; transform: translateZ(0) scale(1.04); pointer-events: none; }
+
+  .splash-logo {
+    width: 80px; height: 80px;
+    border-radius: 18px;
+    background: transparent;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 36px; color: #fff;
+    box-shadow: 0 0 30px rgba(37,99,235,0.45);
+    animation: splashPulse 1.5s ease-in-out infinite alternate;
+  }
+  @keyframes splashPulse {
+    from { box-shadow: 0 0 20px rgba(37,99,235,0.4), 0 0 60px rgba(37,99,235,0.1); }
+    to   { box-shadow: 0 0 40px rgba(37,99,235,0.7), 0 0 100px rgba(37,99,235,0.2); }
+  }
+
+  .splash-wordmark {
+    font-size: 32px; font-weight: 800;
+    letter-spacing: 8px;
+    background: linear-gradient(90deg, var(--neon-purple), var(--accent-tertiary));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .splash-tagline {
+    font-family: var(--font-mono); font-size: 11px;
+    color: var(--text-muted); letter-spacing: 3px;
+    animation: fadeUp 0.8s ease 0.5s both;
+  }
+  .splash-loader {
+    width: 120px; height: 2px;
+    background: var(--border-subtle);
+    border-radius: 2px; overflow: hidden;
+    margin-top: 20px;
+  }
+  .splash-loader-bar {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent-primary), var(--neon-cyan));
+    border-radius: 2px;
+    animation: loadBar 0.15s ease forwards;
+  }
+  @keyframes loadBar { from { width:0% } to { width:100% } }
+  @keyframes fadeUp { from { opacity:0; transform:translateY(10px) } to { opacity:1; transform:none } }
+
+  /* ── APP SHELL ── */
+  #app {
+    width: 100%; height: 100%;
+    display: flex; flex-direction: column;
+    opacity: 0; transition: opacity 0.35s ease, transform 0.35s cubic-bezier(0.22,1,0.36,1);
+    transform: translateY(18px) scale(0.98);
+    margin: 0;
+    position: relative; overflow: hidden;
+    background: var(--bg-deep);
+    will-change: opacity, transform;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+  }
+  #app.visible { opacity: 1; transform: translateY(0) scale(1); }
+
+  /* Lock overlay premium entrance */
+  #one-lock-overlay {
+    animation: none;
+  }
+  #one-lock-overlay.nlk-enter {
+    animation: nlkEnter 0.4s cubic-bezier(0.22,1,0.36,1) forwards;
+  }
+  @keyframes nlkEnter {
+    from { opacity: 0; transform: scale(0.96) translateY(12px); }
+    to   { opacity: 1; transform: scale(1)    translateY(0);    }
+  }
+
+
+  /* ── PAGES ── */
+  .pages {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+  }
+  .page {
+    position: absolute; inset: 0;
+    overflow-y: auto; overflow-x: hidden;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: calc(var(--nav-height) + env(safe-area-inset-bottom, 0px) + 20px);
+    opacity: 0; pointer-events: none; visibility: hidden;
+    transform: translateY(6px) translateZ(0);
+    transition: opacity 0.24s ease, transform 0.24s cubic-bezier(0.25,1,0.5,1), visibility 0s linear 0.24s;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    will-change: opacity, transform;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    overscroll-behavior-y: contain;
+  }
+
+  /* ── Global PTR Indicator — fixed overlay, works on ALL pages ── */
+  #ptr-indicator-global {
+    position: fixed;
+    top: 0;
+    left: 0; right: 0;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    padding: 10px 20px 8px;
+    background: rgba(10,10,18,0.94);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-bottom: 1px solid rgba(99,102,241,0.18);
+    transform: translateY(-100%);
+    opacity: 0;
+    transition: none;
+    pointer-events: none;
+  }
+  body.light-mode #ptr-indicator-global {
+    background: rgba(238,240,247,0.96) !important;
+    border-bottom-color: rgba(99,102,241,0.18) !important;
+  }
+  @keyframes _gptr_spin { to { transform: rotate(360deg); } }
+  @keyframes _wdSpin { to { transform: rotate(360deg); } }
+  @keyframes _gptr_done { 0%{opacity:1} 80%{opacity:1} 100%{opacity:0;transform:translateY(-100%)} }
+  #ptr-indicator-global.ptr-spinning #gptr-arc {
+    animation: _gptr_spin 0.7s linear infinite;
+    transform-origin: 11px 11px;
+    transform-box: fill-box;
+  }
+  #ptr-indicator-global.ptr-done {
+    animation: _gptr_done 1.4s ease forwards;
+  }
+  #br-recipient-display::-webkit-scrollbar { display: none; }
+  .page.active { opacity: 1; pointer-events: all; visibility: visible; transform: translateY(0) translateZ(0);
+    transition: opacity 0.24s ease, transform 0.24s cubic-bezier(0.25,1,0.5,1), visibility 0s linear 0s; }
+  @keyframes _bsb_pulse {
+    0%,100% { opacity:1; box-shadow:0 0 6px rgba(16,185,129,0.5); }
+    50%      { opacity:0.6; box-shadow:0 0 12px rgba(16,185,129,0.9); }
+  }
+  #page-swap { overflow: hidden !important; display: flex; flex-direction: column; }
+  #sw-scroll-body { flex: 1; min-height: 0; }
+  #page-nansen { overflow: hidden !important; display: flex; flex-direction: column; height: 100%; padding-bottom: 0 !important; }
+  #page-delegation { overflow: hidden !important; display: flex; flex-direction: column; height: 100%; padding-bottom: 0 !important; }
+  #page-bridge { overflow: hidden !important; display: flex; flex-direction: column; height: 100%; }

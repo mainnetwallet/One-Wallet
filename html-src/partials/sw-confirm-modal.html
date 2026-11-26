@@ -1,0 +1,111 @@
+    <div id="sw-confirm-modal" onclick="if(event.target===this)swCloseConfirm()" ontouchend="if(event.target===this){event.preventDefault();swCloseConfirm();}">
+      <div id="sw-confirm-sheet">
+
+        <!-- Drag Handle -->
+        <div class="cs-handle"></div>
+
+        <!-- Scrollable Body -->
+        <div id="sw-confirm-scroll">
+
+
+          <!-- Header -->
+          <div class="cs-header">
+            <div class="cs-header-left">
+              <div class="cs-icon-wrap">
+                <span class="material-icons-round" style="font-size:17px;color:#fff;">swap_horiz</span>
+              </div>
+              <div>
+                <div class="cs-title">Confirm Swap</div>
+                <div class="cs-subtitle">REVIEW YOUR TRADE</div>
+              </div>
+            </div>
+            <div class="cs-close-btn" onclick="swCloseConfirm()">
+              <span class="material-icons-round" style="font-size:15px;color:var(--text-muted);">close</span>
+            </div>
+          </div>
+
+          <!-- Token Flow -->
+          <div class="cs-token-card">
+            <!-- FROM -->
+            <div class="cs-token-row">
+              <div class="cs-token-left">
+                <div id="sw-conf-from-icon" class="cs-token-icon" style="background:linear-gradient(135deg,#627EEA,#364FC7);">Ξ</div>
+                <div>
+                  <div id="sw-conf-from-sym" class="cs-token-name">ETH</div>
+                  <div class="cs-token-tag">YOU PAY</div>
+                </div>
+              </div>
+              <div id="sw-conf-from-amt" class="cs-token-amt" style="color:var(--text-primary);">0.00</div>
+            </div>
+            <!-- Divider arrow -->
+            <div class="cs-arrow-row">
+              <div class="cs-arrow-dot">
+                <span class="material-icons-round" style="font-size:13px;color:var(--neon-purple);">arrow_downward</span>
+              </div>
+            </div>
+            <!-- TO -->
+            <div class="cs-token-row">
+              <div class="cs-token-left">
+                <div id="sw-conf-to-icon" class="cs-token-icon" style="background:linear-gradient(135deg,#2775CA,#1557A0);">$</div>
+                <div>
+                  <div id="sw-conf-to-sym" class="cs-token-name">USDC</div>
+                  <div class="cs-token-tag">YOU RECEIVE</div>
+                </div>
+              </div>
+              <div id="sw-conf-to-amt" class="cs-token-amt" style="color:var(--accent-green);">0.00</div>
+            </div>
+          </div>
+
+          <!-- Details -->
+          <div class="cs-details">
+            <div class="cs-detail-row">
+              <div class="cs-detail-label">
+                <span class="material-icons-round" style="font-size:11px;">price_change</span>Price
+              </div>
+              <span id="sw-conf-rate" class="cs-detail-val">—</span>
+            </div>
+            <div class="cs-detail-row">
+              <div class="cs-detail-label">
+                <span class="material-icons-round" style="font-size:11px;">trending_down</span>Price Impact
+              </div>
+              <span id="sw-conf-impact" class="cs-detail-val" style="color:var(--accent-green);">—</span>
+            </div>
+            <div class="cs-detail-row">
+              <div class="cs-detail-label">
+                <span class="material-icons-round" style="font-size:11px;">shield</span>Min. Received
+              </div>
+              <span id="sw-conf-min" class="cs-detail-val">—</span>
+            </div>
+            <div class="cs-detail-row">
+              <div class="cs-detail-label">
+                <span class="material-icons-round" style="font-size:11px;">tune</span>Slippage
+              </div>
+              <span id="sw-conf-slip" class="cs-detail-val" style="color:var(--accent-amber);">—</span>
+            </div>
+            <div class="cs-detail-row">
+              <div class="cs-detail-label">
+                <span class="material-icons-round" style="font-size:11px;">local_gas_station</span>Est. Gas Fee
+              </div>
+              <span id="sw-conf-gas" class="cs-detail-val">—</span>
+            </div>
+          </div>
+
+          <!-- DEX badge -->
+          <div class="cs-dex-badge" id="sw-conf-dex-badge">
+            <span class="material-icons-round" id="sw-conf-dex-icon" style="font-size:13px;color:var(--accent-green);">verified</span>
+            <span id="sw-conf-dex-label">via <strong id="sw-conf-dex">—</strong></span>
+          </div>
+
+        </div><!-- /scroll -->
+
+        <!-- Sticky Footer -->
+        <div id="sw-confirm-footer">
+          <button id="sw-conf-execute-btn" class="cs-confirm-btn" onclick="this.disabled=true;this.style.opacity='0.7';this.innerHTML='<span class=\'material-icons-round\' style=\'font-size:15px;animation:swSpin 0.8s linear infinite;\'>sync</span> Confirming…';swExecuteSwap()">
+            <span class="material-icons-round" style="font-size:16px;">rocket_launch</span>
+            Confirm &amp; Swap
+          </button>
+
+        </div>
+
+      </div><!-- /sheet -->
+    </div>

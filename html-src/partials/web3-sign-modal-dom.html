@@ -1,0 +1,25 @@
+<!-- Web3 Modal DOM -->
+<div id="one-w3-modal-overlay">
+  <div id="one-w3-modal">
+    <div class="w3m-handle"></div>
+    <div class="w3m-header">
+      <div class="w3m-site-icon" id="w3m-site-icon">🌐</div>
+      <div class="w3m-site-info">
+        <div class="w3m-site-name" id="w3m-site-name">Unknown Site</div>
+        <div class="w3m-action-label" id="w3m-action-label">REQUEST</div>
+      </div>
+    </div>
+    <div class="w3m-wallet-row" id="w3m-wallet-row" style="display:none;">
+      <div class="w3m-wallet-dot"></div>
+      <div class="w3m-wallet-label" id="w3m-wallet-label">Wallet</div>
+      <div class="w3m-wallet-addr" id="w3m-wallet-addr"></div>
+    </div>
+    <div class="w3m-body" id="w3m-body">
+      <!-- Filled dynamically -->
+    </div>
+    <div class="w3m-footer">
+      <button class="w3m-btn-reject" id="w3m-btn-reject" onclick="window._oneW3ModalReject()">Reject</button>
+      <button class="w3m-btn-approve" id="w3m-btn-approve" onclick="window._oneW3ModalApprove()">Approve</button>
+    </div>
+  </div>
+</div>

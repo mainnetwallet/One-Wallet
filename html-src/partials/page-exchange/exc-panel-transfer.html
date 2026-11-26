@@ -1,0 +1,85 @@
+        <!-- ── TRANSFER TAB ── -->
+    <div id="exc-panel-transfer" class="exc-panel" style="display:none;flex-direction:column;height:100%;overflow:hidden;background:var(--bg-deep);">
+
+      <!-- Header -->
+      <div style="display:flex;align-items:center;padding:14px 12px;flex-shrink:0;border-bottom:1px solid rgba(255,255,255,0.06);">
+        <div onclick="trfBack();rippleEffect(this,event)" style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;-webkit-tap-highlight-color:transparent;">
+          <span class="material-icons-round" style="color:var(--text-primary);font-size:24px;">arrow_back</span>
+        </div>
+        <div style="flex:1;text-align:center;font-size:17px;font-weight:700;color:var(--text-primary);font-family:var(--font-mono);margin-right:36px;letter-spacing:0.2px;">Transfer</div>
+        <div onclick="trfOpenHistory()" style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;-webkit-tap-highlight-color:transparent;">
+          <span class="material-icons-round" style="font-size:22px;color:var(--text-muted);">schedule</span>
+        </div>
+      </div>
+
+      <!-- No-transfer notice (shown for exchanges that don't support internal transfer) -->
+      <div id="trf-no-transfer-msg" style="display:none;flex:1;flex-direction:column;align-items:center;justify-content:center;padding:32px 24px;gap:14px;">
+        <span class="material-icons-round" style="font-size:48px;color:rgba(255,255,255,0.12);">block</span>
+        <div style="font-size:15px;font-weight:700;color:var(--text-primary);font-family:var(--font-mono);text-align:center;"><span id="trf-no-trf-name"></span></div>
+        <div style="font-size:13px;color:var(--text-muted);font-family:var(--font-mono);text-align:center;line-height:1.6;">This exchange does not support internal account transfers via API.</div>
+      </div>
+
+      <!-- Transfer form (hidden for unsupported exchanges) -->
+      <div id="trf-form-wrap" style="display:flex;flex-direction:column;flex:1;overflow:hidden;">
+
+      <!-- Scrollable content -->
+      <div style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:16px 16px 24px;">
+
+        <!-- From / To card -->
+        <div style="position:relative;background:var(--bg-surface);border:1px solid rgba(255,255,255,0.07);border-radius:16px;overflow:hidden;">
+          <div onclick="trfOpenAccountPicker('from')" style="display:flex;align-items:center;padding:18px 16px;cursor:pointer;-webkit-tap-highlight-color:transparent;">
+            <div style="width:54px;font-size:13px;color:var(--text-muted);font-family:var(--font-mono);letter-spacing:0.3px;">FROM</div>
+            <div id="trf-from-label" style="flex:1;font-size:16px;font-weight:700;color:var(--text-primary);font-family:var(--font-mono);">Funding</div>
+            <span class="material-icons-round" style="font-size:20px;color:var(--text-muted);">chevron_right</span>
+          </div>
+          <div style="height:1px;background:rgba(255,255,255,0.06);margin:0 16px;"></div>
+          <div onclick="trfOpenAccountPicker('to')" style="display:flex;align-items:center;padding:18px 16px;cursor:pointer;-webkit-tap-highlight-color:transparent;">
+            <div style="width:54px;font-size:13px;color:var(--text-muted);font-family:var(--font-mono);letter-spacing:0.3px;">TO</div>
+            <div id="trf-to-label" style="flex:1;font-size:16px;font-weight:700;color:var(--text-primary);font-family:var(--font-mono);">Spot Wallet</div>
+            <span class="material-icons-round" style="font-size:20px;color:var(--text-muted);">chevron_right</span>
+          </div>
+          <!-- Swap direction button -->
+          <div onclick="trfSwapDirection()" style="position:absolute;right:14px;top:50%;transform:translateY(-50%);width:34px;height:34px;border-radius:50%;background:var(--bg-raised);border:1px solid rgba(255,255,255,0.1);box-shadow:0 2px 8px rgba(0,0,0,0.4);display:flex;align-items:center;justify-content:center;cursor:pointer;-webkit-tap-highlight-color:transparent;">
+            <span class="material-icons-round" style="font-size:18px;color:var(--text-secondary);">swap_vert</span>
+          </div>
+        </div>
+
+        <!-- Coin label -->
+        <div style="font-size:10px;color:var(--text-muted);font-family:var(--font-mono);letter-spacing:0.8px;text-transform:uppercase;margin:22px 0 8px;">Coin</div>
+
+        <!-- Coin selector row -->
+        <div onclick="trfOpenCoinPicker()" style="display:flex;align-items:center;background:var(--bg-surface);border:1px solid rgba(255,255,255,0.07);border-radius:16px;padding:14px 16px;cursor:pointer;-webkit-tap-highlight-color:transparent;">
+          <div id="trf-coin-icon" style="width:32px;height:32px;border-radius:50%;background:#f0b90b;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-right:12px;font-size:15px;color:#fff;font-weight:700;">₿</div>
+          <div style="flex:1;display:flex;align-items:baseline;gap:6px;">
+            <span id="trf-coin-sym" style="font-size:16px;font-weight:700;color:var(--text-primary);font-family:var(--font-mono);">BTC</span>
+            <span id="trf-coin-name" style="font-size:12px;color:var(--text-muted);font-family:var(--font-mono);">Bitcoin</span>
+          </div>
+          <span class="material-icons-round" style="font-size:20px;color:var(--text-muted);">chevron_right</span>
+        </div>
+
+        <!-- Inline warning -->
+        <div id="trf-warning" style="display:none;font-size:13px;color:var(--accent-red,#f6465d);font-family:var(--font-mono);margin-top:14px;line-height:1.5;">No amount available to transfer, please select another coin.</div>
+
+        <!-- Amount label -->
+        <div style="font-size:10px;color:var(--text-muted);font-family:var(--font-mono);letter-spacing:0.8px;text-transform:uppercase;margin:22px 0 8px;">Amount</div>
+
+        <!-- Amount input -->
+        <div style="display:flex;align-items:center;background:var(--bg-surface);border:1px solid rgba(255,255,255,0.07);border-radius:16px;padding:16px 16px;">
+          <input id="trf-amount-input" type="text" inputmode="decimal" placeholder="0" oninput="trfOnAmountInput()" style="flex:1;border:none;outline:none;background:transparent;font-size:20px;font-weight:600;color:var(--text-primary);font-family:var(--font-mono);min-width:0;caret-color:var(--accent-primary);" />
+          <span id="trf-amount-unit" style="font-size:14px;font-weight:700;color:var(--text-secondary);font-family:var(--font-mono);margin-right:14px;">BTC</span>
+          <span onclick="trfSetMax()" style="font-size:13px;font-weight:700;color:var(--accent-amber,#f0b90b);font-family:var(--font-mono);cursor:pointer;-webkit-tap-highlight-color:transparent;">MAX</span>
+        </div>
+        <div style="font-size:12px;color:var(--text-muted);font-family:var(--font-mono);margin-top:8px;">
+          Available <span id="trf-available-amt" style="color:var(--text-secondary);">0.00000000</span> <span id="trf-available-sym" style="color:var(--text-secondary);">BTC</span>
+        </div>
+
+      </div>
+
+      <!-- Sticky footer -->
+      <div style="flex-shrink:0;padding:12px 16px calc(16px + env(safe-area-inset-bottom,0px));background:var(--bg-deep);border-top:1px solid rgba(255,255,255,0.06);">
+        <button id="trf-confirm-btn" onclick="trfConfirm()" disabled style="width:100%;border:none;border-radius:14px;padding:15px 0;font-size:14px;font-weight:800;font-family:var(--font-mono);cursor:pointer;background:rgba(240,185,11,0.2);color:rgba(240,185,11,0.4);transition:background .15s,color .15s;letter-spacing:0.5px;">CONFIRM TRANSFER</button>
+      </div>
+
+      </div><!-- /trf-form-wrap -->
+
+    </div><!-- /exc-panel-transfer -->

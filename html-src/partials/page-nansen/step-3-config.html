@@ -1,0 +1,134 @@
+        <!-- ══ STEP 3: CONFIG ══ -->
+        <div id="swap-step-3" style="display:none;">
+
+          <!-- Active pair display -->
+          <div id="active-pair-banner" style="background:rgba(34,211,238,0.08);border:1px solid rgba(34,211,238,0.2);border-radius:var(--radius-md);padding:10px 14px;margin-bottom:14px;display:flex;align-items:center;gap:10px;">
+            <span class="material-icons-round" style="color:var(--neon-cyan);font-size:18px;">swap_horiz</span>
+            <div style="flex:1;">
+              <div style="font-size:9px;font-weight:700;color:var(--text-muted);letter-spacing:1.5px;font-family:var(--font-mono);margin-bottom:3px;">ACTIVE PAIR</div>
+              <div id="active-pair-text" style="font-size:13px;font-weight:700;color:var(--neon-cyan);">— Select a pair —</div>
+            </div>
+            <div onclick="goToStep2()" style="font-size:10px;font-weight:700;color:var(--accent-primary);font-family:var(--font-mono);letter-spacing:1px;cursor:pointer;padding:4px 10px;border:1px solid rgba(99,102,241,0.3);border-radius:7px;">CHANGE</div>
+          </div>
+
+          <!-- Swap count per wallet -->
+          <div class="config-card">
+            <div class="config-card-header">
+              <span class="material-icons-round" style="color:var(--accent-amber)">repeat</span>
+              <div>
+                <div class="config-card-title">Swaps Per Wallet</div>
+                <div class="config-card-sub">Random range (even numbers only)</div>
+              </div>
+            </div>
+            <div class="range-row">
+              <div class="range-input-wrap">
+                <div class="range-label">MIN</div>
+                <input type="number" class="range-input" id="swap-min" value="2" min="0" max="9999" step="2" oninput="updateSwapRange()">
+              </div>
+              <div class="range-sep">—</div>
+              <div class="range-input-wrap">
+                <div class="range-label">MAX</div>
+                <input type="number" class="range-input" id="swap-max" value="6" min="0" max="9999" step="2" oninput="updateSwapRange()">
+              </div>
+              <div class="range-preview" id="range-preview" style="display:none;">2, 4, 6 swaps</div>
+            </div>
+            <button onclick="randomizeSwapCounts()" style="margin-top:12px;width:100%;padding:10px;background:linear-gradient(135deg,rgba(99,102,241,0.15),rgba(139,92,246,0.15));border:1px solid rgba(99,102,241,0.3);border-radius:10px;color:var(--accent-primary);font-family:var(--font-display);font-size:12px;font-weight:700;letter-spacing:1px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:all 0.2s ease;" id="randomize-btn">
+              <span class="material-icons-round" style="font-size:16px;">casino</span>
+              RANDOMIZE SWAP COUNTS
+            </button>
+            <div id="randomize-preview" style="display:none;margin-top:10px;"></div>
+          </div>
+
+          <div style="display:flex;gap:10px;margin-top:4px;">
+            <button class="swap-btn" style="background:var(--bg-raised);box-shadow:none;flex:0 0 48px;padding:0;" onclick="goToStep2()">
+              <span class="material-icons-round" style="font-size:20px;">arrow_back</span>
+            </button>
+            <button class="swap-btn" id="review-start-btn" style="flex:1;transition:opacity 0.2s,filter 0.2s;" onclick="goToStep4()">
+              Review & Start
+            </button>
+          </div>
+
+          <!-- Integrator -->
+          <div class="config-card">
+            <div class="config-card-header" style="margin-bottom:12px;">
+              <span class="material-icons-round" style="color:var(--neon-cyan)">swap_horiz</span>
+              <div>
+                <div class="config-card-title">Integrator Source</div>
+              </div>
+            </div>
+            <!-- Integrator chips -->
+            <div id="integrator-list" style="display:flex;flex-direction:column;gap:8px;margin-bottom:10px;"></div>
+            <!-- Add custom integrator -->
+            <div style="display:flex;gap:8px;align-items:center;margin-top:4px;">
+              <input type="text" id="integrator-custom-input" class="config-input" placeholder="custom integrator id…" style="flex:1;font-family:var(--font-mono);font-size:11px;" />
+              <button onclick="addCustomIntegrator()" style="padding:9px 14px;background:linear-gradient(135deg,var(--accent-primary),var(--accent-secondary));border:none;border-radius:10px;color:#fff;font-size:11px;font-weight:700;font-family:var(--font-display);cursor:pointer;letter-spacing:0.5px;white-space:nowrap;display:flex;align-items:center;gap:5px;transition:all 0.2s;box-shadow:var(--glow-primary);" onmousedown="this.style.transform='scale(0.93)'" onmouseup="this.style.transform=''" ontouchstart="this.style.transform='scale(0.93)'" ontouchend="this.style.transform=''">
+                <span class="material-icons-round" style="font-size:14px;">add</span>ADD
+              </button>
+            </div>
+          </div>
+
+          <!-- Swap Modes (collapsible) — mirrors Settings -->
+          <div class="config-card" style="padding:0;overflow:hidden;">
+            <div onclick="(function(h){var b=document.getElementById('cfg-modes-body');var open=b.style.display!=='none';b.style.display=open?'none':'block';h.querySelector('.cfg-modes-chevron').style.transform=open?'rotate(0deg)':'rotate(180deg)';})(this)"
+              style="display:flex;align-items:center;gap:10px;padding:14px 16px;cursor:pointer;transition:background 0.2s;"
+              onmousedown="this.style.background='var(--bg-raised)'" onmouseup="this.style.background=''"
+              ontouchstart="this.style.background='var(--bg-raised)'" ontouchend="this.style.background=''">
+              <span class="material-icons-round" style="color:var(--accent-green);font-size:18px;">savings</span>
+              <div style="flex:1;">
+                <div class="config-card-title" style="margin:0;">Swap Modes</div>
+                <div style="font-size:10px;font-family:var(--font-mono);color:var(--text-muted);margin-top:2px;">Paymaster · Ultra Fast · Dry Run</div>
+              </div>
+              <span class="material-icons-round cfg-modes-chevron" style="font-size:18px;color:var(--text-muted);transition:transform 0.3s;transform:rotate(0deg);">expand_more</span>
+            </div>
+            <div id="cfg-modes-body" style="display:none;border-top:1px solid var(--border-subtle);">
+              <!-- Hidden sync element keeps isPaymasterEnabled() working -->
+              <div id="cfg-paymaster" class="toggle on" style="display:none;"></div>
+              <input type="hidden" id="paymaster-url-input" />
+
+              <!-- Paymaster Mode -->
+              <div style="display:flex;align-items:center;gap:10px;padding:13px 16px;border-bottom:1px solid var(--border-subtle);">
+                <span class="material-icons-round" style="color:var(--accent-green);font-size:17px;">savings</span>
+                <div style="flex:1;">
+                  <div style="font-size:13px;font-weight:700;color:var(--text-primary);">Paymaster</div>
+                  <div style="font-size:10px;font-family:var(--font-mono);color:var(--text-muted);margin-top:1px;" id="cfg-paymaster-sub">ON → Gasless TX &nbsp;·&nbsp; OFF → EOA TX</div>
+                </div>
+                <div class="toggle on" id="swap-modes-paymaster"
+                  onclick="event.stopPropagation();(function(t){t.classList.toggle('on');var isOn=t.classList.contains('on');try{localStorage.setItem('one_swap_paymaster_enabled',isOn?'on':'off');}catch(e){}var sub=document.getElementById('cfg-paymaster-sub');if(sub)sub.textContent=isOn?'ON → Gasless TX  ·  OFF → EOA TX':'OFF → EOA TX  ·  ON → Gasless TX';showToast(isOn?'Swap Paymaster ON':'Swap Paymaster OFF',isOn?'check_circle':'cancel');haptic();})(this);">
+                </div>
+              </div>
+
+              <!-- Dry Run Mode -->
+              <div style="display:flex;align-items:center;gap:10px;padding:13px 16px;">
+                <span class="material-icons-round" style="color:var(--accent-red);font-size:17px;">science</span>
+                <div style="flex:1;">
+                  <div style="font-size:13px;font-weight:700;color:var(--text-primary);">Dry Run Mode</div>
+                  <div style="font-size:10px;font-family:var(--font-mono);color:var(--text-muted);margin-top:1px;">Simulate only</div>
+                </div>
+                <div class="toggle" id="cfg-dry" onclick="event.stopPropagation();toggleSwitch('cfg-dry');toggleSwitch('toggle-dry');"></div>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- Slippage (collapsible) -->
+          <div class="config-card" style="padding:0;overflow:hidden;">
+            <div onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'block':'none';this.querySelector('.slip-chevron').style.transform=this.nextElementSibling.style.display==='none'?'rotate(0deg)':'rotate(180deg)'"
+              style="display:flex;align-items:center;gap:10px;padding:14px 16px;cursor:pointer;transition:background 0.2s;"
+              onmousedown="this.style.background='var(--bg-raised)'" onmouseup="this.style.background=''"
+              ontouchstart="this.style.background='var(--bg-raised)'" ontouchend="this.style.background=''">
+              <span class="material-icons-round" style="color:var(--accent-amber);font-size:18px;">percent</span>
+              <div style="flex:1;">
+                <div class="config-card-title" style="margin:0;">Slippage Tolerance</div>
+              </div>
+              <span class="material-icons-round slip-chevron" style="font-size:18px;color:var(--text-muted);transition:transform 0.3s;transform:rotate(0deg);">expand_more</span>
+            </div>
+            <div style="display:none;padding:0 16px 14px;border-top:1px solid var(--border-subtle);">
+              <div class="chip-selector" style="padding:10px 0 0;">
+                <div class="chip-opt selected" onclick="selectChip(this,'slip-cfg');if(typeof SW!=='undefined')SW.slippage=0.1;">0.1%</div>
+                <div class="chip-opt" onclick="selectChip(this,'slip-cfg');if(typeof SW!=='undefined')SW.slippage=0.5;">0.5%</div>
+                <div class="chip-opt" onclick="selectChip(this,'slip-cfg');if(typeof SW!=='undefined')SW.slippage=1.0;">1.0%</div>
+              </div>
+            </div>
+          </div>
+
+        </div>

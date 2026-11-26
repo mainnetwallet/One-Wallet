@@ -1,0 +1,34 @@
+<!-- ══════ SEND MODAL ══════ -->
+<!-- ── QR Scanner Modal (Send To Address) ── -->
+<div id="send-qr-modal-overlay" onclick="if(event.target===this)closeSendQrScanner()">
+  <div id="send-qr-inner">
+    <div id="send-qr-header">
+      <div>
+        <div id="send-qr-title">Scan QR Code</div>
+        <div id="send-qr-subtitle">POINT CAMERA AT WALLET ADDRESS QR</div>
+      </div>
+      <div id="send-qr-close" onclick="closeSendQrScanner()"
+        onmousedown="this.style.opacity='.6'" onmouseup="this.style.opacity='1'"
+        ontouchstart="this.style.opacity='.6'" ontouchend="this.style.opacity='1'">
+        <span class="material-icons-round" style="font-size:17px;color:var(--text-muted);">close</span>
+      </div>
+    </div>
+    <div id="send-qr-video-wrap">
+      <video id="send-qr-video" autoplay playsinline muted></video>
+      <canvas id="send-qr-canvas"></canvas>
+      <div id="send-qr-aim">
+        <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M10 30 L10 10 L30 10" stroke="#6366f1" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M70 10 L90 10 L90 30" stroke="#6366f1" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M90 70 L90 90 L70 90" stroke="#6366f1" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M30 90 L10 90 L10 70" stroke="#6366f1" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+    </div>
+    <div id="send-qr-status">Camera initializing...</div>
+  </div>
+</div>
+
+<!--@include partials/send-flow/send-overlay.html-->
+
+<!--@include partials/send-flow/send-confirm.html-->

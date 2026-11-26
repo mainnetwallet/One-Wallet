@@ -1,0 +1,76 @@
+    <!-- ── BRIDGE CHAIN PICKER ── -->
+    <div id="br-chain-overlay" style="position:fixed;top:0;left:0;right:0;bottom:0;z-index:25000;background:rgba(5,5,8,0.75);display:flex;flex-direction:column;justify-content:flex-end;align-items:center;opacity:0;will-change:opacity;transform:translateZ(0);-webkit-transform:translateZ(0);pointer-events:none;transition:opacity 0.25s ease;">
+      <div id="br-chain-modal-inner" style="width:100%;max-width: 100%;height:60vh;display:flex;flex-direction:column;background:var(--bg-deep);border-radius:24px 24px 0 0;border:1px solid var(--border-subtle);border-bottom:none;margin-bottom:calc(var(--nav-height) + env(safe-area-inset-bottom, 0px));">
+        <div style="padding:16px 20px 12px;display:flex;align-items:center;gap:14px;border-bottom:1px solid var(--border-subtle);background:var(--bg-deep);flex-shrink:0;">
+          <div onclick="brCloseChainPicker()" style="width:36px;height:36px;border-radius:10px;background:var(--bg-glass);border:1px solid var(--border-subtle);display:flex;align-items:center;justify-content:center;cursor:pointer;">
+            <span class="material-icons-round" style="font-size:20px;color:var(--text-secondary);">arrow_back</span>
+          </div>
+          <div style="font-size:18px;font-weight:800;">Select Chain</div>
+        </div>
+        <!-- Chain Search -->
+        <div style="padding:12px 20px 10px;background:var(--bg-deep);border-bottom:1px solid var(--border-subtle);flex-shrink:0;">
+          <div style="display:flex;align-items:center;gap:10px;background:var(--bg-raised);border:1px solid var(--border-subtle);border-radius:12px;padding:10px 14px;transition:border-color 0.2s ease;" id="br-chain-search-wrap">
+            <span class="material-icons-round" style="font-size:18px;color:var(--text-muted);flex-shrink:0;">search</span>
+            <input id="br-chain-search"
+              type="text" autocomplete="off" autocorrect="off" spellcheck="false"
+              placeholder="Search chains…"
+              oninput="brFilterChains()"
+              style="flex:1;background:none;border:none;outline:none;font-size:14px;font-family:var(--font-display);color:var(--text-primary);caret-color:var(--accent-primary);"
+            />
+            <span id="br-chain-search-clear" onclick="brClearChainSearch()" style="display:none;cursor:pointer;">
+              <span class="material-icons-round" style="font-size:16px;color:var(--text-muted);">close</span>
+            </span>
+          </div>
+          <div id="br-chain-count" style="font-family:var(--font-mono);font-size:10px;color:var(--text-muted);margin-top:8px;padding-left:2px;"></div>
+        </div>
+        <div style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:12px 20px calc(var(--nav-height) + 20px);background:var(--bg-deep);scrollbar-width:none;" id="br-chain-list"></div>
+      </div>
+    </div>
+
+    <!-- ── BRIDGE TOKEN PICKER ── -->
+    <div id="br-token-overlay" style="position:fixed;top:0;left:0;right:0;bottom:0;z-index:25000;background:rgba(5,5,8,0.75);display:flex;flex-direction:column;justify-content:flex-end;align-items:center;opacity:0;will-change:opacity;transform:translateZ(0);-webkit-transform:translateZ(0);pointer-events:none;transition:opacity 0.25s ease;">
+      <div id="br-token-modal-inner" style="width:100%;max-width: 100%;height:60vh;display:flex;flex-direction:column;background:var(--bg-deep);border-radius:24px 24px 0 0;border:1px solid var(--border-subtle);border-bottom:none;margin-bottom:calc(var(--nav-height) + env(safe-area-inset-bottom, 0px));">
+        <div style="padding:16px 20px 12px;display:flex;align-items:center;gap:14px;border-bottom:1px solid var(--border-subtle);background:var(--bg-deep);flex-shrink:0;">
+          <div onclick="brCloseTokenPicker()" style="width:36px;height:36px;border-radius:10px;background:var(--bg-glass);border:1px solid var(--border-subtle);display:flex;align-items:center;justify-content:center;cursor:pointer;">
+            <span class="material-icons-round" style="font-size:20px;color:var(--text-secondary);">arrow_back</span>
+          </div>
+          <div style="font-size:18px;font-weight:800;flex:1;">Select Token</div>
+        </div>
+        <div style="padding:12px 20px;background:var(--bg-deep);border-bottom:1px solid var(--border-subtle);flex-shrink:0;">
+          <input id="br-token-search" placeholder="Search token…" oninput="brFilterTokens()"
+            style="width:100%;background:var(--bg-raised);border:1px solid var(--border-subtle);border-radius:12px;padding:10px 14px;font-family:var(--font-mono);font-size:12px;color:var(--text-primary);outline:none;">
+        </div>
+        <div style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:12px 20px calc(var(--nav-height) + 20px);background:var(--bg-deep);scrollbar-width:none;" id="br-token-list">
+          <div style="text-align:center;padding:30px;font-family:var(--font-mono);font-size:11px;color:var(--text-muted);">Loading…</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── WALLET PANEL (right-side drawer 30%) ── -->
+    <div id="br-wallet-panel-overlay" onclick="if(!event.target.closest('#br-wallet-panel')){brCloseWalletPanel();}" style="position:fixed;top:0;left:0;right:0;bottom:calc(var(--nav-height) + env(safe-area-inset-bottom, 0px));z-index:25000;background:rgba(5,5,8,0.92);opacity:0;will-change:opacity;transform:translateZ(0);-webkit-transform:translateZ(0);pointer-events:none;transition:opacity 0.25s ease;">
+      <div id="br-wallet-panel" style="position:absolute;top:0;right:0;width:72%;max-width:310px;height:100%;background:var(--bg-deep);border-left:1px solid var(--border-subtle);display:flex;flex-direction:column;transform:translateX(100%);transition:transform 0.38s cubic-bezier(0.22,1,0.36,1);overflow:hidden;">
+        <!-- Panel header -->
+        <div style="padding:14px 16px 12px;border-bottom:1px solid var(--border-subtle);flex-shrink:0;display:flex;align-items:center;gap:10px;">
+          <div style="flex:1;">
+            <div style="font-size:15px;font-weight:800;margin-bottom:2px;" id="br-wallet-panel-title">Select Wallet</div>
+            <div style="font-size:9px;color:var(--text-muted);font-family:var(--font-mono);letter-spacing:1px;" id="br-wallet-panel-sub">Sender wallet</div>
+          </div>
+          <div onclick="brCloseWalletPanel()" style="width:32px;height:32px;border-radius:10px;background:var(--bg-glass);border:1px solid var(--border-subtle);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;">
+            <span class="material-icons-round" style="font-size:17px;color:var(--text-muted);">close</span>
+          </div>
+        </div>
+        <!-- Key input section -->
+        <div style="padding:10px 12px;border-bottom:1px solid var(--border-subtle);flex-shrink:0;">
+          <div style="font-size:9px;font-weight:700;color:var(--text-muted);font-family:var(--font-mono);letter-spacing:1.5px;margin-bottom:7px;">ENTER PRIVATE KEY</div>
+          <div style="display:flex;gap:6px;align-items:center;">
+            <input id="br-key-input" type="text" placeholder="Private key (0x…) or recipient address"
+              style="flex:1;background:var(--bg-void);border:1px solid var(--border-subtle);border-radius:9px;padding:8px 10px;font-family:var(--font-mono);font-size:11px;color:var(--text-primary);outline:none;min-width:0;"
+              oninput="brKeyInputPreview()" />
+            <div onclick="brUseKeyInput()" style="padding:7px 12px;background:linear-gradient(135deg,var(--accent-primary),var(--accent-secondary));border-radius:9px;font-size:11px;font-weight:700;color:#fff;cursor:pointer;flex-shrink:0;transition:all 0.2s;" ontouchstart="this.style.opacity='0.7'" ontouchend="this.style.opacity='1'">USE</div>
+          </div>
+          <div id="br-key-preview" style="font-family:var(--font-mono);font-size:10px;color:var(--text-muted);margin-top:5px;min-height:14px;"></div>
+        </div>
+        <!-- Groups list -->
+        <div style="flex:1;overflow-y:auto;padding:12px 12px 40px;scrollbar-width:none;" id="br-wallet-panel-body"></div>
+      </div>
+    </div>

@@ -1,0 +1,101 @@
+        <!-- Self Transfer UI -->
+        <div id="selfTransferUI" style="display: none;">
+            <div class="th-section-header"><button class="th-back-btn" onclick="showMainDashboard()" title="Back to Dashboard"><span class="material-icons-round">arrow_back</span></button><h1>🔄 Self Transfer</h1><button class="th-header-chain-btn" onclick="thOpenChainPicker('selfTransfer')" title="Switch network for Self Transfer"><span class="th-hcb-emoji" id="th-net-emoji-selfTransfer-hdr">⛓️</span><span class="th-hcb-name" id="th-net-name-selfTransfer-hdr">Network</span><span class="material-icons-round">expand_more</span></button></div>
+            <div style="font-size: 0.78rem; color: #a0a0a0; margin-bottom: 8px;">Send transactions to yourself from multiple wallets</div>
+
+            <!-- Transfer Mode Toggle — compact -->
+            <div style="display: flex; justify-content: center; margin-bottom: 8px;">
+                <div style="background: #1a1a1a; border: 1.5px solid #2a2a2a; border-radius: 10px; padding: 3px; display: inline-flex; gap: 3px; width:100%;">
+                    <button id="selfNativeModeBtn" class="mode-toggle-btn active" onclick="switchSelfTransferMode('native')" style="flex:1;padding: 8px 10px; border-radius: 7px; border: none; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; font-weight: 600; font-size:0.8rem; cursor: pointer; transition: all 0.3s;">
+                        💰 Native
+                    </button>
+                    <button id="selfTokenModeBtn" class="mode-toggle-btn" onclick="switchSelfTransferMode('token')" style="flex:1;padding: 8px 10px; border-radius: 7px; border: none; background: transparent; color: #888; font-weight: 600; font-size:0.8rem; cursor: pointer; transition: all 0.3s;">
+                        🪙 Token (ERC20)
+                    </button>
+                </div>
+            </div>
+
+            <input type="hidden" id="rpcUrlSelfTransfer" value="">
+
+            <!-- Private Keys — FIRST (উপরে) -->
+            <div class="section" style="padding:10px;margin-bottom:6px;">
+                <div class="section-title">🔑 Wallet Private Keys</div>
+                <div class="input-group" style="margin-bottom:0;">
+                    <label style="display: flex; justify-content: space-between; align-items: center; margin-bottom:5px;">
+                        <span>Private Keys (one per line)</span>
+                        <span id="selfTransferKeyCount" style="background: #2a2a2a; color: #4a9eff; padding: 3px 9px; border-radius: 7px; font-size: 0.72rem; font-weight: 700;">0 wallets</span>
+                    </label>
+                    <button onclick="thOpenWalletPicker('privateKeysSelfTransfer','multi')" style="width:100%;display:flex;align-items:center;justify-content:center;gap:8px;padding:8px 12px;border-radius:9px;border:1px dashed rgba(99,102,241,0.45);background:rgba(99,102,241,0.06);color:var(--neon-purple);font-family:var(--font-mono);font-size:11px;font-weight:700;cursor:pointer;margin-bottom:6px;transition:all .18s;letter-spacing:.5px;" onmousedown="this.style.background='rgba(99,102,241,0.14)'" onmouseup="this.style.background='rgba(99,102,241,0.06)'" ontouchstart="this.style.background='rgba(99,102,241,0.14)'" ontouchend="this.style.background='rgba(99,102,241,0.06)'"><span class="material-icons-round" style="font-size:15px;">account_balance_wallet</span>Select Wallet</button>
+                    <div class="sk-key-wrapper" id="privateKeysSelfTransferWrapper">
+                        <textarea id="privateKeysSelfTransfer" class="sk-key-textarea sk-masked" placeholder="0xabc123...&#10;0xdef456...&#10;(one private key per line)" style="min-height:140px;max-height:140px;font-size:0.82rem;resize:vertical;" autocomplete="off" spellcheck="false" oninput="autoValidateSelfTransferKeys()"></textarea>
+                        <button type="button" class="sk-toggle-btn" id="privateKeysSelfTransferToggleBtn" onclick="skToggleKeyVisibility('privateKeysSelfTransfer','privateKeysSelfTransferToggleBtn')" title="Show/Hide Key">
+                            <span class="material-icons-round sk-eye-icon">visibility_off</span>
+                        </button>
+                    </div>
+                    <div class="hint" style="font-size:0.7rem;margin-top:3px;">✨ Auto-validates keys — removes invalid entries</div>
+                </div>
+            </div>
+
+            <!-- Transaction Settings -->
+            <div class="section" style="padding:10px;margin-bottom:6px;">
+                <div class="section-title">⚡ Transaction Settings</div>
+                <div class="input-group" style="margin-bottom:7px;">
+                    <label>Transactions per Wallet</label>
+                    <input type="number" id="txCountPerWallet" value="1" min="1" max="100" placeholder="1" style="padding:8px 10px;font-size:0.85rem;">
+                    <div class="hint" style="font-size:0.7rem;margin-top:2px;">Each wallet sends this many TXs to itself</div>
+                </div>
+                <div class="input-group" id="nativeAmountGroup" style="margin-bottom:0;">
+                    <label>Amount per TX (ETH/BNB)</label>
+                    <input type="text" id="amountPerTx" value="0" placeholder="0.001" style="padding:8px 10px;font-size:0.85rem;">
+                    <div class="hint" style="font-size:0.7rem;margin-top:2px;">Amount per transaction</div>
+                </div>
+            </div>
+
+            <!-- Token Configuration (Hidden by default) -->
+            <div id="tokenConfigSelfTransfer" class="section" style="display: none; padding:10px; margin-bottom:6px;">
+                <div class="section-title">🪙 Token Configuration</div>
+                <div style="display: grid; grid-template-columns: 1fr; gap: 7px;">
+                    <div class="input-group" style="margin-bottom:0;">
+                        <label>Token Contract Address</label>
+                        <input type="text" id="tokenAddressSelfTransfer" placeholder="0x... (ERC20)" style="padding:8px 10px;font-size:0.82rem;">
+                        <div class="hint" style="font-size:0.7rem;margin-top:2px;">ERC20 token contract address</div>
+                    </div>
+                    <div class="input-group" style="margin-bottom:0;">
+                        <label>Amount per TX</label>
+                        <input type="text" id="tokenAmountPerTx" placeholder="100" style="padding:8px 10px;font-size:0.85rem;">
+                        <div class="hint" style="font-size:0.7rem;margin-top:2px;">Token amount (smallest unit)</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Summary Box — compact inline style -->
+            <div class="section" style="background: linear-gradient(135deg, #1a2a3a 0%, #2a1a3a 100%); border: 1.5px solid #3a4a5a; padding:10px; margin-bottom:6px;">
+                <div style="display:flex; align-items:center; justify-content:space-between; gap:10px;">
+                    <div style="font-size: 0.72rem; color: #888; text-transform:uppercase; letter-spacing:.5px;">Est. Total TXs</div>
+                    <div id="totalTxEstimate" style="font-size: 1.6rem; font-weight: 700; color: #4a9eff; line-height:1;">0</div>
+                    <div style="font-size: 0.72rem; color: #888; text-align:right;">
+                        <span id="totalWalletsEstimate">0</span> wallets<br>× <span id="txPerWalletEstimate">0</span> each
+                    </div>
+                </div>
+            </div>
+
+            <!-- Execution Controls -->
+            <div class="section" style="padding:10px; margin-bottom:6px;">
+                <button class="btn btn-success execute-btn" id="executeSelfTransferBtn" onclick="executeSelfTransfer()" disabled style="width:100%;padding: 10px 8px; font-size: 0.85rem; font-weight: 700; min-height:42px;opacity:0.45;cursor:not-allowed;">
+                    🚀 Execute Self Transfers
+                </button>
+            </div>
+
+            <!-- Logs Section — compact -->
+            <div class="section" style="padding:10px; margin-bottom:6px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                    <div class="section-title" style="margin-bottom: 0; font-size:0.88rem;">📝 Logs</div>
+                    <button class="btn btn-secondary" onclick="clearLogSelfTransfer()" style="width: auto; padding: 5px 10px; font-size: 0.75rem;">
+                        🗑️ Clear
+                    </button>
+                </div>
+                <div class="log-section" id="logContainerSelfTransfer" style="height: 250px; overflow-y: auto;">
+                    <div class="log-line log-info">[INFO] Configure settings and click Execute to start self transfers...</div>
+                </div>
+            </div>
+        </div>

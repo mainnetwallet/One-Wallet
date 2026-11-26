@@ -1,0 +1,261 @@
+
+      /* ── Confirm Swap Sheet — Premium Compact Mobile v10 ── */
+      /* ══ CONFIRM SWAP MODAL ══ */
+      #sw-confirm-modal {
+        display: none;
+        position: fixed;
+        inset: 0;
+        z-index: 9100;
+        background: rgba(0,0,0,0);
+        backdrop-filter: blur(0px);
+        -webkit-backdrop-filter: blur(0px);
+        transition: background 0.28s ease, backdrop-filter 0.28s ease;
+        align-items: flex-end;
+        justify-content: center;
+        touch-action: none;
+      }
+      #sw-confirm-modal.cs-visible {
+        display: flex;
+        background: rgba(2,2,8,0.88);
+        backdrop-filter: blur(28px) saturate(1.8);
+        -webkit-backdrop-filter: blur(28px) saturate(1.8);
+      }
+      #sw-confirm-sheet {
+        position: absolute;
+        bottom: calc(var(--nav-height) + env(safe-area-inset-bottom, 0px));
+        left: 0; right: 0;
+        width: 100%;
+        max-width: 480px;
+        margin: 0 auto;
+        transform: translateY(100%);
+        background: linear-gradient(175deg, #13132a 0%, #0c0c1e 55%, #08080f 100%);
+        border: 1px solid rgba(99,102,241,0.2);
+        border-bottom: none;
+        border-radius: 28px 28px 0 0;
+        padding: 0;
+        transition: transform 0.4s cubic-bezier(0.32,1.12,0.64,1);
+        max-height: calc(80vh - var(--nav-height));
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        box-shadow: 0 -8px 60px rgba(99,102,241,0.2), 0 -2px 0 rgba(99,102,241,0.25), 0 -40px 80px rgba(0,0,0,0.8);
+      }
+      #sw-confirm-sheet::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 15%; right: 15%;
+        height: 2px;
+        background: linear-gradient(90deg, transparent, rgba(99,102,241,0.9) 30%, rgba(139,92,246,1) 50%, rgba(6,182,212,0.6) 75%, transparent);
+        border-radius: 99px;
+        z-index: 2;
+      }
+      #sw-confirm-modal.cs-visible #sw-confirm-sheet { transform: translateY(0); }
+      #sw-confirm-sheet { touch-action: pan-y; }
+
+      /* drag handle */
+      .cs-handle {
+        width: 40px; height: 4px;
+        background: rgba(255,255,255,0.12);
+        border-radius: 99px;
+        margin: 12px auto 0;
+        flex-shrink: 0;
+      }
+
+      /* scrollable body */
+      #sw-confirm-scroll {
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        padding: 14px 18px 6px;
+        flex: 1;
+        touch-action: pan-y;
+        overscroll-behavior: contain;
+      }
+      #sw-confirm-scroll::-webkit-scrollbar { display: none; }
+
+      /* header */
+      .cs-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 16px;
+      }
+      .cs-header-left { display: flex; align-items: center; gap: 10px; }
+      .cs-icon-wrap {
+        width: 34px; height: 34px;
+        border-radius: 10px;
+        background: linear-gradient(135deg, #6366f1, #8b5cf6);
+        display: flex; align-items: center; justify-content: center;
+        box-shadow: 0 0 18px rgba(99,102,241,0.55);
+        flex-shrink: 0;
+        position: relative; overflow: hidden;
+      }
+      .cs-icon-wrap::before {
+        content: '';
+        position: absolute; inset: 0;
+        background: linear-gradient(135deg, rgba(255,255,255,0.25) 0%, transparent 55%);
+      }
+      .cs-title { font-size: 15px; font-weight: 800; letter-spacing: -0.3px; color: #fff; }
+      .cs-subtitle {
+        font-family: var(--font-mono); font-size: 8px;
+        color: var(--accent-primary); letter-spacing: 2.5px;
+        margin-top: 2px; opacity: 0.7; text-transform: uppercase;
+      }
+      .cs-close-btn {
+        width: 30px; height: 30px;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.06);
+        border: 1px solid rgba(255,255,255,0.09);
+        display: flex; align-items: center; justify-content: center;
+        cursor: pointer;
+        transition: background 0.18s;
+      }
+      .cs-close-btn:active { background: rgba(255,255,255,0.12); transform: scale(0.9); }
+
+      /* ── Token flow card ── */
+      .cs-token-card {
+        background: rgba(255,255,255,0.03);
+        border: 1px solid rgba(255,255,255,0.07);
+        border-radius: 18px;
+        overflow: hidden;
+        margin-bottom: 10px;
+      }
+      .cs-token-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px 14px;
+      }
+      .cs-token-left { display: flex; align-items: center; gap: 10px; }
+      .cs-token-icon {
+        width: 36px; height: 36px;
+        border-radius: 10px;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 13px; font-weight: 800; color: #fff;
+        flex-shrink: 0;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.45);
+      }
+      .cs-token-name { font-size: 15px; font-weight: 800; color: #fff; letter-spacing: -0.2px; }
+      .cs-token-tag {
+        font-family: var(--font-mono);
+        font-size: 7px; color: rgba(255,255,255,0.35);
+        margin-top: 2px; letter-spacing: 1.2px; text-transform: uppercase;
+      }
+      .cs-token-amt {
+        font-size: 17px; font-weight: 800;
+        font-family: var(--font-mono);
+        letter-spacing: -0.5px;
+      }
+      /* arrow divider between tokens */
+      .cs-arrow-row {
+        display: flex; align-items: center; justify-content: center;
+        height: 28px;
+        background: rgba(99,102,241,0.04);
+        border-top: 1px solid rgba(255,255,255,0.05);
+        border-bottom: 1px solid rgba(255,255,255,0.05);
+        position: relative;
+      }
+      .cs-arrow-dot {
+        width: 24px; height: 24px; border-radius: 50%;
+        background: rgba(99,102,241,0.15);
+        border: 1px solid rgba(99,102,241,0.3);
+        display: flex; align-items: center; justify-content: center;
+        box-shadow: 0 0 10px rgba(99,102,241,0.2);
+      }
+
+      /* ── Details grid ── */
+      .cs-details {
+        background: rgba(255,255,255,0.025);
+        border: 1px solid rgba(255,255,255,0.07);
+        border-radius: 16px;
+        padding: 0 14px;
+        margin-bottom: 10px;
+      }
+      .cs-detail-row {
+        display: flex; align-items: center;
+        justify-content: space-between;
+        padding: 9px 0;
+      }
+      .cs-detail-row + .cs-detail-row {
+        border-top: 1px solid rgba(255,255,255,0.04);
+      }
+      .cs-detail-label {
+        display: flex; align-items: center; gap: 6px;
+        font-family: var(--font-mono); font-size: 10px;
+        color: rgba(255,255,255,0.45); letter-spacing: 0.3px;
+      }
+      .cs-detail-label .material-icons-round {
+        font-size: 12px !important;
+        color: var(--accent-primary); opacity: 0.7;
+      }
+      .cs-detail-val {
+        font-family: var(--font-mono); font-size: 11px;
+        font-weight: 700; color: #fff;
+      }
+
+      /* ── DEX badge ── */
+      .cs-dex-badge {
+        display: flex; align-items: center; justify-content: center; gap: 6px;
+        background: rgba(16,185,129,0.07);
+        border: 1px solid rgba(16,185,129,0.2);
+        border-radius: 12px;
+        padding: 7px 12px;
+        margin-bottom: 10px;
+      }
+      .cs-dex-badge span { font-size: 10px; font-weight: 700; color: var(--accent-green); }
+
+      /* ── Footer ── */
+      #sw-confirm-footer {
+        padding: 10px 18px calc(10px + env(safe-area-inset-bottom, 0px));
+        flex-shrink: 0;
+        background: linear-gradient(180deg, transparent 0%, rgba(8,8,15,0.95) 35%);
+        border-top: 1px solid rgba(255,255,255,0.05);
+      }
+      .cs-confirm-btn {
+        width: 100%;
+        padding: 13px;
+        background: linear-gradient(135deg, #10b981 0%, #059669 60%, #0d9488 100%);
+        border: none; border-radius: 16px;
+        font-family: var(--font-display); font-size: 14px; font-weight: 800;
+        color: #fff; letter-spacing: 0.3px;
+        cursor: pointer;
+        display: flex; align-items: center; justify-content: center; gap: 7px;
+        box-shadow: 0 0 28px rgba(16,185,129,0.4), 0 4px 16px rgba(0,0,0,0.5);
+        transition: all 0.2s;
+        -webkit-tap-highlight-color: transparent;
+        position: relative; overflow: hidden;
+      }
+      .cs-confirm-btn::before {
+        content: '';
+        position: absolute; inset: 0;
+        background: linear-gradient(135deg, rgba(255,255,255,0.18) 0%, transparent 55%);
+        pointer-events: none;
+      }
+      .cs-confirm-btn:active { transform: scale(0.98); opacity: 0.88; }
+      .cs-cancel-link {
+        text-align: center; margin-top: 10px;
+        font-size: 12px; color: rgba(255,255,255,0.3);
+        cursor: pointer; padding: 4px;
+        letter-spacing: 0.3px;
+        -webkit-tap-highlight-color: transparent;
+      }
+      .cs-cancel-link:active { opacity: 0.5; }
+
+      /* light mode */
+      body.light-mode .cs-token-card { background: #fff !important; border-color: rgba(99,102,241,0.1) !important; }
+      body.light-mode .cs-token-name, body.light-mode .cs-token-amt { color: #111 !important; }
+      body.light-mode .cs-details { background: rgba(99,102,241,0.04) !important; border-color: rgba(99,102,241,0.1) !important; }
+      body.light-mode .cs-detail-val { color: #111 !important; }
+      body.light-mode #sw-confirm-sheet { background: linear-gradient(180deg,#f2f3ff 0%,#eceef8 100%) !important; border-color: rgba(99,102,241,0.18) !important; }
+      body.light-mode #sw-confirm-footer { background: linear-gradient(180deg,transparent 0%,#eceef8 35%) !important; border-color: rgba(99,102,241,0.1) !important; }
+      body.light-mode .cs-close-btn { background: rgba(99,102,241,0.07) !important; border-color: rgba(99,102,241,0.12) !important; }
+      body.light-mode .cs-arrow-dot { background: #e4e6f5 !important; border-color: rgba(99,102,241,0.18) !important; }
+      body.light-mode .cs-handle { background: rgba(99,102,241,0.18) !important; }
+      body.light-mode .cs-dex-badge { background: rgba(16,185,129,0.06) !important; }
+      body.light-mode .cs-detail-label { color: rgba(0,0,0,0.45) !important; }
+
+      /* ══════════════════════════════════════════════════════
+         DESKTOP FULL-SCREEN CONFIRM MODAL
+         ══════════════════════════════════════════════════════ */
+      
+    

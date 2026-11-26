@@ -1,0 +1,72 @@
+    <!-- Manual Contract Add Modal -->
+    <div class="modal-overlay" id="manualContractModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">
+                    <span>➕</span>
+                    <span>Add Contract Manually</span>
+                </div>
+                <button class="modal-close" onclick="closeManualContractModal()">×</button>
+            </div>
+
+            <div class="modal-section">
+                <div class="section">
+                    <div class="section-title">Contract Details</div>
+                    
+                    <div class="input-group">
+                        <label>Contract Type</label>
+                        <select id="manualContractType" style="width: 100%; padding: 10px; background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 8px; color: #e0e0e0; font-size: 0.9rem;">
+                            <option value="NATIVE">Native Token (ETH, BNB, etc.)</option>
+                            <option value="TOKEN">ERC20 Token</option>
+                        </select>
+                        <div class="hint">Select the contract type</div>
+                    </div>
+
+                    <div class="input-group">
+                        <label>Contract Address</label>
+                        <input type="text" id="manualContractAddress" placeholder="0x..." style="font-family: 'Courier New', monospace;">
+                        <div class="hint">Enter the deployed contract address</div>
+                    </div>
+
+                    <div class="input-group" id="manualTokenAddressGroup" style="display: none;">
+                        <label>Token Contract Address (for ERC20)</label>
+                        <input type="text" id="manualTokenAddress" placeholder="0x..." style="font-family: 'Courier New', monospace;">
+                        <div class="hint">Required for TOKEN type contracts</div>
+                    </div>
+                    <input type="hidden" id="manualContractRpc" value="">
+
+                    <div class="input-group">
+                        <label>Network</label>
+                        <!-- Read-only: always uses Home section active chain -->
+                        <div id="manualSelectedChainDisplay" style="
+                            background: var(--bg-glass);
+                            border: 1px solid var(--border-subtle);
+                            border-radius: var(--radius-md);
+                            padding: 12px 14px;
+                            display: flex;
+                            align-items: center;
+                            gap: 12px;
+                            opacity: 0.85;
+                        ">
+                            <div class="hcp-chain-emoji" style="width:36px;height:36px;font-size:20px;" id="manualChainEmoji">⛓️</div>
+                            <div class="hcp-chain-info">
+                                <div class="hcp-chain-name" id="manualSelectedChainName">Loading…</div>
+                                <div class="hcp-chain-sub" id="manualSelectedChainSymbol">Home section chain</div>
+                            </div>
+                            <span class="material-icons-round" style="font-size:14px;color:var(--text-muted);margin-left:auto;flex-shrink:0;opacity:0.5;">lock</span>
+                        </div>
+                        <div class="hint">Uses Home section active chain</div>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px;">
+                        <button class="btn btn-danger" onclick="closeManualContractModal()" style="padding: 12px;">
+                            ❌ Cancel
+                        </button>
+                        <button class="btn btn-success" onclick="saveManualContract()" style="padding: 12px;">
+                            ✅ Add Contract
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>

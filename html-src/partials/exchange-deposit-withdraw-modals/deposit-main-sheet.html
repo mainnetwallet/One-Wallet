@@ -1,0 +1,117 @@
+<!-- ══ Exchange Deposit Modal ══ -->
+<!-- ══ Deposit Main Sheet ══ -->
+<div id="exc-deposit-overlay" style="display:none;position:fixed;inset:0;z-index:30000;background:rgba(0,0,0,0.72);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);" onclick="excDepositClose(event)">
+  <div id="exc-deposit-sheet" style="position:absolute;bottom:0;left:0;right:0;background:#0f0f1a;border-radius:20px 20px 0 0;max-height:94vh;display:flex;flex-direction:column;overflow:hidden;transform:translateY(100%);transition:transform 0.32s cubic-bezier(0.32,0.72,0,1);">
+
+    <!-- Header -->
+    <div style="display:flex;align-items:center;padding:14px 16px 10px;flex-shrink:0;position:relative;border-bottom:1px solid rgba(255,255,255,0.06);">
+      <div onclick="excDepositCloseBtn()" style="width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,0.06);display:flex;align-items:center;justify-content:center;cursor:pointer;-webkit-tap-highlight-color:transparent;">
+        <span class="material-icons-round" style="font-size:20px;color:#8b8ba7;">arrow_back</span>
+      </div>
+      <div style="flex:1;text-align:center;font-size:17px;font-weight:700;color:#f1f1f8;letter-spacing:0.1px;">Deposit <span id="exc-dep-coin-sym">USDT</span></div>
+      <div style="width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,0.06);display:flex;align-items:center;justify-content:center;">
+        <span class="material-icons-round" style="font-size:18px;color:#4a4a65;">history</span>
+      </div>
+    </div>
+
+    <!-- Scrollable body -->
+    <div style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;background:#0f0f1a;">
+
+      <!-- QR Code area -->
+      <div style="display:flex;flex-direction:column;align-items:center;padding:24px 24px 20px;">
+        <div style="background:#fff;padding:14px;border-radius:16px;box-shadow:0 0 0 1px rgba(255,255,255,0.06),0 8px 32px rgba(0,0,0,0.5);">
+          <div id="exc-dep-qr" style="width:196px;height:196px;display:flex;align-items:center;justify-content:center;"></div>
+        </div>
+      </div>
+
+      <!-- Token Selector -->
+      <div style="margin:0 16px 2px;border-top:1px solid rgba(255,255,255,0.06);">
+        <div style="padding:12px 0 8px;font-size:10px;color:#4a4a65;letter-spacing:0.8px;text-transform:uppercase;">Token</div>
+        <div onclick="excDepTokenModalOpen()" style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px 8px 10px;margin-bottom:10px;background:rgba(255,255,255,0.05);border:1.5px solid rgba(99,102,241,0.25);border-radius:12px;cursor:pointer;-webkit-tap-highlight-color:transparent;">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <div id="exc-dep-sel-icon" style="width:32px;height:32px;border-radius:50%;background:#26a17b;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#fff;flex-shrink:0;">₮</div>
+            <div>
+              <div id="exc-dep-sel-sym" style="font-size:15px;font-weight:700;color:#f1f1f8;">USDT</div>
+              <div id="exc-dep-sel-name" style="font-size:11px;color:#8b8ba7;margin-top:1px;">Tether USD</div>
+            </div>
+          </div>
+          <span class="material-icons-round" style="font-size:20px;color:#6366f1;">expand_more</span>
+        </div>
+      </div>
+
+      <!-- Network row (single selected, click to open modal) -->
+      <div style="margin:0 16px;border-top:1px solid rgba(255,255,255,0.06);border-bottom:1px solid rgba(255,255,255,0.06);">
+        <div style="padding:12px 0 4px;font-size:10px;color:#4a4a65;letter-spacing:0.8px;text-transform:uppercase;">Network</div>
+        <div id="exc-dep-net-selected-row" onclick="excDepositNetModalOpen()" style="display:flex;align-items:center;justify-content:space-between;padding:8px 0 14px;cursor:pointer;-webkit-tap-highlight-color:transparent;">
+          <div>
+            <div id="exc-dep-net-label" style="font-size:16px;font-weight:700;color:#f1f1f8;letter-spacing:0.2px;">BSC</div>
+            <div id="exc-dep-net-sub" style="font-size:12px;color:#8b8ba7;margin-top:2px;">BNB Smart Chain (BEP20)</div>
+            <div id="exc-dep-contract-row" style="font-size:11px;color:#4a4a65;margin-top:3px;display:none;">Contract <span id="exc-dep-contract-val" style="color:#8b8ba7;font-family:var(--font-mono,monospace);"></span></div>
+          </div>
+          <div style="width:36px;height:36px;border-radius:10px;background:rgba(255,255,255,0.06);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+            <span class="material-icons-round" style="font-size:18px;color:#8b8ba7;">swap_horiz</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Deposit Address -->
+      <div style="margin:0 16px;border-bottom:1px solid rgba(255,255,255,0.06);">
+        <div style="padding:12px 0 4px;">
+          <div style="font-size:10px;color:#4a4a65;letter-spacing:0.8px;text-transform:uppercase;margin-bottom:10px;">Deposit Address</div>
+          <div style="display:flex;align-items:flex-start;gap:10px;padding-bottom:14px;">
+            <div id="exc-dep-addr-text" style="flex:1;font-size:13px;font-weight:500;color:#f59e0b;font-family:var(--font-mono,monospace);word-break:break-all;line-height:1.6;">—</div>
+            <div onclick="excDepositCopyAddr()" style="width:38px;height:38px;border-radius:10px;background:rgba(99,102,241,0.12);border:1px solid rgba(99,102,241,0.2);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;-webkit-tap-highlight-color:transparent;">
+              <span class="material-icons-round" style="font-size:18px;color:#6366f1;">content_copy</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Memo / Tag row (hidden by default, shown only when exchange returns one) -->
+      <div id="exc-dep-memo-row" style="display:none;margin:0 16px;border-bottom:1px solid rgba(255,255,255,0.06);">
+        <div style="padding:12px 0 4px;">
+          <div style="display:flex;align-items:center;gap:6px;margin-bottom:10px;">
+            <div style="font-size:10px;color:#4a4a65;letter-spacing:0.8px;text-transform:uppercase;">Memo / Tag</div>
+            <div style="background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.35);border-radius:4px;padding:1px 6px;">
+              <span style="font-size:9px;font-weight:700;color:#ef4444;letter-spacing:0.5px;">REQUIRED</span>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;padding-bottom:14px;">
+            <div id="exc-dep-memo-val" style="flex:1;font-size:14px;font-weight:600;color:#f1f1f8;font-family:var(--font-mono,monospace);word-break:break-all;letter-spacing:0.5px;">—</div>
+            <div onclick="excDepositCopyMemo()" style="width:38px;height:38px;border-radius:10px;background:rgba(239,68,68,0.10);border:1px solid rgba(239,68,68,0.2);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;-webkit-tap-highlight-color:transparent;">
+              <span class="material-icons-round" style="font-size:18px;color:#ef4444;">content_copy</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Memo warning (shown only when memo row is visible) -->
+      <div id="exc-dep-memo-warn" style="display:none;margin:0 16px 2px;padding:10px 12px;background:rgba(239,68,68,0.07);border:1px solid rgba(239,68,68,0.18);border-radius:10px;">
+        <div style="display:flex;align-items:flex-start;gap:8px;">
+          <span class="material-icons-round" style="font-size:14px;color:#ef4444;flex-shrink:0;margin-top:1px;">error_outline</span>
+          <div style="font-size:11px;color:#8b8ba7;line-height:1.6;">You <span style="color:#ef4444;font-weight:700;">must</span> include the Memo/Tag when depositing. Missing memo will result in <span style="color:#ef4444;font-weight:600;">permanent loss of funds</span>.</div>
+        </div>
+      </div>
+
+      <!-- More Details -->
+      <div style="margin:0 16px;border-bottom:1px solid rgba(255,255,255,0.06);">
+        <div style="display:flex;align-items:center;justify-content:center;padding:13px 0;cursor:pointer;gap:4px;" onclick="this.querySelector('.dep-more-icon').style.transform=(this.querySelector('.dep-more-icon').style.transform==='rotate(180deg)'?'':'rotate(180deg)')">
+          <span style="font-size:12px;color:#4a4a65;letter-spacing:0.3px;">More Details</span>
+          <span class="material-icons-round dep-more-icon" style="font-size:15px;color:#4a4a65;transition:transform 0.2s;">expand_more</span>
+        </div>
+      </div>
+
+      <!-- Warning -->
+      <div style="margin:14px 16px 32px;background:rgba(245,158,11,0.07);border:1px solid rgba(245,158,11,0.18);border-radius:12px;padding:12px 14px;display:flex;gap:10px;align-items:flex-start;">
+        <span class="material-icons-round" style="font-size:15px;color:#f59e0b;flex-shrink:0;margin-top:1px;">warning_amber</span>
+        <div style="font-size:11px;color:#8b8ba7;line-height:1.65;">Send only <span id="exc-dep-warn-sym" style="color:#f59e0b;font-weight:600;">USDT</span> on the selected network. Sending other assets may result in permanent loss.</div>
+      </div>
+
+      <!-- hidden fields kept for JS compat -->
+      <div id="exc-dep-coin-icon" style="display:none;">₮</div>
+      <div id="exc-dep-coin-name" style="display:none;">Tether USD</div>
+
+    </div>
+  </div>
+</div>
+

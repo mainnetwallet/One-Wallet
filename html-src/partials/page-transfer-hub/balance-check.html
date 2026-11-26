@@ -1,0 +1,87 @@
+        <!-- Balance Check UI -->
+        <div id="balanceCheckUI" style="display: none;">
+
+        <div class="th-section-header"><button class="th-back-btn" onclick="showMainDashboard()" title="Back to Dashboard"><span class="material-icons-round">arrow_back</span></button><h1>💰 Balance Check</h1><button class="th-header-chain-btn" onclick="thOpenChainPicker('balanceCheck')" title="Switch network for Balance Check"><span class="th-hcb-emoji" id="th-net-emoji-balanceCheck-hdr">⛓️</span><span class="th-hcb-name" id="th-net-name-balanceCheck-hdr">Network</span><span class="material-icons-round">expand_more</span></button></div>
+
+        <input type="hidden" id="rpcUrlBalanceCheck" value="">
+
+        <!-- Addresses / Private Keys Input -->
+        <div class="section" style="padding:10px;margin-bottom:6px;">
+            <div class="section-title">Addresses / Private Keys</div>
+            <div class="input-group" style="margin-bottom:7px;">
+                <label style="font-size:0.8rem;">Enter Addresses or Private Keys</label>
+                <button onclick="thOpenWalletPicker('inputBalanceCheck','multi')" style="width:100%;display:flex;align-items:center;justify-content:center;gap:8px;padding:8px 12px;border-radius:9px;border:1px dashed rgba(99,102,241,0.45);background:rgba(99,102,241,0.06);color:var(--neon-purple);font-family:var(--font-mono);font-size:11px;font-weight:700;cursor:pointer;margin-bottom:6px;transition:all .18s;letter-spacing:.5px;" onmousedown="this.style.background='rgba(99,102,241,0.14)'" onmouseup="this.style.background='rgba(99,102,241,0.06)'" ontouchstart="this.style.background='rgba(99,102,241,0.14)'" ontouchend="this.style.background='rgba(99,102,241,0.06)'"><span class="material-icons-round" style="font-size:15px;">account_balance_wallet</span>Select Wallet</button>
+                <textarea id="inputBalanceCheck" placeholder="📋 Paste keys or addresses:&#10;0x1234... OR 1234...&#10;Comma, space, or newline separated&#10;✅ Auto-detects &amp; ignores labels!" style="min-height:100px;max-height:140px;font-family:monospace;font-size:0.82rem;resize:vertical;"></textarea>
+                <div class="hint" style="font-size:0.7rem;margin-top:3px;">Supports addresses (40 chars) and private keys (64 chars)</div>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                <button id="checkBalancesBtn" class="btn btn-primary" onclick="checkBalances()" style="padding:10px 8px;font-size:0.85rem;min-height:40px;opacity:0.45;cursor:not-allowed;" disabled>
+                    🔍 Check Balances
+                </button>
+                <button class="btn btn-danger" onclick="clearBalanceCheck()" style="padding:10px 8px;font-size:0.85rem;min-height:40px;">
+                    🗑️ Clear All
+                </button>
+            </div>
+        </div>
+
+        <!-- Token Address (Optional) -->
+        <div class="section" style="padding:10px;margin-bottom:6px;">
+            <div class="section-title">Token Balance (Optional)</div>
+            <div class="input-group" style="margin-bottom:0;">
+                <label style="font-size:0.8rem;">Token Contract Address</label>
+                <input type="text" id="tokenAddressBalanceCheck" placeholder="0x... (ERC20)" style="padding:8px 10px;font-size:0.82rem;">
+                <div class="hint" style="font-size:0.7rem;margin-top:3px;">Leave empty for native balance only (ETH, BNB, etc.)</div>
+            </div>
+        </div>
+
+        <!-- Summary Stats -->
+        <div class="section" style="padding:10px;margin-bottom:6px;">
+            <div class="section-title">Summary</div>
+            <div class="stats-grid" style="gap:6px;">
+                <div class="stat-card" style="padding:8px 10px;">
+                    <div class="stat-label">Total Addresses</div>
+                    <div class="stat-value" id="totalAddressesBalance" style="font-size:15px;">0</div>
+                </div>
+                <div class="stat-card" style="padding:8px 10px;">
+                    <div class="stat-label">Total Balance</div>
+                    <div class="stat-value" id="totalBalanceSum" style="font-size:15px;">0</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Balance Results -->
+        <div class="section" style="padding:10px;margin-bottom:6px;">
+            <div class="section-title">Balance Results</div>
+            <div id="balanceResultsList" style="background: #0f0f0f; border: 1px solid #2a2a2a; border-radius: 8px; padding: 10px; min-height: 100px;">
+                <div style="text-align: center; color: #808080; padding: 20px 10px;">
+                    <div style="font-size: 2rem; margin-bottom: 6px;">💰</div>
+                    <div style="font-size:0.85rem;">No results yet</div>
+                    <div style="font-size: 0.75rem; margin-top: 5px; color:#606060;">Enter addresses or keys and click "Check Balances"</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Export Options -->
+        <div class="section" style="padding:10px;margin-bottom:6px;">
+            <div class="section-title">Export</div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                <button class="btn btn-success" onclick="exportBalanceCSV()" style="padding:10px 8px;font-size:0.82rem;min-height:40px;">
+                    📊 CSV
+                </button>
+                <button class="btn btn-success" onclick="exportBalanceJSON()" style="padding:10px 8px;font-size:0.82rem;min-height:40px;">
+                    📄 JSON
+                </button>
+            </div>
+        </div>
+
+        <!-- Log Section -->
+        <div class="section" style="padding:10px;margin-bottom:6px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                <div class="section-title" style="margin-bottom: 0;font-size:0.88rem;">Logs</div>
+                <button class="btn" onclick="clearLogBalanceCheck()" style="width: auto; padding: 5px 10px; font-size: 0.75rem; background: #2a2a2a; color: #e0e0e0;">Clear</button>
+            </div>
+            <div class="log-container" id="logContainerBalanceCheck" style="max-height:200px;">
+            </div>
+        </div>
+
+        </div>

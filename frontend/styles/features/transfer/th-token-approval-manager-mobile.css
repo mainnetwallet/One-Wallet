@@ -1,0 +1,73 @@
+        /* ===== TOKEN APPROVAL MANAGER — MOBILE PHONE OPTIMIZED ===== */
+        /* Force single-column layout, compact spacing, smaller boxes */
+        #th-wrapper #tokenApprovalManagerUI .grid,
+        #th-wrapper #tokenApprovalManagerUI [style*="grid-template-columns: 1fr 1fr"],
+        #th-wrapper #tokenApprovalManagerUI [style*="grid-template-columns: repeat(2"] {
+            grid-template-columns: 1fr !important;
+            gap: 8px !important;
+        }
+
+        #th-wrapper #tokenApprovalManagerUI .section {
+            padding: 10px !important;
+            margin-bottom: 6px !important;
+        }
+
+        #th-wrapper #tokenApprovalManagerUI .section-title {
+            font-size: 0.88rem !important;
+            padding: 7px 10px !important;
+            margin: -10px -10px 8px -10px !important;
+        }
+
+        #th-wrapper #tokenApprovalManagerUI .input-group {
+            margin-bottom: 8px !important;
+        }
+
+        #th-wrapper #tokenApprovalManagerUI input[type="text"] {
+            padding: 9px 10px !important;
+            font-size: 0.82rem !important;
+            min-height: 40px !important;
+        }
+
+        #th-wrapper #tokenApprovalManagerUI .sk-key-textarea {
+            min-height: 100px !important;
+            max-height: 140px !important;
+            font-size: 0.8rem !important;
+        }
+
+        #th-wrapper #tokenApprovalManagerUI .stat-card {
+            padding: 7px 10px !important;
+        }
+
+        #th-wrapper #tokenApprovalManagerUI .stat-value {
+            font-size: 15px !important;
+        }
+
+        #th-wrapper #tokenApprovalManagerUI .stat-label {
+            font-size: 0.68rem !important;
+        }
+
+        #th-wrapper #tokenApprovalManagerUI .btn {
+            padding: 10px 8px !important;
+            font-size: 0.82rem !important;
+            min-height: 40px !important;
+        }
+
+        #th-wrapper #tokenApprovalManagerUI .hint {
+            font-size: 0.7rem !important;
+            margin-top: 3px !important;
+        }
+
+        #th-wrapper #tokenApprovalManagerUI .log-section {
+            margin-top: 6px !important;
+        }
+
+        #th-wrapper #tokenApprovalManagerUI .log-container {
+            max-height: 200px !important;
+            font-size: 0.75rem !important;
+        }
+
+        #th-wrapper #tokenApprovalManagerUI .stats-grid {
+            gap: 6px !important;
+        }
+        /* ===== END TOKEN APPROVAL MANAGER ===== */
+

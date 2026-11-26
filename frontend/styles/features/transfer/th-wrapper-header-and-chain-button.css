@@ -1,0 +1,92 @@
+  /* Transfer Hub Scoped Styles */
+  #th-wrapper {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    color: #e0e0e0;
+    line-height: 1.5;
+  }
+
+  /* TH Chain Picker Button */
+  .th-chain-btn {
+    width: 100%; display: flex; align-items: center; gap: 10px;
+    padding: 10px 14px; border-radius: 12px;
+    border: 1px solid var(--border-subtle); background: var(--bg-raised);
+    color: var(--text-primary); cursor: pointer; transition: all 0.2s;
+    -webkit-tap-highlight-color: transparent; user-select: none;
+    margin-bottom: 0;
+  }
+  .th-chain-btn:active { transform: scale(0.98); background: var(--bg-glass-hover); }
+  .th-chain-btn:hover { border-color: rgba(99,102,241,0.4); background: var(--bg-glass); }
+
+  /* ── TH Section Header with Chain Switch Button ── */
+  .th-section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: relative;
+    margin-bottom: 0;
+    gap: 10px;
+  }
+            .th-back-btn {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                width: 34px;
+                height: 34px;
+                border-radius: 10px;
+                background: var(--bg-glass);
+                border: 1px solid var(--border-subtle);
+                cursor: pointer;
+                flex-shrink: 0;
+                margin-right: 4px;
+                transition: background 0.15s;
+                -webkit-tap-highlight-color: transparent;
+            }
+            .th-back-btn:active { background: var(--bg-glass-hover); }
+            .th-back-btn .material-icons-round { font-size: 18px; color: var(--text-secondary); pointer-events: none; }
+
+  .th-section-header h1 {
+    margin: 0;
+    flex: 1;
+  }
+  .th-header-chain-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 10px;
+    border-radius: 10px;
+    border: 1px solid var(--border-subtle);
+    background: var(--bg-raised);
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: all 0.2s;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+    flex-shrink: 0;
+    white-space: nowrap;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    width: 130px;
+    overflow: hidden;
+  }
+  .th-header-chain-btn:active  { transform: scale(0.97); background: var(--bg-glass-hover); }
+  .th-header-chain-btn:hover   { border-color: rgba(99,102,241,0.4); background: rgba(99,102,241,0.06); }
+  .th-header-chain-btn .th-hcb-emoji { font-size: 14px; line-height: 1; width: 18px; height: 18px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; overflow: hidden; }
+  .th-header-chain-btn .th-hcb-name  { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+  .th-header-chain-btn .material-icons-round { font-size: 14px; color: var(--text-muted); flex-shrink: 0; }
+
+        
+        /* Additional mobile tap highlight prevention */
+        
+        #th-wrapper a, #th-wrapper button, #th-wrapper input, #th-wrapper select, #th-wrapper textarea {
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        
+        /* Tablet/Desktop - slightly larger */
+        
+
+        
+        
+        

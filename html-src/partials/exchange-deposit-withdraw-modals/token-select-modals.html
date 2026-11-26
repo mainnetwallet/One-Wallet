@@ -1,0 +1,54 @@
+<!-- ══ Exchange Deposit — Select Token Modal ══ -->
+<!-- ══ Withdraw Token Select Modal ══ -->
+<div id="exc-wd-tok-overlay" style="display:none;position:fixed;inset:0;z-index:30003;background:rgba(0,0,0,0.72);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);" onclick="excWdTokModalClose(event)">
+  <div id="exc-wd-tok-sheet" style="position:absolute;bottom:0;left:0;right:0;background:#0f0f1a;border-radius:20px 20px 0 0;max-height:88vh;display:flex;flex-direction:column;overflow:hidden;transform:translateY(100%);transition:transform 0.3s cubic-bezier(0.32,0.72,0,1);">
+    <!-- Header -->
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px 12px;border-bottom:1px solid rgba(255,255,255,0.06);flex-shrink:0;">
+      <div>
+        <div style="font-size:16px;font-weight:700;color:#f1f1f8;">Select Token</div>
+        <div id="exc-wd-tok-exch-label" style="font-size:11px;color:#8b8ba7;margin-top:2px;"></div>
+      </div>
+      <div onclick="excWdTokModalClose(null,true)" style="width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,0.06);display:flex;align-items:center;justify-content:center;cursor:pointer;-webkit-tap-highlight-color:transparent;">
+        <span class="material-icons-round" style="font-size:18px;color:#8b8ba7;">close</span>
+      </div>
+    </div>
+    <!-- Exchange balance summary -->
+    <div id="exc-wd-tok-bal-summary" style="padding:10px 20px;background:rgba(245,158,11,0.05);border-bottom:1px solid rgba(255,255,255,0.06);flex-shrink:0;display:none;">
+      <div style="font-size:10px;color:#4a4a65;letter-spacing:0.8px;text-transform:uppercase;margin-bottom:4px;">Exchange Balance</div>
+      <div id="exc-wd-tok-bal-val" style="font-size:13px;font-weight:600;color:#f59e0b;"></div>
+    </div>
+    <!-- Search -->
+    <div style="padding:10px 16px;border-bottom:1px solid rgba(255,255,255,0.06);flex-shrink:0;">
+      <div style="display:flex;align-items:center;gap:8px;background:rgba(255,255,255,0.06);border-radius:10px;padding:8px 12px;">
+        <span class="material-icons-round" style="font-size:18px;color:#4a4a65;">search</span>
+        <input id="exc-wd-tok-search" type="text" placeholder="Search token…" oninput="_renderWdTokList(this.value)"
+          style="flex:1;background:none;border:none;outline:none;font-size:14px;color:#f1f1f8;font-family:var(--font-mono,monospace);" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+      </div>
+    </div>
+    <!-- Token list -->
+    <div id="exc-wd-tok-list" style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:4px 0 32px;"></div>
+  </div>
+</div>
+
+<div id="exc-dep-tok-overlay" style="display:none;position:fixed;inset:0;z-index:30002;background:rgba(0,0,0,0.72);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);" onclick="excDepTokenModalClose(event)">
+  <div id="exc-dep-tok-sheet" style="position:absolute;bottom:0;left:0;right:0;background:#0f0f1a;border-radius:20px 20px 0 0;max-height:88vh;display:flex;flex-direction:column;overflow:hidden;transform:translateY(100%);transition:transform 0.3s cubic-bezier(0.32,0.72,0,1);">
+    <!-- Header -->
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px 12px;border-bottom:1px solid rgba(255,255,255,0.06);flex-shrink:0;">
+      <div style="font-size:16px;font-weight:700;color:#f1f1f8;">Select Token</div>
+      <div onclick="excDepTokenModalClose(null,true)" style="width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,0.06);display:flex;align-items:center;justify-content:center;cursor:pointer;-webkit-tap-highlight-color:transparent;">
+        <span class="material-icons-round" style="font-size:18px;color:#8b8ba7;">close</span>
+      </div>
+    </div>
+    <!-- Search -->
+    <div style="padding:10px 16px;border-bottom:1px solid rgba(255,255,255,0.06);flex-shrink:0;">
+      <div style="display:flex;align-items:center;gap:8px;background:rgba(255,255,255,0.06);border-radius:10px;padding:8px 12px;">
+        <span class="material-icons-round" style="font-size:18px;color:#4a4a65;">search</span>
+        <input id="exc-dep-tok-search" type="text" placeholder="Search token…" oninput="_renderDepTokenList(this.value)"
+          style="flex:1;background:none;border:none;outline:none;font-size:14px;color:#f1f1f8;font-family:var(--font-mono,monospace);" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+      </div>
+    </div>
+    <!-- Token list -->
+    <div id="exc-dep-tok-list" style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:4px 0 32px;"></div>
+  </div>
+</div>
+

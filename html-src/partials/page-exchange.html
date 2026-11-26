@@ -1,0 +1,102 @@
+    <!-- ╔══════ EXCHANGE PAGE ══════╗ -->
+    <div class="page" id="page-exchange" style="display:flex;flex-direction:column;overflow:hidden;padding-bottom:0;height:100%;">
+
+      <!-- Exchange Top Bar -->
+      <div id="exc-topbar" style="flex-shrink:0;padding:10px 16px 0;display:flex;flex-direction:column;gap:8px;">
+
+        <!-- Row 1: Exchange selector + API status -->
+        <div style="display:flex;align-items:center;justify-content:space-between;">
+          <!-- Exchange selector pill -->
+          <div id="exc-selector-btn" onclick="excOpenSelector()" style="display:flex;align-items:center;gap:8px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);border-radius:12px;padding:7px 12px;cursor:pointer;-webkit-tap-highlight-color:transparent;">
+            <img id="exc-logo" src="" style="width:20px;height:20px;border-radius:50%;object-fit:contain;background:#111;" onerror="this.style.display='none';document.getElementById('exc-logo-fb').style.display='flex'"/>
+            <div id="exc-logo-fb" style="display:none;width:20px;height:20px;border-radius:50%;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:#fff;font-family:var(--font-mono);"></div>
+            <span id="exc-name" style="font-size:13px;font-weight:700;color:var(--text-primary);font-family:var(--font-mono);">BINANCE</span>
+            <span class="material-icons-round" style="font-size:14px;color:var(--text-muted);">expand_more</span>
+          </div>
+          <!-- API status + settings -->
+          <div style="display:flex;align-items:center;gap:8px;">
+            <div id="exc-api-status" style="display:flex;align-items:center;gap:5px;padding:5px 10px;border-radius:10px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);">
+              <span id="exc-api-dot" style="width:6px;height:6px;border-radius:50%;background:#ef4444;flex-shrink:0;"></span>
+              <span id="exc-api-label" style="font-size:10px;font-weight:600;font-family:var(--font-mono);color:var(--text-muted);">NO KEY</span>
+            </div>
+            <div onclick="excOpenApiSetup()" style="width:32px;height:32px;border-radius:10px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);display:flex;align-items:center;justify-content:center;cursor:pointer;-webkit-tap-highlight-color:transparent;">
+              <span class="material-icons-round" style="font-size:17px;color:var(--text-muted);">key</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Tab content area -->
+      <div style="flex:1;overflow:hidden;position:relative;margin-top:8px;">
+
+        <!-- ── MARKETS TAB ── -->
+        <div id="exc-panel-markets" class="exc-panel" style="display:flex;flex-direction:column;height:100%;">
+          <!-- Search bar -->
+          <div style="padding:0 16px 8px;flex-shrink:0;">
+            <div style="display:flex;align-items:center;gap:8px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:12px;padding:8px 12px;">
+              <span class="material-icons-round" style="font-size:16px;color:var(--text-muted);">search</span>
+              <input id="exc-mkt-search" type="text" placeholder="Search pair… e.g. BTC" oninput="excFilterMarkets()" style="flex:1;background:transparent;border:none;outline:none;font-size:13px;color:var(--text-primary);font-family:var(--font-mono);" />
+              <!-- Quote filter -->
+              <div style="display:flex;gap:4px;" id="exc-quote-btns">
+                <div onclick="excSetQuote('USDT')" id="exc-q-USDT" class="exc-q-btn exc-q-active">USDT</div>
+                <div onclick="excSetQuote('BTC')"  id="exc-q-BTC"  class="exc-q-btn">BTC</div>
+                <div onclick="excSetQuote('ETH')"  id="exc-q-ETH"  class="exc-q-btn">ETH</div>
+              </div>
+            </div>
+          </div>
+          <!-- Sort header -->
+          <div style="display:flex;align-items:center;padding:0 16px 6px;flex-shrink:0;">
+            <span style="flex:1;font-size:10px;font-family:var(--font-mono);color:var(--text-muted);letter-spacing:0.8px;">PAIR</span>
+            <span onclick="excSortMarkets('price')" style="width:90px;text-align:right;font-size:10px;font-family:var(--font-mono);color:var(--text-muted);letter-spacing:0.8px;cursor:pointer;">PRICE <span id="exc-sort-price">↕</span></span>
+            <span onclick="excSortMarkets('change')" style="width:72px;text-align:right;font-size:10px;font-family:var(--font-mono);color:var(--text-muted);letter-spacing:0.8px;cursor:pointer;">24H <span id="exc-sort-change">↕</span></span>
+          </div>
+          <!-- Markets list -->
+          <div id="exc-markets-list" style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:0 16px 16px;">
+            <div style="display:flex;align-items:center;justify-content:center;padding:40px 0;gap:10px;">
+              <div class="exc-spinner"></div>
+              <span style="font-size:13px;color:var(--text-muted);font-family:var(--font-mono);">Loading markets…</span>
+            </div>
+          </div>
+        </div>
+
+        <!--@include partials/page-exchange/exc-panel-trade.html-->
+
+        
+        <!-- ── ORDERS TAB ── -->
+        <div id="exc-panel-orders" class="exc-panel" style="display:none;flex-direction:column;height:100%;">
+          <!-- ── Orders Category Tabs ── -->
+          <div style="padding:10px 16px 0;flex-shrink:0;">
+            <div style="display:flex;gap:4px;background:rgba(255,255,255,0.04);border-radius:12px;padding:4px;">
+              <div id="exc-ocat-open"    onclick="excSwitchOrdersCat('open')"    class="exc-ocat-tab exc-ocat-active">Positions</div>
+              <div id="exc-ocat-all"     onclick="excSwitchOrdersCat('all')"     class="exc-ocat-tab">All</div>
+              <div id="exc-ocat-spot"    onclick="excSwitchOrdersCat('spot')"    class="exc-ocat-tab">Spot</div>
+              <div id="exc-ocat-futures" onclick="excSwitchOrdersCat('futures')" class="exc-ocat-tab">Futures</div>
+              <div id="exc-ocat-convert" onclick="excSwitchOrdersCat('convert')" class="exc-ocat-tab">Convert</div>
+            </div>
+          </div>
+          <!-- ── Orders List ── -->
+          <div id="exc-orders-list" style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:8px 16px 16px;">
+            <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 0;gap:12px;">
+              <span class="material-icons-round" style="font-size:48px;color:rgba(255,255,255,0.1);">receipt_long</span>
+              <span style="font-size:13px;color:var(--text-muted);font-family:var(--font-mono);">Add API key to view orders</span>
+            </div>
+          </div>
+        </div>
+
+        <!--@include partials/page-exchange/exc-panel-future.html-->
+
+        <!--@include partials/page-exchange/exc-panel-portfolio.html-->
+
+
+        <!--@include partials/page-exchange/exc-panel-transfer.html-->
+
+    <!--@include partials/page-exchange/exc-transfer-overlays.html-->
+
+    <script src="scripts/features/exchange/exchange-transfer.js"></script>
+
+
+      </div><!-- /tab content -->
+
+
+    </div>

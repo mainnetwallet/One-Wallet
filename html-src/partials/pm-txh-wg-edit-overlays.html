@@ -1,0 +1,58 @@
+<!-- ══════ PAIR MANAGER MODAL ══════ -->
+<div class="send-overlay" id="pm-overlay" style="z-index:660;">
+  <div class="send-modal">
+    <div class="send-header">
+      <div class="send-back-btn" onclick="closePairManager()">
+        <span class="material-icons-round">arrow_back</span>
+      </div>
+      <div class="send-header-title">Manage Pairs</div>
+      <div id="pm-count-badge" style="padding:4px 10px;border-radius:8px;background:rgba(34,211,238,0.12);border:1px solid rgba(34,211,238,0.3);font-size:10px;font-weight:700;color:var(--neon-cyan);font-family:var(--font-mono);">0 PAIRS</div>
+    </div>
+    <div class="send-body" style="padding:16px 20px 40px;">
+      <div id="pm-list"></div>
+      <div id="pm-empty" style="display:none;text-align:center;padding:40px 20px;">
+        <div style="width:56px;height:56px;border-radius:18px;background:rgba(34,211,238,0.08);border:1px solid rgba(34,211,238,0.15);display:flex;align-items:center;justify-content:center;margin:0 auto 14px;">
+          <span class="material-icons-round" style="font-size:26px;color:var(--neon-cyan);opacity:0.4">bookmarks</span>
+        </div>
+        <div style="font-size:14px;font-weight:700;color:var(--text-secondary);margin-bottom:6px;">No Saved Pairs</div>
+        <div style="font-size:11px;color:var(--text-muted);font-family:var(--font-mono);line-height:1.6;">Create a pair in Step 2<br>and it will appear here.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════ TX HISTORY MODAL ══════ -->
+<div class="txh-overlay" id="txh-overlay">
+  <div class="txh-modal">
+    <div class="txh-header">
+      <div class="txh-back-btn" onclick="closeTxHistory()">
+        <span class="material-icons-round">arrow_back</span>
+      </div>
+      <div class="txh-title">Transaction History</div>
+      <div class="txh-count-badge" id="txh-count-badge">0 TXs</div>
+    </div>
+    <div class="txh-body" id="txh-body">
+      <!-- Filled by JS -->
+    </div>
+  </div>
+</div>
+
+<!-- ══════ WALLET GROUP EDIT MODAL ══════ -->
+<div class="wg-edit-overlay" id="wg-edit-overlay">
+  <div class="wg-edit-box">
+    <div style="font-size:16px;font-weight:800;margin-bottom:16px;">Edit Group Name</div>
+    <input type="text" id="wg-edit-name-input" class="send-input"
+      style="font-family:var(--font-display);font-size:14px;font-weight:700;margin-bottom:14px;"
+      placeholder="Group name…" autocomplete="off" spellcheck="false" />
+    <div style="display:flex;gap:8px;">
+      <button onclick="closeWgEditModal()"
+        style="flex:1;padding:12px;background:var(--bg-raised);border:1px solid var(--border-subtle);border-radius:var(--radius-md);color:var(--text-secondary);font-family:var(--font-display);font-size:13px;font-weight:700;cursor:pointer;">
+        CANCEL
+      </button>
+      <button onclick="saveWgEditName()"
+        style="flex:2;padding:12px;background:linear-gradient(135deg,var(--accent-primary),var(--accent-secondary));border:none;border-radius:var(--radius-md);color:#fff;font-family:var(--font-display);font-size:13px;font-weight:800;cursor:pointer;box-shadow:var(--glow-primary);">
+        SAVE NAME
+      </button>
+    </div>
+  </div>
+</div>

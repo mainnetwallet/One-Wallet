@@ -1,0 +1,40 @@
+    <div id="br-history-modal" onclick="if(event.target===this)brCloseHistory()" ontouchend="if(event.target===this){event.preventDefault();brCloseHistory();}">
+      <div id="br-history-sheet">
+        <div class="brh-pill"></div>
+
+        <!-- Header -->
+        <div class="brh-header">
+          <div class="brh-title-wrap">
+            <div class="brh-title-icon">
+              <span class="material-icons-round" style="font-size:16px;color:var(--neon-cyan);">receipt_long</span>
+            </div>
+            <span class="brh-title">Recent Bridge/Swap</span>
+            <span class="brh-count-pill" id="brh-count-pill">0</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <div id="brh-clear-btn" onclick="brClearHistory()" ontouchend="event.preventDefault();brClearHistory();" style="display:none;align-items:center;gap:5px;padding:5px 11px;border-radius:20px;background:rgba(244,63,94,0.1);border:1px solid rgba(244,63,94,0.25);cursor:pointer;transition:opacity 0.15s;" onmousedown="this.style.opacity='.6'" onmouseup="this.style.opacity='1'" ontouchstart="this.style.opacity='.6'" onmouseleave="this.style.opacity='1'">
+              <span class="material-icons-round" style="font-size:14px;color:var(--accent-red);">delete_sweep</span>
+              <span style="font-size:11px;font-weight:700;font-family:var(--font-display);color:var(--accent-red);">Clear</span>
+            </div>
+            <div class="brh-close-btn" onclick="brCloseHistory()" ontouchend="event.preventDefault();brCloseHistory();">
+              <span class="material-icons-round" style="font-size:16px;color:var(--text-muted);">close</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Filter tabs -->
+        <div class="brh-filter-bar">
+          <div class="brh-filter-chip active" id="brh-filter-all" onclick="brHistSetFilter('all')">ALL</div>
+          <div class="brh-filter-chip" id="brh-filter-bridge" onclick="brHistSetFilter('bridge')">BRIDGE</div>
+          <div class="brh-filter-chip" id="brh-filter-swap" onclick="brHistSetFilter('swap')">SWAP</div>
+        </div>
+
+        <!-- List -->
+        <div id="br-hist-list"></div>
+
+        <!-- Footer -->
+        <div class="brh-footer">
+          <span class="brh-footer-info" id="brh-expire-info">RECENT TRANSACTIONS</span>
+        </div>
+      </div>
+    </div>

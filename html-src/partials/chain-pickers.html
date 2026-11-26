@@ -1,0 +1,136 @@
+<!-- ══════ DELEGATION CHAIN PICKER OVERLAY ══════ -->
+<div class="hcp-overlay" id="del-chain-overlay" onclick="if(event.target===this)closeDelChainPicker()" style="z-index:960;">
+  <div class="hcp-modal" id="del-chain-modal" style="max-height:75vh;">
+    <!-- Handle -->
+    <div style="display:flex;justify-content:center;padding:10px 0 0;">
+      <div style="width:36px;height:4px;border-radius:2px;background:rgba(255,255,255,0.12);"></div>
+    </div>
+    <!-- Header -->
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 20px 10px;flex-shrink:0;">
+      <div>
+        <div style="font-size:16px;font-weight:800;">Select Chain</div>
+        <div style="font-size:10px;font-family:var(--font-mono);color:var(--accent-primary);margin-top:2px;letter-spacing:1.5px;">EIP-7702 DELEGATION NETWORK</div>
+      </div>
+      <div onclick="closeDelChainPicker()" style="width:34px;height:34px;border-radius:10px;background:var(--bg-glass);border:1px solid var(--border-subtle);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all 0.2s;" onmousedown="this.style.transform='scale(0.9)'" onmouseup="this.style.transform=''" ontouchstart="this.style.transform='scale(0.9)'" ontouchend="this.style.transform=''">
+        <span class="material-icons-round" style="font-size:17px;color:var(--text-secondary)">close</span>
+      </div>
+    </div>
+    <!-- EIP-7702 info strip -->
+    <div style="margin:0 16px 10px;padding:10px 14px;background:linear-gradient(135deg,rgba(99,102,241,0.1),rgba(139,92,246,0.07));border:1px solid rgba(99,102,241,0.25);border-radius:12px;display:flex;align-items:center;gap:10px;flex-shrink:0;">
+      <span style="font-size:20px;line-height:1;">⚡</span>
+      <div>
+        <div style="font-size:11px;font-weight:700;color:var(--neon-purple);">EIP-7702 Compatible Chains</div>
+        <div style="font-size:10px;color:var(--text-muted);font-family:var(--font-mono);margin-top:1px;">Base has native Coinbase sponsorship</div>
+      </div>
+    </div>
+    <!-- Search -->
+    <div style="padding:0 16px 10px;flex-shrink:0;">
+      <div style="display:flex;align-items:center;gap:10px;background:var(--bg-raised);border:1px solid var(--border-subtle);border-radius:12px;padding:10px 14px;">
+        <span class="material-icons-round" style="font-size:16px;color:var(--text-muted);flex-shrink:0;">search</span>
+        <input id="del-chain-search" type="text" placeholder="Search networks…"
+          style="flex:1;background:none;border:none;outline:none;font-family:var(--font-mono);font-size:12px;color:var(--text-primary);"
+          oninput="renderDelChainList()" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
+        <span id="del-chain-search-clear" onclick="document.getElementById('del-chain-search').value='';renderDelChainList();" style="display:none;cursor:pointer;">
+          <span class="material-icons-round" style="font-size:15px;color:var(--text-muted);">close</span>
+        </span>
+      </div>
+    </div>
+    <!-- Chain list -->
+    <div id="del-chain-list" style="flex:1;overflow-y:auto;scrollbar-width:none;padding:0 16px 24px;"></div>
+  </div>
+</div>
+
+<!-- ══════ PROFILE CHAIN SWITCH MODAL ══════ -->
+<div class="hcp-overlay" id="pcp-overlay" onclick="pcpOverlayClick(event)" style="z-index:910;">
+  <div class="hcp-modal" id="pcp-modal">
+    <!-- Handle -->
+    <div style="display:flex;justify-content:center;padding:10px 0 0;">
+      <div style="width:36px;height:4px;border-radius:2px;background:rgba(255,255,255,0.12);"></div>
+    </div>
+    <!-- Header -->
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 20px 10px;flex-shrink:0;">
+      <div>
+        <div style="font-size:16px;font-weight:800;">Select Network</div>
+        <div style="font-size:10px;font-family:var(--font-mono);color:var(--text-muted);margin-top:2px;letter-spacing:1px;">CHECK DELEGATION ON CHAIN</div>
+      </div>
+      <div onclick="closeProfChainPicker()" style="width:34px;height:34px;border-radius:10px;background:var(--bg-glass);border:1px solid var(--border-subtle);display:flex;align-items:center;justify-content:center;cursor:pointer;" onmousedown="this.style.transform='scale(0.9)'" onmouseup="this.style.transform=''" ontouchstart="this.style.transform='scale(0.9)'" ontouchend="this.style.transform=''">
+        <span class="material-icons-round" style="font-size:17px;color:var(--text-secondary)">close</span>
+      </div>
+    </div>
+    <!-- Search -->
+    <div style="padding:0 16px 10px;flex-shrink:0;">
+      <div style="display:flex;align-items:center;gap:10px;background:var(--bg-raised);border:1px solid var(--border-subtle);border-radius:12px;padding:10px 14px;">
+        <span class="material-icons-round" style="font-size:16px;color:var(--text-muted);flex-shrink:0;">search</span>
+        <input id="pcp-search" type="text" placeholder="Search networks…"
+          style="flex:1;background:none;border:none;outline:none;font-family:var(--font-mono);font-size:12px;color:var(--text-primary);"
+          oninput="pcpSearch()" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
+        <span id="pcp-search-clear" onclick="pcpClearSearch()" style="display:none;cursor:pointer;">
+          <span class="material-icons-round" style="font-size:15px;color:var(--text-muted);">close</span>
+        </span>
+      </div>
+    </div>
+    <!-- Chain list -->
+    <div id="pcp-list" style="flex:1;overflow-y:auto;scrollbar-width:none;padding:0 16px 24px;"></div>
+  </div>
+</div>
+
+
+<!-- ══════ TRANSFER HUB CHAIN PICKER MODAL ══════ -->
+<div class="hcp-overlay" id="th-chain-overlay" onclick="if(event.target===this)thCloseChainPicker()" style="z-index:9600;">
+  <div class="hcp-modal" id="th-chain-modal">
+    <div style="display:flex;justify-content:center;padding:10px 0 0;">
+      <div style="width:36px;height:4px;border-radius:2px;background:rgba(255,255,255,0.12);"></div>
+    </div>
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 20px 10px;flex-shrink:0;">
+      <div>
+        <div style="font-size:16px;font-weight:800;">Select Network</div>
+        <div id="th-chain-modal-sub" style="font-size:10px;font-family:var(--font-mono);color:var(--text-muted);margin-top:2px;letter-spacing:1px;">TRANSFER HUB</div>
+      </div>
+      <div onclick="thCloseChainPicker()" style="width:34px;height:34px;border-radius:10px;background:var(--bg-glass);border:1px solid var(--border-subtle);display:flex;align-items:center;justify-content:center;cursor:pointer;" onmousedown="this.style.transform='scale(0.9)'" onmouseup="this.style.transform=''" ontouchstart="this.style.transform='scale(0.9)'" ontouchend="this.style.transform=''">
+        <span class="material-icons-round" style="font-size:17px;color:var(--text-secondary)">close</span>
+      </div>
+    </div>
+    <div style="padding:0 16px 10px;flex-shrink:0;">
+      <div style="display:flex;align-items:center;gap:10px;background:var(--bg-raised);border:1px solid var(--border-subtle);border-radius:12px;padding:10px 14px;">
+        <span class="material-icons-round" style="font-size:16px;color:var(--text-muted);flex-shrink:0;">search</span>
+        <input id="th-chain-search" type="text" placeholder="Search networks…"
+          style="flex:1;background:none;border:none;outline:none;font-family:var(--font-mono);font-size:12px;color:var(--text-primary);"
+          oninput="thRenderChainList()" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
+        <span id="th-chain-search-clear" onclick="document.getElementById('th-chain-search').value='';thRenderChainList();" style="display:none;cursor:pointer;">
+          <span class="material-icons-round" style="font-size:15px;color:var(--text-muted);">close</span>
+        </span>
+      </div>
+    </div>
+    <div id="th-chain-list" style="flex:1;overflow-y:auto;scrollbar-width:none;padding:0 16px 20px;"></div>
+  </div>
+</div>
+
+<!-- ══════ SWAP CHAIN PICKER MODAL ══════ -->
+<div class="hcp-overlay" id="sw-chain-overlay" onclick="if(event.target===this)closeSwapChainPicker()" style="z-index:950;">
+  <div class="hcp-modal" id="sw-chain-modal">
+    <div style="display:flex;justify-content:center;padding:10px 0 0;">
+      <div style="width:36px;height:4px;border-radius:2px;background:rgba(255,255,255,0.12);"></div>
+    </div>
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 20px 10px;flex-shrink:0;">
+      <div>
+        <div style="font-size:16px;font-weight:800;">Select Network</div>
+        <div style="font-size:10px;font-family:var(--font-mono);color:var(--text-muted);margin-top:2px;letter-spacing:1px;">SWAP CHAIN SELECTION</div>
+      </div>
+      <div onclick="closeSwapChainPicker()" style="width:34px;height:34px;border-radius:10px;background:var(--bg-glass);border:1px solid var(--border-subtle);display:flex;align-items:center;justify-content:center;cursor:pointer;" onmousedown="this.style.transform='scale(0.9)'" onmouseup="this.style.transform=''" ontouchstart="this.style.transform='scale(0.9)'" ontouchend="this.style.transform=''">
+        <span class="material-icons-round" style="font-size:17px;color:var(--text-secondary)">close</span>
+      </div>
+    </div>
+    <div style="padding:0 16px 10px;flex-shrink:0;">
+      <div style="display:flex;align-items:center;gap:10px;background:var(--bg-raised);border:1px solid var(--border-subtle);border-radius:12px;padding:10px 14px;">
+        <span class="material-icons-round" style="font-size:16px;color:var(--text-muted);flex-shrink:0;">search</span>
+        <input id="sw-chain-search" type="text" placeholder="Search networks…"
+          style="flex:1;background:none;border:none;outline:none;font-family:var(--font-mono);font-size:12px;color:var(--text-primary);"
+          oninput="renderSwapChainList()" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
+        <span id="sw-chain-search-clear" onclick="document.getElementById('sw-chain-search').value='';renderSwapChainList();" style="display:none;cursor:pointer;">
+          <span class="material-icons-round" style="font-size:15px;color:var(--text-muted);">close</span>
+        </span>
+      </div>
+    </div>
+    <div id="sw-chain-list" style="flex:1;overflow-y:auto;scrollbar-width:none;padding:0 16px 20px;"></div>
+  </div>
+</div>

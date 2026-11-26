@@ -1,0 +1,215 @@
+        /* Dashboard Card Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px) scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+        
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+        }
+        
+        @keyframes bounce {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+        
+        #th-wrapper .dashboard-card {
+            position: relative;
+        }
+        
+
+        
+        #th-wrapper .dashboard-card:hover {
+            /* handled per-element in app icon CSS */
+        }
+        
+        #th-wrapper .dashboard-card:active {
+            /* handled per-element in app icon CSS */
+        }
+        
+        /* Ensure content stays above water effects */
+        #th-wrapper .dashboard-card > div {
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Loading Spinner Styles */
+        #th-wrapper .btn.loading {
+            position: relative;
+            color: transparent !important;
+            pointer-events: none;
+        }
+
+        #th-wrapper .btn.loading::after {
+            content: "";
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            top: 50%;
+            left: 50%;
+            margin-left: -8px;
+            margin-top: -8px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top-color: #ffffff;
+            border-radius: 50%;
+            animation: spinner 0.6s linear infinite;
+        }
+
+        @keyframes spinner {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        #th-wrapper .btn-primary.loading::after {
+            border-color: rgba(255, 255, 255, 0.3);
+            border-top-color: #ffffff;
+        }
+
+        #th-wrapper .btn-success.loading::after {
+            border-color: rgba(255, 255, 255, 0.3);
+            border-top-color: #ffffff;
+        }
+
+        #th-wrapper .execute-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        #th-wrapper .log-section {
+            background: #0a0a0a;
+            border: 1px solid #1a1a1a;
+            border-radius: 12px;
+            padding: 15px;
+        }
+
+        #th-wrapper .mode-selector {
+            background: linear-gradient(135deg, #1a1a1a 0%, #0f0f0f 100%);
+            border: 2px solid #2a2a2a;
+            border-radius: 10px;
+            padding: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            /* APK: Better tap target */
+            min-height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #th-wrapper .mode-selector:hover {
+            border-color: #4a9eff;
+            background: linear-gradient(135deg, #2a2a2a 0%, #1a1a1a 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(74, 158, 255, 0.2);
+        }
+
+        #th-wrapper .mode-selector.active {
+            border-color: #4a9eff;
+            background: linear-gradient(135deg, rgba(74, 158, 255, 0.15) 0%, rgba(74, 158, 255, 0.08) 100%);
+            box-shadow: 0 0 15px rgba(74, 158, 255, 0.25);
+        }
+
+        #th-wrapper .mode-selector.active::before {
+            content: '✓';
+            position: absolute;
+            top: 6px;
+            right: 6px;
+            background: #4a9eff;
+            color: white;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.75rem;
+        }
+
+        #th-wrapper .log-container {
+            background: #000000;
+            border: 1px solid #1a1a1a;
+            border-radius: 12px;
+            padding: 14px; /* More padding */
+            font-family: 'SF Mono', 'Monaco', 'Courier New', monospace;
+            font-size: 0.9rem; /* MUCH bigger! */
+            height: 35vh;
+            min-height: 220px;
+            max-height: 500px;
+            overflow-y: auto;
+            line-height: 1.6; /* More line height */
+            overscroll-behavior: contain;
+            /* APK: Better scrolling */
+            -webkit-overflow-scrolling: touch;
+            scroll-behavior: smooth;
+            /* APK: Better link selection in logs */
+            word-break: break-word;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        
+
+        #th-wrapper .log-line {
+            margin-bottom: 4px;
+            word-break: break-all;
+        }
+        
+        #th-wrapper .log-link {
+            color: inherit;
+            text-decoration: underline;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+        
+        #th-wrapper .log-link:hover {
+            opacity: 0.7;
+        }
+
+        #th-wrapper .log-info {
+            color: #4a9eff;
+        }
+
+        #th-wrapper .log-success {
+            color: #10b981;
+        }
+
+        #th-wrapper .log-warning {
+            color: #f59e0b;
+        }
+
+        #th-wrapper .log-error {
+            color: #ef4444;
+        }
+

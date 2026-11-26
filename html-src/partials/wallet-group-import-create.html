@@ -1,0 +1,27 @@
+<!--@include partials/wallet-group-import-create/wg-import-overlay.html-->
+
+<!--@include partials/wallet-group-import-create/wg-keyinput-overlay.html-->
+
+<!--@include partials/wallet-group-import-create/wg-create-overlay.html-->
+
+<link rel="stylesheet" href="styles/features/exchange/exchange.css">
+
+<!-- ══════ SWAP GROUP PICKER MODAL ══════ -->
+<div class="send-overlay" id="wg-picker-overlay" style="z-index:700;">
+  <div class="send-modal">
+    <div class="send-header">
+      <div class="send-back-btn" onclick="closeWgPicker()">
+        <span class="material-icons-round">arrow_back</span>
+      </div>
+      <div class="send-header-title">Select Wallet Group</div>
+      <div id="wg-picker-badge" style="padding:4px 10px;border-radius:8px;background:rgba(99,102,241,0.15);border:1px solid rgba(99,102,241,0.3);font-size:10px;font-weight:700;color:var(--neon-purple);font-family:var(--font-mono);">0 GROUPS</div>
+    </div>
+    <div class="send-body" style="padding:16px 20px 40px;">
+      <div id="wg-picker-list" style="display:flex;flex-direction:column;gap:10px;">
+        <div style="text-align:center;padding:30px;font-family:var(--font-mono);font-size:11px;color:var(--text-muted);">
+          No groups found. Import in Settings.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

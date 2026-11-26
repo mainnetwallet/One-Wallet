@@ -1,0 +1,368 @@
+  /* ══════════════════════════════════════════════════════
+     LIGHT MODE — Complete Override System
+     ══════════════════════════════════════════════════════ */
+  body.light-mode {
+    /* CSS Variable overrides */
+    --bg-void:        #eef0f7;
+    --bg-deep:        #f2f4fb;
+    --bg-surface:     #ffffff;
+    --bg-raised:      #e8eaf5;
+    --bg-glass:       rgba(99,102,241,0.06);
+    --bg-glass-hover: rgba(99,102,241,0.11);
+    --border-subtle:  rgba(99,102,241,0.15);
+    --border-glow:    rgba(99,102,241,0.4);
+    --text-primary:   #1e1b4b;
+    --text-secondary: #3730a3;
+    --text-muted:     #6366f1;
+    --shadow-card:    0 2px 16px rgba(99,102,241,0.1), 0 1px 4px rgba(0,0,0,0.05);
+    --glow-primary:   0 0 12px rgba(99,102,241,0.15);
+    --glow-cyan:      0 0 12px rgba(6,182,212,0.15);
+    --glow-green:     0 0 10px rgba(16,185,129,0.15);
+  }
+
+  /* ── Background layers ── */
+  body.light-mode                        { background: #eef0f7 !important; color: #1e1b4b !important; }
+  body.light-mode #app                   { background: #f2f4fb !important; }
+  body.light-mode #splash                { background: #eef0f7 !important; }
+  body.light-mode .page,
+  body.light-mode .pages                 { background: #f2f4fb !important; }
+
+  /* ── Bottom Nav ── */
+  body.light-mode .bottom-nav {
+    background: rgba(242,244,251,0.97) !important;
+    border-top: 1px solid rgba(99,102,241,0.15) !important;
+    position: fixed !important;
+    bottom: 0 !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    z-index: 20000 !important;
+  }
+  body.light-mode .nav-item .material-icons-round { color: #a5b4fc !important; }
+  body.light-mode .nav-item span.label            { color: #a5b4fc !important; }
+  body.light-mode .nav-item.active .material-icons-round { color: #6366f1 !important; }
+  body.light-mode .nav-item.active span.label            { color: #6366f1 !important; }
+
+  /* ── All text: cascade color downward but do NOT fight inline style="" overrides.
+     Using :not([style*="color"]) ensures explicitly styled elements (e.g. accent
+     badges, green values, loading spinners) keep their own colour in light mode
+     instead of being silently swallowed by this rule. ── */
+  body.light-mode *:not([style*="color"]) { color: inherit; }
+  body.light-mode .greeting-sub,
+  body.light-mode .section-title,
+  body.light-mode .menu-group-label,
+  body.light-mode .prof-chain-label,
+  body.light-mode .swap-box-label,
+  body.light-mode .slider-label,
+  body.light-mode .token-sub,
+  body.light-mode .act-sub,
+  body.light-mode .menu-sub,
+  body.light-mode .stat-label,
+  body.light-mode .sii-label,
+  body.light-mode .p-chip-label,
+  body.light-mode .qa-btn span.qa-label { color: #6366f1 !important; }
+
+  body.light-mode .token-usd { color: var(--accent-green) !important; }
+
+  body.light-mode .greeting-main,
+  body.light-mode .token-name,
+  body.light-mode .token-amount,
+  body.light-mode .act-title,
+  body.light-mode .act-amount,
+  body.light-mode .menu-title,
+  body.light-mode .stat-value,
+  body.light-mode .swap-title,
+  body.light-mode .sii-value,
+  body.light-mode .p-chip-value,
+  body.light-mode .settings-title-block h2,
+  body.light-mode .bridge-hero-title,
+  body.light-mode .bridge-action-title,
+  body.light-mode .key-input-title,
+  body.light-mode h1, body.light-mode h2, body.light-mode h3 { color: #1e1b4b !important; }
+
+  /* ── Cards, surfaces ── */
+  body.light-mode .token-card,
+  body.light-mode .activity-item,
+  body.light-mode .stat-card,
+  body.light-mode .route-card,
+  body.light-mode .br-route-card,
+  body.light-mode .br-chain-item,
+  body.light-mode .br-token-item,
+  body.light-mode .bridge-action-card,
+  body.light-mode .hcp-chain-item,
+  body.light-mode .prof-chain-node,
+  body.light-mode .key-input-card,
+  body.light-mode .swap-box {
+    background: #ffffff !important;
+    border-color: rgba(99,102,241,0.14) !important;
+    box-shadow: 0 2px 12px rgba(99,102,241,0.07) !important;
+  }
+
+  body.light-mode .menu-item {
+    background: #ffffff !important;
+    border-color: rgba(99,102,241,0.13) !important;
+    box-shadow: 0 1px 6px rgba(99,102,241,0.06) !important;
+  }
+
+  /* ── Portfolio card ── */
+  body.light-mode .portfolio-card {
+    background: linear-gradient(135deg, #e0e4ff 0%, #d5d9ff 50%, #cdd2ff 100%) !important;
+    border-color: rgba(99,102,241,0.25) !important;
+  }
+  body.light-mode .p-chip {
+    background: rgba(255,255,255,0.7) !important;
+    border-color: rgba(99,102,241,0.18) !important;
+  }
+  body.light-mode .p-chip-label { color: rgba(99,102,241,0.7) !important; }
+  body.light-mode .p-chip-value { color: #1e1b4b !important; }
+
+  /* ── Quick actions ── */
+  body.light-mode .qa-btn {
+    background: linear-gradient(145deg, #ffffff 0%, #f4f5ff 100%) !important;
+    border-color: rgba(99,102,241,0.18) !important;
+    box-shadow: 0 2px 8px rgba(99,102,241,0.08), inset 0 1px 0 rgba(255,255,255,0.9) !important;
+  }
+
+  /* ── Settings + toggle ── */
+  body.light-mode .settings-icon-big {
+    background: rgba(99,102,241,0.08) !important;
+    border-color: rgba(99,102,241,0.2) !important;
+  }
+  body.light-mode .menu-icon {
+    background: rgba(99,102,241,0.08) !important;
+  }
+  body.light-mode .toggle {
+    background: #d1d5f0 !important;
+    border-color: rgba(99,102,241,0.2) !important;
+  }
+  body.light-mode .toggle.on {
+    background: #6366f1 !important;
+    border-color: #6366f1 !important;
+  }
+  body.light-mode .toggle::after      { background: rgba(255,255,255,0.7) !important; }
+  body.light-mode .toggle.on::after   { background: #fff !important; }
+
+  /* ── Inputs ── */
+  body.light-mode input,
+  body.light-mode textarea,
+  body.light-mode .swap-amount,
+  body.light-mode .key-textarea,
+  body.light-mode .sup-sk-textarea,
+  body.light-mode .bsb-sk-textarea,
+  body.light-mode .config-input {
+    background: #f0f2ff !important;
+    color: #1e1b4b !important;
+    border-color: rgba(99,102,241,0.18) !important;
+  }
+  body.light-mode input::placeholder,
+  body.light-mode textarea::placeholder { color: #a5b4fc !important; }
+  body.light-mode .swap-amount { background: transparent !important; }
+
+  /* ── Token selector ── */
+  body.light-mode .token-selector {
+    background: #e8eaf5 !important;
+    border-color: rgba(99,102,241,0.15) !important;
+  }
+  body.light-mode .ts-name { color: #1e1b4b !important; }
+
+  /* ── Chip selector ── */
+  body.light-mode .chip-opt {
+    background: #e8eaf5 !important;
+    border-color: rgba(99,102,241,0.15) !important;
+    color: #3730a3 !important;
+  }
+  body.light-mode .chip-opt.selected {
+    background: rgba(99,102,241,0.15) !important;
+    border-color: rgba(99,102,241,0.4) !important;
+    color: #6366f1 !important;
+  }
+
+  body.light-mode .sw-slip-chip-lg { background:#e8eaf5 !important; border-color:rgba(99,102,241,0.15) !important; color:#3730a3 !important; }
+  body.light-mode .sw-slip-chip-lg.selected { background:rgba(99,102,241,0.15) !important; border-color:rgba(99,102,241,0.4) !important; color:#6366f1 !important; }
+  body.light-mode .sw-dex-row { background:rgba(16,185,129,0.05) !important; border-color:rgba(16,185,129,0.22) !important; box-shadow:0 2px 8px rgba(16,185,129,0.08) !important; }
+  body.light-mode .sw-dex-row.best-dex { background:rgba(16,185,129,0.06) !important; border-color:rgba(16,185,129,0.25) !important; }
+  body.light-mode .sw-dex-row.selected-dex { background:linear-gradient(135deg,rgba(99,102,241,0.12) 0%,rgba(139,92,246,0.07) 100%) !important; border-color:rgba(99,102,241,0.6) !important; box-shadow:0 0 0 1px rgba(99,102,241,0.2), 0 4px 20px rgba(99,102,241,0.2) !important; transform: scale(1.012); }
+  body.light-mode .sw-token-row:hover { background:rgba(99,102,241,0.06) !important; border-color:rgba(99,102,241,0.15) !important; }
+
+  body.light-mode .sw-recent-item { background:rgba(99,102,241,0.04) !important; border-color:rgba(99,102,241,0.12) !important; }
+  body.light-mode .sw-route-node { background:#e8eaf5 !important; border-color:rgba(99,102,241,0.15) !important; color:#1e1b4b !important; }
+
+  /* ── Bridge chain pill ── */
+  body.light-mode .bridge-chain-pill {
+    background: #e8eaf5 !important;
+    border-color: rgba(99,102,241,0.15) !important;
+    color: #3730a3 !important;
+  }
+
+  /* ── Profile section ── */
+  body.light-mode .profile-addr {
+    background: #e8eaf5 !important;
+    border-color: rgba(99,102,241,0.15) !important;
+    color: #3730a3 !important;
+  }
+  body.light-mode .prof-chain-node { background: #ffffff !important; }
+  body.light-mode .prof-chain-node.active {
+    background: rgba(99,102,241,0.1) !important;
+    border-color: rgba(99,102,241,0.4) !important;
+  }
+  body.light-mode .prof-chain-node-name { color: #6366f1 !important; }
+
+  /* ── Hcp/Modals ── */
+  body.light-mode .hcp-modal,
+  body.light-mode #hw-group-modal,
+  body.light-mode #br-chain-modal-inner,
+  body.light-mode #br-token-modal-inner,
+  body.light-mode #del-chain-modal {
+    background: #f8f9ff !important;
+    border-color: rgba(99,102,241,0.15) !important;
+  }
+
+  /* ── Skeleton ── */
+  body.light-mode .skeleton {
+    background: linear-gradient(90deg,#e8eaf5 25%,#f2f4fb 50%,#e8eaf5 75%) !important;
+  }
+
+  /* ── Route / path nodes ── */
+  body.light-mode .route-node {
+    background: #e8eaf5 !important;
+    border-color: rgba(99,102,241,0.15) !important;
+    color: #1e1b4b !important;
+  }
+
+  /* ── Step bar ── */
+  body.light-mode .step-circle {
+    background: #e8eaf5 !important;
+    border-color: rgba(99,102,241,0.2) !important;
+    color: #6366f1 !important;
+  }
+  body.light-mode .step-line { background: rgba(99,102,241,0.15) !important; }
+  body.light-mode .step-label { color: #6366f1 !important; }
+
+  /* ── Delegation step bar (light mode) ── */
+  body.light-mode .del-step-dot {
+    background: #e8eaf5 !important;
+    border-color: rgba(99,102,241,0.25) !important;
+    color: #4338ca !important;
+  }
+  body.light-mode .del-step-item.active .del-step-dot {
+    background: linear-gradient(135deg,var(--accent-primary),var(--accent-secondary)) !important;
+    border-color: transparent !important;
+    color: #fff !important;
+  }
+  body.light-mode .del-step-item.done .del-step-dot {
+    background: linear-gradient(135deg,var(--accent-green),#059669) !important;
+    border-color: transparent !important;
+    color: #fff !important;
+  }
+  body.light-mode .del-step-label { color: #6366f1 !important; }
+  body.light-mode .del-step-item.active .del-step-label { color: var(--accent-secondary) !important; }
+  body.light-mode .del-step-item.done .del-step-label { color: var(--accent-green) !important; }
+  body.light-mode .del-step-connector { background: rgba(99,102,241,0.18) !important; }
+  body.light-mode .del-step-connector.filled { background: linear-gradient(90deg,var(--accent-primary),var(--accent-secondary)) !important; }
+
+
+
+  /* ── Toast ── */
+  body.light-mode .toast {
+    background: #ffffff !important;
+    border-color: rgba(99,102,241,0.2) !important;
+    color: #1e1b4b !important;
+  }
+
+  /* ── Max/settings btn ── */
+  body.light-mode .settings-btn {
+    background: #e8eaf5 !important;
+    border-color: rgba(99,102,241,0.15) !important;
+  }
+  body.light-mode .swap-flip-btn {
+    background: #e8eaf5 !important;
+    border-color: rgba(99,102,241,0.2) !important;
+  }
+
+  /* ── GAS toggle ── */
+  body.light-mode #one-gas-toggle,
+  body.light-mode [id^="one-gas-toggle"] {
+    background: rgba(99,102,241,0.07) !important;
+    border-color: rgba(99,102,241,0.15) !important;
+  }
+
+  /* ── Inline white/rgba(255,255,255) text fix ──
+     These are the worst offenders: spans with hardcoded rgba(255,255,255) colors */
+  body.light-mode [style*="color:rgba(255,255,255"],
+  body.light-mode [style*="color: rgba(255,255,255"] {
+    color: #6366f1 !important;
+  }
+  body.light-mode [style*="color:#f1f1f8"],
+  body.light-mode [style*="color: #f1f1f8"] { color: #1e1b4b !important; }
+  body.light-mode [style*="color:#8b8ba7"],
+  body.light-mode [style*="color: #8b8ba7"] { color: #6366f1 !important; }
+  body.light-mode [style*="color:#4a4a65"],
+  body.light-mode [style*="color: #4a4a65"] { color: #a5b4fc !important; }
+  body.light-mode [style*="color:#7878a0"]  { color: #6366f1 !important; }
+  body.light-mode [style*="color:#f0f0fa"]  { color: #1e1b4b !important; }
+
+  /* Force background dark overrides */
+  body.light-mode [style*="background:#050508"],
+  body.light-mode [style*="background: #050508"],
+  body.light-mode [style*="background:#0a0a12"],
+  body.light-mode [style*="background:#0f0f1a"],
+  body.light-mode [style*="background:#141423"],
+  body.light-mode [style*="background:#07070f"],
+  body.light-mode [style*="background:#06060d"] { background: #f2f4fb !important; }
+
+  body.light-mode [style*="background:rgba(10,10,18"],
+  body.light-mode [style*="background: rgba(10,10,18"] { background: rgba(242,244,251,0.97) !important; }
+  body.light-mode [style*="background:rgba(0,0,0,0.5)"],
+  body.light-mode [style*="background:rgba(0,0,0,0.7)"],
+  body.light-mode [style*="background:rgba(0,0,0,0.75)"] { background: rgba(30,27,75,0.5) !important; }
+
+  /* Wallet progress items */
+  body.light-mode .wallet-prog-item  { background: #ffffff !important; border-color: rgba(99,102,241,0.13) !important; }
+  body.light-mode .prog-bar-track    { background: #e8eaf5 !important; }
+  body.light-mode .wpi-wallet-name   { color: #1e1b4b !important; }
+  body.light-mode .wpi-swap-count    { color: #6366f1 !important; }
+
+  /* ── Slippage chips ── */
+  body.light-mode .br-slip-chip {
+    background: #e8eaf5 !important;
+    border-color: rgba(99,102,241,0.15) !important;
+    color: #3730a3 !important;
+  }
+  body.light-mode .br-slip-chip.selected {
+    background: rgba(99,102,241,0.15) !important;
+    color: #6366f1 !important;
+  }
+
+  /* ── Splash ── */
+  body.light-mode .splash-tagline { color: #a5b4fc !important; }
+  body.light-mode .splash-loader  { background: rgba(99,102,241,0.15) !important; }
+
+  /* Theme toggle track/thumb */
+  .theme-toggle-track {
+    width: 58px; height: 30px; border-radius: 15px;
+    background: var(--bg-raised);
+    border: 2px solid var(--border-subtle);
+    position: relative; cursor: pointer;
+    transition: all 0.35s ease; flex-shrink: 0;
+    display: flex; align-items: center; padding: 3px;
+  }
+  .theme-toggle-track.light {
+    background: linear-gradient(135deg, #fef3c7, #fde68a);
+    border-color: rgba(245,158,11,0.4);
+  }
+  .theme-toggle-thumb {
+    width: 22px; height: 22px; border-radius: 50%;
+    background: rgba(255,255,255,0.55);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; line-height: 1;
+    transition: all 0.35s cubic-bezier(0.34,1.56,0.64,1);
+    transform: translateX(0);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  }
+  .theme-toggle-track.light .theme-toggle-thumb {
+    transform: translateX(28px);
+    background: #fff;
+    box-shadow: 0 2px 8px rgba(245,158,11,0.3);
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+

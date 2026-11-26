@@ -1,0 +1,214 @@
+  /* ══════ EIP-7702 DELEGATION MODAL ══════ */
+  .delegation-modal-overlay {
+    position: fixed; top: 0; left: 0; right: 0; bottom: calc(var(--nav-height) + env(safe-area-inset-bottom, 0px)); z-index: 500;
+    background: rgba(5,5,8,0.92);
+    display: flex; flex-direction: column;
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.25s ease;
+    will-change: opacity;
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+  }
+  .delegation-modal-overlay.open {
+    opacity: 1; pointer-events: all;
+  }
+  .delegation-modal {
+    width: 100%; max-width: 100%; margin: 0 auto;
+    height: 100%; display: flex; flex-direction: column;
+    transform: translateY(30px);
+    transition: transform 0.3s cubic-bezier(0.25,1,0.5,1);
+  }
+  .delegation-modal-overlay.open .delegation-modal {
+    transform: none;
+  }
+  .del-modal-header {
+    padding: 16px 20px 12px;
+    display: flex; align-items: center; gap: 14px;
+    border-bottom: 1px solid var(--border-subtle);
+    background: var(--bg-deep); flex-shrink: 0;
+  }
+  .del-back-btn {
+    width: 36px; height: 36px; border-radius: 10px;
+    background: var(--bg-glass); border: 1px solid var(--border-subtle);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; transition: all 0.2s ease; flex-shrink: 0;
+  }
+  .del-back-btn:active { transform: scale(0.88); }
+  .del-back-btn .material-icons-round { font-size: 20px; color: var(--text-secondary); }
+  .del-modal-title { font-size: 18px; font-weight: 800; flex: 1; }
+  .del-modal-badge {
+    padding: 4px 10px; border-radius: 8px;
+    background: rgba(99,102,241,0.15); border: 1px solid rgba(99,102,241,0.3);
+    font-size: 10px; font-weight: 700; color: var(--neon-purple);
+    letter-spacing: 1px; font-family: var(--font-mono);
+  }
+  .del-modal-body {
+    flex: 1; overflow-y: auto; overflow-x: hidden;
+    padding: 20px 20px 40px;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    background: var(--bg-deep);
+  }
+  .del-modal-body::-webkit-scrollbar { display: none; }
+
+  /* Hero card inside modal */
+  .del-hero-card {
+    background: linear-gradient(135deg, rgba(99,102,241,0.1) 0%, rgba(139,92,246,0.1) 50%, rgba(6,182,212,0.07) 100%);
+    border: 1px solid rgba(99,102,241,0.25);
+    border-radius: var(--radius-lg);
+    padding: 20px;
+    margin-bottom: 16px;
+    position: relative; overflow: hidden;
+  }
+  .del-hero-card::before {
+    content:''; position:absolute; top:-50px; right:-50px;
+    width:180px; height:180px;
+    background: radial-gradient(circle, rgba(99,102,241,0.18) 0%, transparent 70%);
+    border-radius:50%; pointer-events:none;
+  }
+  .del-hero-top {
+    display: flex; align-items: center; gap: 12px; margin-bottom: 16px;
+  }
+  .del-hero-icon {
+    width: 42px; height: 42px; border-radius: 13px;
+    background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    box-shadow: var(--glow-primary);
+    font-size: 20px;
+  }
+  .del-hero-title {
+    font-size: 16px; font-weight: 800;
+    background: linear-gradient(90deg, var(--neon-purple), var(--neon-cyan));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .del-hero-sub { font-size: 11px; color: var(--text-muted); margin-top: 2px; font-family: var(--font-mono); }
+
+  /* Result boxes */
+  .del-result-grid {
+    display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px;
+  }
+  .del-result-box {
+    background: rgba(5,5,8,0.7);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    padding: 12px 14px;
+    position: relative; z-index: 1;
+  }
+  .del-result-label {
+    font-size: 9px; font-weight: 700; color: var(--text-muted);
+    text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 6px;
+    font-family: var(--font-mono);
+  }
+  .del-result-value {
+    font-family: var(--font-mono); font-size: 11px;
+    color: var(--text-secondary); word-break: break-all; line-height: 1.6;
+  }
+  .del-result-value.highlight { color: var(--neon-cyan); font-weight: 600; }
+  .del-result-value.key-amber { color: var(--accent-amber); }
+  .del-result-value.del-green { color: var(--accent-green); }
+
+  /* Action buttons */
+  .del-btn-row { display: flex; flex-direction: column; gap: 10px; position: relative; z-index: 1; }
+  .del-btn {
+    width: 100%; padding: 14px 20px;
+    border: none; border-radius: var(--radius-md);
+    font-size: 13px; font-weight: 700; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    transition: all 0.3s cubic-bezier(0.34,1.56,0.64,1);
+    font-family: var(--font-display); letter-spacing: 0.5px;
+  }
+  .del-btn:active:not(:disabled) { transform: scale(0.95); }
+  .del-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .del-btn-generate {
+    background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+    color: #fff; box-shadow: var(--glow-primary);
+  }
+  .del-btn-generate:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 0 32px rgba(99,102,241,0.5); }
+  .del-btn-delegate {
+    background: linear-gradient(135deg, var(--accent-green), #059669);
+    color: #fff; box-shadow: var(--glow-green);
+  }
+  .del-btn-delegate:hover:not(:disabled) { transform: translateY(-2px); }
+  .del-btn-copy {
+    background: rgba(245,158,11,0.12); color: var(--accent-amber);
+    border: 1px solid rgba(245,158,11,0.3) !important;
+    display: none;
+  }
+  .del-btn-copy:hover:not(:disabled) { background: rgba(245,158,11,0.2); }
+
+  /* Status box */
+  .del-status-box {
+    margin-top: 12px; padding: 12px 14px;
+    border-radius: var(--radius-md); font-size: 11px;
+    font-family: var(--font-mono); display: none; position: relative; z-index: 1;
+    line-height: 1.6;
+  }
+  .del-status-box.running {
+    background: rgba(99,102,241,0.1); border: 1px solid rgba(99,102,241,0.25);
+    color: var(--neon-purple); display: block;
+  }
+  .del-status-box.success {
+    background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.25);
+    color: var(--accent-green); display: block;
+  }
+  .del-status-box.error {
+    background: rgba(244,63,94,0.1); border: 1px solid rgba(244,63,94,0.25);
+    color: var(--accent-red); display: block;
+  }
+
+  /* Config section */
+  .del-section-title {
+    font-size: 10px; font-weight: 700; color: var(--text-muted);
+    letter-spacing: 2px; text-transform: uppercase;
+    padding: 16px 0 10px;
+  }
+  .del-config-card {
+    background: var(--bg-glass); border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md); padding: 14px 16px; margin-bottom: 10px;
+  }
+  .del-config-label {
+    font-size: 10px; font-weight: 700; color: #a0a0c0;
+    letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 8px;
+    font-family: var(--font-mono);
+  }
+  .del-config-input {
+    width: 100%; background: var(--bg-void); border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-sm); padding: 10px 12px;
+    font-family: var(--font-mono); font-size: 11px; color: #e8e8f4;
+    outline: none; transition: border-color 0.2s;
+  }
+  .del-config-input:focus { border-color: rgba(99,102,241,0.4); }
+  .del-config-textarea {
+    width: 100%; background: var(--bg-void); border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-sm); padding: 10px 12px;
+    font-family: var(--font-mono); font-size: 11px; color: var(--text-primary);
+    outline: none; transition: border-color 0.2s; resize: none; min-height: 90px;
+    line-height: 1.8;
+  }
+  .del-config-textarea:focus { border-color: rgba(99,102,241,0.4); }
+  .del-helper { font-size: 10px; color: var(--text-muted); margin-top: 6px; font-family: var(--font-mono); }
+
+  /* Spinner */
+  @keyframes delSpin { to { transform: rotate(360deg); } }
+  .del-spinner {
+    width: 14px; height: 14px;
+    border: 2px solid rgba(255,255,255,0.2);
+    border-top-color: currentColor;
+    border-radius: 50%;
+    animation: delSpin 0.7s linear infinite;
+    display: inline-block; flex-shrink: 0;
+  }
+
+  /* Quick preset buttons */
+  .del-preset-row { display: flex; gap: 8px; margin-top: 8px; }
+  .del-preset-btn {
+    flex: 1; padding: 8px 10px; border-radius: 10px;
+    background: var(--bg-raised); border: 1px solid var(--border-subtle);
+    font-size: 10px; font-weight: 700; cursor: pointer; color: var(--text-secondary);
+    font-family: var(--font-mono); transition: all 0.2s ease; text-align: center;
+  }
+  .del-preset-btn:active { transform: scale(0.93); }
+  .del-preset-btn:hover { background: rgba(99,102,241,0.15); border-color: rgba(99,102,241,0.3); color: var(--neon-purple); }
+

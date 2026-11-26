@@ -1,0 +1,29 @@
+    <!-- ╔══════ SWAP WALLET PANEL (Bridge-style side drawer) ══════╗ -->
+    <div id="sw-wallet-panel-overlay" onclick="if(!event.target.closest('#sw-wallet-panel')){swCloseWalletPanel();}" style="position:fixed;top:0;left:0;right:0;bottom:calc(var(--nav-height) + env(safe-area-inset-bottom, 0px));z-index:9200;background:rgba(5,5,8,0.92);opacity:0;will-change:opacity;transform:translateZ(0);-webkit-transform:translateZ(0);pointer-events:none;transition:opacity 0.25s ease;">
+      <div id="sw-wallet-panel" style="position:absolute;top:0;right:0;width:72%;max-width:310px;height:100%;background:var(--bg-deep);border-left:1px solid var(--border-subtle);display:flex;flex-direction:column;transform:translateX(100%);transition:transform 0.38s cubic-bezier(0.22,1,0.36,1);overflow:hidden;">
+        <!-- Panel header -->
+        <div style="padding:14px 16px 12px;border-bottom:1px solid var(--border-subtle);flex-shrink:0;display:flex;align-items:center;gap:10px;">
+          <div style="flex:1;">
+            <div style="font-size:15px;font-weight:800;margin-bottom:2px;">Select Signing Wallet</div>
+            <div style="font-size:9px;color:var(--text-muted);font-family:var(--font-mono);letter-spacing:1px;">WALLET GROUPS &amp; KEYS</div>
+          </div>
+          <div onclick="swCloseWalletPanel()" style="width:32px;height:32px;border-radius:10px;background:var(--bg-glass);border:1px solid var(--border-subtle);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;" onmousedown="this.style.opacity='.7'" onmouseup="this.style.opacity='1'" ontouchstart="this.style.opacity='.7'" ontouchend="this.style.opacity='1'">
+            <span class="material-icons-round" style="font-size:17px;color:var(--text-muted);">close</span>
+          </div>
+        </div>
+        <!-- Key input section -->
+        <div style="padding:10px 12px;border-bottom:1px solid var(--border-subtle);flex-shrink:0;">
+          <div style="font-size:9px;font-weight:700;color:var(--text-muted);font-family:var(--font-mono);letter-spacing:1.5px;margin-bottom:7px;">ENTER PRIVATE KEY</div>
+          <div style="display:flex;gap:6px;align-items:center;">
+            <input id="sw-key-input" type="text" placeholder="0x... or raw hex"
+              style="flex:1;background:var(--bg-void);border:1px solid var(--border-subtle);border-radius:9px;padding:8px 10px;font-family:var(--font-mono);font-size:11px;color:var(--text-primary);outline:none;min-width:0;"
+              oninput="swKeyInputPreview()" />
+            <div onclick="swUseKeyInput()" style="padding:7px 12px;background:linear-gradient(135deg,var(--accent-primary),var(--accent-secondary));border-radius:9px;font-size:11px;font-weight:700;color:#fff;cursor:pointer;flex-shrink:0;transition:all 0.2s;" onmousedown="this.style.opacity='.7'" onmouseup="this.style.opacity='1'" ontouchstart="this.style.opacity='.7'" ontouchend="this.style.opacity='1'">USE</div>
+          </div>
+          <div id="sw-key-preview" style="font-family:var(--font-mono);font-size:10px;color:var(--text-muted);margin-top:5px;min-height:14px;"></div>
+        </div>
+        <!-- Groups list -->
+        <div style="flex:1;overflow-y:auto;padding:12px 12px 0;scrollbar-width:none;" id="sw-wallet-panel-body"></div>
+        <!-- OTHER WALLETS section removed: swap uses group keys only -->
+      </div>
+    </div>

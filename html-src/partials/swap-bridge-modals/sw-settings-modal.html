@@ -1,0 +1,62 @@
+    <!-- Settings Panel -->
+    <div id="sw-settings-modal" style="position:fixed;top:0;left:0;right:0;bottom:calc(var(--nav-height) + env(safe-area-inset-bottom, 0px));z-index:10000;background:rgba(0,0,0,0.75);align-items:flex-end;justify-content:center;" onclick="if(event.target===this)swCloseSettings()" ontouchend="if(event.target===this){event.preventDefault();swCloseSettings();}">
+      <div id="sw-settings-sheet" style="width:100%;max-width: 100%;background:var(--bg-deep);border-radius:24px 24px 0 0;border:1px solid var(--border-subtle);border-bottom:none;padding-bottom:env(safe-area-inset-bottom,8px);transform:translateY(100%);transition:transform 0.32s cubic-bezier(0.34,1.1,0.64,1);">
+        <!-- Drag handle -->
+        <div style="display:flex;justify-content:center;padding:12px 0 4px;">
+          <div style="width:36px;height:4px;border-radius:2px;background:var(--border-subtle);"></div>
+        </div>
+        <!-- Header -->
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 20px 16px;">
+          <div style="font-size:16px;font-weight:800;font-family:var(--font-display);">Swap Settings</div>
+          <div onclick="swCloseSettings()" ontouchend="event.preventDefault();swCloseSettings();" style="width:32px;height:32px;border-radius:50%;background:var(--bg-raised);border:1px solid var(--border-subtle);display:flex;align-items:center;justify-content:center;cursor:pointer;" onmousedown="this.style.opacity='.6'" onmouseup="this.style.opacity='1'" ontouchstart="this.style.opacity='.6'">
+            <span class="material-icons-round" style="font-size:17px;color:var(--text-muted);">close</span>
+          </div>
+        </div>
+        <!-- Content -->
+        <div style="padding:0 20px 32px;display:flex;flex-direction:column;gap:0;">
+          <!-- Slippage -->
+          <div style="margin-bottom:20px;">
+            <div style="font-family:var(--font-mono);font-size:9px;color:var(--text-muted);letter-spacing:2px;font-weight:700;margin-bottom:10px;">SLIPPAGE TOLERANCE</div>
+            <div style="display:flex;gap:8px;align-items:center;">
+              <div class="sw-slip-chip-lg" onclick="swSelectSlipAdv(this,'0.1')">0.1%</div>
+              <div class="sw-slip-chip-lg selected" onclick="swSelectSlipAdv(this,'0.5')">0.5%</div>
+              <div class="sw-slip-chip-lg" onclick="swSelectSlipAdv(this,'1.0')">1.0%</div>
+              <div class="sw-slip-chip-lg" onclick="swSelectSlipAdv(this,'3.0')">3.0%</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;background:var(--bg-raised);border:1px solid rgba(99,102,241,0.3);border-radius:10px;padding:8px 12px;margin-top:8px;">
+              <input id="sw-adv-slip" type="number" placeholder="Custom %" min="0.01" max="50" step="0.1" style="flex:1;background:transparent;border:none;outline:none;font-family:var(--font-mono);font-size:13px;color:var(--text-primary);" oninput="swAdvSlipInput(this.value)">
+              <span style="font-family:var(--font-mono);font-size:12px;color:var(--text-muted);">%</span>
+            </div>
+          </div>
+          <!-- Transaction Deadline -->
+          <div style="margin-bottom:4px;">
+            <div style="font-family:var(--font-mono);font-size:9px;color:var(--text-muted);letter-spacing:2px;font-weight:700;margin-bottom:10px;">TRANSACTION DEADLINE</div>
+            <div style="display:flex;align-items:center;gap:8px;background:var(--bg-raised);border:1px solid var(--border-subtle);border-radius:10px;padding:8px 12px;">
+              <input id="sw-deadline" type="number" value="20" min="1" max="4320" style="width:60px;background:transparent;border:none;outline:none;font-family:var(--font-mono);font-size:13px;color:var(--text-primary);">
+              <span style="font-family:var(--font-mono);font-size:12px;color:var(--text-muted);">minutes</span>
+            </div>
+          </div>
+          <!-- Multi-route toggle -->
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 0;border-top:1px solid var(--border-subtle);margin-top:16px;">
+            <div>
+              <div style="font-size:13px;font-weight:700;">Multi-Route Splitting</div>
+              <div style="font-family:var(--font-mono);font-size:10px;color:var(--text-muted);margin-top:2px;">Split across multiple DEXs for best price</div>
+            </div>
+            <div id="sw-multiroute-toggle" onclick="swToggleMultiRoute(this)" class="toggle on" style="width:44px;height:24px;border-radius:12px;background:var(--accent-primary);border:1.5px solid var(--accent-primary);position:relative;cursor:pointer;transition:all 0.3s;flex-shrink:0;" data-on="true">
+              <div style="position:absolute;top:2px;right:2px;width:16px;height:16px;border-radius:50%;background:#fff;transition:all 0.3s;"></div>
+            </div>
+          </div>
+          <!-- Expert mode -->
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 0;border-top:1px solid var(--border-subtle);">
+            <div>
+              <div style="font-size:13px;font-weight:700;">Expert Mode</div>
+              <div style="font-family:var(--font-mono);font-size:10px;color:var(--accent-red);margin-top:2px;">Allows high slippage trades — use with caution</div>
+            </div>
+            <div id="sw-expert-toggle" onclick="swToggleExpert(this)" class="toggle" style="width:44px;height:24px;border-radius:12px;background:var(--bg-raised);border:1.5px solid var(--border-subtle);position:relative;cursor:pointer;transition:all 0.3s;flex-shrink:0;" data-on="false">
+              <div style="position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:var(--text-muted);transition:all 0.3s;"></div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>

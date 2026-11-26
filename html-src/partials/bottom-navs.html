@@ -1,0 +1,47 @@
+  <!-- Bottom Nav -->
+  <nav class="bottom-nav">
+    <div class="nav-item active" id="nav-home" onclick="switchPage('home')">
+      <span class="material-icons-round">home</span>
+      <span class="label">HOME</span>
+    </div>
+    <div class="nav-item" id="nav-swap" onclick="switchPage('swap')">
+      <span class="material-icons-round">swap_horiz</span>
+      <span class="label">SWAP</span>
+    </div>
+    <div class="nav-item" id="nav-bridge" onclick="event.stopPropagation();switchPage('bridge')">
+      <span class="material-icons-round">alt_route</span>
+      <span class="label">BRIDGE</span>
+    </div>
+    <div class="nav-item" id="nav-profile" onclick="switchPage('profile')" style="position:relative;">
+      <span class="material-icons-round">person</span>
+      <span class="label">PROFILE</span>
+    </div>
+    <div class="nav-item" id="nav-settings" onclick="switchPage('settings')">
+      <span class="material-icons-round">settings</span>
+      <span class="label">SETTINGS</span>
+    </div>
+  </nav>
+
+  <!-- ── Exchange mode bottom nav (Markets / Trade / Orders / Portfolio) ── -->
+  <nav class="bottom-nav" id="exc-bottom-nav" style="display:none;">
+    <div class="nav-item exc-nav-item active" id="exc-nav-markets" onclick="excSwitchTab('markets')">
+      <span class="material-icons-round">show_chart</span>
+      <span class="label">MARKETS</span>
+    </div>
+    <div class="nav-item exc-nav-item" id="exc-nav-trade" onclick="excSwitchTab('trade')">
+      <span class="material-icons-round">candlestick_chart</span>
+      <span class="label">TRADE</span>
+    </div>
+    <div class="nav-item exc-nav-item" id="exc-nav-future" onclick="excGoFuture()">
+      <span class="material-icons-round">trending_up</span>
+      <span class="label">FUTURE</span>
+    </div>
+    <div class="nav-item exc-nav-item" id="exc-nav-orders" onclick="excSwitchTab('orders')">
+      <span class="material-icons-round">receipt_long</span>
+      <span class="label">ORDERS</span>
+    </div>
+    <div class="nav-item exc-nav-item" id="exc-nav-portfolio" onclick="excSwitchTab('portfolio')">
+      <span class="material-icons-round">pie_chart</span>
+      <span class="label">PORTFOLIO</span>
+    </div>
+  </nav>

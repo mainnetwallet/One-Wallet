@@ -1,0 +1,102 @@
+plugins {
+    id 'com.android.application'
+}
+
+def getVersionCode() {
+    def props = new Properties()
+    file("../gradle.properties").withInputStream { props.load(it) }
+    return props.getProperty('VERSION_CODE', '1').trim().toInteger()
+}
+
+def getVersionName() {
+    def props = new Properties()
+    file("../gradle.properties").withInputStream { props.load(it) }
+    return props.getProperty('VERSION_NAME', '1.0').trim()
+}
+
+// frontend/index.html is generated from html-src/ (not committed). Build it before anything
+// that packages or inspects the assets. Needs python3 on PATH (python on Windows).
+def pythonCmd = System.getProperty('os.name').toLowerCase().contains('win') ? 'python' : 'python3'
+
+tasks.register('generateHtml', Exec) {
+    group = 'build'
+    description = 'Generates frontend/index.html from html-src/ (index.src.html + partials)'
+    inputs.dir(rootProject.file('html-src'))
+    inputs.file(rootProject.file('tools/build_html.py'))
+    outputs.file(rootProject.file('frontend/index.html'))
+    workingDir rootProject.projectDir
+    commandLine pythonCmd, 'tools/build_html.py'
+}
+
+tasks.named('preBuild') { dependsOn 'generateHtml' }
+tasks.configureEach { t ->
+    if (t.name ==~ /merge.*Assets/ || t.name ==~ /lint.*/ || t.name ==~ /generate.*LintModel/) {
+        t.dependsOn 'generateHtml'
+    }
+}
+
+android {
+    namespace 'com.one.wallet'
+    compileSdk 34
+
+    defaultConfig {
+        applicationId "com.one.wallet"
+        minSdk 24
+        targetSdk 34
+        versionCode getVersionCode()
+        versionName getVersionName()
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    signingConfigs {
+        release {
+            def keystorePath = System.getenv("KEYSTORE_PATH") ?: ""
+            if (keystorePath) {
+                storeFile file(keystorePath)
+                storePassword System.getenv("STORE_PASSWORD") ?: ""
+                keyAlias System.getenv("KEY_ALIAS") ?: ""
+                keyPassword System.getenv("KEY_PASSWORD") ?: ""
+            }
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+        debug {
+            applicationIdSuffix ".debug"
+            debuggable true
+        }
+    }
+
+    sourceSets {
+        main {
+            // WebView UI lives in /frontend, packaged as APK assets. frontend/index.html is generated
+            // by :app:generateHtml from /html-src.
+            assets.srcDirs = ['../frontend']
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+
+    packagingOptions {
+        resources {
+            excludes += '/META-INF/{AL2.0,LGPL2.1}'
+        }
+    }
+}
+
+dependencies {
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'com.google.android.material:material:1.11.0'
+    implementation 'androidx.webkit:webkit:1.10.0'
+    implementation 'androidx.biometric:biometric:1.1.0'
+    implementation 'androidx.core:core:1.12.0'
+    implementation 'androidx.recyclerview:recyclerview:1.3.2'
+}

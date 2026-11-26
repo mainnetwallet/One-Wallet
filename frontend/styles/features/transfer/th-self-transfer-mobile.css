@@ -1,0 +1,64 @@
+        /* ===== SELF TRANSFER UI — MOBILE PHONE OPTIMIZED ===== */
+        #th-wrapper #selfTransferUI .section {
+            padding: 10px !important;
+            margin-bottom: 6px !important;
+        }
+
+        #th-wrapper #selfTransferUI .section-title {
+            font-size: 0.88rem !important;
+            padding: 7px 10px !important;
+            margin: -10px -10px 8px -10px !important;
+        }
+
+        #th-wrapper #selfTransferUI .input-group {
+            margin-bottom: 7px !important;
+        }
+
+        #th-wrapper #selfTransferUI input[type="text"],
+        #th-wrapper #selfTransferUI input[type="number"] {
+            padding: 8px 10px !important;
+            font-size: 0.85rem !important;
+            min-height: 38px !important;
+        }
+
+        #th-wrapper #selfTransferUI .sk-key-textarea {
+            min-height: 140px !important;
+            max-height: 140px !important;
+            font-size: 0.8rem !important;
+        }
+
+        #th-wrapper #selfTransferUI .btn {
+            padding: 10px 8px !important;
+            font-size: 0.82rem !important;
+            min-height: 40px !important;
+        }
+
+        #th-wrapper #selfTransferUI .hint {
+            font-size: 0.7rem !important;
+            margin-top: 2px !important;
+            line-height: 1.3 !important;
+        }
+
+        #th-wrapper #selfTransferUI .log-section {
+            height: 250px !important;
+            max-height: 250px !important;
+            min-height: 250px !important;
+            font-size: 0.75rem !important;
+        }
+
+        /* Force all grids in selfTransferUI to single column */
+        #th-wrapper #selfTransferUI [style*="grid-template-columns: 1fr 1fr"],
+        #th-wrapper #selfTransferUI [style*="grid-template-columns: 2fr 1fr"],
+        #th-wrapper #selfTransferUI [style*="grid-template-columns: repeat(2"] {
+            grid-template-columns: 1fr !important;
+            gap: 7px !important;
+        }
+
+        /* Mode toggle full width */
+        #th-wrapper #selfTransferUI .mode-toggle-btn {
+            flex: 1 !important;
+            padding: 8px 6px !important;
+            font-size: 0.8rem !important;
+        }
+        /* ===== END SELF TRANSFER UI ===== */
+

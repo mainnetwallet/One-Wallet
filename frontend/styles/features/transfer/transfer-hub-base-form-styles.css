@@ -1,0 +1,324 @@
+/* ── Wrapper padding ── */
+        #th-wrapper #batchTransferUI {
+            padding: 0 10px 20px !important;
+        }
+
+        /* ── Section Header ── */
+        #th-wrapper #batchTransferUI .th-section-header {
+            padding: 10px 0 8px !important;
+            margin-bottom: 8px !important;
+        }
+        #th-wrapper #batchTransferUI .th-section-header h1 {
+            font-size: 1.1rem !important;
+            font-weight: 800 !important;
+            letter-spacing: -0.02em !important;
+            color: var(--text-primary) !important;
+            margin: 0 !important;
+        }
+
+        /* ── Mode Toggle (Native / Token) ── */
+        #th-wrapper #batchTransferUI > div[style*="justify-content: center"],
+        #th-wrapper #batchTransferUI > div:has(#nativeModeBtn) {
+            margin-bottom: 8px !important;
+        }
+        #th-wrapper #batchTransferUI .mode-toggle-btn {
+            padding: 7px 14px !important;
+            font-size: 0.76rem !important;
+            font-weight: 700 !important;
+            border-radius: 7px !important;
+            min-height: 32px !important;
+        }
+        /* Toggle pill container */
+        #th-wrapper #batchTransferUI > div[style*="justify-content: center"] > div {
+            background: var(--bg-raised) !important;
+            border: 1px solid var(--border-subtle) !important;
+            border-radius: 10px !important;
+            padding: 3px !important;
+            gap: 3px !important;
+        }
+
+        /* ── Section Cards ── */
+        #th-wrapper #batchTransferUI .section {
+            background: var(--bg-raised) !important;
+            border: 1px solid var(--border-subtle) !important;
+            border-radius: 12px !important;
+            padding: 11px !important;
+            margin-bottom: 8px !important;
+            overflow: hidden !important;
+        }
+        #th-wrapper #batchTransferUI .section::before {
+            display: none !important;
+        }
+        #th-wrapper #batchTransferUI .section-title {
+            font-size: 0.65rem !important;
+            font-weight: 700 !important;
+            letter-spacing: 0.08em !important;
+            text-transform: uppercase !important;
+            color: var(--text-muted) !important;
+            margin-bottom: 8px !important;
+        }
+
+        /* ── Grid: force single column on mobile ── */
+        #th-wrapper #batchTransferUI .grid,
+        #th-wrapper #batchTransferUI > div[style*="grid-template-columns: repeat(2"] {
+            grid-template-columns: 1fr !important;
+            gap: 8px !important;
+            margin-bottom: 8px !important;
+        }
+
+        /* ── input-group spacing ── */
+        #th-wrapper #batchTransferUI .input-group {
+            margin-bottom: 8px !important;
+        }
+        #th-wrapper #batchTransferUI .input-group:last-child {
+            margin-bottom: 0 !important;
+        }
+
+        /* ── Labels ── */
+        #th-wrapper #batchTransferUI label {
+            font-size: 0.7rem !important;
+            font-weight: 600 !important;
+            color: var(--text-secondary) !important;
+            margin-bottom: 4px !important;
+        }
+
+        /* ── Inputs & Textareas ── */
+        #th-wrapper #batchTransferUI input[type="text"],
+        #th-wrapper #batchTransferUI input[type="number"],
+        #th-wrapper #batchTransferUI select {
+            background: var(--bg-surface) !important;
+            border: 1px solid var(--border-subtle) !important;
+            border-radius: 9px !important;
+            padding: 8px 10px !important;
+            font-size: 0.8rem !important;
+            min-height: 36px !important;
+            color: var(--text-primary) !important;
+            font-family: var(--font-mono) !important;
+            transition: border-color 0.15s, box-shadow 0.15s !important;
+        }
+        #th-wrapper #batchTransferUI input:focus,
+        #th-wrapper #batchTransferUI select:focus {
+            border-color: var(--accent-primary) !important;
+            box-shadow: 0 0 0 2px rgba(99,102,241,0.12) !important;
+            outline: none !important;
+        }
+        #th-wrapper #batchTransferUI textarea:not(.sk-key-textarea) {
+            background: var(--bg-surface) !important;
+            border: 1px solid var(--border-subtle) !important;
+            border-radius: 9px !important;
+            padding: 8px 10px !important;
+            font-size: 0.76rem !important;
+            font-family: var(--font-mono) !important;
+            min-height: 100px !important;
+            color: var(--text-primary) !important;
+            resize: vertical !important;
+            line-height: 1.6 !important;
+        }
+        #th-wrapper #batchTransferUI textarea:not(.sk-key-textarea):focus {
+            border-color: var(--accent-primary) !important;
+            box-shadow: 0 0 0 2px rgba(99,102,241,0.12) !important;
+            outline: none !important;
+        }
+
+        /* ── Hint text ── */
+        #th-wrapper #batchTransferUI .hint {
+            font-size: 0.64rem !important;
+            color: var(--text-muted) !important;
+            margin-top: 3px !important;
+            line-height: 1.4 !important;
+        }
+
+        /* ── Wallet Info Box ── */
+        #th-wrapper #batchTransferUI .wallet-info {
+            background: var(--bg-surface) !important;
+            border: 1px solid var(--border-subtle) !important;
+            border-radius: 9px !important;
+            padding: 8px 10px !important;
+            margin-top: 6px !important;
+        }
+        #th-wrapper #batchTransferUI .wallet-info-item {
+            font-size: 0.7rem !important;
+            margin-bottom: 5px !important;
+            display: flex !important;
+            justify-content: space-between !important;
+            align-items: flex-start !important;
+            gap: 6px !important;
+        }
+        #th-wrapper #batchTransferUI .wallet-info-item:last-child { margin-bottom: 0 !important; }
+        #th-wrapper #batchTransferUI .wallet-info-label {
+            color: var(--text-muted) !important;
+            font-weight: 600 !important;
+            flex-shrink: 0 !important;
+        }
+        #th-wrapper #batchTransferUI .wallet-info-value {
+            color: var(--text-primary) !important;
+            font-family: var(--font-mono) !important;
+            font-size: 0.67rem !important;
+            word-break: break-all !important;
+            text-align: right !important;
+        }
+
+        /* ── Stats Grid ── */
+        #th-wrapper #batchTransferUI .stats-grid {
+            display: grid !important;
+            grid-template-columns: 1fr 1fr !important;
+            gap: 6px !important;
+            margin-bottom: 8px !important;
+            margin-top: 0 !important;
+        }
+        #th-wrapper #batchTransferUI .stat-card {
+            background: var(--bg-surface) !important;
+            border: 1px solid var(--border-subtle) !important;
+            border-radius: 9px !important;
+            padding: 7px 9px !important;
+        }
+        #th-wrapper #batchTransferUI .stat-card[style*="grid-column: 1 / -1"] {
+            grid-column: 1 / -1 !important;
+        }
+        #th-wrapper #batchTransferUI .stat-label {
+            font-size: 0.6rem !important;
+            font-weight: 700 !important;
+            text-transform: uppercase !important;
+            letter-spacing: 0.06em !important;
+            color: var(--text-muted) !important;
+            margin-bottom: 2px !important;
+        }
+        #th-wrapper #batchTransferUI .stat-value {
+            font-size: 1.0rem !important;
+            font-weight: 700 !important;
+            color: var(--text-primary) !important;
+            font-family: var(--font-mono) !important;
+            line-height: 1.1 !important;
+        }
+
+        /* ── Quick preset amount buttons ── */
+        #th-wrapper #batchTransferUI div[style*="grid-template-columns: repeat(4"] {
+            grid-template-columns: repeat(4, 1fr) !important;
+            gap: 5px !important;
+            margin-top: 6px !important;
+        }
+        #th-wrapper #batchTransferUI div[style*="grid-template-columns: repeat(4"] .btn {
+            padding: 6px 3px !important;
+            font-size: 0.66rem !important;
+            font-weight: 700 !important;
+            border-radius: 7px !important;
+            min-height: 30px !important;
+        }
+
+        /* ── Buttons ── */
+        #th-wrapper #batchTransferUI .btn {
+            padding: 10px 12px !important;
+            font-size: 0.8rem !important;
+            font-weight: 700 !important;
+            border-radius: 10px !important;
+            min-height: 40px !important;
+        }
+        #th-wrapper #batchTransferUI .btn-primary {
+            background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%) !important;
+            box-shadow: 0 3px 10px rgba(99,102,241,0.22) !important;
+        }
+        #th-wrapper #batchTransferUI .btn-success {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+            box-shadow: 0 3px 10px rgba(16,185,129,0.22) !important;
+        }
+        #th-wrapper #batchTransferUI .btn-danger {
+            background: linear-gradient(135deg, #f43f5e 0%, #e11d48 100%) !important;
+            box-shadow: 0 3px 10px rgba(244,63,94,0.18) !important;
+        }
+        #th-wrapper #batchTransferUI .btn:active:not(:disabled) {
+            transform: scale(0.96) !important;
+            transition: transform 0.09s !important;
+        }
+        #th-wrapper #batchTransferUI .btn:disabled {
+            opacity: 0.38 !important;
+            box-shadow: none !important;
+        }
+
+        /* ── Execute section: stack buttons on mobile ── */
+        #th-wrapper #batchTransferUI .execute-section {
+            grid-template-columns: 1fr !important;
+            gap: 7px !important;
+            margin-bottom: 8px !important;
+        }
+
+        /* ── Progress Bar ── */
+        #th-wrapper #batchTransferUI .progress-bar {
+            background: var(--bg-surface) !important;
+            border-radius: 99px !important;
+            height: 4px !important;
+            overflow: hidden !important;
+            margin-bottom: 8px !important;
+        }
+        #th-wrapper #batchTransferUI .progress-fill {
+            background: linear-gradient(90deg, var(--accent-primary), var(--accent-tertiary)) !important;
+            border-radius: 99px !important;
+            transition: width 0.4s ease !important;
+        }
+
+        /* ── Contract Info Box ── */
+        #th-wrapper #batchTransferUI .contract-info {
+            background: var(--bg-surface) !important;
+            border: 1px solid var(--border-subtle) !important;
+            border-radius: 9px !important;
+            padding: 8px 10px !important;
+            margin-bottom: 8px !important;
+        }
+        #th-wrapper #batchTransferUI .contract-info-item {
+            display: flex !important;
+            justify-content: space-between !important;
+            align-items: flex-start !important;
+            font-size: 0.7rem !important;
+            margin-bottom: 5px !important;
+            gap: 6px !important;
+        }
+        #th-wrapper #batchTransferUI .contract-info-item:last-child { margin-bottom: 0 !important; }
+        #th-wrapper #batchTransferUI .contract-info-label {
+            color: var(--text-muted) !important;
+            font-weight: 600 !important;
+            flex-shrink: 0 !important;
+        }
+        #th-wrapper #batchTransferUI .contract-info-value {
+            color: var(--text-primary) !important;
+            font-family: var(--font-mono) !important;
+            font-size: 0.65rem !important;
+            word-break: break-all !important;
+            text-align: right !important;
+        }
+
+        /* ── Log Section ── */
+        #th-wrapper #batchTransferUI .log-section {
+            background: var(--bg-deep) !important;
+            border: 1px solid var(--border-subtle) !important;
+            border-radius: 12px !important;
+            padding: 10px !important;
+            margin-top: 2px !important;
+        }
+        #th-wrapper #batchTransferUI .log-section .section-title {
+            font-size: 0.65rem !important;
+            text-transform: uppercase !important;
+            letter-spacing: 0.08em !important;
+            color: var(--text-muted) !important;
+            font-weight: 700 !important;
+        }
+        #th-wrapper #batchTransferUI .log-container {
+            background: rgba(0,0,0,0.4) !important;
+            border: 1px solid rgba(255,255,255,0.04) !important;
+            border-radius: 8px !important;
+            padding: 8px 10px !important;
+            font-size: 0.68rem !important;
+            height: 22vh !important;
+            min-height: 130px !important;
+            max-height: 300px !important;
+            line-height: 1.6 !important;
+            -webkit-overflow-scrolling: touch !important;
+        }
+
+        /* ── Token Balance Collapsible Box ── */
+        #th-wrapper #batchTransferUI #recipientBalancesToken,
+        #th-wrapper #batchTransferUI #recipientBalancesToken * {
+            background: var(--bg-surface) !important;
+            border-color: var(--border-subtle) !important;
+            border-radius: 8px !important;
+        }
+
+

@@ -1,0 +1,12 @@
+  <!-- ══════ BACKGROUND TX PILL ══════
+       Swap / Bridge processing চলার সময় অন্য section-এ গেলে
+       এই floating pill দেখা যাবে — tap করলে সেই section-এ ফিরে যাবে
+  ═══════════════════════════════════ -->
+  <div id="bg-tx-pill" onclick="window._bgPillTap && window._bgPillTap()" style="display:none;">
+    <div class="bgp-spinner-ring"></div>
+    <div class="bgp-text">
+      <span id="bgp-label">Swap processing…</span>
+      <span class="bgp-tap-hint">Tap to view</span>
+    </div>
+    <span class="bgp-arrow material-icons-round">arrow_forward_ios</span>
+  </div>

@@ -1,0 +1,319 @@
+        /* ========================================
+           MOBILE RESPONSIVE OPTIMIZATION
+           ======================================== */
+        
+        /* Tablet and below */
+        
+        
+        /* Mobile devices (portrait and landscape) */
+        
+        #th-wrapper .container {
+                padding: 0;
+                max-width: 100%;
+            }
+            
+            /* Header optimization */
+            #th-wrapper .header {
+                padding: 12px 8px;
+                margin-bottom: 12px;
+            }
+            
+            #th-wrapper .header h1 {
+                font-size: 1.3rem;
+            }
+/* Section optimization */
+            #th-wrapper .section {
+                padding: 14px;
+                margin-bottom: 12px;
+            }
+            
+            #th-wrapper .section-title {
+                font-size: 1.1rem;
+                padding: 10px 12px;
+                margin: -14px -14px 12px -14px;
+            }
+            
+            /* Input fields - larger touch targets */
+            #th-wrapper input, #th-wrapper textarea, #th-wrapper select {
+                padding: 14px 12px;
+                font-size: 0.95rem;
+                min-height: 48px; /* Minimum touch target size */
+                border-width: 1.5px;
+            }
+            
+            #th-wrapper textarea {
+                min-height: 200px;
+                font-size: 0.9rem;
+            }
+            
+            /* Buttons - larger and more touch-friendly */
+            #th-wrapper .btn {
+                padding: 16px 20px;
+                font-size: 1rem;
+                min-height: 52px;
+                font-weight: 700;
+                letter-spacing: 0.3px;
+            }
+            
+            /* Grid adjustments */
+            #th-wrapper .grid {
+                gap: 12px;
+            }
+            
+            #th-wrapper .stats-grid {
+                gap: 8px;
+            }
+            
+            #th-wrapper .stat-card {
+                padding: 14px 12px;
+            }
+            
+            #th-wrapper .stat-label {
+                font-size: 0.8rem;
+            }
+            
+            #th-wrapper .stat-value {
+                font-size: 1.3rem;
+            }
+            
+            /* Input group spacing */
+            #th-wrapper .input-group {
+                margin-bottom: 14px;
+            }
+            
+            #th-wrapper .input-group label {
+                font-size: 0.85rem;
+                margin-bottom: 6px;
+                font-weight: 600;
+            }
+            
+            #th-wrapper .hint {
+                font-size: 0.75rem;
+                line-height: 1.4;
+                margin-top: 6px;
+            }
+            
+            /* Chain grid mobile */
+            #th-wrapper .chain-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 8px;
+            }
+            
+            #th-wrapper .chain-card {
+                padding: 12px 10px;
+                font-size: 0.85rem;
+            }
+            
+            #th-wrapper .chain-name {
+                font-size: 0.8rem;
+            }
+            
+            #th-wrapper .chain-symbol {
+                font-size: 0.75rem;
+            }
+            
+            /* RPC preset buttons */
+            #th-wrapper .rpc-preset-btn {
+                padding: 10px 14px;
+                font-size: 0.8rem;
+                margin: 3px;
+            }
+            
+            /* Progress bar */
+            #th-wrapper .progress-container {
+                height: 6px;
+            }
+            
+            /* Log container */
+            #th-wrapper .log-container {
+                max-height: 350px;
+                font-size: 0.8rem;
+                padding: 10px;
+            }
+            
+            #th-wrapper .log-line {
+                padding: 8px 10px;
+                line-height: 1.5;
+            }
+            
+            /* Modal mobile */
+            #th-wrapper .modal-content {
+                padding: 16px;
+                width: 96%;
+                max-height: 92vh;
+            }
+            
+            #th-wrapper .modal-title {
+                font-size: 1.2rem;
+            }
+            
+            #th-wrapper .modal-close {
+                width: 36px;
+                height: 36px;
+                font-size: 1.3rem;
+            }
+            
+            /* Wallet info mobile */
+            #th-wrapper .wallet-info {
+                padding: 12px;
+                gap: 10px;
+            }
+            
+            #th-wrapper .wallet-info-label {
+                font-size: 0.8rem;
+            }
+            
+            #th-wrapper .wallet-info-value {
+                font-size: 0.9rem;
+            }
+            
+            /* Transfer mode cards */
+            #th-wrapper .transfer-mode-card {
+                padding: 16px;
+                min-height: auto;
+            }
+            
+            #th-wrapper .mode-icon {
+                font-size: 2rem;
+            }
+            
+            #th-wrapper .mode-title {
+                font-size: 1.1rem;
+            }
+            
+            #th-wrapper .mode-description {
+                font-size: 0.8rem;
+            }
+            
+            /* Contract info mobile */
+            #th-wrapper .contract-info-item {
+                padding: 10px;
+                font-size: 0.85rem;
+            }
+            
+            /* Prevent text selection on double-tap */
+            #th-wrapper .btn, #th-wrapper .chain-card, #th-wrapper .menu-item {
+                -webkit-user-select: none;
+                user-select: none;
+            }
+            
+            /* Improve touch feedback */
+            #th-wrapper .btn:active {
+                transform: scale(0.97);
+            }
+            
+            #th-wrapper .chain-card:active, #th-wrapper .menu-item:active {
+                transform: scale(0.98);
+            }
+        
+        
+        /* Small mobile devices */
+        
+        #th-wrapper .header h1 {
+                font-size: 1.2rem;
+            }
+            
+            #th-wrapper .section {
+                padding: 12px;
+            }
+            
+            #th-wrapper .section-title {
+                font-size: 1rem;
+                padding: 8px 10px;
+                margin: -12px -12px 10px -12px;
+            }
+            
+            /* Single column for everything */
+            #th-wrapper .chain-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            #th-wrapper .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            /* Smaller text inputs for very small screens */
+            #th-wrapper input, #th-wrapper textarea, #th-wrapper select {
+                font-size: 0.9rem;
+            }
+            
+            #th-wrapper textarea {
+                min-height: 180px;
+            }
+            
+            #th-wrapper .btn {
+                padding: 14px 16px;
+                font-size: 0.95rem;
+            }
+            
+            /* Log container smaller on very small screens */
+            #th-wrapper .log-container {
+                max-height: 300px;
+                font-size: 0.75rem;
+            }
+            
+            #th-wrapper .modal-content {
+                padding: 14px;
+                width: 98%;
+            }
+            
+            #th-wrapper .modal-title {
+                font-size: 1.1rem;
+            }
+        
+        
+        /* Landscape mobile optimization */
+        @media (max-width: 768px) and (orientation: landscape) {
+            
+            #th-wrapper .log-container {
+                max-height: 250px;
+            }
+            
+            #th-wrapper textarea {
+                min-height: 150px;
+            }
+            
+            #th-wrapper .modal-content {
+                max-height: 85vh;
+            }
+        }
+        
+        /* Touch device optimizations */
+        @media (hover: none) and (pointer: coarse) {
+            /* Remove hover effects on touch devices */
+            .btn:hover:not(:disabled),
+            .chain-card:hover,
+            
+            /* Larger minimum touch targets */
+            #th-wrapper button, #th-wrapper .btn, #th-wrapper input, #th-wrapper select, #th-wrapper textarea, #th-wrapper .chain-card, #th-wrapper .menu-item {
+                min-height: 44px; /* iOS minimum touch target */
+            }
+            
+            /* Better active states for touch */
+            #th-wrapper .btn:active:not(:disabled) {
+                transform: scale(0.96);
+                transition: transform 0.05s;
+            }
+            
+            #th-wrapper .chain-card:active {
+                transform: scale(0.97);
+                transition: transform 0.05s;
+            }
+            
+        }
+        
+        /* High DPI displays (Retina) */
+        @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+            /* Sharper borders and shadows */
+            #th-wrapper .section, #th-wrapper .btn, #th-wrapper input, #th-wrapper textarea, #th-wrapper select {
+                border-width: 0.5px;
+            }
+        }
+        
+        /* Prevent zoom on input focus (iOS) */
+        @supports (-webkit-touch-callout: none) {
+            #th-wrapper input, #th-wrapper textarea, #th-wrapper select {
+                font-size: 16px !important; /* Prevents iOS zoom */
+            }
+        }
+

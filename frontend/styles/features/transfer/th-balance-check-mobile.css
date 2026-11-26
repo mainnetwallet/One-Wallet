@@ -1,0 +1,67 @@
+        /* ===== BALANCE CHECK UI — MOBILE PHONE OPTIMIZED ===== */
+        #th-wrapper #balanceCheckUI .section {
+            padding: 10px !important;
+            margin-bottom: 6px !important;
+        }
+
+        #th-wrapper #balanceCheckUI .section-title {
+            font-size: 0.88rem !important;
+            padding: 7px 10px !important;
+            margin: -10px -10px 8px -10px !important;
+        }
+
+        #th-wrapper #balanceCheckUI .input-group {
+            margin-bottom: 7px !important;
+        }
+
+        #th-wrapper #balanceCheckUI input[type="text"] {
+            padding: 8px 10px !important;
+            font-size: 0.82rem !important;
+            min-height: 38px !important;
+        }
+
+        #th-wrapper #balanceCheckUI textarea {
+            min-height: 100px !important;
+            max-height: 140px !important;
+            font-size: 0.82rem !important;
+        }
+
+        #th-wrapper #balanceCheckUI .btn {
+            padding: 10px 8px !important;
+            font-size: 0.82rem !important;
+            min-height: 40px !important;
+        }
+
+        #th-wrapper #balanceCheckUI .hint {
+            font-size: 0.7rem !important;
+            margin-top: 3px !important;
+        }
+
+        #th-wrapper #balanceCheckUI .stat-card {
+            padding: 8px 10px !important;
+        }
+
+        #th-wrapper #balanceCheckUI .stat-value {
+            font-size: 15px !important;
+        }
+
+        #th-wrapper #balanceCheckUI .stat-label {
+            font-size: 0.68rem !important;
+        }
+
+        #th-wrapper #balanceCheckUI .stats-grid {
+            gap: 6px !important;
+        }
+
+        #th-wrapper #balanceCheckUI .log-container {
+            max-height: 200px !important;
+            font-size: 0.75rem !important;
+        }
+
+        /* Force single column on any remaining grids */
+        #th-wrapper #balanceCheckUI [style*="grid-template-columns: 1fr 1fr"]:not([style*="gap: 8px"]) {
+            grid-template-columns: 1fr !important;
+            gap: 7px !important;
+        }
+        /* ===== END BALANCE CHECK UI ===== */
+

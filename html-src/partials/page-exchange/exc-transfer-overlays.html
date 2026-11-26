@@ -1,0 +1,31 @@
+    <!-- ── Transfer: Account Picker Sheet (From / To) ── -->
+    <div id="trf-acct-overlay" style="display:none;position:fixed;left:0;right:0;top:0;bottom:calc(var(--nav-height) + env(safe-area-inset-bottom,0px));z-index:19500;background:rgba(0,0,0,0.65);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);" onclick="trfCloseAccountPicker(event)">
+      <div id="trf-acct-sheet" style="position:absolute;bottom:0;left:0;right:0;background:#0f0f1a;border-radius:20px 20px 0 0;max-height:60vh;display:flex;flex-direction:column;overflow:hidden;transform:translateY(100%);transition:transform 0.28s cubic-bezier(0.32,0.72,0,1);">
+        <div style="display:flex;align-items:center;justify-content:center;padding:14px 16px 10px;position:relative;flex-shrink:0;border-bottom:1px solid rgba(255,255,255,0.06);">
+          <span style="font-size:15px;font-weight:700;color:var(--text-primary);font-family:var(--font-mono);letter-spacing:0.2px;">Select Wallet</span>
+          <span onclick="trfCloseAccountPicker()" class="material-icons-round" style="position:absolute;right:14px;font-size:22px;color:var(--text-muted);cursor:pointer;">close</span>
+        </div>
+        <div id="trf-acct-list" style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:6px 8px 16px;">
+          <!-- populated by JS -->
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Transfer: Coin Picker Sheet ── -->
+    <div id="trf-coin-overlay" style="display:none;position:fixed;left:0;right:0;top:0;bottom:calc(var(--nav-height) + env(safe-area-inset-bottom,0px));z-index:19500;background:rgba(0,0,0,0.65);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);" onclick="trfCloseCoinPicker(event)">
+      <div id="trf-coin-sheet" style="position:absolute;bottom:0;left:0;right:0;background:#0f0f1a;border-radius:20px 20px 0 0;max-height:78vh;display:flex;flex-direction:column;overflow:hidden;transform:translateY(100%);transition:transform 0.28s cubic-bezier(0.32,0.72,0,1);">
+        <div style="display:flex;align-items:center;justify-content:center;padding:14px 16px 10px;position:relative;flex-shrink:0;border-bottom:1px solid rgba(255,255,255,0.06);">
+          <span style="font-size:15px;font-weight:700;color:var(--text-primary);font-family:var(--font-mono);letter-spacing:0.2px;">Select Coin</span>
+          <span onclick="trfCloseCoinPicker()" class="material-icons-round" style="position:absolute;right:14px;font-size:22px;color:var(--text-muted);cursor:pointer;">close</span>
+        </div>
+        <div style="padding:10px 14px;flex-shrink:0;">
+          <div style="display:flex;align-items:center;gap:8px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:9px 12px;">
+            <span class="material-icons-round" style="font-size:18px;color:var(--text-muted);">search</span>
+            <input id="trf-coin-search" type="text" placeholder="Search coin" oninput="trfFilterCoins()" style="flex:1;border:none;outline:none;background:transparent;font-size:14px;color:var(--text-primary);font-family:var(--font-mono);caret-color:var(--accent-primary);" />
+          </div>
+        </div>
+        <div id="trf-coin-list" style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:4px 10px 16px;">
+          <!-- populated by JS -->
+        </div>
+      </div>
+    </div>

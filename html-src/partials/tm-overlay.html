@@ -1,0 +1,96 @@
+<!-- ══════ TOKEN MANAGER MODAL ══════ -->
+<div class="send-overlay" id="tm-overlay" style="z-index:25000;bottom:calc(var(--nav-height) + env(safe-area-inset-bottom, 0px));">
+  <div class="send-modal">
+    <div class="send-header">
+      <div class="send-back-btn" onclick="closeTokenManager()">
+        <span class="material-icons-round">arrow_back</span>
+      </div>
+      <div class="send-header-title">Manage Tokens</div>
+      <div id="tm-count-badge" style="padding:4px 10px;border-radius:8px;background:rgba(99,102,241,0.15);border:1px solid rgba(99,102,241,0.3);font-size:10px;font-weight:700;color:var(--neon-purple);font-family:var(--font-mono);">0 TOKENS</div>
+    </div>
+
+    <div class="send-body" style="padding:16px 20px 40px;">
+
+      <!-- Chain selector for token add -->
+      <div style="margin-bottom:10px;">
+        <div id="tm-chain-selector" onclick="openTmChainPicker()" style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--bg-glass);border:1px solid var(--border-subtle);border-radius:12px;cursor:pointer;transition:all 0.2s;" onmousedown="this.style.opacity='.7'" onmouseup="this.style.opacity='1'" ontouchstart="this.style.opacity='.7'" ontouchend="this.style.opacity='1'">
+          <span id="tm-chain-emoji" style="font-size:20px;display:flex;align-items:center;justify-content:center;width:28px;height:28px;flex-shrink:0;">🌐</span>
+          <div style="flex:1;">
+            <div id="tm-chain-name" style="font-size:13px;font-weight:700;">All Networks</div>
+            <div id="tm-chain-sub" style="font-size:10px;color:var(--text-muted);font-family:var(--font-mono);">All chains</div>
+          </div>
+          <span class="material-icons-round" style="font-size:18px;color:var(--text-muted);">expand_more</span>
+        </div>
+      </div>
+
+      <!-- Unified Search + Contract Address -->
+      <div style="position:relative;margin-bottom:6px;">
+        <span id="tm-search-icon" class="material-icons-round" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:18px;color:var(--text-muted);pointer-events:none;">search</span>
+        <input id="tm-search" type="text" class="send-input"
+          style="padding-left:40px;padding-right:36px;font-family:var(--font-display);font-size:13px;"
+          placeholder="Search token name / symbol or paste 0x contract…"
+          oninput="onTmSearch()" autocomplete="off" autocorrect="off"
+          autocapitalize="off" spellcheck="false" />
+        <div id="tm-clear-search" onclick="clearTmSearch()" style="display:none;position:absolute;right:12px;top:50%;transform:translateY(-50%);cursor:pointer;">
+          <span class="material-icons-round" style="font-size:16px;color:var(--text-muted);">close</span>
+        </div>
+      </div>
+      <div id="tm-contract-status" style="font-family:var(--font-mono);font-size:10px;color:var(--text-muted);margin-bottom:6px;padding-left:4px;min-height:14px;"></div>
+
+      <!-- Contract Address Preview Card (shown when RPC fetch succeeds but token not on CG/CMC) -->
+      <div id="tm-contract-preview" style="display:none;margin-bottom:12px;">
+        <div style="font-size:9px;font-weight:700;color:var(--text-muted);letter-spacing:2px;font-family:var(--font-mono);padding:0 2px 8px;">CONTRACT SEARCH RESULT</div>
+        <div id="tm-contract-preview-card" style="display:flex;align-items:center;gap:12px;padding:13px 14px;border-radius:var(--radius-md);background:rgba(99,102,241,0.07);border:1px solid rgba(99,102,241,0.25);">
+          <!-- filled dynamically -->
+        </div>
+        <div id="tm-contract-preview-warn" style="display:none;margin-top:6px;padding:8px 12px;border-radius:10px;background:rgba(245,158,11,0.07);border:1px solid rgba(245,158,11,0.2);font-size:10px;font-family:var(--font-mono);color:var(--accent-amber);line-height:1.5;">
+          ⚠️ Not found on CoinGecko or DexScreener.<br>Data loaded directly from blockchain RPC.
+        </div>
+      </div>
+
+      <!-- Search results -->
+      <div id="tm-search-results" style="display:none;margin-bottom:6px;">
+        <div id="tm-search-results-header" style="font-size:10px;font-weight:700;color:var(--text-muted);letter-spacing:2px;font-family:var(--font-mono);padding:0 2px 10px;">SEARCH RESULTS</div>
+        <div id="tm-results-list"></div>
+        <div id="tm-searching" style="display:none;text-align:center;padding:20px;font-family:var(--font-mono);font-size:11px;color:var(--text-muted);">
+          <span class="del-spinner" style="margin-right:8px;"></span>Searching CoinGecko & DexScreener…
+        </div>
+        <div id="tm-no-results" style="display:none;text-align:center;padding:24px 16px;font-family:var(--font-mono);font-size:11px;color:var(--text-muted);">
+          <div style="font-size:32px;margin-bottom:10px;">🔍</div>
+          <div style="font-size:12px;font-weight:700;color:var(--text-secondary);margin-bottom:6px;font-family:var(--font-display);">Token Not Found</div>
+          <div style="line-height:1.7;font-size:10px;">Not on CoinGecko / DexScreener?<br>Select a chain and paste the <span style="color:var(--neon-cyan);">contract address</span>.</div>
+        </div>
+      </div>
+
+      <!-- Divider -->
+      <div id="tm-divider" style="height:1px;background:var(--border-subtle);margin:4px 0 16px;"></div>
+
+      <!-- Active tokens list -->
+      <div style="font-size:10px;font-weight:700;color:var(--text-muted);letter-spacing:2px;font-family:var(--font-mono);padding:0 2px 10px;">ACTIVE TOKENS</div>
+      <div id="tm-active-list"></div>
+
+    </div>
+  </div>
+
+  <!-- ══════ TM CHAIN PICKER MODAL (inside tm-overlay so z-index stacks correctly) ══════ -->
+  <div id="tm-chain-overlay" style="position:absolute;inset:0;z-index:10;background:rgba(0,0,0,0.85);opacity:0;will-change:opacity;transform:translateZ(0);-webkit-transform:translateZ(0);pointer-events:none;transition:opacity 0.25s ease;display:flex;align-items:flex-end;justify-content:center;">
+    <div id="tm-chain-modal" style="width:100%;max-width: 100%;background:var(--bg-surface);border-radius:var(--radius-xl) var(--radius-xl) 0 0;border:1px solid var(--border-subtle);border-bottom:none;padding:20px 16px 40px;transform:translateY(100%);transition:transform 0.3s cubic-bezier(0.34,1.3,0.64,1);max-height:70vh;display:flex;flex-direction:column;">
+      <div style="width:36px;height:4px;background:rgba(255,255,255,0.15);border-radius:2px;margin:0 auto 12px;"></div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+        <div style="font-size:11px;font-weight:700;font-family:var(--font-mono);color:var(--text-muted);letter-spacing:2px;">SELECT CHAIN</div>
+        <div onclick="closeTmChainPicker()" style="width:30px;height:30px;border-radius:50%;background:var(--bg-glass);border:1px solid var(--border-subtle);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all 0.2s;" onmousedown="this.style.opacity='.6'" onmouseup="this.style.opacity='1'" ontouchstart="this.style.opacity='.6'" ontouchend="this.style.opacity='1'">
+          <span class="material-icons-round" style="font-size:16px;color:var(--text-secondary);">close</span>
+        </div>
+      </div>
+      <!-- Chain search input -->
+      <div style="position:relative;margin-bottom:12px;flex-shrink:0;">
+        <span class="material-icons-round" style="position:absolute;left:11px;top:50%;transform:translateY(-50%);font-size:16px;color:var(--text-muted);pointer-events:none;">search</span>
+        <input id="tm-chain-search" type="text" placeholder="Search chains…"
+          autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
+          oninput="tmFilterChains()"
+          style="width:100%;padding:9px 12px 9px 35px;background:var(--bg-raised);border:1px solid var(--border-subtle);border-radius:10px;color:var(--text-primary);font-family:var(--font-mono);font-size:12px;outline:none;-webkit-appearance:none;" />
+      </div>
+      <div id="tm-chain-list" style="overflow-y:auto;scrollbar-width:none;flex:1;"></div>
+    </div>
+  </div>
+</div>

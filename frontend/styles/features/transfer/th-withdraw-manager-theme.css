@@ -1,0 +1,147 @@
+        /* ══════════════════════════════════════════
+           WITHDRAW MANAGER — One Theme Redesign
+           ══════════════════════════════════════════ */
+        #withdrawManagerUI {
+            font-family: var(--font-display);
+        }
+
+        #withdrawManagerUI > div[style*="font-size: 0.9rem"] {
+            font-size: 0.72rem !important;
+            color: var(--text-muted) !important;
+            margin-bottom: 8px !important;
+            letter-spacing: 0.3px;
+        }
+
+        /* ── Mobile-first: single column stacked layout ── */
+        #withdrawManagerUI .section {
+            background: var(--bg-raised) !important;
+            border: 1px solid var(--border-subtle) !important;
+            border-radius: var(--radius-sm) !important;
+            padding: 10px !important;
+            box-shadow: var(--shadow-card) !important;
+            position: relative;
+            overflow: hidden;
+        }
+        #withdrawManagerUI .section::before {
+            content: '';
+            position: absolute;
+            top: 0 !important;
+            left: 0 !important;
+            right: 0 !important;
+            bottom: auto !important;
+            height: 2px !important;
+            width: auto !important;
+            background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary)) !important;
+            border-radius: var(--radius-sm) var(--radius-sm) 0 0 !important;
+            transform: none !important;
+            transition: none !important;
+        }
+        #withdrawManagerUI .section:hover::before {
+            width: auto !important;
+            height: 2px !important;
+            top: 0 !important;
+            left: 0 !important;
+            transform: none !important;
+        }
+
+        #withdrawManagerUI .section-title {
+            font-family: var(--font-display) !important;
+            font-size: 0.65rem !important;
+            font-weight: 700 !important;
+            text-transform: uppercase !important;
+            letter-spacing: 1px !important;
+            color: var(--text-secondary) !important;
+            margin-bottom: 8px !important;
+        }
+
+        /* Selected contract info box */
+        #selectedContractInfoBox {
+            background: linear-gradient(135deg, rgba(99,102,241,0.08) 0%, rgba(139,92,246,0.08) 100%) !important;
+            border: 1px solid var(--border-glow) !important;
+            border-radius: var(--radius-sm) !important;
+            padding: 8px !important;
+            margin-bottom: 8px !important;
+        }
+
+        /* No contract selected */
+        #noContractSelected {
+            border: 1px dashed var(--border-subtle) !important;
+            border-radius: var(--radius-sm) !important;
+            color: var(--text-muted) !important;
+            padding: 14px 10px !important;
+            text-align: center;
+        }
+        #noContractSelected > div:first-child {
+            font-size: 1.5rem !important;
+            margin-bottom: 4px !important;
+        }
+        #noContractSelected > div:nth-child(2) {
+            font-size: 0.75rem !important;
+            margin-bottom: 3px !important;
+        }
+        #noContractSelected > div:nth-child(3) {
+            font-size: 0.68rem !important;
+        }
+
+        /* Input group */
+        #withdrawManagerUI .input-group {
+            margin-bottom: 7px !important;
+        }
+        #withdrawManagerUI .input-group label {
+            font-size: 0.65rem !important;
+            font-weight: 700 !important;
+            color: var(--text-secondary) !important;
+            text-transform: uppercase !important;
+            letter-spacing: 0.5px !important;
+            display: block;
+            margin-bottom: 4px;
+        }
+        #withdrawManagerUI .input-group input,
+        #withdrawManagerUI .input-group textarea {
+            background: var(--bg-surface) !important;
+            border: 1px solid var(--border-subtle) !important;
+            border-radius: var(--radius-sm) !important;
+            color: var(--text-primary) !important;
+            font-family: var(--font-mono) !important;
+            font-size: 0.72rem !important;
+            padding: 6px 10px !important;
+            width: 100% !important;
+            box-sizing: border-box !important;
+            transition: border-color 0.2s;
+        }
+        #withdrawManagerUI .input-group input:focus,
+        #withdrawManagerUI .input-group textarea:focus {
+            border-color: var(--border-glow) !important;
+            outline: none !important;
+            box-shadow: 0 0 0 2px rgba(99,102,241,0.12) !important;
+        }
+
+        #withdrawManagerUI .hint {
+            font-size: 0.62rem !important;
+            color: var(--text-muted) !important;
+            margin-top: 3px !important;
+        }
+
+        /* Contracts grid — compact mobile cards */
+        #contractsList {
+            background: var(--bg-deep) !important;
+            border: 1px solid var(--border-subtle) !important;
+            border-radius: var(--radius-sm) !important;
+            display: grid !important;
+            grid-template-columns: 1fr !important;
+            gap: 6px !important;
+            max-height: 340px !important;
+            padding: 6px !important;
+        }
+
+        /* Log section */
+        #withdrawManagerUI .log-section {
+            background: var(--bg-deep) !important;
+            border: 1px solid var(--border-subtle) !important;
+            border-radius: var(--radius-sm) !important;
+            padding: 8px !important;
+        }
+        #withdrawManagerUI .log-section .section-title {
+            color: var(--text-secondary) !important;
+        }
+

@@ -1,0 +1,42 @@
+        <!-- STEP 3: Run & Log -->
+        <div class="bsb-panel" id="bsb-step3" style="display:none;">
+
+          <!-- Stats grid -->
+          <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:14px;">
+            <div style="background:var(--bg-raised);border:1px solid var(--border-subtle);border-radius:10px;padding:10px 8px;text-align:center;">
+              <div id="bsb-sKeys" style="font-size:18px;font-weight:bold;color:#3b82f6;font-family:var(--font-mono);">0</div>
+              <div style="font-size:10px;color:var(--text-muted);margin-top:2px;font-family:var(--font-mono);">Keys</div>
+            </div>
+            <div style="background:var(--bg-raised);border:1px solid var(--border-subtle);border-radius:10px;padding:10px 8px;text-align:center;">
+              <div id="bsb-sTxns" style="font-size:18px;font-weight:bold;color:#3b82f6;font-family:var(--font-mono);">0</div>
+              <div style="font-size:10px;color:var(--text-muted);margin-top:2px;font-family:var(--font-mono);">UserOps</div>
+            </div>
+            <div style="background:var(--bg-raised);border:1px solid var(--border-subtle);border-radius:10px;padding:10px 8px;text-align:center;">
+              <div id="bsb-sSwaps" style="font-size:18px;font-weight:bold;color:#3b82f6;font-family:var(--font-mono);">0</div>
+              <div style="font-size:10px;color:var(--text-muted);margin-top:2px;font-family:var(--font-mono);">Swaps</div>
+            </div>
+            <div style="background:var(--bg-raised);border:1px solid var(--border-subtle);border-radius:10px;padding:10px 8px;text-align:center;">
+              <div id="bsb-sErr" style="font-size:18px;font-weight:bold;color:#f43f5e;font-family:var(--font-mono);">0</div>
+              <div style="font-size:10px;color:var(--text-muted);margin-top:2px;font-family:var(--font-mono);">Errors</div>
+            </div>
+          </div>
+
+          <!-- Start / Stop buttons -->
+          <div style="display:flex;gap:8px;margin-bottom:12px;">
+            <button id="bsb-startBtn" onclick="bsbStartBot()" disabled style="flex:1;padding:13px;border-radius:8px;border:none;cursor:pointer;font-size:14px;font-family:var(--font-mono);font-weight:bold;background:linear-gradient(135deg,#3b82f6,#8b5cf6);color:#fff;display:flex;align-items:center;justify-content:center;gap:6px;opacity:0.4;">🚀 Start Bot</button>
+            <button id="bsb-stopBtn" onclick="bsbStopBot()" style="display:none;flex:1;padding:13px;border-radius:8px;border:none;cursor:pointer;font-size:14px;font-family:var(--font-mono);font-weight:bold;background:#ef4444;color:#fff;display:none;align-items:center;justify-content:center;gap:6px;">⛔ Stop</button>
+          </div>
+
+          <!-- Log -->
+          <div style="background:var(--bg-raised);border:1px solid var(--border-subtle);border-radius:var(--radius-md);padding:14px;">
+            <div style="font-size:11px;color:var(--accent-tertiary);font-weight:700;margin-bottom:10px;text-transform:uppercase;letter-spacing:1px;display:flex;align-items:center;gap:8px;font-family:var(--font-mono);">
+              📜 Live Log
+              <button onclick="document.getElementById('bsb-logBox').innerHTML=''" style="padding:3px 10px;font-size:11px;background:var(--bg-surface);border:1px solid var(--border-subtle);color:var(--text-muted);border-radius:6px;cursor:pointer;margin-left:auto;font-family:var(--font-mono);">Clear</button>
+            </div>
+            <div id="bsb-logBox" style="background:var(--bg-void);border:1px solid var(--border-subtle);border-radius:8px;padding:12px;height:360px;overflow-y:auto;font-size:11px;line-height:1.8;word-break:break-all;font-family:var(--font-mono);"></div>
+          </div>
+
+          <!-- Back button -->
+          <button onclick="bsbGoStep(2)" style="width:100%;padding:11px;border-radius:8px;border:1px solid var(--border-subtle);cursor:pointer;font-size:13px;font-family:var(--font-mono);font-weight:bold;background:transparent;color:var(--text-muted);margin-top:10px;">← Back</button>
+
+        </div><!-- /bsb-step3 -->

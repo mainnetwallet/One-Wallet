@@ -1,0 +1,126 @@
+        <!-- ══ STEP 1: KEY INPUT ══ -->
+        <div id="swap-step-1">
+
+          <!-- Active group indicator -->
+          <div id="swap-active-group-pill" class="swap-group-pill" onclick="event.stopPropagation();openSwapGroupDrawer()" style="display:none;">
+            <div class="sgp-icon"><span class="material-icons-round">folder_special</span></div>
+            <div class="sgp-info">
+              <div class="sgp-name" id="swap-group-name">—</div>
+              <div class="sgp-meta" id="swap-group-meta">0 keys loaded</div>
+            </div>
+            <span class="material-icons-round" style="color:var(--text-muted);font-size:18px;">edit</span>
+          </div>
+
+          <!-- Select Wallet button — opens side drawer -->
+          <div id="swap-group-picker">
+
+            <!-- Clickable Select Wallet row -->
+            <div onclick="event.stopPropagation();openSwapGroupDrawer()"
+              style="display:flex;align-items:center;gap:12px;padding:13px 16px;
+                background:linear-gradient(135deg,rgba(99,102,241,0.10),rgba(139,92,246,0.07));
+                border:1.5px solid rgba(99,102,241,0.30);
+                border-radius:14px;cursor:pointer;transition:all 0.2s ease;margin-bottom:10px;"
+              onmousedown="this.style.opacity='0.75'" onmouseup="this.style.opacity='1'"
+              ontouchstart="this.style.opacity='0.75'" ontouchend="this.style.opacity='1'">
+              <div style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,var(--accent-primary),var(--accent-secondary));display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 0 12px rgba(99,102,241,0.4);">
+                <span class="material-icons-round" style="font-size:18px;color:#fff;">folder_open</span>
+              </div>
+              <div style="flex:1;min-width:0;">
+                <div style="font-size:12px;font-weight:800;font-family:var(--font-display);color:var(--text-primary);letter-spacing:0.5px;">Select Wallet</div>
+                <div style="font-size:9px;font-family:var(--font-mono);color:var(--text-muted);letter-spacing:1px;margin-top:2px;" id="swap-group-btn-sub">TAP TO CHOOSE GROUPS</div>
+              </div>
+              <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;">
+                <div id="key-count-badge" style="display:none;font-size:9px;font-weight:800;font-family:var(--font-mono);color:var(--neon-cyan);letter-spacing:1px;background:rgba(34,211,238,0.1);border:1px solid rgba(34,211,238,0.25);padding:3px 8px;border-radius:7px;">0 KEYS</div>
+                <span class="material-icons-round" style="font-size:20px;color:var(--accent-primary);">chevron_right</span>
+              </div>
+            </div>
+
+            <!-- Hidden stubs for JS compatibility -->
+            <div id="swap-group-list" style="display:none;"></div>
+            <div id="swap-multiselect-summary" style="display:none;">
+              <span id="sms-text"></span>
+              <span id="sms-count"></span>
+            </div>
+            <button id="swap-picker-done-btn" style="display:none;" onclick="closeSwapGroupPicker()"></button>
+            <button id="group-toggle-all-btn" style="display:none;" onclick="toggleAllGroups()"></button>
+          </div>
+
+          <!-- Wallet preview section hidden — selection via side drawer -->
+          <div id="wallet-preview-section" style="display:none;">
+            <div id="wallet-preview-list" style="display:none;"></div>
+            <button id="wallet-toggle-all-btn" style="display:none;" onclick="toggleAllWallets()"></button>
+          </div>
+
+          <!-- ── KEY DISPLAY & MANUAL INPUT BOX ── -->
+          <div id="step1-key-box" style="margin-bottom:14px;display:none;">
+            <!-- Header row -->
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+              <div style="display:flex;align-items:center;gap:8px;">
+                <div style="width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,rgba(99,102,241,0.25),rgba(139,92,246,0.2));border:1px solid rgba(99,102,241,0.3);display:flex;align-items:center;justify-content:center;">
+                  <span class="material-icons-round" style="font-size:14px;color:var(--accent-primary);">vpn_key</span>
+                </div>
+                <div>
+                  <div style="font-size:11px;font-weight:800;font-family:var(--font-display);color:var(--text-primary);letter-spacing:0.3px;">Private Keys</div>
+                  <div style="font-size:9px;font-family:var(--font-mono);color:var(--text-muted);letter-spacing:1px;margin-top:1px;">SELECTED + MANUAL INPUT</div>
+                </div>
+              </div>
+              <div style="display:flex;align-items:center;gap:6px;">
+                <div id="step1-key-valid-badge" style="display:none;font-size:9px;font-weight:800;font-family:var(--font-mono);color:var(--accent-green);letter-spacing:1px;background:rgba(16,185,129,0.12);border:1px solid rgba(16,185,129,0.3);padding:3px 9px;border-radius:7px;">0 VALID</div>
+                <!-- Show / Hide toggle button -->
+                <div id="step1-key-show-btn" onclick="step1ToggleKeyVisibility()" title="Show/Hide keys"
+                  style="display:flex;align-items:center;gap:4px;padding:4px 9px;border-radius:7px;background:rgba(99,102,241,0.10);border:1px solid rgba(99,102,241,0.25);cursor:pointer;transition:all 0.2s;"
+                  onmousedown="this.style.opacity='0.6'" onmouseup="this.style.opacity='1'"
+                  ontouchstart="this.style.opacity='0.6'" ontouchend="this.style.opacity='1'">
+                  <span class="material-icons-round" id="step1-key-show-icon" style="font-size:13px;color:var(--accent-primary);">visibility</span>
+                  <span id="step1-key-show-label" style="font-size:9px;font-weight:800;font-family:var(--font-mono);color:var(--accent-primary);letter-spacing:0.8px;">SHOW</span>
+                </div>
+                <div onclick="step1ClearKeys()" title="Clear all" style="width:26px;height:26px;border-radius:7px;background:rgba(244,63,94,0.10);border:1px solid rgba(244,63,94,0.25);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all 0.2s;" onmousedown="this.style.opacity='0.6'" onmouseup="this.style.opacity='1'" ontouchstart="this.style.opacity='0.6'" ontouchend="this.style.opacity='1'">
+                  <span class="material-icons-round" style="font-size:13px;color:var(--accent-red);">delete_outline</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Masked display layer (default visible — hides real keys) -->
+            <div id="step1-key-masked" style="position:relative;width:100%;background:var(--bg-raised);border:1.5px solid var(--border-subtle);border-radius:12px;padding:11px 14px;height:160px;max-height:160px;box-sizing:border-box;display:flex;flex-direction:column;gap:0;overflow:hidden;">
+              <div id="step1-key-masked-rows" style="display:flex;flex-direction:column;gap:5px;overflow-y:auto;flex:1;scrollbar-width:none;-webkit-overflow-scrolling:touch;"></div>
+              <!-- Empty state -->
+              <div id="step1-key-masked-empty" style="font-family:var(--font-mono);font-size:10px;color:var(--text-muted);line-height:1.9;padding:4px 0;">
+                Keys auto-fill here when you select groups above.<br>
+                Tap <b style="color:var(--accent-primary);">SHOW</b> to view or type/paste keys.
+              </div>
+            </div>
+
+            <!-- Real textarea (hidden by default, shown when SHOW is active) -->
+            <div id="step1-key-textarea-wrap" style="display:none;position:relative;">
+              <textarea id="step1-key-textarea"
+                placeholder="One key per line — 0x... or raw 64-char hex"
+                rows="5"
+                oninput="step1OnKeyInput()"
+                autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
+                style="width:100%;background:var(--bg-raised);border:1.5px solid rgba(99,102,241,0.45);border-radius:12px;padding:11px 14px;font-family:var(--font-mono);font-size:10.5px;color:var(--text-primary);outline:none;resize:vertical;min-height:90px;line-height:1.7;box-sizing:border-box;transition:border-color 0.2s;"
+                onfocus="this.style.borderColor='rgba(99,102,241,0.65)'"
+                onblur="this.style.borderColor='rgba(99,102,241,0.45)'"></textarea>
+              <!-- Key count overlay -->
+              <div id="step1-key-count-overlay" style="position:absolute;bottom:9px;right:10px;font-size:9px;font-family:var(--font-mono);color:var(--text-muted);background:var(--bg-raised);padding:2px 7px;border-radius:6px;border:1px solid var(--border-subtle);pointer-events:none;display:none;">0 keys</div>
+            </div>
+
+            <!-- Validation status bar -->
+            <div id="step1-key-status" style="display:none;margin-top:7px;padding:7px 12px;border-radius:9px;background:rgba(16,185,129,0.07);border:1px solid rgba(16,185,129,0.2);display:flex;align-items:center;gap:8px;">
+              <span class="material-icons-round" id="step1-key-status-icon" style="font-size:14px;color:var(--accent-green);">check_circle</span>
+              <span id="step1-key-status-text" style="font-family:var(--font-mono);font-size:10px;color:var(--text-secondary);flex:1;"></span>
+            </div>
+          </div>
+
+          <button class="swap-btn" id="step1-next-btn" onclick="
+            if (typeof _step1UpdateStatus === 'function') _step1UpdateStatus();
+            if (!validatedKeys || validatedKeys.length === 0) {
+              showToast('No keys selected', 'warning');
+              var kbox = document.getElementById('step1-key-box');
+              if (kbox) { kbox.style.outline='2px solid var(--accent-amber)'; kbox.style.borderRadius='14px'; setTimeout(function(){kbox.style.outline='';},1800); }
+              return;
+            }
+            goToStep2();
+          ">
+            Select Pair →
+          </button>
+        </div>

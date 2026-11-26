@@ -1,0 +1,200 @@
+
+        /* ── SUP Transfer: sk-key-wrapper styles ── */
+        #page-sup-transfer .sk-key-wrapper .sup-sk-textarea {
+            width: 100%;
+            box-sizing: border-box;
+            resize: none;
+            background: var(--bg-raised);
+            border: 1px solid var(--border-subtle);
+            color: var(--text-primary);
+            font-family: var(--font-mono);
+            font-size: 11px;
+            padding: 11px 44px 11px 13px;
+            border-radius: 10px;
+            outline: none;
+            line-height: 1.8;
+            transition: border-color .15s, box-shadow .15s;
+            word-break: break-all;
+        }
+        #page-sup-transfer .sk-key-wrapper .sup-sk-textarea:focus {
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 2px rgba(99,102,241,0.12);
+        }
+        #page-sup-transfer .sk-key-wrapper .sup-sk-textarea.sk-masked {
+            -webkit-text-security: disc;
+            text-security: disc;
+            letter-spacing: 3px;
+        }
+        #page-sup-transfer .sk-key-wrapper .sup-sk-textarea.sk-visible {
+            -webkit-text-security: none;
+            text-security: none;
+            letter-spacing: 1px;
+        }
+        #page-sup-transfer .sk-key-wrapper .sup-sk-toggle-btn {
+            position: absolute;
+            right: 10px;
+            top: 10px;
+            transform: none;
+            background: rgba(99,102,241,0.10);
+            border: 1px solid rgba(99,102,241,0.25);
+            border-radius: 7px;
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background 0.18s, border-color 0.18s;
+            padding: 0;
+            outline: none;
+            -webkit-tap-highlight-color: transparent;
+            z-index: 2;
+        }
+        #page-sup-transfer .sk-key-wrapper .sup-sk-toggle-btn:active,
+        #page-sup-transfer .sk-key-wrapper .sup-sk-toggle-btn:hover {
+            background: rgba(99,102,241,0.22);
+            border-color: rgba(99,102,241,0.5);
+        }
+        #page-sup-transfer .sk-key-wrapper .sup-sk-eye-icon {
+            font-size: 16px !important;
+            color: var(--neon-purple, #a78bfa) !important;
+            line-height: 1;
+        }
+
+        /* ── Base Swap Bot: Private Keys sk-key-wrapper styles ── */
+        #page-base-swap-bot .bsb-sk-wrapper {
+            position: relative;
+            display: block;
+            width: 100%;
+        }
+        #page-base-swap-bot .bsb-sk-wrapper .bsb-sk-textarea {
+            width: 100%;
+            box-sizing: border-box;
+            background: var(--bg-surface);
+            border: 1px solid var(--border-subtle);
+            color: var(--text-primary);
+            border-radius: 8px;
+            padding: 7px 40px 7px 10px;
+            font-size: 11px;
+            font-family: var(--font-mono);
+            margin-bottom: 8px;
+            outline: none;
+            resize: vertical;
+            min-height: 80px;
+            word-break: break-all;
+            transition: border-color .15s, box-shadow .15s;
+        }
+        #page-base-swap-bot .bsb-sk-wrapper .bsb-sk-textarea:focus {
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 2px rgba(99,102,241,0.12);
+        }
+        #page-base-swap-bot .bsb-sk-wrapper .bsb-sk-textarea.sk-masked {
+            -webkit-text-security: disc;
+            text-security: disc;
+            letter-spacing: 3px;
+        }
+        #page-base-swap-bot .bsb-sk-wrapper .bsb-sk-textarea.sk-visible {
+            -webkit-text-security: none;
+            text-security: none;
+            letter-spacing: 1px;
+        }
+        #page-base-swap-bot .bsb-sk-wrapper .bsb-sk-toggle-btn {
+            position: absolute;
+            right: 8px;
+            top: 8px;
+            transform: none;
+            background: rgba(99,102,241,0.10);
+            border: 1px solid rgba(99,102,241,0.25);
+            border-radius: 7px;
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background 0.18s, border-color 0.18s;
+            padding: 0;
+            outline: none;
+            -webkit-tap-highlight-color: transparent;
+            z-index: 2;
+        }
+        #page-base-swap-bot .bsb-sk-wrapper .bsb-sk-toggle-btn:active,
+        #page-base-swap-bot .bsb-sk-wrapper .bsb-sk-toggle-btn:hover {
+            background: rgba(99,102,241,0.22);
+            border-color: rgba(99,102,241,0.5);
+        }
+        #page-base-swap-bot .bsb-sk-wrapper .bsb-sk-eye-icon {
+            font-size: 16px !important;
+            color: var(--neon-purple, #a78bfa) !important;
+            line-height: 1;
+        }
+
+        #th-wrapper select {
+            cursor: pointer;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        
+        #th-wrapper select:hover {
+            border-color: #3a3a3a;
+        }
+
+        #th-wrapper .hint {
+            font-size: 0.95rem; /* Much larger! */
+            color: #808080; /* Lighter color for better visibility */
+            margin-top: 8px;
+            line-height: 1.5;
+        }
+        
+        
+
+        #th-wrapper .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-top: 12px;
+        }
+
+        #th-wrapper .stat-card {
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 8px;
+            padding: 12px;
+        }
+
+        #th-wrapper .stat-label {
+            font-size: 0.95rem; /* Much bigger! */
+            color: #909090; /* Lighter */
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+        
+        
+
+        #th-wrapper .stat-value {
+            font-size: 1.6rem; /* Much bigger! */
+            font-weight: 700;
+            color: #ffffff;
+            font-family: 'SF Mono', 'Monaco', monospace;
+        }
+        
+        
+
+        #th-wrapper .btn {
+            width: 100%;
+            padding: 11px 14px;
+            border: none;
+            border-radius: 10px;
+            font-size: 0.88rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            position: relative;
+            overflow: hidden;
+            transform-origin: center;
+            min-height: 42px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        

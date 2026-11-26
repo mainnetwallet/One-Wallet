@@ -1,0 +1,60 @@
+    <div id="snd-success-overlay">
+      <div id="snd-success-card">
+        <!-- Particles injected by JS -->
+
+        <!-- Checkmark -->
+        <div class="sso-check-ring" id="snd-check-ring">
+          <span class="material-icons-round" style="font-size:38px;color:var(--accent-green);">check</span>
+        </div>
+
+        <div class="sso-title" id="snd-title" style="font-family:var(--font-display);font-size:22px;font-weight:800;color:var(--accent-green);margin-bottom:4px;letter-spacing:-0.3px;position:relative;">Sent!</div>
+        <div class="sso-subtitle" id="snd-subtitle" style="font-family:var(--font-mono);font-size:10px;color:var(--text-muted);letter-spacing:2px;margin-bottom:20px;position:relative;">TRANSACTION CONFIRMED</div>
+
+        <!-- Token icon + amount (centered) -->
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:18px;padding:12px 16px;background:var(--bg-surface);border:1px solid rgba(16,185,129,0.15);border-radius:16px;width:100%;box-sizing:border-box;position:relative;">
+          <div id="snd-tok-icon" style="width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg,#627EEA,#364FC7);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:#fff;flex-shrink:0;box-shadow:0 4px 12px rgba(0,0,0,0.35);overflow:hidden;">Ξ</div>
+          <div style="flex:1;min-width:0;">
+            <div id="snd-tok-amt" style="font-family:var(--font-mono);font-size:18px;font-weight:800;color:var(--text-primary);line-height:1;">0.00</div>
+            <div id="snd-tok-sym" style="font-family:var(--font-mono);font-size:10px;color:var(--text-muted);letter-spacing:1px;margin-top:2px;">ETH</div>
+          </div>
+          <span class="material-icons-round" style="font-size:14px;color:var(--accent-green);flex-shrink:0;">send</span>
+        </div>
+
+        <!-- Info rows -->
+        <div style="width:100%;padding:4px 0;margin-bottom:4px;position:relative;">
+          <div class="sso-info-row">
+            <span class="sso-info-label">From</span>
+            <span id="snd-from-addr" class="sso-info-val" style="font-size:10px;color:var(--text-secondary);">—</span>
+          </div>
+          <div class="sso-info-row">
+            <span class="sso-info-label">To</span>
+            <span id="snd-to-addr" class="sso-info-val" style="font-size:10px;color:var(--neon-cyan);">—</span>
+          </div>
+          <div class="sso-info-row">
+            <span class="sso-info-label">Network</span>
+            <span id="snd-chain" class="sso-info-val">—</span>
+          </div>
+          <div class="sso-info-row">
+            <span class="sso-info-label">Gas Mode</span>
+            <span id="snd-gas" class="sso-info-val" style="color:var(--accent-green);">—</span>
+          </div>
+          <div class="sso-info-row">
+            <span class="sso-info-label">Block</span>
+            <span id="snd-block" class="sso-info-val">—</span>
+          </div>
+          <div class="sso-info-row">
+            <span class="sso-info-label">Time</span>
+            <span id="snd-time" class="sso-info-val">—</span>
+          </div>
+        </div>
+
+        <!-- TX hash link -->
+        <a id="snd-hash-row" class="sso-hash-link" href="#" target="_blank" rel="noopener" style="display:none;">
+          <span class="material-icons-round" style="font-size:14px;color:var(--neon-cyan);flex-shrink:0;">open_in_new</span>
+          <span class="sso-hash-text" id="snd-hash-txt">View on Explorer</span>
+        </a>
+
+        <!-- Done -->
+        <button class="sso-done-btn" onclick="window._sndSsoClose()">Done</button>
+      </div>
+    </div>

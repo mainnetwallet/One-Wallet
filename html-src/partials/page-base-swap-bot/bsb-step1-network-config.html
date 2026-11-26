@@ -1,0 +1,139 @@
+        <!-- STEP 1: Network & Uniswap Config -->
+        <div class="bsb-panel" id="bsb-step1" style="display:none;">
+
+          <div style="background:var(--bg-raised);border:1px solid var(--border-subtle);border-radius:var(--radius-md);padding:14px;margin-bottom:12px;">
+            <div style="font-size:11px;color:var(--accent-tertiary);font-weight:700;margin-bottom:12px;text-transform:uppercase;letter-spacing:1px;display:flex;align-items:center;gap:8px;font-family:var(--font-mono);">⚙️ Network</div>
+            <label style="font-size:11px;color:var(--text-muted);display:block;margin-bottom:3px;font-family:var(--font-mono);">RPC URL #1 (Primary)</label>
+            <input id="bsb-rpc" value="https://base-mainnet.g.alchemy.com/v2/N1ew1Lwn_-52DrYiECH_1" style="width:100%;background:var(--bg-surface);border:1px solid var(--border-subtle);color:var(--text-primary);border-radius:8px;padding:7px 10px;font-size:11px;font-family:var(--font-mono);margin-bottom:8px;outline:none;"/>
+            <label style="font-size:11px;color:var(--text-muted);display:block;margin-bottom:3px;font-family:var(--font-mono);">RPC URL #2 (Fallback)</label>
+            <input id="bsb-rpc2" value="https://mainnet.base.org" style="width:100%;background:var(--bg-surface);border:1px solid var(--border-subtle);color:var(--text-primary);border-radius:8px;padding:7px 10px;font-size:11px;font-family:var(--font-mono);margin-bottom:8px;outline:none;"/>
+            <label style="font-size:11px;color:var(--text-muted);display:block;margin-bottom:3px;font-family:var(--font-mono);">RPC URL #3 (Fallback)</label>
+            <input id="bsb-rpc3" value="https://base.llamarpc.com" style="width:100%;background:var(--bg-surface);border:1px solid var(--border-subtle);color:var(--text-primary);border-radius:8px;padding:7px 10px;font-size:11px;font-family:var(--font-mono);margin-bottom:8px;outline:none;"/>
+            <label style="font-size:11px;color:var(--text-muted);display:block;margin-bottom:3px;font-family:var(--font-mono);">Bundler / Paymaster URL (Coinbase)</label>
+            <input id="bsb-pm" value="https://api.developer.coinbase.com/rpc/v1/base/A6jXZc7eEPBCQQEErk6jTcw5LRWUnwzv" readonly style="width:100%;background:var(--bg-surface);border:1px solid var(--border-subtle);color:var(--text-muted);border-radius:8px;padding:7px 10px;font-size:11px;font-family:var(--font-mono);margin-bottom:2px;outline:none;cursor:default;user-select:none;"/><div style="font-size:9px;color:var(--text-muted);font-family:var(--font-mono);margin-bottom:8px;opacity:0.7;">⚙️ Settings → Base Paymaster থেকে change করুন</div>
+            <label style="font-size:11px;color:var(--text-muted);display:block;margin-bottom:3px;font-family:var(--font-mono);">Chain ID</label>
+            <input id="bsb-chainId" type="number" value="8453" readonly style="width:100%;background:var(--bg-surface);border:1px solid var(--border-subtle);color:var(--text-muted);border-radius:8px;padding:7px 10px;font-size:11px;font-family:var(--font-mono);margin-bottom:8px;outline:none;cursor:default;user-select:none;"/>
+            <label style="font-size:11px;color:var(--text-muted);display:block;margin-bottom:3px;font-family:var(--font-mono);">EntryPoint v0.6.0</label>
+            <input id="bsb-ep" value="0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789" readonly style="width:100%;background:var(--bg-surface);border:1px solid var(--border-subtle);color:var(--text-muted);border-radius:8px;padding:7px 10px;font-size:11px;font-family:var(--font-mono);margin-bottom:8px;outline:none;"/>
+            <label style="font-size:11px;color:var(--text-muted);display:block;margin-bottom:3px;font-family:var(--font-mono);">Simple Account Factory</label>
+            <input id="bsb-factory" value="0x9406Cc6185a346906296840746125a0E44976454" readonly style="width:100%;background:var(--bg-surface);border:1px solid var(--border-subtle);color:var(--text-muted);border-radius:8px;padding:7px 10px;font-size:11px;font-family:var(--font-mono);margin-bottom:8px;outline:none;"/>
+          </div>
+
+          <div style="background:var(--bg-raised);border:1px solid var(--border-subtle);border-radius:var(--radius-md);padding:14px;margin-bottom:12px;">
+            <div style="font-size:11px;color:var(--accent-tertiary);font-weight:700;margin-bottom:12px;text-transform:uppercase;letter-spacing:1px;display:flex;align-items:center;gap:8px;font-family:var(--font-mono);">🦄 Uniswap V4</div>
+            <label style="font-size:11px;color:var(--text-muted);display:block;margin-bottom:3px;font-family:var(--font-mono);">PoolManager</label>
+            <input id="bsb-poolMgr" value="0x498581fF718922c3f8e6A244956aF099B2652b2b" readonly style="width:100%;background:var(--bg-surface);border:1px solid var(--border-subtle);color:var(--text-muted);border-radius:8px;padding:7px 10px;font-size:11px;font-family:var(--font-mono);margin-bottom:8px;outline:none;cursor:default;user-select:none;"/>
+            <label style="font-size:11px;color:var(--text-muted);display:block;margin-bottom:3px;font-family:var(--font-mono);">PositionManager</label>
+            <input id="bsb-posMgr" value="0x7C5f5A4bBd8fD63184577525326123B519429bDc" readonly style="width:100%;background:var(--bg-surface);border:1px solid var(--border-subtle);color:var(--text-muted);border-radius:8px;padding:7px 10px;font-size:11px;font-family:var(--font-mono);margin-bottom:8px;outline:none;cursor:default;user-select:none;"/>
+            <label style="font-size:11px;color:var(--text-muted);display:block;margin-bottom:3px;font-family:var(--font-mono);">UniversalRouter</label>
+            <input id="bsb-router" value="0x6fF5693b99212Da76ad316178A184AB56D299b43" readonly style="width:100%;background:var(--bg-surface);border:1px solid var(--border-subtle);color:var(--text-muted);border-radius:8px;padding:7px 10px;font-size:11px;font-family:var(--font-mono);margin-bottom:8px;outline:none;cursor:default;user-select:none;"/>
+            <label style="font-size:11px;color:var(--text-muted);display:block;margin-bottom:3px;font-family:var(--font-mono);">Permit2</label>
+            <input id="bsb-p2" value="0x000000000022D473030F116dDEE9F6B43aC78BA3" readonly style="width:100%;background:var(--bg-surface);border:1px solid var(--border-subtle);color:var(--text-muted);border-radius:8px;padding:7px 10px;font-size:11px;font-family:var(--font-mono);margin-bottom:8px;outline:none;cursor:default;user-select:none;"/>
+            <label style="font-size:11px;color:var(--text-muted);display:block;margin-bottom:3px;font-family:var(--font-mono);">Fee Tier</label>
+            <select id="bsb-fee" disabled style="width:100%;background:var(--bg-surface);border:1px solid var(--border-subtle);color:var(--text-muted);border-radius:8px;padding:7px 10px;font-size:11px;font-family:var(--font-mono);margin-bottom:8px;outline:none;pointer-events:none;opacity:0.6;">
+              <option value="500">500 — 0.05%</option>
+              <option value="3000" selected>3000 — 0.3%</option>
+              <option value="10000">10000 — 1%</option>
+            </select>
+            <label style="font-size:11px;color:var(--text-muted);display:block;margin-bottom:3px;font-family:var(--font-mono);">Tick Spacing</label>
+            <input id="bsb-tick" type="number" value="60" readonly style="width:100%;background:var(--bg-surface);border:1px solid var(--border-subtle);color:var(--text-muted);border-radius:8px;padding:7px 10px;font-size:11px;font-family:var(--font-mono);margin-bottom:8px;outline:none;cursor:default;user-select:none;"/>
+          </div>
+
+          <!-- Aerodrome -->
+          <div style="background:var(--bg-raised);border:1px solid var(--border-subtle);border-radius:var(--radius-md);padding:14px;margin-bottom:12px;">
+            <div style="font-size:11px;color:var(--accent-tertiary);font-weight:700;margin-bottom:12px;text-transform:uppercase;letter-spacing:1px;display:flex;align-items:center;gap:8px;font-family:var(--font-mono);">🚀 Aerodrome</div>
+            <label style="font-size:11px;color:var(--text-muted);display:block;margin-bottom:3px;font-family:var(--font-mono);">Router</label>
+            <input id="bsb-aero-router" value="0xcF77a3Ba9A5CA399B7c97c74d54e5b1Beb874E43" readonly style="width:100%;background:var(--bg-surface);border:1px solid var(--border-subtle);color:var(--text-muted);border-radius:8px;padding:7px 10px;font-size:11px;font-family:var(--font-mono);margin-bottom:8px;outline:none;cursor:default;user-select:none;"/>
+            <label style="font-size:11px;color:var(--text-muted);display:block;margin-bottom:3px;font-family:var(--font-mono);">Factory</label>
+            <input id="bsb-aero-factory" value="0x420DD381b31aEf6683db6B902084cB0FFECe40Da" readonly style="width:100%;background:var(--bg-surface);border:1px solid var(--border-subtle);color:var(--text-muted);border-radius:8px;padding:7px 10px;font-size:11px;font-family:var(--font-mono);margin-bottom:8px;outline:none;cursor:default;user-select:none;"/>
+            <label style="font-size:11px;color:var(--text-muted);display:block;margin-bottom:3px;font-family:var(--font-mono);">Fee Tier</label>
+            <select id="bsb-aero-fee" disabled style="width:100%;background:var(--bg-surface);border:1px solid var(--border-subtle);color:var(--text-muted);border-radius:8px;padding:7px 10px;font-size:11px;font-family:var(--font-mono);margin-bottom:8px;outline:none;pointer-events:none;opacity:0.6;">
+              <option value="100">100 — 0.01%</option>
+              <option value="500" selected>500 — 0.05%</option>
+              <option value="3000">3000 — 0.3%</option>
+              <option value="10000">10000 — 1%</option>
+            </select>
+          </div>
+
+          <!-- BaseSwap -->
+          <div style="background:var(--bg-raised);border:1px solid var(--border-subtle);border-radius:var(--radius-md);padding:14px;margin-bottom:12px;">
+            <div style="font-size:11px;color:var(--accent-tertiary);font-weight:700;margin-bottom:12px;text-transform:uppercase;letter-spacing:1px;display:flex;align-items:center;gap:8px;font-family:var(--font-mono);">🔵 BaseSwap V2</div>
+            <label style="font-size:11px;color:var(--text-muted);display:block;margin-bottom:3px;font-family:var(--font-mono);">Router</label>
+            <input id="bsb-baseswap-router" value="0x327Df1E6de05895d2ab08513aaDD9313Fe505d86" readonly style="width:100%;background:var(--bg-surface);border:1px solid var(--border-subtle);color:var(--text-muted);border-radius:8px;padding:7px 10px;font-size:11px;font-family:var(--font-mono);margin-bottom:8px;outline:none;cursor:default;user-select:none;"/>
+            <label style="font-size:11px;color:var(--text-muted);display:block;margin-bottom:3px;font-family:var(--font-mono);">Fee Tier</label>
+            <select id="bsb-baseswap-fee" disabled style="width:100%;background:var(--bg-surface);border:1px solid var(--border-subtle);color:var(--text-muted);border-radius:8px;padding:7px 10px;font-size:11px;font-family:var(--font-mono);margin-bottom:8px;outline:none;pointer-events:none;opacity:0.6;">
+              <option value="500">500 — 0.05%</option>
+              <option value="3000" selected>3000 — 0.3%</option>
+              <option value="10000">10000 — 1%</option>
+            </select>
+          </div>
+
+          <!-- SwapBased -->
+          <div style="background:var(--bg-raised);border:1px solid var(--border-subtle);border-radius:var(--radius-md);padding:14px;margin-bottom:12px;">
+            <div style="font-size:11px;color:var(--accent-tertiary);font-weight:700;margin-bottom:12px;text-transform:uppercase;letter-spacing:1px;display:flex;align-items:center;gap:8px;font-family:var(--font-mono);">⚡ SwapBased V2</div>
+            <label style="font-size:11px;color:var(--text-muted);display:block;margin-bottom:3px;font-family:var(--font-mono);">Router</label>
+            <input id="bsb-swapbased-router" value="0xaAa3b1f1BD7bcc97fd1917C18aaBe968345E72A7" readonly style="width:100%;background:var(--bg-surface);border:1px solid var(--border-subtle);color:var(--text-muted);border-radius:8px;padding:7px 10px;font-size:11px;font-family:var(--font-mono);margin-bottom:8px;outline:none;cursor:default;user-select:none;"/>
+            <label style="font-size:11px;color:var(--text-muted);display:block;margin-bottom:3px;font-family:var(--font-mono);">Fee Tier</label>
+            <select id="bsb-swapbased-fee" disabled style="width:100%;background:var(--bg-surface);border:1px solid var(--border-subtle);color:var(--text-muted);border-radius:8px;padding:7px 10px;font-size:11px;font-family:var(--font-mono);margin-bottom:8px;outline:none;pointer-events:none;opacity:0.6;">
+              <option value="500">500 — 0.05%</option>
+              <option value="3000" selected>3000 — 0.3%</option>
+              <option value="10000">10000 — 1%</option>
+            </select>
+          </div>
+
+          <!-- RocketSwap -->
+          <div style="background:var(--bg-raised);border:1px solid var(--border-subtle);border-radius:var(--radius-md);padding:14px;margin-bottom:12px;">
+            <div style="font-size:11px;color:var(--accent-tertiary);font-weight:700;margin-bottom:12px;text-transform:uppercase;letter-spacing:1px;display:flex;align-items:center;gap:8px;font-family:var(--font-mono);">🚀 RocketSwap V2</div>
+            <label style="font-size:11px;color:var(--text-muted);display:block;margin-bottom:3px;font-family:var(--font-mono);">Router</label>
+            <input id="bsb-rocketswap-router" value="0x4cf76043B3f97ba06917cBd90F9e3A2AAC1B306e" readonly style="width:100%;background:var(--bg-surface);border:1px solid var(--border-subtle);color:var(--text-muted);border-radius:8px;padding:7px 10px;font-size:11px;font-family:var(--font-mono);margin-bottom:8px;outline:none;cursor:default;user-select:none;"/>
+            <label style="font-size:11px;color:var(--text-muted);display:block;margin-bottom:3px;font-family:var(--font-mono);">Fee Tier</label>
+            <select id="bsb-rocketswap-fee" disabled style="width:100%;background:var(--bg-surface);border:1px solid var(--border-subtle);color:var(--text-muted);border-radius:8px;padding:7px 10px;font-size:11px;font-family:var(--font-mono);margin-bottom:8px;outline:none;pointer-events:none;opacity:0.6;">
+              <option value="500">500 — 0.05%</option>
+              <option value="3000" selected>3000 — 0.3%</option>
+              <option value="10000">10000 — 1%</option>
+            </select>
+          </div>
+
+          <!-- Alien Base -->
+          <div style="background:var(--bg-raised);border:1px solid var(--border-subtle);border-radius:var(--radius-md);padding:14px;margin-bottom:12px;">
+            <div style="font-size:11px;color:var(--accent-tertiary);font-weight:700;margin-bottom:12px;text-transform:uppercase;letter-spacing:1px;display:flex;align-items:center;gap:8px;font-family:var(--font-mono);">👽 Alien Base V2</div>
+            <label style="font-size:11px;color:var(--text-muted);display:block;margin-bottom:3px;font-family:var(--font-mono);">Router</label>
+            <input id="bsb-alienbase-router" value="0x8c1A3cF8f83074169FE5D7aD50B978e1cD6b37c7" readonly style="width:100%;background:var(--bg-surface);border:1px solid var(--border-subtle);color:var(--text-muted);border-radius:8px;padding:7px 10px;font-size:11px;font-family:var(--font-mono);margin-bottom:8px;outline:none;cursor:default;user-select:none;"/>
+            <label style="font-size:11px;color:var(--text-muted);display:block;margin-bottom:3px;font-family:var(--font-mono);">Fee Tier</label>
+            <select id="bsb-alienbase-fee" disabled style="width:100%;background:var(--bg-surface);border:1px solid var(--border-subtle);color:var(--text-muted);border-radius:8px;padding:7px 10px;font-size:11px;font-family:var(--font-mono);margin-bottom:8px;outline:none;pointer-events:none;opacity:0.6;">
+              <option value="500">500 — 0.05%</option>
+              <option value="3000" selected>3000 — 0.3%</option>
+              <option value="10000">10000 — 1%</option>
+            </select>
+          </div>
+
+          <!-- SushiSwap V3 -->
+          <div style="background:var(--bg-raised);border:1px solid var(--border-subtle);border-radius:var(--radius-md);padding:14px;margin-bottom:12px;">
+            <div style="font-size:11px;color:var(--accent-tertiary);font-weight:700;margin-bottom:12px;text-transform:uppercase;letter-spacing:1px;display:flex;align-items:center;gap:8px;font-family:var(--font-mono);">🍣 SushiSwap V3</div>
+            <label style="font-size:11px;color:var(--text-muted);display:block;margin-bottom:3px;font-family:var(--font-mono);">NonfungiblePositionManager</label>
+            <input id="bsb-sushi-nfpm" value="0x80C7DD17B01855a6D2347444a0FCC36136a314de" readonly style="width:100%;background:var(--bg-surface);border:1px solid var(--border-subtle);color:var(--text-muted);border-radius:8px;padding:7px 10px;font-size:11px;font-family:var(--font-mono);margin-bottom:8px;outline:none;cursor:default;user-select:none;"/>
+            <label style="font-size:11px;color:var(--text-muted);display:block;margin-bottom:3px;font-family:var(--font-mono);">Fee Tier</label>
+            <select id="bsb-sushi-fee" disabled style="width:100%;background:var(--bg-surface);border:1px solid var(--border-subtle);color:var(--text-muted);border-radius:8px;padding:7px 10px;font-size:11px;font-family:var(--font-mono);margin-bottom:8px;outline:none;pointer-events:none;opacity:0.6;">
+              <option value="500">500 — 0.05%</option>
+              <option value="3000" selected>3000 — 0.3%</option>
+              <option value="10000">10000 — 1%</option>
+            </select>
+          </div>
+
+          <!-- PancakeSwap V3 -->
+          <div style="background:var(--bg-raised);border:1px solid var(--border-subtle);border-radius:var(--radius-md);padding:14px;margin-bottom:12px;">
+            <div style="font-size:11px;color:var(--accent-tertiary);font-weight:700;margin-bottom:12px;text-transform:uppercase;letter-spacing:1px;display:flex;align-items:center;gap:8px;font-family:var(--font-mono);">🥞 PancakeSwap V3</div>
+            <label style="font-size:11px;color:var(--text-muted);display:block;margin-bottom:3px;font-family:var(--font-mono);">NonfungiblePositionManager</label>
+            <input id="bsb-cake-nfpm" value="0x46A15B0b27311cedF172AB29E4f4766fbE7F4364" readonly style="width:100%;background:var(--bg-surface);border:1px solid var(--border-subtle);color:var(--text-muted);border-radius:8px;padding:7px 10px;font-size:11px;font-family:var(--font-mono);margin-bottom:8px;outline:none;cursor:default;user-select:none;"/>
+            <label style="font-size:11px;color:var(--text-muted);display:block;margin-bottom:3px;font-family:var(--font-mono);">Fee Tier</label>
+            <select id="bsb-cake-fee" disabled style="width:100%;background:var(--bg-surface);border:1px solid var(--border-subtle);color:var(--text-muted);border-radius:8px;padding:7px 10px;font-size:11px;font-family:var(--font-mono);margin-bottom:8px;outline:none;pointer-events:none;opacity:0.6;">
+              <option value="500" selected>500 — 0.05%</option>
+              <option value="3000">3000 — 0.3%</option>
+              <option value="10000">10000 — 1%</option>
+            </select>
+          </div>
+
+          <!-- Next button -->
+          <button onclick="bsbGoStep(2)" style="width:100%;padding:13px;border-radius:8px;border:none;cursor:pointer;font-size:14px;font-family:var(--font-mono);font-weight:bold;background:linear-gradient(135deg,#3b82f6,#8b5cf6);color:#fff;display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:12px;">Next → Keys &amp; Settings</button>
+
+        </div><!-- /bsb-step1 -->

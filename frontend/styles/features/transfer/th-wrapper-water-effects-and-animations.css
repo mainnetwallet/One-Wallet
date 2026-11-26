@@ -1,0 +1,109 @@
+        /* Animated water caustics overlay */
+        
+        @keyframes waterCaustics {
+            0%, 100% {
+                background-position: 0% 0%, 100% 100%, 50% 50%;
+                opacity: 0.6;
+            }
+            50% {
+                background-position: 100% 100%, 0% 0%, 30% 70%;
+                opacity: 0.4;
+            }
+        }
+        
+        /* Floating water bubbles */
+        
+        @keyframes waterFloat {
+            0% {
+                transform: translateY(0);
+            }
+            100% {
+                transform: translateY(-200px);
+            }
+        }
+        
+        /* Water wave effect on scroll */
+        #th-wrapper .container {
+            position: relative;
+            z-index: 2;
+        }
+        
+        /* Floating water particles - removed for performance */
+        
+        
+        
+        
+        
+        
+        
+        
+        @keyframes foodFloat {
+            0%, 100% {
+                transform: translateY(0) scale(1);
+            }
+            50% {
+                transform: translateY(-5px) scale(1.1);
+            }
+        }
+        
+        /* Food eaten animation */
+        #th-wrapper .food-eaten {
+            animation: foodEaten 0.3s ease-out forwards !important;
+        }
+        
+        @keyframes foodEaten {
+            0% {
+                transform: scale(1);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(0);
+                opacity: 0;
+            }
+        }
+        
+        /* Water ripple effect */
+        #th-wrapper .water-ripple {
+            position: fixed;
+            border-radius: 50%;
+            border: 2px solid rgba(120, 200, 255, 0.5);
+            background: radial-gradient(circle, rgba(120, 200, 255, 0.15) 0%, transparent 70%);
+            pointer-events: none;
+            animation: rippleExpand 1s ease-out;
+            z-index: 9998;
+        }
+        
+        @keyframes rippleExpand {
+            from {
+                width: 0;
+                height: 0;
+                opacity: 1;
+            }
+            to {
+                width: 200px;
+                height: 200px;
+                opacity: 0;
+            }
+        }
+        
+        /* Bubble effect */
+        #th-wrapper .bubble {
+            position: fixed;
+            border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.7), rgba(120, 200, 255, 0.2));
+            pointer-events: none;
+            animation: bubbleRise 1.5s ease-out forwards;
+            z-index: 9997;
+        }
+        
+        @keyframes bubbleRise {
+            from {
+                transform: translateY(0) scale(1);
+                opacity: 0.7;
+            }
+            to {
+                transform: translateY(-200px) scale(0.5);
+                opacity: 0;
+            }
+        }
+

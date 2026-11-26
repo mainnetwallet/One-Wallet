@@ -1,0 +1,213 @@
+<!-- ══════ EIP-7702 DELEGATION PAGE ══════ -->
+<div id="page-delegation" class="page" style="display:flex;flex-direction:column;overflow:hidden;padding-bottom:0;">
+  <div style="width: 100%; max-width: 100%; margin: 0 auto;height:100%;display:flex;flex-direction:column;">
+
+    <!-- Header -->
+    <div class="del-modal-header">
+      <div class="del-back-btn" onclick="switchPage('profile')">
+        <span class="material-icons-round">arrow_back</span>
+      </div>
+      <div style="flex:1;">
+        <div class="del-modal-title">EIP-7702 Delegation</div>
+        <div style="font-size:9px;font-family:var(--font-mono);color:var(--text-muted);margin-top:1px;letter-spacing:1px;" id="del-header-step-label">STEP 1 OF 3 — NETWORK</div>
+      </div>
+      <div class="del-modal-badge" id="del-chain-badge" style="display:flex;align-items:center;gap:5px;cursor:pointer;" onclick="openDelChainPicker()" title="Tap to switch chain">
+        <span id="del-badge-emoji" style="font-size:13px;line-height:1;">🔵</span>
+        <span id="del-badge-name">BASE</span>
+      </div>
+    </div>
+
+    <!-- ══ STEP PROGRESS BAR ══ -->
+    <div class="del-stepbar" id="del-stepbar">
+      <!-- Step 1 -->
+      <div class="del-step-item active" id="del-step-item-1" onclick="delGoToStep(1)">
+        <div class="del-step-dot">1</div>
+        <div class="del-step-label">Network</div>
+        <div class="del-step-connector" id="del-conn-1-2"></div>
+      </div>
+      <!-- Step 2 -->
+      <div class="del-step-item" id="del-step-item-2" onclick="delGoToStep(2)">
+        <div class="del-step-dot">2</div>
+        <div class="del-step-label">Wallets</div>
+        <div class="del-step-connector" id="del-conn-2-3"></div>
+      </div>
+      <!-- Step 3 -->
+      <div class="del-step-item" id="del-step-item-3" onclick="delGoToStep(3)">
+        <div class="del-step-dot">3</div>
+        <div class="del-step-label">Execute</div>
+      </div>
+    </div>
+
+    <!-- Body -->
+    <div class="del-modal-body" id="del-modal-body-scroll">
+
+      <!-- ════════════════════
+           STEP 1 — NETWORK
+           ════════════════════ -->
+      <div class="del-step-panel active" id="del-panel-1">
+
+
+
+        <div style="margin-bottom:12px;">
+          <div class="del-config-label">Delegation Contract Address</div>
+          <input type="text" class="del-config-input" id="del-delegationAddress"
+            value="0x000100abaad02f1cfc8bbe32bd5a564817339e72">
+          <div class="del-preset-row">
+            <div class="del-preset-btn" id="del-btnRevoke">🔴 Revoke</div>
+          </div>
+        </div>
+
+        <!-- Custom Owner Function -->
+        <div style="margin-bottom:12px;">
+          <div class="del-config-label" style="display:flex;align-items:center;justify-content:space-between;">
+            <span>Owner Function</span>
+            <span style="font-size:9px;color:var(--accent-amber);font-weight:700;letter-spacing:1px;background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.25);padding:2px 7px;border-radius:5px;">OPTIONAL</span>
+          </div>
+          <input type="text" class="del-config-input" id="del-ownerFunction"
+            placeholder="e.g. ownerAtIndex(uint256) or nextOwnerIndex()"
+            autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+          <div class="del-helper" style="margin-top:6px;">Leave blank for default (<code style="color:var(--neon-cyan);font-size:9px;">nextOwnerIndex()</code>).</div>
+          <div id="del-owner-fn-status" style="display:none;margin-top:6px;font-size:10px;font-family:var(--font-mono);color:var(--neon-purple);"></div>
+        </div>
+
+        <div style="margin-bottom:12px;">
+          <div class="del-config-label">RPC URLs (one per line)</div>
+          <textarea class="del-config-textarea" id="del-rpcUrls">https://base-mainnet.g.alchemy.com/v2/4Oc_WOXAqH_o6A9K2g5kPveiDofz_E5Q
+https://base-mainnet.g.alchemy.com/v2/N1ew1Lwn_-52DrYiECH_1
+https://base-mainnet.g.alchemy.com/v2/DEnZ44mHX1MaVB8gQh1ku
+https://base-mainnet.g.alchemy.com/v2/s-tyoqpIgcYFI7vKBzy0q
+https://base-mainnet.g.alchemy.com/v2/c3MzGKxN8rb3JyyY1AcQ7gU31VnOwnt2</textarea>
+          <div class="del-helper">Multiple RPCs = faster parallel processing</div>
+        </div>
+        <input type="hidden" id="del-rpcUrl" value="">
+
+        <!-- Next nav -->
+        <div class="del-step-nav">
+          <button class="del-step-nav-next" onclick="delGoToStep(2)">
+            <span>Wallets</span>
+            <span class="material-icons-round">arrow_forward</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- ════════════════════
+           STEP 2 — WALLETS
+           ════════════════════ -->
+      <div class="del-step-panel" id="del-panel-2">
+
+
+        <div style="margin-bottom:12px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+            <div class="del-config-label" style="margin-bottom:0;">Private Keys (one per line)</div>
+            <button id="del-pk-toggle" onclick="delPkToggle()" style="display:flex;align-items:center;gap:4px;background:var(--bg-raised);border:1px solid var(--border-subtle);border-radius:8px;padding:5px 10px;cursor:pointer;font-family:var(--font-mono);font-size:10px;font-weight:700;color:var(--text-secondary);transition:all 0.2s;outline:none;">
+              <span class="material-icons-round" id="del-pk-icon" style="font-size:14px;">visibility</span>
+              <span id="del-pk-lbl">Show</span>
+            </button>
+          </div>
+          <!-- Masked overlay (shown when hidden) -->
+          <div id="del-pk-masked" onclick="document.getElementById('del-pk-toggle').click()" style="display:block;min-height:110px;background:var(--bg-raised);border:1.5px solid var(--border-subtle);border-radius:12px;padding:10px 12px;font-family:var(--font-mono);font-size:11px;cursor:pointer;overflow-y:auto;max-height:200px;" title="Click to show keys">
+            <div id="del-pk-masked-rows" style="display:flex;flex-direction:column;gap:6px;">
+              <div style="color:var(--text-muted);font-size:10px;letter-spacing:1px;">Paste keys to see addresses…</div>
+            </div>
+          </div>
+          <!-- Actual textarea (hidden by default) -->
+          <textarea class="del-config-textarea" id="del-privateKeys" placeholder="0xabc123...&#10;0xdef456...&#10;&#10;Supports: line by line, Python list, comma separated" style="min-height:110px;display:none;"></textarea>
+          <div class="del-helper">Supports: line by line, Python list, or comma separated</div>
+          <div id="del-keyCountBadge" style="display:none;margin-top:8px;">
+            <div class="del-key-pill">
+              <span class="material-icons-round">key</span>
+              <span id="del-keyCountNum">0</span> key(s) detected
+            </div>
+          </div>
+        </div>
+
+        <!-- Group import -->
+        <div style="margin-bottom:12px;">
+          <div class="del-config-label">Import from Group</div>
+          <button onclick="openDelGroupDrawer()" style="width:100%;padding:12px 16px;background:var(--bg-raised);border:1.5px dashed rgba(99,102,241,0.4);border-radius:12px;color:var(--text-secondary);font-family:var(--font-display);font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:10px;transition:all 0.2s ease;" ontouchstart="this.style.borderStyle='solid';this.style.background='rgba(99,102,241,0.08)'" ontouchend="this.style.borderStyle='dashed';this.style.background='var(--bg-raised)'">
+            <div style="width:32px;height:32px;border-radius:9px;background:rgba(99,102,241,0.15);border:1px solid rgba(99,102,241,0.3);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+              <span class="material-icons-round" style="font-size:16px;color:var(--accent-primary);">folder_open</span>
+            </div>
+            <div style="flex:1;text-align:left;">
+              <div style="font-size:12px;font-weight:700;color:var(--text-primary);">Select Wallet Group</div>
+              <div id="del-group-trigger-meta" style="font-size:10px;color:var(--text-muted);font-family:var(--font-mono);margin-top:1px;">Tap to choose groups →</div>
+            </div>
+            <span class="material-icons-round" style="font-size:18px;color:var(--text-muted);">chevron_right</span>
+          </button>
+          <div id="del-group-import-status" style="display:none;margin-top:8px;font-size:10px;font-family:var(--font-mono);color:var(--accent-green);"></div>
+        </div>
+
+        <!-- Nav -->
+        <div class="del-step-nav">
+          <div class="del-step-nav-back" onclick="delGoToStep(1)">
+            <span class="material-icons-round">arrow_back</span>
+          </div>
+          <button class="del-step-nav-next" onclick="delGoToStep(3)">
+            <span>Execute</span>
+            <span class="material-icons-round">rocket_launch</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- ════════════════════
+           STEP 3 — EXECUTE
+           ════════════════════ -->
+      <div class="del-step-panel" id="del-panel-3">
+
+
+        <!-- Stats row -->
+        <div class="del-stats-row">
+          <div class="del-stat-card">
+            <div class="del-stat-label">TOTAL</div>
+            <div class="del-stat-value" id="del-totalWallets">0</div>
+          </div>
+          <div class="del-stat-card">
+            <div class="del-stat-label">OK</div>
+            <div class="del-stat-value" id="del-successCount" style="color:var(--accent-green)">0</div>
+          </div>
+          <div class="del-stat-card">
+            <div class="del-stat-label">FAIL</div>
+            <div class="del-stat-value" id="del-failCount" style="color:var(--accent-red)">0</div>
+          </div>
+          <div class="del-stat-card">
+            <div class="del-stat-label">SKIP</div>
+            <div class="del-stat-value" id="del-skipCount" style="color:var(--accent-amber)">0</div>
+          </div>
+        </div>
+
+        <!-- Action buttons -->
+        <div class="del-btn-col">
+          <button class="del-btn del-btn-delegate" id="del-btnDelegate">
+            <span class="material-icons-round" style="font-size:17px;">rocket_launch</span>
+            Start Delegation
+          </button>
+          <div class="del-btn-grid-2">
+            <button class="del-btn del-btn-outline" id="del-btnCheckWallets" style="height:48px;">
+              <span class="material-icons-round" style="font-size:16px;">search</span>
+              Check
+            </button>
+            <button class="del-btn del-btn-amber" id="del-btnCheckAndRedelegate" style="height:48px;">
+              <span class="material-icons-round" style="font-size:16px;">refresh</span>
+              Re-delegate
+            </button>
+          </div>
+          <button class="del-btn del-btn-danger" id="del-btnRevokeBatch">
+            <span class="material-icons-round" style="font-size:17px;">cancel</span>
+            Revoke All
+          </button>
+        </div>
+        <!-- Nav -->
+        <div class="del-step-nav">
+          <div class="del-step-nav-back" onclick="delGoToStep(2)">
+            <span class="material-icons-round">arrow_back</span>
+          </div>
+          <div style="flex:1;font-size:10px;font-family:var(--font-mono);color:var(--text-muted);text-align:center;padding:0 8px;">
+            All set — hit Start Delegation ↑
+          </div>
+        </div>
+      </div>
+
+      <div style="height:calc(var(--nav-height) + 20px);"></div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,166 @@
+    <div id="br-success-overlay">
+      <div id="br-success-card">
+
+        <!-- Icon ring -->
+        <div class="bso-icon-ring" id="bso-icon-ring">
+          <span class="material-icons-round" id="bso-icon" style="font-size:36px;color:var(--accent-primary);filter:drop-shadow(0 0 10px rgba(99,102,241,0.5));">swap_horiz</span>
+        </div>
+
+        <!-- Title -->
+        <div id="bso-title" style="font-family:var(--font-display);font-size:20px;font-weight:800;color:var(--accent-primary);margin-bottom:3px;letter-spacing:-0.3px;position:relative;">Bridging…</div>
+        <div id="bso-subtitle" style="font-family:var(--font-mono);font-size:10px;color:var(--text-muted);letter-spacing:2px;margin-bottom:18px;position:relative;">TRANSACTION SENT</div>
+
+        <!-- Token flow -->
+        <div class="bso-token-flow">
+          <div class="bso-token-side">
+            <div id="bso-from-icon" class="bso-token-icon" style="background:linear-gradient(135deg,#627EEA,#364FC7);">Ξ</div>
+            <div id="bso-from-amt" class="bso-token-amt">—</div>
+            <div id="bso-from-sym" class="bso-token-sym">—</div>
+            <div id="bso-from-chain" style="font-family:var(--font-mono);font-size:8px;color:var(--text-muted);margin-top:2px;">—</div>
+          </div>
+          <span class="material-icons-round" style="color:var(--accent-primary);font-size:20px;flex-shrink:0;">arrow_forward</span>
+          <div class="bso-token-side">
+            <div id="bso-to-icon" class="bso-token-icon" style="background:linear-gradient(135deg,#2775CA,#1557A0);">$</div>
+            <div id="bso-to-amt" class="bso-token-amt" style="color:var(--accent-green);">—</div>
+            <div id="bso-to-sym" class="bso-token-sym">—</div>
+            <div id="bso-to-chain" style="font-family:var(--font-mono);font-size:8px;color:var(--text-muted);margin-top:2px;">—</div>
+          </div>
+        </div>
+
+        <!-- SENT TX row — shows TX label + extra info for same-chain swap -->
+        <div class="bso-tx-row" id="bso-sent-row" style="flex-direction:column;align-items:flex-start;gap:10px;padding:0;overflow:hidden;background:transparent;border-color:transparent;">
+
+          <!-- Extra info grid — shown for same-chain swap -->
+          <div id="bso-extra-info" style="display:none;width:100%;">
+
+            <!-- Network -->
+            <div class="bso-info-row">
+              <div style="font-family:var(--font-mono);font-size:8px;letter-spacing:1.2px;color:var(--text-muted);flex-shrink:0;font-weight:700;">NETWORK</div>
+              <div id="bso-info-chain" style="font-family:var(--font-mono);font-size:11px;font-weight:700;color:var(--text-primary);display:flex;align-items:center;gap:5px;justify-content:flex-end;">
+                <span id="bso-info-chain-logo" style="display:flex;align-items:center;justify-content:center;width:14px;height:14px;flex-shrink:0;"></span>
+                <span>—</span>
+              </div>
+            </div>
+
+            <!-- Protocol -->
+            <div class="bso-info-row">
+              <div style="font-family:var(--font-mono);font-size:8px;letter-spacing:1.2px;color:var(--text-muted);flex-shrink:0;font-weight:700;">PROTOCOL</div>
+              <div id="bso-info-protocol" style="font-family:var(--font-mono);font-size:11px;font-weight:700;color:var(--neon-purple);display:flex;align-items:center;gap:5px;justify-content:flex-end;">
+                <span id="bso-info-protocol-logo" style="display:flex;align-items:center;justify-content:center;width:14px;height:14px;flex-shrink:0;border-radius:4px;overflow:hidden;"></span>
+                <span>—</span>
+              </div>
+            </div>
+
+            <!-- Gas Fee -->
+            <div class="bso-info-row">
+              <div style="font-family:var(--font-mono);font-size:8px;letter-spacing:1.2px;color:var(--text-muted);flex-shrink:0;font-weight:700;">NETWORK FEE</div>
+              <div id="bso-info-fee" style="font-family:var(--font-mono);font-size:11px;font-weight:700;color:var(--accent-green);display:flex;align-items:center;gap:5px;justify-content:flex-end;">
+                <span class="material-icons-round" style="font-size:11px;color:var(--accent-green);">local_gas_station</span>
+                <span>—</span>
+              </div>
+            </div>
+
+            <!-- Protocol Fee (Rubic only — hidden for LiFi/Rango) -->
+            <div class="bso-info-row" id="bso-protocol-fee-row" style="display:none;">
+              <div style="font-family:var(--font-mono);font-size:8px;letter-spacing:1.2px;color:#a78bfa;flex-shrink:0;font-weight:700;">PROTOCOL FEE</div>
+              <div id="bso-info-protocol-fee" style="font-family:var(--font-mono);font-size:11px;font-weight:700;color:#a78bfa;display:flex;align-items:center;gap:5px;justify-content:flex-end;">
+                <span style="font-size:11px;">🏷️</span>
+                <span id="bso-info-protocol-fee-val">—</span>
+              </div>
+            </div>
+
+            <!-- Est. Time -->
+            <div class="bso-info-row">
+              <div style="font-family:var(--font-mono);font-size:8px;letter-spacing:1.2px;color:var(--text-muted);flex-shrink:0;font-weight:700;">EST. TIME</div>
+              <div id="bso-info-time" style="font-family:var(--font-mono);font-size:11px;font-weight:700;color:var(--neon-cyan);display:flex;align-items:center;gap:5px;justify-content:flex-end;">
+                <span class="material-icons-round" style="font-size:11px;color:var(--neon-cyan);">schedule</span>
+                <span id="bso-info-time-val">—</span>
+              </div>
+            </div>
+
+            <!-- TX Hash (same-chain swap) -->
+            <div class="bso-info-row">
+              <div style="font-family:var(--font-mono);font-size:8px;letter-spacing:1.2px;color:var(--text-muted);flex-shrink:0;font-weight:700;">TX HASH</div>
+              <div id="bso-sent-hash-samechain" onclick="window._bsoOpenSentExplorer()" class="bso-tx-hash" style="font-size:10px;cursor:pointer;display:flex;align-items:center;gap:4px;justify-content:flex-end;">
+                <span class="material-icons-round" style="font-size:11px;flex-shrink:0;">open_in_new</span>
+                <span id="bso-sent-hash-txt-samechain">—</span>
+              </div>
+            </div>
+
+          </div>
+          <div id="bso-bridge-info" style="display:none;width:100%;">
+
+            <!-- From Network + TX Hash -->
+            <div class="bso-info-row">
+              <div style="font-family:var(--font-mono);font-size:8px;letter-spacing:1.2px;color:var(--text-muted);flex-shrink:0;font-weight:700;">FROM CHAIN</div>
+              <div style="display:flex;flex-direction:column;align-items:flex-end;gap:3px;">
+                <div id="bso-br-from-chain" style="font-family:var(--font-mono);font-size:11px;font-weight:700;color:var(--text-primary);display:flex;align-items:center;gap:5px;justify-content:flex-end;">
+                  <span id="bso-br-from-chain-logo" style="display:flex;align-items:center;justify-content:center;width:14px;height:14px;flex-shrink:0;"></span>
+                  <span>—</span>
+                </div>
+                <div id="bso-sent-hash" onclick="window._bsoOpenSentExplorer()" class="bso-tx-hash" style="font-size:10px;cursor:pointer;display:flex;align-items:center;gap:4px;">
+                  <span class="material-icons-round" style="font-size:11px;flex-shrink:0;">open_in_new</span>
+                  <span id="bso-sent-hash-txt">—</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- To Network + Receiver TX Hash -->
+            <div class="bso-info-row">
+              <div style="font-family:var(--font-mono);font-size:8px;letter-spacing:1.2px;color:var(--text-muted);flex-shrink:0;font-weight:700;">TO CHAIN</div>
+              <div style="display:flex;flex-direction:column;align-items:flex-end;gap:3px;">
+                <div id="bso-br-to-chain" style="font-family:var(--font-mono);font-size:11px;font-weight:700;color:var(--text-primary);display:flex;align-items:center;gap:5px;justify-content:flex-end;">
+                  <span id="bso-br-to-chain-logo" style="display:flex;align-items:center;justify-content:center;width:14px;height:14px;flex-shrink:0;"></span>
+                  <span>—</span>
+                </div>
+                <div id="bso-recv-hash" onclick="window._bsoOpenRecvExplorer()" class="bso-tx-hash waiting" style="font-size:10px;cursor:pointer;display:flex;align-items:center;gap:4px;">
+                  <span class="material-icons-round" style="font-size:11px;flex-shrink:0;">hourglass_empty</span>
+                  <span id="bso-recv-hash-txt">waiting for bridge…</span>
+                  <span class="bso-spin" id="bso-recv-spin" style="border-top-color:var(--accent-green);border-color:rgba(16,185,129,0.2);margin-left:2px;"></span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Bridge Protocol -->
+            <div class="bso-info-row">
+              <div style="font-family:var(--font-mono);font-size:8px;letter-spacing:1.2px;color:var(--text-muted);flex-shrink:0;font-weight:700;">BRIDGE</div>
+              <div id="bso-br-protocol" style="font-family:var(--font-mono);font-size:11px;font-weight:700;color:var(--neon-purple);display:flex;align-items:center;gap:5px;justify-content:flex-end;">
+                <span id="bso-br-protocol-logo" style="display:flex;align-items:center;justify-content:center;width:14px;height:14px;flex-shrink:0;border-radius:4px;overflow:hidden;"></span>
+                <span>—</span>
+              </div>
+            </div>
+
+            <!-- Network Fee -->
+            <div class="bso-info-row">
+              <div style="font-family:var(--font-mono);font-size:8px;letter-spacing:1.2px;color:var(--text-muted);flex-shrink:0;font-weight:700;">NETWORK FEE</div>
+              <div id="bso-br-fee" style="font-family:var(--font-mono);font-size:11px;font-weight:700;color:var(--accent-green);display:flex;align-items:center;gap:5px;justify-content:flex-end;">
+                <span class="material-icons-round" style="font-size:11px;color:var(--accent-green);">local_gas_station</span>
+                <span>—</span>
+              </div>
+            </div>
+
+            <!-- Est. Time -->
+            <div class="bso-info-row">
+              <div style="font-family:var(--font-mono);font-size:8px;letter-spacing:1.2px;color:var(--text-muted);flex-shrink:0;font-weight:700;">EST. TIME</div>
+              <div id="bso-br-time" style="font-family:var(--font-mono);font-size:11px;font-weight:700;color:var(--neon-cyan);display:flex;align-items:center;gap:5px;justify-content:flex-end;">
+                <span class="material-icons-round" style="font-size:11px;color:var(--neon-cyan);">schedule</span>
+                <span id="bso-br-time-val">—</span>
+              </div>
+            </div>
+
+          </div>
+
+        </div><!-- end bso-sent-row -->
+
+        <!-- Done btn -->
+        <button class="bso-done-btn" id="bso-done-btn" onclick="window._bsoClose()">Done</button>
+
+        <!-- Close-while-waiting btn (shown only during pending state) -->
+        <button class="bso-done-btn" id="bso-close-waiting-btn"
+          onclick="window._bsoCloseWhileWaiting()"
+          style="display:none;margin-top:8px;background:linear-gradient(135deg,rgba(99,102,241,0.18),rgba(139,92,246,0.18));border:1px solid rgba(99,102,241,0.35);color:var(--text-secondary);font-size:13px;font-weight:600;box-shadow:none;">
+          Close (bridge continues in background)
+        </button>
+
+      </div>
+    </div>

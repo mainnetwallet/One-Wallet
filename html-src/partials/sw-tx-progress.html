@@ -1,0 +1,55 @@
+    <div id="sw-tx-progress">
+      <div id="sw-txp-card">
+
+        <!-- Spinner -->
+        <div class="txp-spinner-wrap">
+          <div class="txp-spinner-ring"></div>
+          <div class="txp-spinner-ring-2"></div>
+          <div class="txp-spinner-inner">
+            <span class="material-icons-round">bolt</span>
+          </div>
+        </div>
+
+        <!-- Steps -->
+        <div class="txp-steps">
+          <div class="txp-step" id="txp-step-approve">
+            <div class="txp-step-dot"></div>APPROVE
+          </div>
+          <span class="txp-step-sep">›</span>
+          <div class="txp-step active" id="txp-step-send">
+            <div class="txp-step-dot"></div>SEND
+          </div>
+          <span class="txp-step-sep">›</span>
+          <div class="txp-step" id="txp-step-confirm">
+            <div class="txp-step-dot"></div>CONFIRM
+          </div>
+        </div>
+
+        <!-- Label -->
+        <div id="txp-title">Broadcasting…</div>
+        <div id="txp-sub">WAITING FOR NETWORK</div>
+
+        <!-- From token -->
+        <div class="txp-token-pill">
+          <div id="txp-from-icon" class="txp-token-icon" style="background:linear-gradient(135deg,#627EEA,#364FC7);">Ξ</div>
+          <div>
+            <div id="txp-from-name" class="txp-token-name">ETH</div>
+            <div id="txp-from-amt"  class="txp-token-amt">—</div>
+          </div>
+        </div>
+
+        <div class="txp-arrow-sep">
+          <span class="material-icons-round" style="font-size:16px;color:var(--text-muted);">arrow_downward</span>
+        </div>
+
+        <!-- To token -->
+        <div class="txp-token-pill">
+          <div id="txp-to-icon" class="txp-token-icon" style="background:linear-gradient(135deg,#2775CA,#1557A0);">$</div>
+          <div>
+            <div id="txp-to-name" class="txp-token-name">USDC</div>
+            <div id="txp-to-amt"  class="txp-token-amt" style="color:var(--accent-green);">~<span id="txp-to-amt-val">—</span></div>
+          </div>
+        </div>
+
+      </div>
+    </div>

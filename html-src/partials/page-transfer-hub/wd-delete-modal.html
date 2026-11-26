@@ -1,0 +1,40 @@
+    <div id="wdDeleteModal" style="display:none;position:fixed;inset:0;z-index:99000;background:rgba(5,5,8,0.92);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);align-items:center;justify-content:center;padding:20px;">
+      <div id="wdDeleteModalBox" style="width:100%;max-width:400px;background:linear-gradient(145deg,#0f0f1a 0%,#14142a 100%);border:1px solid rgba(99,102,241,0.25);border-radius:24px;overflow:hidden;box-shadow:0 0 0 1px rgba(99,102,241,0.1),0 32px 80px rgba(0,0,0,0.8),0 0 60px rgba(99,102,241,0.08);transform:scale(0.88) translateY(20px);transition:transform 0.32s cubic-bezier(0.34,1.56,0.64,1),opacity 0.22s ease;opacity:0;">
+
+        <!-- Header glow bar -->
+        <div style="height:3px;background:linear-gradient(90deg,#6366f1,#f43f5e,#6366f1);background-size:200% 100%;animation:wdBarShift 2s linear infinite;"></div>
+
+        <!-- Icon + Title -->
+        <div style="padding:28px 28px 0;text-align:center;">
+          <div id="wdDeleteIcon" style="width:72px;height:72px;margin:0 auto 16px;border-radius:50%;background:rgba(244,63,94,0.12);border:2px solid rgba(244,63,94,0.3);display:flex;align-items:center;justify-content:center;font-size:2rem;transition:all 0.3s;">🗑️</div>
+          <div id="wdDeleteTitle" style="font-family:'Syne',sans-serif;font-size:1.25rem;font-weight:800;color:#f1f1f8;letter-spacing:-0.3px;margin-bottom:6px;">Delete Contract?</div>
+          <div id="wdDeleteSub" style="font-size:0.8rem;color:#8b8ba7;line-height:1.5;padding:0 8px;"></div>
+        </div>
+
+        <!-- Step indicator -->
+        <div style="display:flex;align-items:center;justify-content:center;gap:8px;padding:20px 28px 8px;">
+          <div id="wdStep1Dot" style="width:8px;height:8px;border-radius:50%;background:#6366f1;transition:all 0.3s;"></div>
+          <div id="wdStepLine" style="flex:1;max-width:60px;height:2px;background:rgba(255,255,255,0.08);border-radius:2px;overflow:hidden;"><div id="wdStepLineInner" style="height:100%;width:0%;background:#f43f5e;transition:width 0.4s ease;"></div></div>
+          <div id="wdStep2Dot" style="width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,0.15);transition:all 0.3s;"></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;padding:0 28px;margin-bottom:4px;">
+          <span id="wdStepLabel1" style="font-size:0.65rem;font-family:'JetBrains Mono',monospace;color:#6366f1;font-weight:600;letter-spacing:.5px;">STEP 1</span>
+          <span id="wdStepLabel2" style="font-size:0.65rem;font-family:'JetBrains Mono',monospace;color:rgba(255,255,255,0.2);font-weight:600;letter-spacing:.5px;">STEP 2</span>
+        </div>
+
+        <!-- Warning info box -->
+        <div id="wdDeleteInfo" style="margin:12px 28px 0;background:rgba(244,63,94,0.07);border:1px solid rgba(244,63,94,0.2);border-radius:12px;padding:12px 14px;">
+          <div id="wdDeleteInfoContent" style="font-size:0.78rem;color:#f87171;line-height:1.7;"></div>
+        </div>
+
+        <!-- Buttons -->
+        <div style="padding:20px 28px 28px;display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+          <button onclick="wdDeleteCancel()" style="padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.05);color:#a0a0b8;font-family:'Syne',sans-serif;font-size:0.85rem;font-weight:700;cursor:pointer;transition:all 0.18s;" onmousedown="this.style.transform='scale(0.96)'" onmouseup="this.style.transform=''" ontouchstart="this.style.transform='scale(0.96)'" ontouchend="this.style.transform=''">
+            Cancel
+          </button>
+          <button id="wdDeleteConfirmBtn" onclick="wdDeleteStep()" style="padding:12px;border-radius:12px;border:none;background:linear-gradient(135deg,#ef4444,#b91c1c);color:#fff;font-family:'Syne',sans-serif;font-size:0.85rem;font-weight:800;cursor:pointer;transition:all 0.18s;letter-spacing:.3px;box-shadow:0 4px 14px rgba(239,68,68,0.35);" onmousedown="this.style.transform='scale(0.96)'" onmouseup="this.style.transform=''" ontouchstart="this.style.transform='scale(0.96)'" ontouchend="this.style.transform=''">
+            Delete
+          </button>
+        </div>
+      </div>
+    </div>

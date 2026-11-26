@@ -1,0 +1,92 @@
+<!-- ══════ CURRENCY PICKER BOTTOM SHEET ══════ -->
+<div id="currency-picker-overlay" onclick="if(event.target===this)closeCurrencyPicker()" style="
+  position:fixed;inset:0;background:rgba(0,0,0,0.6);backdrop-filter:blur(6px);
+  z-index:9999;display:flex;align-items:flex-end;justify-content:center;
+  opacity:0;pointer-events:none;transition:opacity 0.28s ease;">
+  <div id="currency-picker-sheet" style="
+    width:100%;max-width:480px;
+    background:var(--bg-raised);
+    border-radius:28px 28px 0 0;
+    border-top:1px solid var(--border-subtle);
+    padding:0 0 34px;
+    transform:translateY(100%);
+    transition:transform 0.32s cubic-bezier(0.32,0.72,0,1);
+    box-shadow:0 -8px 48px rgba(0,0,0,0.5);">
+
+    <!-- Handle -->
+    <div style="display:flex;justify-content:center;padding:14px 0 4px;">
+      <div style="width:40px;height:4px;border-radius:2px;background:var(--border-subtle);"></div>
+    </div>
+
+    <!-- Header -->
+    <div style="padding:12px 20px 20px;display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--border-subtle);">
+      <div onclick="closeCurrencyPicker()" style="width:36px;height:36px;border-radius:12px;background:var(--bg-glass);border:1px solid var(--border-subtle);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;" onmousedown="this.style.background='var(--bg-glass-hover)'" onmouseup="this.style.background='var(--bg-glass)'" ontouchstart="this.style.background='var(--bg-glass-hover)'" ontouchend="this.style.background='var(--bg-glass)'">
+        <span class="material-icons-round" style="font-size:20px;color:var(--text-secondary);pointer-events:none;">arrow_back</span>
+      </div>
+      <div style="width:40px;height:40px;border-radius:12px;background:rgba(16,185,129,0.15);display:flex;align-items:center;justify-content:center;">
+        <span class="material-icons-round" style="color:var(--accent-green);font-size:20px;">currency_exchange</span>
+      </div>
+      <div>
+        <div style="font-size:16px;font-weight:700;color:var(--text-primary);font-family:var(--font-display);">Currency Display</div>
+        <div style="font-size:11px;color:var(--text-muted);font-family:var(--font-mono);margin-top:2px;">Choose your preferred base currency</div>
+      </div>
+    </div>
+
+    <!-- Options -->
+    <div style="padding:16px 16px 0;display:flex;flex-direction:column;gap:10px;" id="currency-options-list">
+
+      <!-- USD -->
+      <div class="currency-option-row" onclick="setCurrency('USD')" data-cur="USD" style="
+        display:flex;align-items:center;gap:14px;padding:14px 16px;
+        border-radius:16px;border:1px solid var(--border-subtle);
+        background:var(--bg-glass);cursor:pointer;transition:all 0.18s ease;">
+        <div style="width:44px;height:44px;border-radius:14px;background:rgba(16,185,129,0.12);display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700;color:var(--accent-green);font-family:var(--font-mono);">$</div>
+        <div style="flex:1;">
+          <div style="font-size:14px;font-weight:600;color:var(--text-primary);">US Dollar</div>
+          <div style="font-size:11px;color:var(--text-muted);font-family:var(--font-mono);margin-top:2px;">USD — Global standard</div>
+        </div>
+        <span class="material-icons-round cur-check" style="font-size:20px;color:var(--accent-green);opacity:0;transition:opacity 0.18s;">check_circle</span>
+      </div>
+
+      <!-- BDT -->
+      <div class="currency-option-row" onclick="setCurrency('BDT')" data-cur="BDT" style="
+        display:flex;align-items:center;gap:14px;padding:14px 16px;
+        border-radius:16px;border:1px solid var(--border-subtle);
+        background:var(--bg-glass);cursor:pointer;transition:all 0.18s ease;">
+        <div style="width:44px;height:44px;border-radius:14px;background:rgba(6,182,212,0.12);display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700;color:var(--accent-tertiary);font-family:var(--font-mono);">৳</div>
+        <div style="flex:1;">
+          <div style="font-size:14px;font-weight:600;color:var(--text-primary);">Bangladeshi Taka</div>
+          <div style="font-size:11px;color:var(--text-muted);font-family:var(--font-mono);margin-top:2px;" id="bdt-rate-label">BDT — Loading rate…</div>
+        </div>
+        <span class="material-icons-round cur-check" style="font-size:20px;color:var(--accent-green);opacity:0;transition:opacity 0.18s;">check_circle</span>
+      </div>
+
+      <!-- ETH -->
+      <div class="currency-option-row" onclick="setCurrency('ETH')" data-cur="ETH" style="
+        display:flex;align-items:center;gap:14px;padding:14px 16px;
+        border-radius:16px;border:1px solid var(--border-subtle);
+        background:var(--bg-glass);cursor:pointer;transition:all 0.18s ease;">
+        <div style="width:44px;height:44px;border-radius:14px;background:rgba(99,102,241,0.12);display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700;color:var(--neon-purple);font-family:var(--font-mono);">Ξ</div>
+        <div style="flex:1;">
+          <div style="font-size:14px;font-weight:600;color:var(--text-primary);">Ethereum</div>
+          <div style="font-size:11px;color:var(--text-muted);font-family:var(--font-mono);margin-top:2px;" id="eth-rate-label">ETH — Loading price…</div>
+        </div>
+        <span class="material-icons-round cur-check" style="font-size:20px;color:var(--accent-green);opacity:0;transition:opacity 0.18s;">check_circle</span>
+      </div>
+
+      <!-- BTC -->
+      <div class="currency-option-row" onclick="setCurrency('BTC')" data-cur="BTC" style="
+        display:flex;align-items:center;gap:14px;padding:14px 16px;
+        border-radius:16px;border:1px solid var(--border-subtle);
+        background:var(--bg-glass);cursor:pointer;transition:all 0.18s ease;">
+        <div style="width:44px;height:44px;border-radius:14px;background:rgba(245,158,11,0.12);display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700;color:var(--accent-amber);font-family:var(--font-mono);">₿</div>
+        <div style="flex:1;">
+          <div style="font-size:14px;font-weight:600;color:var(--text-primary);">Bitcoin</div>
+          <div style="font-size:11px;color:var(--text-muted);font-family:var(--font-mono);margin-top:2px;" id="btc-rate-label">BTC — Loading price…</div>
+        </div>
+        <span class="material-icons-round cur-check" style="font-size:20px;color:var(--accent-green);opacity:0;transition:opacity 0.18s;">check_circle</span>
+      </div>
+
+    </div>
+  </div>
+</div>

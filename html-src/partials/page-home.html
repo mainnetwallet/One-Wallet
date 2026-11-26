@@ -1,0 +1,221 @@
+    <!-- ╔══════ HOME PAGE ══════╗ -->
+    <div class="page active" id="page-home" style="padding-bottom:0!important;overflow:hidden;display:flex;flex-direction:column;">
+
+      <!-- static top -->
+      <div style="flex-shrink:0;">
+
+
+
+      <!-- Exchange / Wallet toggle -->
+      <div style="display:flex;justify-content:center;padding:8px 16px 2px;">
+        <div id="home-mode-toggle" style="display:flex;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);border-radius:22px;padding:3px;gap:2px;">
+          <div id="home-mode-wallet" onclick="homeSetMode('wallet')" style="padding:6px 28px;border-radius:18px;font-size:13px;font-weight:700;font-family:var(--font-mono);letter-spacing:0.5px;cursor:pointer;transition:all 0.22s ease;background:var(--accent-primary);color:#fff;-webkit-tap-highlight-color:transparent;">Wallet</div>
+          <div id="home-mode-exchange" onclick="homeSetMode('exchange')" style="padding:6px 28px;border-radius:18px;font-size:13px;font-weight:700;font-family:var(--font-mono);letter-spacing:0.5px;cursor:pointer;transition:all 0.22s ease;background:transparent;color:rgba(255,255,255,0.45);-webkit-tap-highlight-color:transparent;">Exchange</div>
+        </div>
+      </div>
+
+      <!-- Top row: Wallet pill + Network pill -->
+      <div style="display:flex;gap:8px;padding:6px 16px 6px;align-items:center;justify-content:space-between;">
+
+        <!-- WALLET pill -->
+        <div style="position:relative;flex-shrink:0;display:flex;flex-direction:row;align-items:center;gap:4px;">
+
+          <!-- Empty state -->
+          <div id="hw-empty" onclick="hwOpenGroupPicker()" style="display:flex;align-items:center;gap:4px;border-radius:10px;padding:6px 10px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);cursor:pointer;-webkit-tap-highlight-color:transparent;">
+            <span class="material-icons-round" style="font-size:14px;color:rgba(255,255,255,0.5);">account_balance_wallet</span>
+            <span style="font-size:9px;font-weight:700;font-family:var(--font-mono);color:rgba(255,255,255,0.3);">NO WALLET</span>
+          </div>
+
+          <!-- Wallet switcher — GROUP pill only -->
+          <div id="hw-list" style="display:none;flex-direction:row;align-items:center;gap:5px;">
+
+            <!-- hidden selects (logic unchanged) -->
+            <select id="home-group-select"  onchange="homeOnGroupChange()"  style="display:none;"></select>
+            <select id="home-wallet-select" onchange="homeOnWalletChange()" style="display:none;"></select>
+
+            <!-- GROUP pill (group name + wallet address + total value) -->
+            <div id="hw-group-pill" onclick="hwOpenGroupPicker()" style="display:flex;flex-direction:row;align-items:center;gap:0;cursor:pointer;-webkit-tap-highlight-color:transparent;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);border-radius:10px;overflow:hidden;pointer-events:auto;max-width:calc(100vw - 120px);">
+              <!-- Left: Group name + Wallet address stacked -->
+              <div style="display:flex;flex-direction:column;gap:2px;padding:5px 8px 5px 9px;border-right:1px solid rgba(255,255,255,0.08);pointer-events:none;min-width:0;flex:1;">
+                <!-- Group name row -->
+                <div style="display:flex;align-items:center;gap:3px;">
+                  <span style="font-size:6.5px;font-weight:700;font-family:var(--font-mono);color:rgba(255,255,255,0.28);letter-spacing:1px;flex-shrink:0;">GRP</span>
+                  <span id="hw-group-label" style="font-size:9px;font-weight:700;font-family:var(--font-mono);color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:90px;">—</span>
+                </div>
+                <!-- Wallet address row -->
+                <div style="display:flex;align-items:center;gap:3px;">
+                  <span style="font-size:6.5px;font-weight:700;font-family:var(--font-mono);color:rgba(255,255,255,0.28);letter-spacing:1px;flex-shrink:0;">W</span>
+                  <span id="hw-wallet-addr-label" style="font-size:9px;font-weight:600;font-family:var(--font-mono);color:var(--text-secondary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:90px;">—</span>
+                </div>
+              </div>
+              <!-- Right: expand icon + Total Value -->
+              <div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px;padding:5px 8px;pointer-events:none;flex-shrink:0;">
+                <span class="material-icons-round" style="font-size:10px;color:rgba(255,255,255,0.3);">expand_more</span>
+                <span id="hw-group-total-value" style="font-size:9px;font-weight:800;font-family:var(--font-mono);color:var(--accent-green);white-space:nowrap;transition:opacity 0.22s ease;">$0.00</span>
+              </div>
+            </div>
+
+            <div id="hw-addr-pill" style="display:none;cursor:pointer;-webkit-tap-highlight-color:transparent;"><div id="hw-addr-text"></div><div id="hw-wallet-index"></div></div>
+          </div>
+          <div class="portfolio-chips" id="home-wallet-chips" style="display:none;"></div>
+        </div>
+
+        <!-- TOTAL VALUE hidden placeholder (keeps JS references alive) -->
+        <div id="hw-total-value-box" style="display:none;">
+          <span id="hw-total-value-text">$0.00</span>
+        </div>
+
+        <!-- NETWORK pill -->
+        <script>
+        (function(){
+          var CHAIN_KEY='one_active_chain';
+          var CHAINS=[
+            {chainId:null,   emoji:'🌐',name:'ALL',      color:'#6366f1'},
+            {chainId:8453,   emoji:'🔵',name:'BASE',     color:'#0052ff'},
+            {chainId:1,      emoji:'⬡', name:'ETH',      color:'#627eea'},
+            {chainId:42161,  emoji:'🔵',name:'ARBITRUM', color:'#28a0f0'},
+            {chainId:10,     emoji:'🔴',name:'OPTIMISM', color:'#ff0420'},
+            {chainId:137,    emoji:'⬡', name:'POLYGON',  color:'#8247e5'},
+            {chainId:56,     emoji:'💛',name:'BNB',      color:'#f3ba2f'},
+            {chainId:43114,  emoji:'🔺',name:'AVAX',     color:'#e84142'},
+            {chainId:59144,  emoji:'◻️',name:'LINEA',    color:'#61dfff'},
+            {chainId:534352, emoji:'📜',name:'SCROLL',   color:'#efc042'},
+            {chainId:324,    emoji:'⚡',name:'ZKSYNC',   color:'#8c8dfc'},
+          ];
+          function rgb(hex){var h=hex.replace('#','');return parseInt(h.slice(0,2),16)+','+parseInt(h.slice(2,4),16)+','+parseInt(h.slice(4,6),16);}
+          var chainId=null,chain=CHAINS[0],isAll=true;
+          try{var v=localStorage.getItem(CHAIN_KEY);if(v&&v!=='null'){chainId=Number(v);isAll=false;chain=CHAINS.find(function(c){return c.chainId===chainId;})||{emoji:'🔗',name:'CHAIN '+chainId,color:'#6366f1'};}}catch(e){}
+          var border=isAll?'rgba(255,255,255,0.12)':'rgba('+rgb(chain.color)+',0.5)';
+          var bg=isAll?'rgba(255,255,255,0.07)':'rgba('+rgb(chain.color)+',0.12)';
+          var html='<div class="chain-switch-btn" id="home-chain-btn" onclick="homeChainBtnClick()" style="position:relative;flex-shrink:0;border-radius:10px;padding:6px 10px;gap:6px;align-items:center;border-color:'+border+';background:'+bg+';">'
+            +'<span id="home-chain-emoji" style="font-size:14px;line-height:1;">'+chain.emoji+'</span>'
+            +'<span id="home-chain-name" style="font-size:9px;font-weight:700;font-family:\'JetBrains Mono\',monospace;letter-spacing:0.5px;">'+chain.name+'</span>'
+            +'<span id="home-chain-clear" onclick="event.stopPropagation();clearHomeChain();" style="display:'+(isAll?'none':'flex')+';align-items:center;justify-content:center;width:14px;height:14px;border-radius:50%;background:rgba(255,255,255,0.15);color:rgba(255,255,255,0.8);font-size:11px;line-height:1;cursor:pointer;font-family:sans-serif;flex-shrink:0;">×</span>'
+            +'<span id="home-chain-arrow" class="material-icons-round" style="font-size:11px;color:rgba(255,255,255,0.4);display:'+(isAll?'inline':'none')+';">expand_more</span>'
+            +'<span id="home-chain-dot" style="position:absolute;top:3px;right:3px;width:5px;height:5px;border-radius:50%;background:var(--accent-green);display:none;box-shadow:0 0 6px var(--accent-green);"></span>'
+            +'</div>';
+          document.currentScript.insertAdjacentHTML('afterend', html);
+        })();
+        </script>
+
+      </div>
+
+      <!-- Hidden portfolio value refs for JS (kept for script compatibility) -->
+      <div style="display:none;">
+        <div id="home-greeting-sub"></div>
+        <div id="home-greeting-main"></div>
+        <div id="home-portfolio-card">
+          <div id="home-portfolio-value">$0.00</div>
+          <div id="home-portfolio-change"><span id="home-portfolio-change-text">+0.00%</span></div>
+          <div id="home-portfolio-chips">
+            <div id="home-pchip-tokens"></div>
+            <div id="home-pchip-chains"></div>
+            <div id="home-pchip-pnl"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- price source hidden label -->
+      <div id="home-price-source-label" style="display:none;padding:2px 16px 0;align-items:center;gap:4px;">
+        <span style="width:5px;height:5px;border-radius:50%;background:var(--accent-green);display:inline-block;box-shadow:0 0 5px var(--accent-green);animation:liveDot 1.5s ease-in-out infinite;"></span>
+        <span style="font-family:var(--font-mono);font-size:9px;color:var(--text-muted);letter-spacing:1px;">LIVE &middot; <span id="live-countdown">15</span>s</span>
+      </div>
+
+      <!-- Quick Actions -->
+      <div class="section-title" style="padding:8px 16px 8px;">QUICK ACTIONS</div>
+      <!-- Row 1: 5 buttons -->
+      <div style="padding:0 16px 7px;display:grid;grid-template-columns:repeat(5,1fr);gap:7px;">
+        <div class="qa-btn" style="min-width:0;" onclick="event.stopPropagation();openSendModal();rippleEffect(this,event)" ontouchend="event.stopPropagation();event.preventDefault();openSendModal();rippleEffect(this,event)">
+          <div class="qa-icon" style="background:rgba(245,158,11,0.15);">
+            <span class="material-icons-round" style="color:var(--accent-amber)">send</span>
+          </div>
+          <span class="qa-label">SEND</span>
+        </div>
+        <div class="qa-btn" style="min-width:0;" onclick="event.stopPropagation();openReceiveModal();rippleEffect(this,event)" ontouchend="event.stopPropagation();event.preventDefault();openReceiveModal();rippleEffect(this,event)">
+          <div class="qa-icon" style="background:rgba(16,185,129,0.15);">
+            <span class="material-icons-round" style="color:var(--accent-green)">call_received</span>
+          </div>
+          <span class="qa-label">RECEIVE</span>
+        </div>
+        <div class="qa-btn" style="min-width:0;" onclick="event.stopPropagation();switchPage('swap');rippleEffect(this,event)" ontouchend="event.stopPropagation();event.preventDefault();switchPage('swap');rippleEffect(this,event)">
+          <div class="qa-icon" style="background:rgba(99,102,241,0.15);">
+            <span class="material-icons-round" style="color:var(--accent-primary)">swap_horiz</span>
+          </div>
+          <span class="qa-label">SWAP</span>
+        </div>
+        <div class="qa-btn" style="min-width:0;" onclick="event.stopPropagation();switchPage('bridge');rippleEffect(this,event)" ontouchend="event.stopPropagation();event.preventDefault();switchPage('bridge');rippleEffect(this,event)">
+          <div class="qa-icon" style="background:rgba(34,211,238,0.15);">
+            <span class="material-icons-round" style="color:var(--neon-cyan)">alt_route</span>
+          </div>
+          <span class="qa-label">BRIDGE</span>
+        </div>
+        <div class="qa-btn" style="min-width:0;" onclick="event.stopPropagation();switchPage('transfer-hub');rippleEffect(this,event)" ontouchend="event.stopPropagation();event.preventDefault();switchPage('transfer-hub');rippleEffect(this,event)">
+          <div class="qa-icon" style="background:rgba(139,92,246,0.15);">
+            <span class="material-icons-round" style="color:var(--accent-secondary)">hub</span>
+          </div>
+          <span class="qa-label">TRANSFER HUB</span>
+        </div>
+      </div>
+      <!-- Row 2: 3 buttons left, 2 empty right -->
+      <div style="padding:0 16px 4px;display:grid;grid-template-columns:repeat(5,1fr);gap:7px;">
+        <div class="qa-btn" style="min-width:0;" onclick="event.stopPropagation();switchPage('nansen');rippleEffect(this,event)" ontouchend="event.stopPropagation();event.preventDefault();switchPage('nansen');rippleEffect(this,event)">
+          <div class="qa-icon" style="background:rgba(244,114,182,0.15);">
+            <span class="material-icons-round" style="color:var(--neon-pink)">swap_calls</span>
+          </div>
+          <span class="qa-label">NANSEN SWAP</span>
+        </div>
+        <div class="qa-btn" style="min-width:0;" onclick="event.stopPropagation();switchPage('sup-transfer');rippleEffect(this,event)" ontouchend="event.stopPropagation();event.preventDefault();switchPage('sup-transfer');rippleEffect(this,event)">
+          <div class="qa-icon" style="background:rgba(6,182,212,0.15);">
+            <span class="material-icons-round" style="color:var(--accent-tertiary)">moving</span>
+          </div>
+          <span class="qa-label">SUP TRANSFER</span>
+        </div>
+        <div class="qa-btn" style="min-width:0;" onclick="event.stopPropagation();switchPage('base-swap-bot');rippleEffect(this,event)" ontouchend="event.stopPropagation();event.preventDefault();switchPage('base-swap-bot');rippleEffect(this,event)">
+          <div class="qa-icon" style="background:rgba(245,158,11,0.15);">
+            <span class="material-icons-round" style="color:var(--accent-amber)">smart_toy</span>
+          </div>
+          <span class="qa-label">BASE SWAP BOT</span>
+        </div>
+        <div></div>
+        <div></div>
+      </div>
+
+      <div style="height:25px;"></div>
+
+      <!-- Tokens header -->
+      <div style="display:flex;align-items:center;gap:8px;padding:0 16px 8px;">
+        <div class="section-title" style="padding:0;flex-shrink:0;">MY TOKENS</div>
+        <!-- Inline token search -->
+        <div style="flex:1;position:relative;">
+          <span class="material-icons-round" style="position:absolute;left:8px;top:50%;transform:translateY(-50%);font-size:14px;color:var(--text-muted);pointer-events:none;">search</span>
+          <input id="home-token-search" type="text"
+            style="width:100%;background:var(--bg-glass);border:1px solid var(--border-subtle);border-radius:9px;padding:6px 28px 6px 28px;font-family:var(--font-mono);font-size:11px;color:var(--text-primary);outline:none;"
+            placeholder="Search tokens…"
+            oninput="homeFilterTokens(this.value)"
+            autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
+          <span id="home-token-search-clear" onclick="homeFilterTokens('');document.getElementById('home-token-search').value='';"
+            style="display:none;position:absolute;right:8px;top:50%;transform:translateY(-50%);cursor:pointer;">
+            <span class="material-icons-round" style="font-size:14px;color:var(--text-muted);">close</span>
+          </span>
+        </div>
+        <div id="home-manage-btn" onclick="homeManageBtnClick()" style="display:flex;align-items:center;gap:4px;cursor:pointer;padding:5px 10px;background:var(--bg-glass);border:1px solid var(--border-subtle);border-radius:9px;transition:all 0.2s ease;flex-shrink:0;position:relative;z-index:2;" onmousedown="homeManageBtnPress(this,true)" onmouseup="homeManageBtnPress(this,false)" ontouchstart="homeManageBtnPress(this,true);this._tsy=event.touches[0].clientY;" ontouchend="homeManageBtnPress(this,false);event.preventDefault();if(!this.dataset.wgDisabled&&Math.abs(event.changedTouches[0].clientY-(this._tsy||0))<8){openTokenManager();}">
+          <span class="material-icons-round" style="font-size:14px;color:var(--accent-primary)">manage_search</span>
+          <span style="font-size:9px;font-weight:700;color:var(--text-secondary);font-family:var(--font-mono);letter-spacing:1px;">MANAGE</span>
+        </div>
+      </div>
+
+      </div><!-- /static top -->
+
+      <!-- only token list scrolls -->
+      <div id="home-token-scroll" style="flex:1;min-height:0;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding-bottom:calc(var(--nav-height) + env(safe-area-inset-bottom, 0px) + 8px);position:relative;overscroll-behavior-y:contain;">
+
+        <div id="token-list">
+          <!-- skeleton -->
+          <div class="skel-card skeleton" id="skel1"></div>
+          <div class="skel-card skeleton" id="skel2"></div>
+          <div class="skel-card skeleton" id="skel3"></div>
+        </div>
+        <div class="scroll-pad"></div>
+      </div>
+
+    </div>

@@ -1,0 +1,102 @@
+  <!-- ══════ CONNECTED WALLETS DRAWER ══════ -->
+  <div class="del-group-drawer-overlay" id="cw-drawer-overlay" onclick="handleCwDrawerOverlayClick(event)" style="position:fixed;top:0;left:0;right:0;bottom:calc(var(--nav-height) + env(safe-area-inset-bottom, 0px));z-index:900;background:rgba(5,5,8,0.75);opacity:0;pointer-events:none;transition:opacity 0.3s ease;will-change:opacity;">
+    <div class="del-group-drawer" id="cw-drawer" style="position:absolute;top:0;right:0;bottom:0;width:min(300px,85%);background:var(--bg-deep);border-left:1px solid var(--border-subtle);display:flex;flex-direction:column;transform:translateX(100%);transition:transform 0.38s cubic-bezier(0.22,1,0.36,1);box-shadow:-8px 0 40px rgba(0,0,0,0.5);overflow:hidden;">
+    <div class="del-drawer-header">
+      <div class="del-drawer-close" id="cw-drawer-back-btn" onclick="cwDrawerGoBack()" style="display:none;">
+        <span class="material-icons-round" style="font-size:20px;color:var(--text-secondary);">arrow_back</span>
+      </div>
+      <div class="del-drawer-close" id="cw-drawer-close-btn" onclick="closeConnectedWalletsDrawer()">
+        <span class="material-icons-round" style="font-size:20px;color:var(--text-secondary);">arrow_back</span>
+      </div>
+      <div class="del-drawer-title" id="cw-drawer-title">Connected Wallets</div>
+      <div class="del-drawer-badge" id="cw-drawer-badge">0 GROUPS</div>
+    </div>
+    <div class="del-drawer-body" id="cw-drawer-list"></div>
+    <div class="del-drawer-footer" style="padding:12px 16px 28px;">
+      <button class="del-drawer-confirm-btn" id="cw-copy-all-btn" onclick="cwCopyAll()" style="background:linear-gradient(135deg,var(--accent-green),rgba(16,185,129,0.8));box-shadow:0 0 20px rgba(16,185,129,0.3);">
+        <span class="material-icons-round" style="font-size:16px;">copy_all</span>
+        <span id="cw-copy-label">Copy All Addresses</span>
+      </button>
+    </div>
+  </div>
+  </div>
+
+  <!-- ══════ BROWSER WALLET DRAWER (In-App Browser toolbar wallet button) ══════ -->
+  <div class="del-group-drawer-overlay" id="br-browser-wallet-overlay"
+    onclick="if(event.target===this)closeBrowserWalletDrawer()"
+    style="position:fixed;top:0;left:0;right:0;bottom:calc(var(--nav-height) + env(safe-area-inset-bottom, 0px));z-index:9999;background:rgba(5,5,8,0.80);opacity:0;pointer-events:none;transition:opacity 0.3s ease;will-change:opacity;">
+    <div class="del-group-drawer" id="br-browser-wallet-drawer"
+      style="position:absolute;top:0;right:0;bottom:0;width:min(300px,85%);background:var(--bg-deep);border-left:1px solid var(--border-subtle);display:flex;flex-direction:column;transform:translateX(100%);transition:transform 0.35s cubic-bezier(0.34,1.56,0.64,1);box-shadow:-8px 0 40px rgba(0,0,0,0.5);overflow:hidden;">
+      <!-- Header -->
+      <div class="del-drawer-header">
+        <div class="del-drawer-close" id="br-bwd-back-btn" onclick="brBwdGoBack()" style="display:none;">
+          <span class="material-icons-round" style="font-size:20px;color:var(--text-secondary);">arrow_back</span>
+        </div>
+        <div class="del-drawer-close" id="br-bwd-close-btn" onclick="closeBrowserWalletDrawer()">
+          <span class="material-icons-round" style="font-size:20px;color:var(--text-secondary);">arrow_back</span>
+        </div>
+        <div class="del-drawer-title" id="br-bwd-title">My Wallets</div>
+        <div class="del-drawer-badge" id="br-bwd-badge">0 GROUPS</div>
+      </div>
+      <!-- Body -->
+      <div class="del-drawer-body" id="br-bwd-list"></div>
+      <!-- Footer -->
+      <div class="del-drawer-footer" style="padding:0;"></div>
+    </div>
+  </div>
+
+  <!-- ══════ SWAP WALLET DRAWER (Nansen & Jumper Swap — Profile + Step 1) ══════ -->
+  <div class="del-group-drawer-overlay" id="swap-wallet-drawer-overlay" onclick="if(event.target===this)closeSwapWalletDrawer()" style="position:fixed;top:0;left:0;right:0;bottom:calc(var(--nav-height) + env(safe-area-inset-bottom, 0px));z-index:1000;background:rgba(5,5,8,0.75);opacity:0;pointer-events:none;transition:opacity 0.3s ease;will-change:opacity;">
+    <div class="del-group-drawer" id="swap-wallet-drawer" style="position:absolute;top:0;right:0;bottom:0;width:min(300px,85%);background:var(--bg-deep);border-left:1px solid var(--border-subtle);display:flex;flex-direction:column;transform:translateX(100%);transition:transform 0.38s cubic-bezier(0.22,1,0.36,1);box-shadow:-8px 0 40px rgba(0,0,0,0.5);overflow:hidden;">
+    <div class="del-drawer-header">
+      <div class="del-drawer-close" id="swap-wallet-drawer-back-btn" onclick="swapWalletDrawerGoBack()" style="display:none;">
+        <span class="material-icons-round" style="font-size:20px;color:var(--text-secondary);">arrow_back</span>
+      </div>
+      <div class="del-drawer-close" id="swap-wallet-drawer-close-btn" onclick="closeSwapWalletDrawer()">
+        <span class="material-icons-round" style="font-size:20px;color:var(--text-secondary);">arrow_back</span>
+      </div>
+      <div class="del-drawer-title" id="swap-wallet-drawer-title">Select Wallet</div>
+      <div class="del-drawer-badge" id="swap-wallet-drawer-badge">0 GROUPS</div>
+    </div>
+
+    <!-- Select All / Clear row -->
+    <div style="padding:10px 16px 0;flex-shrink:0;display:flex;gap:8px;" id="swap-wallet-drawer-actions">
+      <button class="del-drawer-action-btn all" onclick="swapDrawerSelectAll()">SELECT ALL</button>
+      <button class="del-drawer-action-btn clear" onclick="swapDrawerClearAll()">CLEAR</button>
+    </div>
+
+    <div class="del-drawer-body" id="swap-wallet-drawer-list"></div>
+    <div class="del-drawer-footer" style="padding:12px 16px 28px;">
+      <button class="del-drawer-confirm-btn" id="swap-wallet-drawer-confirm-btn" onclick="confirmSwapWalletDrawer()" style="display:none;">
+        <span class="material-icons-round" style="font-size:16px;">check_circle</span>
+        <span id="swap-wallet-drawer-confirm-label">Confirm Selection</span>
+      </button>
+    </div>
+  </div>
+  </div>
+
+  <div class="del-group-drawer-overlay" id="del-group-drawer-overlay" onclick="handleDelDrawerOverlayClick(event)" style="position:fixed;top:0;left:0;right:0;bottom:calc(var(--nav-height) + env(safe-area-inset-bottom, 0px));z-index:900;background:rgba(5,5,8,0.75);opacity:0;pointer-events:none;transition:opacity 0.3s ease;will-change:opacity;">
+    <div class="del-group-drawer" id="del-group-drawer" style="position:absolute;top:0;right:0;bottom:0;width:min(300px,85%);background:var(--bg-deep);border-left:1px solid var(--border-subtle);display:flex;flex-direction:column;transform:translateX(100%);transition:transform 0.38s cubic-bezier(0.22,1,0.36,1);box-shadow:-8px 0 40px rgba(0,0,0,0.5);overflow:hidden;">
+    <div class="del-drawer-header">
+      <div class="del-drawer-close" id="del-drawer-back-btn" onclick="_delGoBack()" style="display:none;">
+        <span class="material-icons-round" style="font-size:20px;color:var(--text-secondary);">arrow_back</span>
+      </div>
+      <div class="del-drawer-close" id="del-drawer-close-btn" onclick="closeDelGroupDrawer()">
+        <span class="material-icons-round" style="font-size:20px;color:var(--text-secondary);">close</span>
+      </div>
+      <div class="del-drawer-title" id="del-drawer-title">Wallet Groups</div>
+      <div class="del-drawer-badge" id="del-drawer-count-badge">0 GROUPS</div>
+    </div>
+    <div class="del-drawer-body" id="del-drawer-group-list">
+      <div style="text-align:center;padding:40px 20px;font-family:var(--font-mono);font-size:11px;color:var(--text-muted);">
+        No groups found.<br>Import in Settings first.
+      </div>
+    </div>
+    <div class="del-drawer-footer">
+      <div class="del-drawer-actions">
+        <button class="del-drawer-action-btn all" onclick="delDrawerSelectAll()">SELECT ALL</button>
+        <button class="del-drawer-action-btn clear" onclick="delDrawerClearAll()">CLEAR</button>
+      </div>
+    </div>
+  </div>
+  </div>

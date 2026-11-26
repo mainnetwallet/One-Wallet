@@ -1,0 +1,54 @@
+    <div id="sw-success-overlay">
+      <div id="sw-success-card">
+        <!-- Particles injected by JS -->
+
+        <!-- Checkmark -->
+        <div class="sso-check-ring">
+          <span class="material-icons-round" style="font-size:38px;color:var(--accent-green);">check</span>
+        </div>
+
+        <div class="sso-title" style="font-family:var(--font-display);font-size:22px;font-weight:800;color:var(--accent-green);margin-bottom:4px;letter-spacing:-0.3px;position:relative;">Swap Complete</div>
+        <div class="sso-subtitle" style="font-family:var(--font-mono);font-size:10px;color:var(--text-muted);letter-spacing:2px;margin-bottom:20px;position:relative;">TRANSACTION CONFIRMED</div>
+
+        <!-- Token flow -->
+        <div class="sso-token-flow">
+          <div class="sso-token-side">
+            <div id="sso-from-icon" class="sso-token-icon" style="background:linear-gradient(135deg,#627EEA,#364FC7);">Ξ</div>
+            <div id="sso-from-amt" class="sso-token-amt">0.00</div>
+            <div id="sso-from-sym" class="sso-token-sym">ETH</div>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,rgba(99,102,241,0.18),rgba(6,182,212,0.18));border:1px solid rgba(99,102,241,0.3);box-shadow:0 0 12px rgba(99,102,241,0.2);flex-shrink:0;">
+            <span class="material-icons-round" style="font-size:18px;background:linear-gradient(135deg,#a78bfa,#22d3ee);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">swap_horiz</span>
+          </div>
+          <div class="sso-token-side">
+            <div id="sso-to-icon" class="sso-token-icon" style="background:linear-gradient(135deg,#2775CA,#1557A0);">$</div>
+            <div id="sso-to-amt" class="sso-token-amt" style="color:var(--accent-green);">0.00</div>
+            <div id="sso-to-sym" class="sso-token-sym">USDC</div>
+          </div>
+        </div>
+
+        <!-- Info rows -->
+        <div style="width:100%;padding:4px 0;margin-bottom:4px;position:relative;">
+          <div class="sso-info-row" style="justify-content:center;">
+            <span id="sso-dex" class="sso-info-val" style="display:flex;align-items:center;gap:6px;width:100%;">—</span>
+          </div>
+          <div class="sso-info-row">
+            <span class="sso-info-label">Network</span>
+            <span id="sso-chain" class="sso-info-val">—</span>
+          </div>
+          <div class="sso-info-row">
+            <span class="sso-info-label">Time</span>
+            <span id="sso-time" class="sso-info-val">—</span>
+          </div>
+        </div>
+
+        <!-- TX hash link (hidden if no hash) -->
+        <a id="sso-hash-row" class="sso-hash-link" href="#" target="_blank" style="display:none;">
+          <span class="material-icons-round" style="font-size:14px;color:var(--neon-cyan);flex-shrink:0;">open_in_new</span>
+          <span class="sso-hash-text" id="sso-hash-txt">View on Explorer</span>
+        </a>
+
+        <!-- Done -->
+        <button class="sso-done-btn" onclick="window._ssoClose()">Done</button>
+      </div>
+    </div>

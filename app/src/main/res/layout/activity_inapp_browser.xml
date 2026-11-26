@@ -1,0 +1,683 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#050508">
+
+    <!-- Main browser layout -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <!-- Chrome-style Top Bar -->
+        <LinearLayout
+            android:id="@+id/inAppToolbar"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:paddingStart="2dp"
+            android:paddingEnd="4dp"
+            android:background="#111120"
+            android:elevation="4dp">
+
+            <!-- Close browser → return to profile -->
+            <ImageButton
+                android:id="@+id/btnCloseToProfile"
+                android:layout_width="40dp"
+                android:layout_height="44dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@android:drawable/ic_menu_close_clear_cancel"
+                android:tint="#9CA3AF"
+                android:contentDescription="Close browser" />
+
+            <!-- Back -->
+            <ImageButton
+                android:id="@+id/btnBack"
+                android:layout_width="40dp"
+                android:layout_height="44dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@drawable/ic_browser_back"
+                android:tint="#FFFFFF"
+                android:alpha="0.35"
+                android:contentDescription="Back" />
+
+            <!-- Forward -->
+            <ImageButton
+                android:id="@+id/btnForward"
+                android:layout_width="36dp"
+                android:layout_height="44dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@drawable/ic_browser_forward"
+                android:tint="#FFFFFF"
+                android:alpha="0.35"
+                android:contentDescription="Forward" />
+
+            <!-- URL Pill -->
+            <LinearLayout
+                android:id="@+id/urlPill"
+                android:layout_width="0dp"
+                android:layout_height="34dp"
+                android:layout_weight="1"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:background="@drawable/url_pill_bg"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp"
+                android:layout_marginStart="6dp"
+                android:layout_marginEnd="6dp"
+                android:clickable="true"
+                android:focusable="true">
+
+                <ImageView
+                    android:id="@+id/ivLock"
+                    android:layout_width="11dp"
+                    android:layout_height="11dp"
+                    android:src="@drawable/ic_lock"
+                    android:layout_marginEnd="5dp"
+                    android:contentDescription="Secure" />
+
+                <TextView
+                    android:id="@+id/inAppUrl"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="New Tab"
+                    android:textColor="#E5E7EB"
+                    android:textSize="13sp"
+                    android:fontFamily="sans-serif-medium"
+                    android:maxLines="1"
+                    android:ellipsize="end" />
+            </LinearLayout>
+
+            <!-- Tab Count Badge (Chrome-style square with number) -->
+            <FrameLayout
+                android:id="@+id/btnTabSwitcher"
+                android:layout_width="40dp"
+                android:layout_height="44dp"
+                android:gravity="center"
+                android:clickable="true"
+                android:focusable="true"
+                android:background="?attr/selectableItemBackgroundBorderless">
+
+                <TextView
+                    android:id="@+id/tvTabCount"
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:layout_gravity="center"
+                    android:text="1"
+                    android:textColor="#E5E7EB"
+                    android:textSize="11sp"
+                    android:textStyle="bold"
+                    android:gravity="center"
+                    android:background="@drawable/tab_count_bg"
+                    android:fontFamily="sans-serif-medium"
+                    android:clickable="false"
+                    android:focusable="false" />
+            </FrameLayout>
+
+            <!-- Wallet button -->
+            <ImageButton
+                android:id="@+id/btnWallet"
+                android:layout_width="36dp"
+                android:layout_height="44dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@drawable/ic_wallet"
+                android:tint="#A5B4FC"
+                android:contentDescription="Wallets" />
+
+            <!-- Chain Selector Pill -->
+            <LinearLayout
+                android:id="@+id/btnChainSelector"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:padding="5dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:clickable="true"
+                android:focusable="true"
+                android:contentDescription="Select chain">
+
+                <ImageView
+                    android:id="@+id/ivChainLogo"
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:scaleType="centerCrop"
+                    android:visibility="gone" />
+
+
+
+            </LinearLayout>
+
+            <!-- More menu (3-dot) — rightmost -->
+            <ImageButton
+                android:id="@+id/btnMenu"
+                android:layout_width="36dp"
+                android:layout_height="44dp"
+                android:layout_marginEnd="2dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@drawable/ic_more_vert"
+                android:contentDescription="More options" />
+
+            <!-- New Tab (hidden) -->
+            <ImageButton
+                android:id="@+id/btnNewTab"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:visibility="gone"
+                android:contentDescription="New Tab" />
+
+            <!-- Close (hidden) -->
+            <ImageButton
+                android:id="@+id/btnClose"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:visibility="gone"
+                android:contentDescription="Close" />
+
+        </LinearLayout>
+
+        <!-- Progress Bar -->
+        <ProgressBar
+            android:id="@+id/inAppProgress"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:max="100"
+            android:progressTint="#6366f1"
+            android:progressBackgroundTint="#1E1E30"
+            android:visibility="gone" />
+
+        <!-- WebView container — tabs stacked here -->
+        <FrameLayout
+            android:id="@+id/webViewContainer"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+    </LinearLayout>
+
+    <!-- ═══════════════════════════════════════════
+         TAB SWITCHER OVERLAY (Chrome-style panel)
+         ═══════════════════════════════════════════ -->
+    <FrameLayout
+        android:id="@+id/tabSwitcherOverlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#F0050508"
+        android:visibility="gone"
+        android:elevation="8dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <!-- Tab switcher toolbar -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp"
+                android:background="#111120"
+                android:elevation="4dp">
+
+                <ImageButton
+                    android:id="@+id/btnCloseTabSwitcher"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:src="@android:drawable/ic_menu_close_clear_cancel"
+                    android:tint="#9CA3AF"
+                    android:contentDescription="Close Tab Switcher" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="8dp"
+                    android:text="Tabs"
+                    android:textColor="#E5E7EB"
+                    android:textSize="17sp"
+                    android:textStyle="bold"
+                    android:fontFamily="sans-serif-medium" />
+
+                <!-- New Tab from switcher -->
+                <TextView
+                    android:id="@+id/btnAddTabFromSwitcher"
+                    android:layout_width="wrap_content"
+                    android:layout_height="34dp"
+                    android:text="+ New Tab"
+                    android:textColor="#FFFFFF"
+                    android:textSize="13sp"
+                    android:gravity="center"
+                    android:paddingStart="14dp"
+                    android:paddingEnd="14dp"
+                    android:background="@drawable/go_btn_bg"
+                    android:fontFamily="sans-serif-medium"
+                    android:clickable="true"
+                    android:focusable="true" />
+
+            </LinearLayout>
+
+            <!-- Tab list -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvTabs"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:padding="12dp"
+                android:clipToPadding="false" />
+
+        </LinearLayout>
+    </FrameLayout>
+
+    <!-- ═══════════════════════════════════════════
+         HISTORY OVERLAY (full-screen panel)
+         ═══════════════════════════════════════════ -->
+    <FrameLayout
+        android:id="@+id/historyOverlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#F0050508"
+        android:visibility="gone"
+        android:elevation="9dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <!-- History toolbar -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp"
+                android:background="#111120"
+                android:elevation="4dp">
+
+                <ImageButton
+                    android:id="@+id/btnCloseHistory"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:src="@android:drawable/ic_menu_close_clear_cancel"
+                    android:tint="#9CA3AF"
+                    android:contentDescription="Close History" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="8dp"
+                    android:text="History"
+                    android:textColor="#E5E7EB"
+                    android:textSize="17sp"
+                    android:textStyle="bold"
+                    android:fontFamily="sans-serif-medium" />
+
+                <TextView
+                    android:id="@+id/btnClearHistory"
+                    android:layout_width="wrap_content"
+                    android:layout_height="34dp"
+                    android:text="Clear All"
+                    android:textColor="#FFFFFF"
+                    android:textSize="13sp"
+                    android:gravity="center"
+                    android:paddingStart="14dp"
+                    android:paddingEnd="14dp"
+                    android:background="@drawable/go_btn_bg"
+                    android:fontFamily="sans-serif-medium"
+                    android:clickable="true"
+                    android:focusable="true" />
+
+            </LinearLayout>
+
+            <!-- History list -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvHistory"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:padding="12dp"
+                android:clipToPadding="false" />
+
+        </LinearLayout>
+    </FrameLayout>
+
+    <!-- ═══════════════════════════════════════════
+         NATIVE CHAIN PICKER OVERLAY (always mobile size, above WebView)
+         ═══════════════════════════════════════════ -->
+    <FrameLayout
+        android:id="@+id/nativeChainPickerOverlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#D0050508"
+        android:visibility="gone"
+        android:elevation="20dp"
+        android:clickable="true"
+        android:focusable="true">
+
+        <!-- Bottom sheet modal -->
+        <LinearLayout
+            android:id="@+id/nativeChainPickerSheet"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="bottom"
+            android:orientation="vertical"
+            android:background="#0D0D1A"
+            android:clipToOutline="true">
+
+            <!-- Drag handle -->
+            <View
+                android:layout_width="36dp"
+                android:layout_height="4dp"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="4dp"
+                android:background="#33FFFFFF" />
+
+            <!-- Header -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingStart="18dp"
+                android:paddingEnd="18dp"
+                android:paddingTop="10dp"
+                android:paddingBottom="10dp">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Select Network"
+                        android:textColor="#E5E7EB"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:fontFamily="sans-serif-medium" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="dApp chain switch"
+                        android:textColor="#6B7280"
+                        android:textSize="10sp"
+                        android:fontFamily="monospace"
+                        android:letterSpacing="0.05" />
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/btnNativeChainPickerClose"
+                    android:layout_width="34dp"
+                    android:layout_height="34dp"
+                    android:text="✕"
+                    android:textColor="#9CA3AF"
+                    android:textSize="16sp"
+                    android:gravity="center"
+                    android:background="#14FFFFFF"
+                    android:clickable="true"
+                    android:focusable="true" />
+            </LinearLayout>
+
+            <!-- Search box -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingStart="13dp"
+                android:paddingEnd="13dp"
+                android:paddingTop="9dp"
+                android:paddingBottom="9dp"
+                android:background="#0DFFFFFF"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginBottom="8dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="🔍"
+                    android:textSize="14sp"
+                    android:layout_marginEnd="8dp" />
+
+                <EditText
+                    android:id="@+id/etNativeChainSearch"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:background="@null"
+                    android:hint="Search networks…"
+                    android:textColorHint="#4B5563"
+                    android:textColor="#E5E7EB"
+                    android:textSize="13sp"
+                    android:singleLine="true"
+                    android:imeOptions="actionSearch"
+                    android:inputType="text" />
+            </LinearLayout>
+
+            <!-- Chain list -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvNativeChains"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:paddingBottom="20dp"
+                android:clipToPadding="false" />
+
+        </LinearLayout>
+    </FrameLayout>
+
+    <!-- ═══════════════════════════════════════════
+         NATIVE WALLET DRAWER OVERLAY (always mobile size, above WebView)
+         ═══════════════════════════════════════════ -->
+    <FrameLayout
+        android:id="@+id/nativeWalletDrawerOverlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#D9050508"
+        android:visibility="gone"
+        android:elevation="20dp"
+        android:clickable="true"
+        android:focusable="true">
+
+        <!-- Right-side drawer — width set to 50% screen in Java -->
+        <LinearLayout
+            android:id="@+id/nativeWalletDrawer"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="end"
+            android:orientation="vertical"
+            android:background="#0A0A14"
+            android:translationX="10000dp">
+
+            <!-- Drawer header -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:paddingTop="16dp"
+                android:paddingBottom="12dp">
+
+                <TextView
+                    android:id="@+id/btnNativeWalletDrawerClose"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:text="✕"
+                    android:textColor="#9CA3AF"
+                    android:textSize="16sp"
+                    android:gravity="center"
+                    android:background="#14FFFFFF"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:layout_marginEnd="10dp" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="WALLETS"
+                        android:textColor="#E5E7EB"
+                        android:textSize="13sp"
+                        android:textStyle="bold"
+                        android:fontFamily="sans-serif-medium" />
+
+                    <TextView
+                        android:id="@+id/tvNativeWalletActive"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="#10B981"
+                        android:textSize="10sp"
+                        android:fontFamily="monospace"
+                        android:visibility="gone" />
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/tvNativeWalletGroupCount"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="#6366F1"
+                    android:textSize="9sp"
+                    android:background="#1E6366F1"
+                    android:paddingStart="8dp"
+                    android:paddingEnd="8dp"
+                    android:paddingTop="3dp"
+                    android:paddingBottom="3dp" />
+            </LinearLayout>
+
+            <!-- Divider -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#12FFFFFF" />
+
+            <!-- Wallet groups list -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvNativeWalletGroups"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:padding="12dp"
+                android:clipToPadding="false" />
+
+        </LinearLayout>
+    </FrameLayout>
+
+    <!-- Search Overlay (unchanged) -->
+    <LinearLayout
+        android:id="@+id/searchOverlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:background="#CC050508"
+        android:visibility="gone"
+        android:clickable="true"
+        android:focusable="true"
+        android:elevation="10dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
+            android:background="#111120"
+            android:elevation="6dp">
+
+            <ImageButton
+                android:id="@+id/btnSearchCancel"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@android:drawable/ic_menu_close_clear_cancel"
+                android:tint="#9CA3AF"
+                android:contentDescription="Cancel" />
+
+            <EditText
+                android:id="@+id/etSearch"
+                android:layout_width="0dp"
+                android:layout_height="36dp"
+                android:layout_weight="1"
+                android:layout_marginStart="4dp"
+                android:layout_marginEnd="6dp"
+                android:background="@drawable/url_pill_bg"
+                android:paddingStart="14dp"
+                android:paddingEnd="14dp"
+                android:textColor="#FFFFFF"
+                android:textColorHint="#6B7280"
+                android:hint="Search or type URL"
+                android:textSize="14sp"
+                android:singleLine="true"
+                android:imeOptions="actionGo"
+                android:inputType="textUri"
+                android:selectAllOnFocus="true" />
+
+            <TextView
+                android:id="@+id/btnSearchPaste"
+                android:layout_width="wrap_content"
+                android:layout_height="36dp"
+                android:text="Paste"
+                android:textColor="#A5B4FC"
+                android:textSize="13sp"
+                android:fontFamily="sans-serif-medium"
+                android:gravity="center"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp"
+                android:layout_marginEnd="6dp"
+                android:background="@drawable/url_pill_bg"
+                android:clickable="true"
+                android:focusable="true" />
+
+            <TextView
+                android:id="@+id/btnSearchGo"
+                android:layout_width="wrap_content"
+                android:layout_height="36dp"
+                android:text="Go"
+                android:textColor="#FFFFFF"
+                android:textSize="14sp"
+                android:fontFamily="sans-serif-medium"
+                android:gravity="center"
+                android:paddingStart="14dp"
+                android:paddingEnd="14dp"
+                android:background="@drawable/go_btn_bg"
+                android:clickable="true"
+                android:focusable="true" />
+        </LinearLayout>
+
+        <View
+            android:id="@+id/searchDismissArea"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:clickable="true"
+            android:focusable="true" />
+
+    </LinearLayout>
+
+</FrameLayout>

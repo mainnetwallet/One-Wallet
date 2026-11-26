@@ -1,0 +1,72 @@
+/* Address — single line, scrollable horizontally on long addresses */
+        #th-wrapper .saved-contract-address {
+            color: #c4b5fd;
+            font-family: var(--font-mono, 'JetBrains Mono', monospace);
+            font-size: 0.74rem;
+            margin-bottom: 4px;
+            white-space: nowrap;
+            overflow-x: auto;
+            overflow-y: hidden;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+            padding-bottom: 2px;
+        }
+        #th-wrapper .saved-contract-address::-webkit-scrollbar {
+            display: none;
+        }
+        #th-wrapper .saved-contract-address a {
+            color: inherit;
+            text-decoration: none;
+            border-bottom: 1px dashed rgba(196,181,253,0.35);
+            transition: color 0.15s, border-color 0.15s;
+        }
+        #th-wrapper .saved-contract-address a:hover {
+            color: #a78bfa;
+            border-bottom-color: #a78bfa;
+        }
+
+        /* Meta row: chain + date + delete */
+        #th-wrapper .saved-contract-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.68rem;
+            color: #555570;
+            gap: 6px;
+            flex-wrap: nowrap;
+            min-width: 0;
+        }
+
+        #th-wrapper .saved-contract-chain {
+            color: #38bdf8;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 120px;
+            flex-shrink: 1;
+        }
+
+        #th-wrapper .saved-contract-date {
+            color: #6b7280;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        #th-wrapper .contract-delete-btn {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: #ffffff;
+            border: none;
+            padding: 3px 8px;
+            border-radius: 5px;
+            font-size: 0.65rem;
+            font-weight: 600;
+            cursor: pointer;
+            flex-shrink: 0;
+            transition: opacity 0.15s, transform 0.1s;
+            letter-spacing: 0.02em;
+        }
+        #th-wrapper .contract-delete-btn:hover {
+            opacity: 0.85;
+            transform: scale(1.04);
+        }
+

@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<!-- GENERATED FILE: edit html-src/index.src.html or html-src/partials/*.html, then run python3 tools/build_html.py -->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<!-- ── CONSOLE LOG CAPTURE: must run before any other script so nothing is missed ── -->
+<script src="scripts/core/console/console-capture.js"></script>
+<!-- ── NATIVE HTTP BRIDGE: must run early so all script blocks can use window.nxFetch ── -->
+<script src="scripts/core/signed-request.js"></script>
+<!-- ── APP LOCK EARLY GUARD: Hide overlay immediately if no lock set ── -->
+<script src="scripts/core/lock-overlay-init.js"></script>
+<!-- ══ PRODUCTION: console disabled for security — TEMP OFF for debug ══ -->
+<script src="scripts/core/console/console-noop.js"></script>
+
+<!-- ══ PAGE-SCOPED TIMER TRACKER — clears intervals on page switch ══ -->
+<script src="scripts/core/page-timers.js"></script>
+
+<!-- ══ SECURITY UTILS — HTML sanitizer + fetch timeout ══ -->
+<script src="scripts/core/sanitize-and-fetch.js"></script>
+
+<!-- ══ SERVICE WORKER BOOTSTRAP — must be first ══
+     এই HTML file টাই SW হিসেবে serve হয়
+     ?__one_sw__=1 param থাকলে SW context এ run করো
+     Page render সম্পূর্ণ skip হয়, শুধু SW code চলে
+-->
+<script src="scripts/core/pwa/sw-bootstrap.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>One Wallet — DeFi Terminal</title>
+
+<!-- ══ PWA META ══ -->
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="One Wallet">
+<meta name="application-name" content="One Wallet">
+<meta name="theme-color" content="#050508">
+<link rel="manifest" id="one-manifest-link">
+<link rel="apple-touch-icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAALQAAAC0CAMAAAAKE/YAAAADAFBMVEVXoOrp46FXXWcAHFYdYmr34V8WHycoWaPZr1hSatphjKKaqZ0FIGCh1OUPIJ6cZCCQ1ZsABCG2nCdRMCGfqNQNndARkKNPaajJehPZtCUqTdJl4/OVblbZ7MUACSgAG0wAYbAZsnRvXiIGVYlo2a//8D0AAP8Z1varlmYAdHREOllUnXVf0H0CCC4AAKoAQz0FRXMAVf87wn3Ks5wBIo4AqqqTfYkBBy4AC00AFG8AGIz3+P0AAAAAJq/N2fzl6fwAJJIANs/Z4/yux/wCEVgAHKkAAhoCR+z8uAYAKcsANbMJVvP7qAMARs8GZ+8ADGX+xQ4GdvX7xy8BOeuWtvyR6I8UFSr7mAGJqfms85oBVtW50v0Ihvn+1S2luvkIlvv0uSsTtvsJqHEqJSpw2Yej7pdzmfoCW6gJp/v91kx6ovuNZxTGx88jqP0BR00DY6a1+KJOVYwEZlsBY9uNdScOJHIBQboCVlYGmG3SmBHV1tj5ykQnKEokmP2yhxP2jAMDa2ITx/0AK+UwJhox1f795jcAAAFRRSmweBUEdmZTVWgIh2gAAAdES3fWoxFQyYQCOEQjHCeGh5TM/bHOpisESItNOyluViZlZ3eVdBqylim0uM7EzPF4h6rPlycntvx64YcaFhszuHlth+yWmK4FN4YA//8wRosxhrgrqnUvyP5LOBlSZZXIiBF4ZSeLmc8AAFWDiKinqLIACY4MNHUxNlEulm9Q1vxzd5Amif1XZ7RyhtCQ1vmu5P3/0w8AHcMvOG4sd/tzWRhveq6GmO0ACS8SJE81RnkpiWpMxn1tyoaYxPumhyaxtbfNiCPoqSsAAH8sOYtRZ85LqXdLuXppeNPQ8/7w2I3t58wlLHBHTYVrSRhqa5Jw2/iRptGX8pX15a0AARMEd8o6My0maPpTeu1LyftS4vx4lNRotvZvx/1q2HuIXBaHayaXgyyUo7OmaRj12nTu+MwAAD8ABzIAGGkHJDUAf/9WRhpY0YdoSyZiaK4EVJIQdq4EhctYtPQT9r2XAAABAHRSTlP///+k/P/w9//////U//b//27////9//////////+tZQP//7L//wH+/wL///8sA/+GA///ugP//v7+/v8A/v///v7///7+//7//v7+//7+///+//7////////+//7///7//v////////7//////v/9/////v////////////7////+/v/+/y7//////0r///////////r////////////+///////9Af////7//////wP////8/////////////////////7T/////////////Av////////////////////+H//////////////////////8EhrX/Av/////+//3/Aqq/ZQAAJIZJREFUeNrN3Qlck2e6KPAguO/Vqu20M9POmWnPzNx77rnn3psvCQkQkpCQQAKByL4IUhBqFaGKUEfEK7hrVajirh3Hve7WrS6tW13q0lZr98WuttrTznTvfZ73/Zb320Lw2vmdpxXCFv7fw/M+7/stSQyxuvGf5O2sgV9F94lZ9EP3x+TxyCPMzdsI/CnVXS5a1Cc6euAs5tdrhkHn88+8BG+mDYze+cO7eYUYeVKkhYtU+jbyYH4W7ht+0buPLIoeOA1+/T+e6Rz6ryD+qs+inwrLC/PSUr1JNIIYCWHC4/FYdSIewqwd+CXyPcnJySk549IgRT890ucrcP/1mcjRQJ71QsxP5eV5opdGCkQ4dEKyEBrkjoOwUT4uD373D9GzCCUiNGzdrOgfCkGcpBB3rNXLMRuQWiHHJpOQaYU7IWVcYXH5Y8j+bWSZnvYCkNNUOe4wvdYIyKKWj9pahKvZj6ek5OQVF/8YPS2CTMOYfWcnkJMiJRNsstUaWY5lYAi/n7yT5VtUp+QUNhY/Fq1uJAZlaUzr82N5XmTkcAlWV7HSi+J1X/QeaxLYkjpZyHXOuEenlveZpiwROfofsbN2FhYqCkOLaw0X8R1nmJJ7379gwZeb/Eo2PxyJOidtReNjAxXj0SDvGl/9AJURDDv4kjvjNZvNmmJCXrAge+TIMROFT0m5lqlTn5h6d7RcLc/0C4+VpwbDmv//uZR8oveCMdkQY8bcP9avUvOFl0LVeVOLo/Uz/cK7hd4EOn2kaLXk5IjAYbAy8kiKXnDWL35FXSBY16lpGxp/p43+R+yv3y1MCtOJO5NffbGJ4070HjNmJCEjesz9J1RqBs2rp/6OqRAR/dvw5uRwXGZKNnUQHBcjkml9ZC/4gpO+Lm8gNNWobmTVBrE/fzVO1xxOrA/mOJg6/DzIQQLIA8ZkZ2aOhNoYk1nKJ/v+WjHV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">
+<link rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAADAFBMVEXg1J+e35nt1GsAHEcfVZqSrKcCZZ0NntnXox7KqGIhLi8AKaASZnMWUGERXc4Jlc9ibJpxlJpmoOOZodsAER8fK2YBLo4gpIMayf5pXCNrqnyhZRjKs5cAD1EBMMoDQVwAYIgHfMMkgmgEiatGLxV63X996qJF19GXe1afgi6cwv//4Bjj3MoBBi8AC00BFHAAGIz29/0AJq4AAADN2frl6PkAJJMANs/Y4/wAARmwyPsADGcDEVkAHKkERuwBNrISFSwGaPEAKcsBRs0BVtAJVvP1qAYPJGyVtvv6twj1xiu0uNErJir5mQGou/Kp9Jj8xQwBZNSJq/m61PyImcwIdvYASbkKhffxtyr92DEKlPtpVyuMZxeVmKkBN+cTpvg1Kh2teA9IOCaUptWQ6I7Gx9EOqHJMNxlURiqzhhOmp7PXoxAACo1teqd42YnV2NgXIlIJZFwSiGkxRXFPVXNxVhtxc4J6ov2Kdie3+aPMixIAAH8BUbk2SYl2k86YcxmPiJO2lS6lrNPLlyn3yUMCS08lKU03MiYvM1IqNWkrU5YzePYqlGsppvwxuXpJZslrSip4ZCloZ3VjcsxvhcnTqizJ/an5iQL+2Az42W7s59AAAKoADaYAHcgALOoTOI8DZbMReGkAqv8nOog3ctFJVpFVdLJGpnZPp/FzmfFsyYWE3o2phyi8kxm8xNGz5v7Tlw3+5TwAAP8AFXQdITwAInUAhdonaP0pif8qqnYmsfcoxv9CLChHRlJQXK9NZJFVZ7FFeMxMuntIx4hJw/lZ1o1pTBt2h7V1qZB25JiLbCmNiqzWw4/Ey+z81EwABicAAFUAF3cAGHwAGIYFLjoAJpEALbUAK7cBLMcALcwNO04CPGoCSa4AVVUGVE8AVaoAVf8Dab4Af38CddUAf/8Bg60OlmwdtPcA//8nLmcpRMYyVcYsndIimP1TT25JTJFIW8NaZnVWgrpGh+hXm+9IuvRQw3t0dH93kYxgyXhu1v6JXh2DZE6coLSM2P2S5P2e/fLyAAABAHRSTlP///8p//9v2////8ce/+So/////x7/YP///////0K0Qi20/z3//////////////v7+//4A///+/v////7//v7+//78/v7////////////////5/////v/////+/////vz///////////////////////////////////8C/////////////////////////////////////////wP/////tP8D////////////////////Aaj/KfX///////////////////////////////8mA37MuSs1fq2v1v82rQP/AwP/AvsC////Af//////////////////////////////RoQRMAAACRtJREFUeNqNlwV0G1cWhscOJ00aKLfLDEOakQUjGEkWy5ZMkWRJZmZO7K1jJ3GoYdwkDTPTNg1Dgw2WGbbdMjPjfW9GsuTkNHulozMazf+9/9533xsNweFYx3FPDlyTgSM1MSxj7x0rx70oUlMz1gx8AUtQEOjjXxz3mzUZJqvVYDCo4kIhRQoKhklJoRl0pDBaMl773UCO+18U8BLHrTEhscUiK41GoyJencLQEELnCRozAGHy38xx/5UAL3FPjjAZ8kAfP2xMG1ULzQ+3L+mUCDCAxT/oJkQgwH+/DOt1XSOpABGVt3vbB6AvCDDWYvHn3wRZEPtev2WEwRyvljJmsIzu3DT6Poqimh/2ektu397ebqfo9diCJTUVPLz9NrGOe1HWy2pGEtMCZe/8dMuZI0eO9H9+VFLStkNlZWV17QO+TlpygsEWUlNzb+bWEdwLFjOEPLisFijKft9Dn2+ZnZ+f/9Ydgw6dPdT05pztSafL5lzwepcMECQLGTn5f4AavJiniJNjtQ7Unx08mOPP/WD24fzc/LWNTafqSrxe7/Y5ZWVzliTRdiCAAxNYIPpZEuRYvWHmTJPJlOM/+EGuP8dkNb3RdHbz2rVN2wDhrSvzJtlpyYIpJ/e3xG1y6bB5gUbqA1YIAOTg1oLjB9+cNWVz3azGbd4Sb1JZ3ZJmQbKQkZM7kBhm1kfltLB6w0yTAWusSAu9gbrLYrp9yvC6Wb9vbCopKfHO+ZL4hEIWxqZmmHIHEQqzXq+X9faZoJobSR5iyOvtZwt4eWPoy5vv2ra2sQ4Ap8q8d1HQDDgH/4OEQhHV09TqA4aHkl2ugGvjSoU0NSq4Jj/f5J/yfGPjqc1Tvqn7U8mXTSVJFO4mlAMA9L0Au9Uw1zW4Z3Hgr3pcFxVUAkWqZbj48qxZUxpPnz775wtN32xvkHIAC68RcQYoGlIesmdyR8f3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">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+<script src="vendor/ethers.umd.min.js"></script>
+
+<script src="vendor/qrcode.min.js"></script>
+<script src="vendor/jsqr.min.js"></script>
+<script src="vendor/lightweight-charts.standalone.production.js"></script>
+<link rel="stylesheet" href="styles/base/base-root-and-safe-area.css">
+<link rel="stylesheet" href="styles/base/light-mode-theme-overrides.css">
+<link rel="stylesheet" href="styles/base/anti-flicker-splash-app-shell-and-pages.css">
+<link rel="stylesheet" href="styles/base/bridge-cards-bottom-nav-and-fab.css">
+<link rel="stylesheet" href="styles/features/home/home-header-portfolio-and-token-list.css">
+<link rel="stylesheet" href="styles/features/swap/swap-page-and-advanced-swap.css">
+<link rel="stylesheet" href="styles/features/home/profile-page-and-menu.css">
+<link rel="stylesheet" href="styles/features/home/settings-page-toast-and-chart-controls.css">
+<link rel="stylesheet" href="styles/features/home/multikey-swap-steps-and-wallet-groups.css">
+<link rel="stylesheet" href="styles/features/wallet/del-group-drawer-and-swap-panels.css">
+<link rel="stylesheet" href="styles/features/wallet/eip7702-delegation-modal.css">
+<link rel="stylesheet" href="styles/features/wallet/delegation-step-bar-and-panels.css">
+<link rel="stylesheet" href="styles/features/wallet/tx-history-modal.css">
+<link rel="stylesheet" href="styles/features/send/send-modal.css">
+<link rel="stylesheet" href="styles/features/wallet/token-manager-and-modal-anti-flicker.css">
+<link rel="stylesheet" href="styles/features/wallet/one-lock-method-picker.css">
+<link rel="stylesheet" href="styles/features/transfer/th-wrapper-header-and-chain-button.css">
+<link rel="stylesheet" href="styles/features/transfer/th-wrapper-water-effects-and-animations.css">
+<link rel="stylesheet" href="styles/features/transfer/th-wrapper-modals-and-scrollbars.css">
+<link rel="stylesheet" href="styles/features/transfer/transfer-hub-base-form-styles.css">
+<link rel="stylesheet" href="styles/features/transfer/transfer-hub-multikey-form-redesign.css">
+<link rel="stylesheet" href="styles/features/transfer/transfer-hub-fullscreen-containers-and-key-textarea.css">
+<link rel="stylesheet" href="styles/features/transfer/sup-transfer-and-base-swap-bot-key-wrapper-styles.css">
+<link rel="stylesheet" href="styles/features/transfer/th-wrapper-controls-mode-toggle-and-rpc-presets.css">
+<link rel="stylesheet" href="styles/features/transfer/th-wrapper-dashboard-animations-spinner-and-mode-selector.css">
+<link rel="stylesheet" href="styles/features/transfer/th-wrapper-wallet-info-chain-grid-and-progress-bar.css">
+<link rel="stylesheet" href="styles/features/transfer/contract-management-and-saved-contracts-styles.css">
+<link rel="stylesheet" href="styles/features/transfer/th-saved-contract-rows.css">
+<link rel="stylesheet" href="styles/features/transfer/th-mobile-responsive-breakpoints.css">
+<link rel="stylesheet" href="styles/features/transfer/th-scrollbar-and-loading-screen.css">
+<link rel="stylesheet" href="styles/features/transfer/th-balance-check-mobile.css">
+<link rel="stylesheet" href="styles/features/transfer/th-self-transfer-mobile.css">
+<link rel="stylesheet" href="styles/features/transfer/th-token-approval-manager-mobile.css">
+<link rel="stylesheet" href="styles/features/transfer/th-nft-selector.css">
+<link rel="stylesheet" href="styles/features/transfer/th-dashboard-app-grid-and-section-toggles.css">
+<link rel="stylesheet" href="styles/features/transfer/th-withdraw-manager-theme.css">
+  <script src="scripts/core/clipboard-paste.js"></script>
+</head>
+<body>
+
+<!--@include partials/lock-overlay.html-->
+
+<!-- ═══ LOCK SETUP MODAL (Multi-method) ═══ -->
+<link rel="stylesheet" href="styles/features/wallet/lock-setup.css">
+
+<!--@include partials/lock-setup.html-->
+
+
+<!-- ── ONE INSTANT TOKEN RESTORE — runs before any other JS ── -->
+<script src="scripts/features/wallet/tokens/early-token-render.js"></script>
+
+<!-- ── SPLASH ── -->
+<!-- ── Always hide splash before first paint ── -->
+<script>(function(){var s=document.createElement('style');s.textContent='#splash{display:none!important}';document.head.appendChild(s);})();</script>
+<style id='_ph_init_style'>#page-home{transition:none!important;opacity:1!important;visibility:visible!important;transform:none!important;}</style>
+
+<!--@include partials/splash-and-toast.html-->
+<!-- ── APP ── -->
+<div id="app">
+
+  <!-- Global Pull-to-Refresh Indicator -->
+  <div id="ptr-indicator-global">
+    <div style="display:flex;align-items:center;gap:8px;">
+      <svg id="gptr-ring" width="22" height="22" viewBox="0 0 22 22" style="flex-shrink:0;">
+        <circle cx="11" cy="11" r="8.5" fill="none" stroke="rgba(99,102,241,0.2)" stroke-width="2"/>
+        <circle id="gptr-arc" cx="11" cy="11" r="8.5" fill="none" stroke="#6366f1" stroke-width="2" stroke-linecap="round" stroke-dasharray="53.4" stroke-dashoffset="53.4" transform="rotate(-90 11 11)" style="filter:drop-shadow(0 0 3px #6366f1);transition:stroke-dashoffset 0.05s linear;"/>
+      </svg>
+      <span id="gptr-label" style="font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:2px;color:#a78bfa;text-transform:uppercase;font-weight:700;">Pull to refresh</span>
+    </div>
+  </div>
+
+
+  <!-- Pages -->
+  <div class="pages">
+
+    <!--@include partials/page-home.html-->
+
+    <!--@include partials/page-swap.html-->
+
+    <!-- ╔══════ SWAP MODALS ══════╗ -->
+
+
+
+    <!--@include partials/swap-bridge-modals.html-->
+
+    <script src="scripts/features/bridge/execute/bridge-confirm-modal.js"></script>
+
+    <!-- ══════════════════════════════════════════════
+         Confirm Swap — Mobile Bottom Sheet (v8)
+         ══════════════════════════════════════════════ -->
+    <link rel="stylesheet" href="styles/features/swap/swap-confirm-sheet.css">
+
+    <!--@include partials/sw-confirm-modal.html-->
+
+    <script src="scripts/features/swap/swap-confirm-sheet.js"></script>
+
+    <!-- ╔══════ SWAP TX PROGRESS OVERLAY ══════╗ -->
+    <link rel="stylesheet" href="styles/shared/tx-progress.css">
+
+    <!--@include partials/sw-tx-progress.html-->
+
+    <script src="scripts/shared/ui/tx-progress-overlay.js"></script>
+
+    <!-- ╔══════ SWAP SUCCESS OVERLAY ══════╗ -->
+    <link rel="stylesheet" href="styles/features/swap/swap-success.css">
+
+    <!--@include partials/sw-success-overlay.html-->
+
+    <script src="scripts/features/swap/swap-success-overlay.js"></script>
+
+    <!-- ╔══════ SEND SUCCESS OVERLAY ══════╗ -->
+    <link rel="stylesheet" href="styles/features/send/send-success.css">
+
+    <!--@include partials/snd-success-overlay.html-->
+
+    <script src="scripts/features/send/send-success-overlay.js"></script>
+
+    <!--@include partials/swap-wallet-panel.html-->
+
+        <!--@include partials/page-bridge.html-->
+
+    <!-- ── BRIDGE TX SUCCESS OVERLAY ── -->
+    <link rel="stylesheet" href="styles/features/bridge/bridge-success.css">
+
+    <!--@include partials/br-success-overlay.html-->
+
+    <script src="scripts/features/bridge/execute/bridge-success-overlay.js"></script>
+
+    <!--@include partials/bridge-overlays.html-->
+
+    <!--@include partials/page-profile.html-->
+
+    <!--@include partials/page-transfer-hub.html-->
+    </div>
+
+      <!--@include partials/th-wallet-picker-drawer.html-->
+
+    <!-- ╚══════ /TRANSFER HUB PAGE ══════╝ -->
+
+    <!--@include partials/page-sup-transfer.html-->
+
+    <!--@include partials/page-base-swap-bot.html-->
+
+    <script src="scripts/features/swap/base-swap-bot/bsb-state-helpers-and-userop-basics.js"></script>
+<script src="scripts/features/swap/base-swap-bot/bsb-fetch-swap-quotes.js"></script>
+<script src="scripts/features/swap/base-swap-bot/bsb-build-userop-and-process-key.js"></script>
+<script src="scripts/features/swap/base-swap-bot/bsb-wallet-picker-list.js"></script>
+<script src="scripts/features/swap/base-swap-bot/base-swap-bot.js"></script>
+
+    <!--@include partials/page-settings.html-->
+    </div>
+
+    <!--@include partials/console-log-panel.html-->
+
+<!--@include partials/page-nansen.html-->
+
+<!--@include partials/page-delegation.html-->
+    <!--@include partials/page-exchange.html-->
+    <!-- ╚══════ /EXCHANGE PAGE ══════╝ -->
+
+
+      <!--@include partials/exchange-sheets.html-->
+
+  <!--@include partials/bottom-navs.html-->
+
+  <!--@include partials/bg-tx-pill.html-->
+
+  <link rel="stylesheet" href="styles/shared/background-tx-pill.css">
+
+  <script src="scripts/shared/ui/background-tx-pill.js"></script>
+  <!--@include partials/wallet-drawers.html-->
+
+  <!--@include partials/rpc-manager-overlay.html-->
+
+
+<!--@include partials/chain-pickers.html-->
+
+<!-- mcsp-overlay removed: manual contract modal now uses home section chain only -->
+
+<script src="scripts/features/transfer/contracts/manual-contract-chain.js"></script>
+<!--@include partials/hcp-overlay.html-->
+
+
+<!--@include partials/tm-overlay.html-->
+
+<!--@include partials/pm-txh-wg-edit-overlays.html-->
+
+<!--@include partials/wallet-group-overlays.html-->
+
+<!--@include partials/receive-and-address-list.html-->
+
+
+
+<!-- ══════ IMPORT WALLET GROUP MODAL ══════ -->
+<link rel="stylesheet" href="styles/features/wallet/import-tabs.css">
+
+<!--@include partials/wallet-group-import-create.html-->
+
+<!--@include partials/send-flow.html-->
+
+<script src="scripts/features/wallet/app-main/app-open-and-chart-price-fetchers-part1.js"></script>
+<script src="scripts/features/wallet/app-main/price-engine-batch-fetchers.js"></script>
+<script src="scripts/features/wallet/app-main/coingecko-client.js"></script>
+<script src="scripts/features/wallet/app-main/chart-exchange-klines.js"></script>
+<script src="scripts/features/wallet/app-main/chart-multi-source-fetch.js"></script>
+<script src="scripts/features/wallet/app-main/price-cache-rpc-fallback-and-token-loading-part1.js"></script>
+<script src="scripts/features/wallet/app-main/price-cache-rpc-fallback-and-token-loading-part2.js"></script>
+<script src="scripts/features/wallet/app-main/price-cache-rpc-fallback-and-token-loading-part3.js"></script>
+<script src="scripts/features/wallet/app-main/portfolio-total-and-token-refresh-part1.js"></script>
+<script src="scripts/features/wallet/app-main/one-crypto.js"></script>
+<script src="scripts/features/wallet/app-main/wallet-group-selection-and-storage.js"></script>
+<script src="scripts/features/wallet/app-main/wallet-group-import-and-create-ui.js"></script>
+<script src="scripts/features/wallet/app-main/wallet-group-mnemonics-and-key-editing-part1.js"></script>
+<script src="scripts/features/wallet/app-main/wg-drag-reorder-and-list.js"></script>
+<script src="scripts/features/wallet/app-main/wg-detail-ui.js"></script>
+<script src="scripts/features/wallet/app-main/wg-manager-modal.js"></script>
+<script src="scripts/features/wallet/app-main/wg-edit-keys.js"></script>
+<script src="scripts/features/wallet/app-main/wallet-group-edit-modals-and-group-picker-part1.js"></script>
+<script src="scripts/features/wallet/app-main/pair-token-info-and-default-pair.js"></script>
+<script src="scripts/features/wallet/app-main/key-validation-and-wallet-selection.js"></script>
+<script src="scripts/features/wallet/app-main/swap-counts-steps-and-delegation-check.js"></script>
+<script src="scripts/features/wallet/app-main/pair-swap-steps-bot-log-and-paymaster-part1.js"></script>
+<script src="scripts/features/wallet/app-main/pair-swap-steps-bot-log-and-paymaster-part2.js"></script>
+<script src="scripts/features/wallet/app-main/bundler-userop.js"></script>
+<script src="scripts/features/wallet/app-main/tx-history-store-and-status.js"></script>
+<script src="scripts/features/wallet/app-main/tx-history-render.js"></script>
+<script src="scripts/features/wallet/app-main/token-manager-defaults.js"></script>
+<script src="scripts/features/wallet/app-main/saved-tokens-storage.js"></script>
+<script src="scripts/features/wallet/app-main/chain-config-and-rpc-fallback.js"></script>
+<script src="scripts/features/wallet/app-main/home-chain-bar-and-boot.js"></script>
+<script src="scripts/features/wallet/app-main/home-chain-picker-and-custom-chain.js"></script>
+<script src="scripts/features/wallet/app-main/chainlist-fetch-and-search.js"></script>
+<script src="scripts/features/wallet/app-main/chainlist-rpc-import.js"></script>
+<script src="scripts/features/wallet/app-main/token-manager.js"></script>
+<script src="scripts/features/wallet/app-main/token-swap-sheet.js"></script>
+<script src="scripts/features/wallet/app-main/token-chart-demo-data.js"></script>
+<script src="scripts/features/wallet/app-main/open-token-chart.js"></script>
+<script src="scripts/features/wallet/app-main/token-chart-controls.js"></script>
+<script src="scripts/features/wallet/app-main/token-chart-swap-navigation.js"></script>
+<script src="scripts/features/wallet/app-main/token-chart-fullscreen.js"></script>
+<script src="scripts/features/wallet/app-main/token-chart-fullscreen-and-chart-types-part2.js"></script>
+<script src="scripts/features/wallet/app-main/chart-drawing-tools-and-coin-market-info-part1.js"></script>
+<script src="scripts/features/wallet/app-main/drawing-tools-events-and-zoom.js"></script>
+<script src="scripts/features/wallet/app-main/drawing-toolbar-and-fullscreen-hooks.js"></script>
+<script src="scripts/features/wallet/app-main/token-chart-hud-and-actions.js"></script>
+<script src="scripts/features/wallet/app-main/coin-market-info-fetchers.js"></script>
+<script src="scripts/features/wallet/app-main/chart-market-data-fetch-and-candle-series-part1.js"></script>
+<script src="scripts/features/wallet/app-main/lw-chart-state-and-init.js"></script>
+<script src="scripts/features/wallet/app-main/lw-chart-data-load-and-polling.js"></script>
+<script src="scripts/features/wallet/app-main/lw-chart-render-series.js"></script>
+<script src="scripts/features/wallet/app-main/chart-candles-fetch-and-markers.js"></script>
+<script src="scripts/features/wallet/app-main/chart-live-price-and-websocket.js"></script>
+<script src="scripts/features/wallet/app-main/token-removal-and-manager-list.js"></script>
+<script src="scripts/features/wallet/app-main/token-contract-lookup-and-add.js"></script>
+<script src="scripts/features/wallet/app-main/add-token-by-contract-and-platform-lookup-part1.js"></script>
+<script src="scripts/features/wallet/app-main/add-token-by-contract-and-platform-lookup-part2.js"></script>
+<script src="scripts/features/wallet/app-main/token-chain-picker-modal.js"></script>
+<script src="scripts/features/wallet/app-main/add-token-on-chain.js"></script>
+<script src="scripts/features/wallet/app-main/send-state-and-chain-config.js"></script>
+<script src="scripts/features/wallet/app-main/token-chain-picker-and-send-selected-box-part2.js"></script>
+<script src="scripts/features/wallet/app-main/send-selected-box-and-key-list.js"></script>
+<script src="scripts/features/wallet/app-main/send-from-wallet-picker.js"></script>
+<script src="scripts/features/wallet/app-main/send-to-address-picker.js"></script>
+<script src="scripts/features/wallet/app-main/send-input-handlers.js"></script>
+<script src="scripts/features/wallet/app-main/send-flow-pickers-and-confirm-part2.js"></script>
+<script src="scripts/features/wallet/app-main/send-flow-pickers-and-confirm-part3.js"></script>
+<script src="scripts/features/wallet/app-main/rpc-alchemy-fallback.js"></script>
+<script src="scripts/features/wallet/app-main/integrators.js"></script>
+<script src="scripts/features/wallet/app-main/toggle-switch-and-notifications.js"></script>
+<script src="scripts/features/wallet/app-main/console-log-panel.js"></script>
+<script src="scripts/features/wallet/app-main/restore-toggles-chip-select-and-home-state.js"></script>
+<script src="scripts/features/wallet/app-main/rpc-alchemy-integrators-and-chain-picker-part2.js"></script>
+<script src="scripts/features/wallet/app-main/rpc-alchemy-integrators-and-chain-picker-part3.js"></script>
+<script src="scripts/features/wallet/app-main/profile-stats-and-dashboard.js"></script>
+<script src="scripts/features/wallet/app-main/addr-list-modal-and-cw-key-selection.js"></script>
+<script src="scripts/features/wallet/app-main/browser-wallet-drawer.js"></script>
+<script src="scripts/features/wallet/app-main/connected-wallets-drawer.js"></script>
+<script src="scripts/features/wallet/app-main/connected-wallets-group-and-key-lists.js"></script>
+<script src="scripts/features/wallet/app-main/copy-all-addresses.js"></script>
+<script src="scripts/features/wallet/app-main/receive-modal.js"></script>
+<script src="scripts/features/wallet/app-main/rpc-panel-fab-and-toast.js"></script>
+<script src="scripts/features/wallet/app-main/profile-dashboard-addr-lists-and-viewport-ui-part3.js"></script>
+
+<!-- ══════ DEL GROUP DRAWER (slide from right) ══════ -->
+
+<script src="scripts/features/wallet/delegation-modal/delegation-steps-and-chain-sync.js"></script>
+<script src="scripts/features/wallet/delegation-modal/delegation-chain-picker.js"></script>
+<script src="scripts/features/wallet/delegation-modal/delegation-group-drawer-and-lists.js"></script>
+<script src="scripts/features/wallet/delegation-modal/delegation-key-auto-import.js"></script>
+<script src="scripts/features/wallet/delegation-modal/delegation-step-bar-and-eip7702-part2.js"></script>
+<script src="scripts/features/bridge/providers/bridge-proxy-and-provider-config.js"></script>
+<script src="scripts/features/bridge/providers/bridge-fetch-rubic.js"></script>
+<script src="scripts/features/bridge/providers/bridge-fetch-rango-and-socket.js"></script>
+<script src="scripts/features/bridge/bridge-shared-helpers-and-chain-rpc.js"></script>
+<script src="scripts/features/bridge/providers/bridge-quote-fetch-and-token-button-part1.js"></script>
+<script src="scripts/features/bridge/providers/bridge-quote-fetch-and-token-button-part2.js"></script>
+<script src="scripts/features/bridge/routes/bridge-balance-routes-and-explorers-part1.js"></script>
+<script src="scripts/features/bridge/execute/bridge-exec-button.js"></script>
+<script src="scripts/features/bridge/routes/bridge-flip-and-fetch-routes.js"></script>
+<script src="scripts/features/bridge/routes/bridge-render-routes.js"></script>
+<script src="scripts/features/bridge/routes/bridge-select-route.js"></script>
+<script src="scripts/features/bridge/routes/bridge-balance-routes-and-explorers-part3.js"></script>
+<script src="scripts/features/bridge/execute/bridge-wallet-panel-and-execute-part1.js"></script>
+<script src="scripts/features/bridge/execute/bridge-wallet-panel-and-execute-part2.js"></script>
+<script src="scripts/features/bridge/pickers/bridge-chain-picker.js"></script>
+<script src="scripts/features/bridge/pickers/bridge-token-picker.js"></script>
+<script src="scripts/features/bridge/history/bridge-history-sheet.js"></script>
+<script src="scripts/features/bridge/history/bridge-history-clear-and-pending-status.js"></script>
+<script src="scripts/features/bridge/history/bridge-pending-badge-check.js"></script>
+<script src="scripts/features/bridge/history/bridge-history-dropdown.js"></script>
+<script src="scripts/features/bridge/pickers/bridge-chain-token-pickers-and-history-part3.js"></script>
+
+<script src="scripts/features/wallet/hw-pill-clicks.js"></script>
+
+<script src="scripts/core/hardware-back-button.js"></script>
+<!-- ══════════════════════════════════════════════════════════════
+  ONE v12 — LIVE SYSTEM ENHANCEMENTS
+  1. Home token price: visible live price per card (already rendered via tlp-*)
+     Refresh every 30s silently (reduced from 5s to save API, but visible immediately)
+  2. Wallet Group Box — selected group+wallet index persisted in localStorage
+     Restored on every page load / app start
+  3. Token Search — CoinMarketCap fallback added after CoinGecko fails
+  4. Post-tx auto-refresh (Send/Swap/Bridge) — reload home token list after tx
+  5. All sections interconnected via events
+══════════════════════════════════════════════════════════════ -->
+<script src="scripts/features/wallet/wallet-group-persist.js"></script>
+
+<!-- ══════════════════════════════════════════════════════
+     ONE — PULL TO REFRESH + TOKEN LIST PERSISTENT CACHE
+     ══════════════════════════════════════════════════════ -->
+<script src="scripts/features/wallet/tokens/token-cache-storage.js"></script>
+<script src="scripts/features/wallet/tokens/token-list-restore.js"></script>
+<script src="scripts/features/wallet/pull-to-refresh-init.js"></script>
+<script src="scripts/features/wallet/tokens/token-watch-save-and-init.js"></script>
+<script src="scripts/features/wallet/tokens/token-cache-pull-refresh.js"></script>
+
+<!-- ══════════════════════════════════════════════════════════
+     ONE GAS ENGINE v3 — gasPrice-based EIP-1559 + Legacy Fallback
+     ══════════════════════════════════════════════════════════ -->
+<script src="scripts/shared/gas-engine.js"></script>
+
+<!--@include partials/hw-group-picker.html-->
+
+
+<!-- ╔══════ SWAP MODAL OVERLAY ══════╗ -->
+
+<script src="scripts/features/swap/swap-wallet-drawer/swap-drawer-controls.js"></script>
+<script src="scripts/features/swap/swap-wallet-drawer/swap-drawer-group-list.js"></script>
+<script src="scripts/features/swap/swap-wallet-drawer/swap-drawer-key-selection.js"></script>
+<script src="scripts/features/swap/swap-wallet-drawer/swap-step1-key-box.js"></script>
+<script src="scripts/features/swap/swap-wallet-drawer/swap-state-and-early-restore.js"></script>
+<script src="scripts/features/swap/swap-wallet-drawer/swap-networks-tokens-and-dex-routers.js"></script>
+<script src="scripts/features/swap/swap-wallet-drawer/swap-get-tokens-and-set-chain.js"></script>
+<script src="scripts/features/swap/swap-wallet-drawer/swap-chain-picker.js"></script>
+<script src="scripts/features/swap/swap-wallet-drawer/swap-state-networks-and-chain-picker-part2.js"></script>
+<script src="scripts/features/swap/swap-wallet-drawer/swap-wallet-select-and-connect-button.js"></script>
+<script src="scripts/features/swap/swap-wallet-drawer/swap-key-input-init-and-token-box.js"></script>
+<script src="scripts/features/swap/swap-wallet-drawer/swap-balances.js"></script>
+<script src="scripts/features/swap/swap-wallet-drawer/swap-update-button.js"></script>
+<script src="scripts/features/swap/swap-wallet-drawer/swap-amount-fetch-and-rpc-fallback.js"></script>
+<script src="scripts/features/swap/swap-wallet-drawer/swap-live-prices-and-quote-generation.js"></script>
+<script src="scripts/features/swap/swap-wallet-drawer/swap-dex-logos.js"></script>
+<script src="scripts/features/swap/swap-wallet-drawer/swap-dex-comparison-and-info.js"></script>
+<script src="scripts/features/swap/swap-wallet-drawer/swap-flip-and-token-picker.js"></script>
+<script src="scripts/features/swap/swap-wallet-drawer/swap-token-select-and-settings.js"></script>
+<script src="scripts/features/swap/swap-wallet-drawer/swap-recent-and-history.js"></script>
+<script src="scripts/features/swap/swap-wallet-drawer/swap-confirm-and-execute.js"></script>
+<script src="scripts/features/swap/swap-wallet-drawer/swap-record-reset-and-velora-tx.js"></script>
+<script src="scripts/features/swap/swap-wallet-drawer/swap-run-swap.js"></script>
+<script src="scripts/features/swap/swap-wallet-drawer/swap-gas-fee-refresh.js"></script>
+<script src="scripts/features/swap/swap-wallet-drawer/swap-window-exports-and-init.js"></script>
+
+<script src="scripts/features/wallet/home-wallet-guard.js"></script>
+
+<script src="scripts/features/wallet/lock-security.js"></script>
+
+
+<!--@include partials/currency-picker-overlay.html-->
+
+<script src="scripts/shared/currency/currency-display.js"></script>
+
+
+<!-- ══════ CUSTOM RPC MANAGER DRAWER ══════ -->
+
+<script src="scripts/shared/custom-rpc/custom-rpc-store.js"></script>
+<script src="scripts/shared/custom-rpc/custom-rpc-drawer.js"></script>
+<script src="scripts/shared/home-portfolio-card-sync.js"></script>
+<script src="scripts/shared/currency/usd-toggle-and-silent-refresh.js"></script>
+<script src="scripts/shared/delegated-stat-click.js"></script>
+
+<!-- ══════════════════════════════════════════════
+     SUP TRANSFER — Embedded Bot Logic
+══════════════════════════════════════════════ -->
+<script src="scripts/features/transfer/smart-wallet-batch.js"></script>
+
+
+  <!-- ╔══════ TH UNIVERSAL WALLET PICKER — JavaScript ══════╗ -->
+  <script src="scripts/features/transfer/wallet-picker/wallet-picker-state-and-render.js"></script>
+  <script src="scripts/features/transfer/wallet-picker/wallet-picker-open-and-selection.js"></script>
+  <script src="scripts/features/transfer/wallet-picker/wallet-picker-sync-and-swipe.js"></script>
+  <!-- ╚══════ /TH UNIVERSAL WALLET PICKER — JavaScript ══════╝ -->
+
+  <!-- ╔══════ TH CHAIN PICKER — JavaScript ══════╗ -->
+  <script src="scripts/shared/rpc-manager/rpc-state-badge-and-log.js"></script>
+<script src="scripts/shared/rpc-manager/rpc-chain-map-and-default-chain.js"></script>
+<script src="scripts/shared/rpc-manager/rpc-manager.js"></script>
+  <!-- ╚══════ /TH CHAIN PICKER — JavaScript ══════╝ -->
+
+  <!-- Single Key Toggle Visibility -->
+  <script src="scripts/features/swap/base-swap-bot/base-swap-bot-key-toggle.js"></script>
+  <!-- /Single Key Toggle Visibility -->
+
+  <!-- Transfer Hub DOMContentLoaded Shim -->
+  <script src="scripts/features/transfer/dom-ready-shim.js"></script>
+  <!-- Transfer Hub Scripts -->
+  <script src="scripts/features/transfer/transfer-hub/core-contracts-and-wake-lock-part1.js"></script>
+  <script src="scripts/features/transfer/transfer-hub/core-contracts-and-wake-lock-part2.js"></script>
+  <script src="scripts/features/transfer/transfer-hub/core-contracts-and-wake-lock-part3.js"></script>
+  <script src="scripts/features/transfer/transfer-hub/core-contracts-and-wake-lock-part4.js"></script>
+  <script src="scripts/features/transfer/transfer-hub/contract-verify-and-transfer-setup-part1.js"></script>
+  <script src="scripts/features/transfer/transfer-hub/contract-verify-and-transfer-setup-part2.js"></script>
+  <script src="scripts/features/transfer/transfer-hub/withdraw-chain-search-and-log.js"></script>
+  <script src="scripts/features/transfer/transfer-hub/central-contracts-and-delete-modal.js"></script>
+  <script src="scripts/features/transfer/transfer-hub/load-all-contracts.js"></script>
+  <script src="scripts/features/transfer/transfer-hub/withdraw-contract-select-and-balance.js"></script>
+  <script src="scripts/features/transfer/transfer-hub/withdraw-native-and-token.js"></script>
+  <script src="scripts/features/transfer/transfer-hub/multikey-and-key-tool-modals.js"></script>
+  <script src="scripts/features/transfer/transfer-hub/self-transfer-estimate.js"></script>
+  <script src="scripts/features/transfer/transfer-hub/self-transfer-and-multikey-token-execute-part1.js"></script>
+  <script src="scripts/features/transfer/transfer-hub/phrase-to-keys-and-copy-helpers.js"></script>
+  <script src="scripts/features/transfer/transfer-hub/multikey-token-ui-and-logs.js"></script>
+  <script src="scripts/features/transfer/transfer-hub/execute-multikey-token.js"></script>
+  <script src="scripts/features/transfer/transfer-hub/token-modal-listeners-and-chain-search.js"></script>
+  <script src="scripts/features/transfer/transfer-hub/token-details-detect-and-format.js"></script>
+  <script src="scripts/features/transfer/transfer-hub/token-balances-amounts-and-validation.js"></script>
+  <script src="scripts/features/transfer/transfer-hub/token-key-listener-and-deploy.js"></script>
+  <script src="scripts/features/transfer/transfer-hub/token-resilient-send.js"></script>
+  <script src="scripts/features/transfer/transfer-hub/token-saved-contracts.js"></script>
+  <script src="scripts/features/transfer/transfer-hub/token-contracts-toggle-and-wallet-detection.js"></script>
+  <script src="scripts/features/transfer/transfer-hub/multikey-native-chain-search.js"></script>
+  <script src="scripts/features/transfer/transfer-hub/multikey-native-amounts-and-parse-keys.js"></script>
+  <script src="scripts/features/transfer/transfer-hub/multikey-native-chain-and-nft-collect-part2.js"></script>
+  <script src="scripts/features/transfer/transfer-hub/multikey-native-chain-and-nft-collect-part3.js"></script>
+  <script src="scripts/features/transfer/transfer-hub/multikey-recipients-contracts-and-token-form-part1.js"></script>
+  <script src="scripts/features/transfer/transfer-hub/multikey-recipients-contracts-and-token-form-part2.js"></script>
+  <script src="scripts/features/transfer/transfer-hub/multikey-native-saved-contracts.js"></script>
+  <script src="scripts/features/transfer/transfer-hub/multikey-native-sender-balance.js"></script>
+  <script src="scripts/features/transfer/transfer-hub/multikey-token-chain-search.js"></script>
+  <script src="scripts/features/transfer/transfer-hub/multikey-recipients-contracts-and-token-form-part4.js"></script>
+  <script src="scripts/features/transfer/transfer-hub/multikey-key-classify-and-validate.js"></script>
+  <script src="scripts/features/transfer/transfer-hub/multikey-token-execute-and-inputs.js"></script>
+  <script src="scripts/features/transfer/transfer-hub/multikey-native-developer-wallet-and-recipient-balance.js"></script>
+  <script src="scripts/features/transfer/transfer-hub/multikey-recipient-detection.js"></script>
+  <script src="scripts/features/transfer/transfer-hub/multikey-activity-and-clipboard-guard.js"></script>
+  <script src="scripts/features/transfer/transfer-hub/multikey-balance-check.js"></script>
+  <script src="scripts/features/transfer/transfer-hub/multikey-approval-chain-grid.js"></script>
+  <script src="scripts/features/transfer/transfer-hub/token-approvals.js"></script>
+  <script src="scripts/features/transfer/transfer-hub/key-to-address-conversion.js"></script>
+  <script src="scripts/features/transfer/transfer-hub/withdraw-contract-verify-and-manual-add.js"></script>
+  <script src="scripts/features/wallet/key-privacy/key-autohide-and-actual-keys.js"></script>
+  <script src="scripts/features/wallet/key-privacy/fresh-key-helpers-and-storage-guard.js"></script>
+  <script src="scripts/features/wallet/key-privacy/nft-state-and-w2w-chain-grids.js"></script>
+  <script src="scripts/features/wallet/key-privacy/w2w-mode-select-and-amounts.js"></script>
+  <script src="scripts/features/wallet/key-privacy/w2w-execute-token.js"></script>
+  <script src="scripts/features/wallet/key-privacy/w2w-execute-gate-and-stats.js"></script>
+  <script src="scripts/features/wallet/key-privacy/w2w-sender-receiver-inputs.js"></script>
+  <script src="scripts/features/wallet/key-privacy/w2w-preview-and-logging.js"></script>
+  <script src="scripts/features/wallet/key-privacy/autohide-storage-guard-and-w2w-part3.js"></script>
+  <script src="scripts/features/wallet/key-privacy/nft-init-and-sender-wallet-detection.js"></script>
+  <script src="scripts/features/wallet/key-privacy/nft-auto-fetch-and-chain-search.js"></script>
+  <script src="scripts/features/wallet/key-privacy/nft-transfer-mode-and-distribute-fetch.js"></script>
+  <script src="scripts/features/wallet/key-privacy/nft-fetch-collect-and-all-wallets.js"></script>
+  <script src="scripts/features/wallet/key-privacy/nft-fetch-by-token-ids.js"></script>
+  <script src="scripts/features/wallet/key-privacy/nft-fetch-from-wallet.js"></script>
+  <script src="scripts/features/wallet/key-privacy/nft-grid-render.js"></script>
+  <script src="scripts/features/wallet/key-privacy/nft-grid-render-and-selection.js"></script>
+  <script src="scripts/features/wallet/key-privacy/nft-selection-state-and-validation.js"></script>
+  <script src="scripts/features/wallet/key-privacy/nft-distribute-and-collect-execute.js"></script>
+  <script src="scripts/features/wallet/key-privacy/nft-clear-and-unload-guard.js"></script>
+
+
+
+
+
+  <!-- ══════════════════════════════════════════════════
+       CONTRACT DELETE MODALS — Native & Token (Section A)
+       Uses alignDrawersToApp() for correct phone positioning
+       ══════════════════════════════════════════════════ -->
+
+  <!--@include partials/contract-delete-modals.html-->
+
+  <script src="scripts/features/transfer/contracts/contract-delete-modal.js"></script>
+
+<!-- ══════════════════════════════════════════════════════════════════
+     ONE BACKGROUND EXECUTION PROTECTION — Global (FULL UPGRADE)
+     App minimize হলেও সব section: price, balance, swap, chart চলবে
+     ══════════════════════════════════════════════════════════════════ -->
+<script src="scripts/core/background-guard.js"></script>
+<!-- ══ END ONE BACKGROUND GUARD (FULL UPGRADE) ══ -->
+
+
+<!-- ══════════════════════════════════════════════════════════════════
+     ONE PWA ENGINE
+     ✅ Install as app (Add to Home Screen)
+     ✅ Minimize হলেও background এ সব section চলবে
+     ✅ Service Worker: background sync, price/balance/swap
+     ✅ Push notification support
+     ══════════════════════════════════════════════════════════════════ -->
+<script src="scripts/core/pwa/pwa.js"></script>
+<!-- ══ END ONE PWA ENGINE ══ -->
+
+
+<!-- ══════════════════════════════════════════════════════════════════
+     ONE CAPACITOR BACKGROUND ENGINE
+     APK বানানোর পরে minimize করলেও সব section background এ চলবে:
+     ✅ Price refresh   ✅ Balance update   ✅ Swap monitor
+     ✅ Chart poll      ✅ Gas tracker      ✅ Activity feed
+     ✅ Foreground service notification
+     ✅ Android WorkManager (battery-safe background jobs)
+     ══════════════════════════════════════════════════════════════════ -->
+<script src="scripts/core/capacitor-background/cap-bg-env-and-refresh.js"></script>
+<script src="scripts/core/capacitor-background/cap-bg-app-state-and-tasks.js"></script>
+<script src="scripts/core/capacitor-background/cap-bg-keepalive-and-jobs.js"></script>
+<script src="scripts/core/capacitor-background/cap-bg-back-network-and-notify.js"></script>
+<script src="scripts/core/capacitor-background/cap-bg-splash-statusbar-and-api.js"></script>
+<!-- ══ END ONE CAPACITOR BACKGROUND ENGINE ══ -->
+
+<!-- ══════════════════════════════════════════════════════════════════
+     CAPACITOR BUILD INSTRUCTIONS
+     এই comment টা APK বানানোর সময় কাজে লাগবে
+     ══════════════════════════════════════════════════════════════════
+
+  📁 FOLDER STRUCTURE:
+  ├── index.html          ← এই ফাইলটা rename করুন
+  ├── capacitor.config.json
+  ├── package.json
+  └── android/            ← npx cap add android এ তৈরি হবে
+
+  📄 capacitor.config.json:
+  {
+    "appId": "com.one.defi",
+    "appName": "One Wallet DeFi Terminal",
+    "webDir": ".",
+    "android": {
+      "allowMixedContent": true,
+      "backgroundColor": "#050508",
+      "webContentsDebuggingEnabled": false,
+      "appendUserAgent": "OneApp/1.0"
+    },
+    "plugins": {
+      "SplashScreen": {
+        "launchShowDuration": 1500,
+        "backgroundColor": "#050508",
+        "androidScaleType": "CENTER_CROP",
+        "showSpinner": false
+      },
+      "StatusBar": {
+        "style": "DARK",
+        "backgroundColor": "#050508"
+      },
+      "LocalNotifications": {
+        "smallIcon": "ic_stat_one",
+        "iconColor": "#6366f1"
+      }
+    }
+  }
+
+  📄 package.json:
+  {
+    "name": "one-defi",
+    "version": "1.0.0",
+    "scripts": {
+      "build": "echo 'No build needed'",
+      "cap:add":  "npx cap add android",
+      "cap:sync": "npx cap sync",
+      "cap:open": "npx cap open android",
+      "cap:run":  "npx cap run android"
+    },
+    "dependencies": {
+      "@capacitor/core": "^6.0.0",
+      "@capacitor/android": "^6.0.0",
+      "@capacitor/app": "^6.0.0",
+      "@capacitor/local-notifications": "^6.0.0",
+      "@capacitor/network": "^6.0.0",
+      "@capacitor/splash-screen": "^6.0.0",
+      "@capacitor/status-bar": "^6.0.0",
+      "@capacitor/background-task": "^6.0.0"
+    },
+    "devDependencies": {
+      "@capacitor/cli": "^6.0.0"
+    }
+  }
+
+  🔧 android/app/src/main/AndroidManifest.xml এ ADD করুন:
+  <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+  <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC"/>
+  <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+  <uses-permission android:name="android.permission.WAKE_LOCK"/>
+  <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
+  <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM"/>
+
+  🔧 BUG FIX 4 — Android 8+ Foreground Service Channel:
+  android/app/src/main/res/values/strings.xml এ ADD করুন:
+  <string name="one_foreground_channel_id">one_foreground</string>
+  <string name="one_foreground_channel_name">One Wallet Background Service</string>
+
+  🔧 BUG FIX 4 — capacitor.config.json এ LocalNotifications section UPDATE করুন:
+  "LocalNotifications": {
+    "smallIcon": "ic_stat_one",
+    "iconColor": "#6366f1",
+    "sound": "default",
+    "channels": [
+      {
+        "id": "one_foreground",
+        "name": "One Wallet Background Service",
+        "importance": 3,
+        "visibility": 1,
+        "lights": false,
+        "vibration": false,
+        "sound": null
+      }
+    ]
+  }
+
+  🔧 TERMINAL COMMANDS (একবারে run করুন):
+  npm install
+  npx cap init "One Wallet DeFi Terminal" "com.one.defi" --web-dir "."
+  npx cap add android
+  npx cap sync
+  npx cap open android
+  (Android Studio → Build → Generate Signed APK)
+
+══════════════════════════════════════════════════════════════════ -->
+
+
+<script src="scripts/features/transfer/swipe-mode-switch.js"></script>
+
+
+
+<!-- ═══════════════════════════════════════════════════════════
+     ONE WEB3 BRIDGE — handles window.ethereum requests from
+     the In-App Browser (DEX/DeFi sites).
+     Called by InAppBrowserActivity via evaluateJavascript:
+       oneHandleWeb3Request(reqId, method, paramsJson)
+     Responds via:
+       OneAndroid.web3Resolve(reqId, resultJson)
+       OneAndroid.web3Reject(reqId, message)
+═══════════════════════════════════════════════════════════ -->
+<link rel="stylesheet" href="styles/features/web3/web3-sign-modal.css">
+
+<!--@include partials/web3-sign-modal-dom.html-->
+
+<script src="scripts/features/web3/web3-bridge/web3-modal-compat-and-state.js"></script>
+<script src="scripts/features/web3/web3-bridge/web3-wallet-and-chain-lookup.js"></script>
+<script src="scripts/features/web3/web3-bridge/web3-modal-open-close-and-approve.js"></script>
+<script src="scripts/features/web3/web3-bridge/web3-browser-tx-modal-and-wallet-select.js"></script>
+<script src="scripts/features/web3/web3-bridge/web3-handle-request.js"></script>
+
+<script src="scripts/shared/ui/chart-nav-visibility.js"></script>
+<script src="scripts/features/exchange/exchange-engine/spot/exc-spot-config-and-caches.js"></script>
+<script src="scripts/features/exchange/exchange-engine/spot/exc-spot-keys-and-crypto.js"></script>
+<script src="scripts/features/exchange/exchange-engine/spot/exc-spot-exchange-fetchers.js"></script>
+<script src="scripts/features/exchange/exchange-engine/spot/exc-spot-fetch-markets.js"></script>
+<script src="scripts/features/exchange/exchange-engine/spot/exc-spot-trade-minimums-and-market-list.js"></script>
+<script src="scripts/features/exchange/exchange-engine/spot/exc-spot-selector-and-api-setup.js"></script>
+<script src="scripts/features/exchange/exchange-engine/spot/exc-spot-trade-form.js"></script>
+<script src="scripts/features/exchange/exchange-engine/spot/exc-spot-place-and-execute-order.js"></script>
+<script src="scripts/features/exchange/exchange-engine/spot/exc-spot-orders-list.js"></script>
+<script src="scripts/features/exchange/exchange-engine/spot/exc-spot-portfolio.js"></script>
+<script src="scripts/features/exchange/exchange-engine/spot/exc-spot-portfolio-accounts-and-init.js"></script>
+<script src="scripts/features/exchange/exchange-engine/spot/exc-spot-orderbook-connect.js"></script>
+<script src="scripts/features/exchange/exchange-engine/spot/exc-spot-orderbook-decoders-and-render.js"></script>
+<script src="scripts/features/exchange/exchange-engine/spot/exc-spot-convert-quote-and-balance.js"></script>
+<script src="scripts/features/exchange/exchange-engine/spot/exc-spot-convert-picker-and-confirm.js"></script>
+<script src="scripts/features/exchange/exchange-engine/exc-spot-engine.js"></script>
+<script src="scripts/features/exchange/exchange-engine/futures/fut-coinbase-jwt-and-crypto-helpers.js"></script>
+<script src="scripts/features/exchange/exchange-engine/futures/fut-exchange-config-and-state.js"></script>
+<script src="scripts/features/exchange/exchange-engine/futures/fut-fetch-helpers-and-signing.js"></script>
+<script src="scripts/features/exchange/exchange-engine/futures/fut-init-balance-and-order-controls.js"></script>
+<script src="scripts/features/exchange/exchange-engine/futures/fut-margin-and-leverage.js"></script>
+<script src="scripts/features/exchange/exchange-engine/futures/fut-pair-picker.js"></script>
+<script src="scripts/features/exchange/exchange-engine/futures/fut-amount-and-price-helpers.js"></script>
+<script src="scripts/features/exchange/exchange-engine/futures/fut-submit-order-and-tpsl.js"></script>
+<script src="scripts/features/exchange/exchange-engine/futures/fut-cancel-positions-and-orders.js"></script>
+<script src="scripts/features/exchange/exchange-engine/futures/fut-feeds-core-and-spot-style-exchanges.js"></script>
+<script src="scripts/features/exchange/exchange-engine/futures/fut-feeds-and-orderbook-render.js"></script>
+<script src="scripts/features/exchange/exchange-engine/fut-futures-engine.js"></script>
+<script src="scripts/features/exchange/exchange-engine/ui-hooks-and-helpers.js"></script>
+
+
+
+
+<script src="scripts/features/exchange/deposit-modal/deposit-state-token-list-and-qr.js"></script>
+<script src="scripts/features/exchange/deposit-modal/deposit-chain-fetchers.js"></script>
+<script src="scripts/features/exchange/deposit-modal/deposit-address-fetchers.js"></script>
+<script src="scripts/features/exchange/deposit-modal/deposit-network-ui-and-close.js"></script>
+<script src="scripts/features/exchange/deposit-modal/deposit-withdraw-chain-fetchers.js"></script>
+<script src="scripts/features/exchange/deposit-modal/deposit-modal.js"></script>
+
+
+<script src="scripts/features/exchange/withdraw-modal/withdraw-state-and-balance.js"></script>
+<script src="scripts/features/exchange/withdraw-modal/withdraw-fee-and-submit.js"></script>
+<script src="scripts/features/exchange/withdraw-modal/withdraw-token-selector-and-network-ui.js"></script>
+<script src="scripts/features/exchange/withdraw-modal/withdraw-modal.js"></script>
+
+<!--@include partials/exchange-deposit-withdraw-modals.html-->
+
+</body>
+</html>
+

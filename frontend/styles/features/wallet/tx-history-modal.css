@@ -1,0 +1,310 @@
+  /* ══════════════ TX HISTORY MODAL ══════════════ */
+  .txh-overlay {
+    position: fixed; top: 0; left: 0; right: 0; bottom: calc(var(--nav-height) + env(safe-area-inset-bottom, 0px)); z-index: 600;
+    background: rgba(3,3,10,0.96);
+    backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+    display: flex; flex-direction: column;
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.28s ease;
+  }
+  .txh-overlay.open { opacity: 1; pointer-events: all; }
+  .txh-modal {
+    width: 100%; max-width: 100%; margin: 0 auto;
+    height: 100%; display: flex; flex-direction: column;
+    transform: translateY(24px);
+    transition: transform 0.32s cubic-bezier(0.34,1.4,0.64,1);
+  }
+  .txh-overlay.open .txh-modal { transform: none; }
+
+  /* ── Header ── */
+  .txh-header {
+    padding: 14px 18px 12px;
+    display: flex; align-items: center; gap: 14px;
+    background: rgba(8,8,18,0.98);
+    border-bottom: 1px solid rgba(99,102,241,0.14);
+    flex-shrink: 0;
+  }
+  .txh-back-btn {
+    width: 38px; height: 38px; border-radius: 12px;
+    background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; transition: all 0.18s ease; flex-shrink: 0;
+  }
+  .txh-back-btn:active { transform: scale(0.88); background: rgba(99,102,241,0.15); }
+  .txh-back-btn .material-icons-round { font-size: 19px; color: var(--text-secondary); }
+  .txh-title {
+    font-size: 17px; font-weight: 800; flex: 1;
+    background: linear-gradient(135deg, #e0e0ff, #a78bfa);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  }
+  .txh-count-badge {
+    padding: 5px 11px; border-radius: 20px;
+    background: rgba(245,158,11,0.12); border: 1px solid rgba(245,158,11,0.28);
+    font-size: 10px; font-weight: 700; color: var(--accent-amber);
+    letter-spacing: 1px; font-family: var(--font-mono);
+  }
+
+  /* ── Body ── */
+  .txh-body {
+    flex: 1; overflow-y: auto; overflow-x: hidden;
+    padding: 14px 16px 50px;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    background: transparent;
+  }
+  .txh-body::-webkit-scrollbar { display: none; }
+
+  /* ── Toolbar ── */
+  .txh-toolbar {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 14px; padding: 10px 14px;
+    background: rgba(255,255,255,0.025);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 12px;
+  }
+  .txh-info-text {
+    font-family: var(--font-mono); font-size: 9px;
+    color: var(--text-muted); letter-spacing: 1.2px;
+  }
+
+
+  /* ── Empty state ── */
+  .txh-empty {
+    display: flex; flex-direction: column; align-items: center;
+    justify-content: center; gap: 16px; padding: 70px 20px;
+    text-align: center;
+  }
+  .txh-empty-icon {
+    width: 72px; height: 72px; border-radius: 22px;
+    background: linear-gradient(135deg,rgba(99,102,241,0.1),rgba(139,92,246,0.07));
+    border: 1px solid rgba(99,102,241,0.18);
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 0 24px rgba(99,102,241,0.1);
+  }
+  .txh-empty-icon .material-icons-round { font-size: 32px; color: var(--neon-purple); opacity: 0.6; }
+  .txh-empty-title { font-size: 15px; font-weight: 800; color: var(--text-secondary); font-family: var(--font-display); }
+  .txh-empty-sub { font-size: 11px; color: var(--text-muted); font-family: var(--font-mono); line-height: 1.7; }
+
+  /* ── Day label ── */
+  .txh-day-label {
+    font-size: 9px; font-weight: 800; letter-spacing: 2.5px;
+    color: rgba(99,102,241,0.5); text-transform: uppercase;
+    font-family: var(--font-mono); padding: 8px 2px 8px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .txh-day-label::after {
+    content: ''; flex: 1; height: 1px;
+    background: linear-gradient(90deg, rgba(99,102,241,0.2), transparent);
+  }
+
+  /* ── TX Item ── */
+  .txh-item {
+    background: linear-gradient(145deg,rgba(255,255,255,0.04),rgba(255,255,255,0.02));
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 16px;
+    padding: 12px 14px;
+    margin-bottom: 8px;
+    display: flex; align-items: flex-start; gap: 12px;
+    cursor: pointer; transition: all 0.2s ease;
+    position: relative; overflow: hidden;
+    animation: slideIn 0.28s ease both;
+  }
+  /* txh-item: no click action — hover/active removed */
+
+  /* status left bar */
+  .txh-item::before {
+    content: ''; position: absolute; left: 0; top: 20%; bottom: 20%;
+    width: 3px; border-radius: 0 2px 2px 0;
+    background: linear-gradient(180deg, var(--accent-primary), var(--accent-secondary));
+    transition: opacity 0.2s;
+  }
+  .txh-item.txh-success::before { background: linear-gradient(180deg,#10b981,#059669); }
+  .txh-item.txh-dry::before     { background: linear-gradient(180deg,#f59e0b,#d97706); }
+  .txh-item.txh-pending::before { background: linear-gradient(180deg,#6366f1,#8b5cf6); }
+  .txh-item.txh-failed::before  { background: linear-gradient(180deg,#f43f5e,#e11d48); }
+
+  /* ── Icon ── */
+  .txh-item-icon {
+    width: 38px; height: 38px; border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; background: rgba(99,102,241,0.12);
+    border: 1px solid rgba(99,102,241,0.22);
+    margin-top: 1px;
+  }
+  .txh-item-icon .material-icons-round { font-size: 17px; color: var(--accent-primary); }
+  .txh-item-icon.success { background: rgba(16,185,129,0.12); border-color: rgba(16,185,129,0.22); }
+  .txh-item-icon.success .material-icons-round { color: var(--accent-green); }
+  .txh-item-icon.dry { background: rgba(245,158,11,0.1); border-color: rgba(245,158,11,0.2); }
+  .txh-item-icon.dry .material-icons-round { color: var(--accent-amber); }
+  .txh-item-icon.pending { background: rgba(99,102,241,0.12); border-color: rgba(99,102,241,0.25); }
+  .txh-item-icon.pending .material-icons-round { color: var(--accent-primary); }
+  .txh-item-icon.failed  { background: rgba(244,63,94,0.12); border-color: rgba(244,63,94,0.25); }
+  .txh-item-icon.failed  .material-icons-round { color: var(--accent-red); }
+
+  /* ── Info block ── */
+  .txh-item-info { flex: 1; min-width: 0; }
+  .txh-item-pair {
+    font-size: 13px; font-weight: 700; margin-bottom: 5px;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    color: var(--text-primary);
+  }
+  .txh-sent-label {
+    font-size: 11px; font-weight: 800; letter-spacing: 1.2px;
+    text-transform: uppercase; font-family: var(--font-mono);
+    color: var(--text-muted); margin-bottom: 5px;
+  }
+  .txh-send-row { display: flex; align-items: center; flex-wrap: wrap; gap: 4px; }
+  .txh-send-row .txh-chain-row { margin: 0; display: contents; }
+  .txh-type-tag {
+    display: inline-block; width: fit-content;
+    font-size: 9px !important; font-weight: 800; letter-spacing: 1.4px;
+    text-transform: uppercase; font-family: var(--font-mono) !important;
+    padding: 2px 7px; border-radius: 5px; margin-bottom: 4px;
+  }
+  .txh-swap-tag  { background: rgba(99,102,241,0.12); color: #818cf8; border: 1px solid rgba(99,102,241,0.25); }
+  .txh-bridge-tag { background: rgba(245,158,11,0.1); color: #fbbf24; border: 1px solid rgba(245,158,11,0.22); }
+  .txh-bridge-header { display: flex; align-items: center; gap: 7px; margin-bottom: 5px; }
+  .txh-bridge-pair { font-size: 12px; font-weight: 700; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .txh-bridge-amounts {
+    display: flex; align-items: center; justify-content: center;
+    gap: 8px; margin-bottom: 5px;
+    font-size: 10px; font-weight: 700; color: var(--text-primary); font-family: var(--font-mono);
+  }
+  .txh-bridge-amt-arrow { color: var(--text-muted); font-size: 11px; }
+  .bamt-num { color: var(--text-primary); }
+  .bamt-sym { color: var(--text-secondary); font-size: 10px; font-weight: 500; }
+  .txh-bridge-hashes { justify-content: space-between; }
+
+  /* ── Bridge two-column layout (pill + hash stacked, aligned) ── */
+  .txh-bridge-cols {
+    display: flex; align-items: flex-start; gap: 6px; width: 100%;
+  }
+  .txh-bridge-col {
+    flex: 1; display: flex; flex-direction: column; gap: 4px; min-width: 0;
+  }
+  .txh-bridge-col .txh-chain-pill {
+    width: 100%; box-sizing: border-box; justify-content: center;
+  }
+  .txh-bridge-col .txh-hash-chip,
+  .txh-bridge-col .txh-pending-badge {
+    width: 100%; box-sizing: border-box; justify-content: center;
+  }
+
+  /* ── Chain pills row ── */
+  .txh-chain-row {
+    display: flex; align-items: center; gap: 5px;
+    flex-wrap: wrap; margin-bottom: 5px;
+  }
+  .txh-chain-row.bridge-row {
+    justify-content: space-between;
+  }
+  .txh-bridge-arrow {
+    flex: 1; text-align: center;
+    font-size: 10px; color: var(--text-muted); font-family: var(--font-mono);
+  }
+  .txh-chain-pill {
+    display: inline-flex; align-items: center; gap: 3px;
+    padding: 2px 7px; border-radius: 6px;
+    font-size: 9px; font-weight: 700; font-family: var(--font-mono);
+    letter-spacing: 0.5px; cursor: pointer; transition: all 0.15s;
+    border: 1px solid transparent;
+  }
+  .txh-chain-pill.from-pill {
+    background: rgba(99,102,241,0.12); border-color: rgba(99,102,241,0.25);
+    color: var(--neon-purple);
+  }
+  .txh-chain-pill.to-pill {
+    background: rgba(16,185,129,0.1); border-color: rgba(16,185,129,0.22);
+    color: var(--accent-green);
+  }
+  .txh-chain-pill.swap-pill {
+    background: rgba(6,182,212,0.1); border-color: rgba(6,182,212,0.22);
+    color: var(--neon-cyan);
+  }
+  .txh-chain-pill:active { transform: scale(0.92); }
+  .txh-bridge-arrow {
+    font-size: 10px; color: var(--text-muted); font-family: var(--font-mono);
+  }
+
+  /* ── Hash row ── */
+  .txh-hash-row {
+    display: flex; align-items: center; justify-content: center; gap: 6px; flex-wrap: wrap;
+  }
+  .txh-hash-chip {
+    display: inline-flex; align-items: center; gap: 3px;
+    padding: 2px 7px; border-radius: 6px;
+    font-size: 9px; font-family: var(--font-mono); font-weight: 600;
+    background: rgba(99,102,241,0.06); border: 1px solid rgba(99,102,241,0.15);
+    color: rgba(167,139,250,0.7); cursor: pointer; transition: all 0.15s;
+    letter-spacing: 0.3px;
+  }
+  .txh-hash-chip:hover { background: rgba(99,102,241,0.12); border-color: rgba(99,102,241,0.3); color: var(--neon-purple); }
+  .txh-hash-chip:active { transform: scale(0.91); }
+  .txh-hash-chip .material-icons-round { font-size: 9px; }
+  .txh-hash-chip.recv-chip { color: rgba(16,185,129,0.65); border-color: rgba(16,185,129,0.18); background: rgba(16,185,129,0.06); }
+  .txh-hash-chip.recv-chip:hover { border-color: rgba(16,185,129,0.35); background: rgba(16,185,129,0.12); color: var(--accent-green); }
+
+  /* ── Status badge ── */
+  .txh-status-badge {
+    display: inline-flex; align-items: center; gap: 3px;
+    padding: 2px 7px; border-radius: 6px;
+    font-size: 9px; font-weight: 800; font-family: var(--font-mono);
+    letter-spacing: 0.8px;
+  }
+  .txh-status-badge.confirmed { background: rgba(16,185,129,0.1); color: var(--accent-green); border: 1px solid rgba(16,185,129,0.2); }
+  .txh-status-badge.pending   { background: rgba(99,102,241,0.1); color: var(--neon-purple); border: 1px solid rgba(99,102,241,0.2); }
+  .txh-status-badge.dry-run   { background: rgba(245,158,11,0.1); color: var(--accent-amber); border: 1px solid rgba(245,158,11,0.2); }
+  .txh-status-badge.failed    { background: rgba(244,63,94,0.1);  color: var(--accent-red);   border: 1px solid rgba(244,63,94,0.2); }
+
+  /* ── Right side ── */
+  .txh-item-right {
+    text-align: right; flex-shrink: 0;
+    display: flex; flex-direction: column; align-items: flex-end; gap: 4px;
+    max-width: 110px; min-width: 72px;
+    align-self: stretch; justify-content: space-between;
+  }
+  .txh-item-amount {
+    font-size: 12px; font-weight: 800;
+    font-family: var(--font-display);
+    background: linear-gradient(135deg, #10b981, #34d399);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text;
+    max-width: 100%; overflow: hidden;
+    text-overflow: ellipsis; white-space: nowrap;
+    letter-spacing: -0.2px;
+  }
+  .txh-item-time { font-size: 9px; color: var(--text-secondary); font-family: var(--font-mono); white-space: nowrap; }
+
+  /* ── Wallet info chip ── */
+  .txh-wallet-chip {
+    display: inline-flex; align-items: center; gap: 3px;
+    padding: 2px 7px; border-radius: 5px;
+    font-size: 8.5px; font-family: var(--font-mono); font-weight: 700;
+    background: rgba(99,102,241,0.13); border: 1px solid rgba(99,102,241,0.28);
+    color: var(--neon-purple); margin-top: 1px; white-space: nowrap;
+  }
+  .txh-wallet-chip .material-icons-round { font-size: 9px; }
+  .txh-wallet-chip .twc-grp {
+    max-width: 70px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    color: var(--text-primary); font-weight: 700;
+  }
+  .txh-wallet-chip .twc-sep { opacity: 0.4; margin: 0 1px; }
+  .txh-wallet-chip .twc-widx { color: var(--neon-purple); }
+  /* stat chip: total swap/bridge count for that wallet */
+
+  body.light-mode .txh-wallet-chip {
+    background: rgba(99,102,241,0.08); border-color: rgba(99,102,241,0.22); color: #6366f1;
+  }
+  body.light-mode .txh-wallet-chip .twc-grp { color: #1e1b4b; }
+
+
+  .txh-expire-note {
+    text-align: center; padding: 24px 0 0;
+    font-family: var(--font-mono); font-size: 9px; color: var(--text-muted);
+    letter-spacing: 1.2px;
+  }
+
+  /* ── Legacy ── */
+  .txh-item-badge, .txh-meta-dot { display: none; }
+
+  

@@ -1,0 +1,142 @@
+        <!-- Phrase to Key UI -->
+        <div id="phraseToKeyUI" style="display: none;">
+
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px;"><button class="th-back-btn" onclick="showMainDashboard()" title="Back to Dashboard"><span class="material-icons-round">arrow_back</span></button>
+
+        <h1 style="margin:0;">🔐 Key & Address Tools</h1></div>
+        <div style="font-size: 0.78rem; color: #a0a0a0; margin-bottom: 10px;">Convert between phrase, private key, and address formats</div>
+
+        <!-- Mode Toggle Tabs -->
+        <div style="display: flex; justify-content: center; margin-bottom: 12px;">
+            <div style="background: #1a1a1a; border: 2px solid #2a2a2a; border-radius: 12px; padding: 4px; display: flex; flex-direction: column; gap: 4px; width: 100%;">
+                <button id="phraseModeBtn" class="mode-toggle-btn active" onclick="switchKeyToolMode('phrase')" style="padding: 9px 14px; border-radius: 8px; border: none; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; font-weight: 600; font-size: 0.85rem; cursor: pointer; transition: all 0.3s; width: 100%;">
+                    🔑 Phrase → Key
+                </button>
+                <button id="keyToAddressModeBtn" class="mode-toggle-btn" onclick="switchKeyToolMode('keyToAddress')" style="padding: 9px 14px; border-radius: 8px; border: none; background: transparent; color: #888; font-weight: 600; font-size: 0.85rem; cursor: pointer; transition: all 0.3s; width: 100%;">
+                    🔐 Key → Address
+                </button>
+            </div>
+        </div>
+
+        <!-- Phrase to Key Mode Content -->
+        <div id="phraseModeContent" style="display: block;">
+            <!-- Input Section -->
+            <div class="section">
+                <div class="section-title">Mnemonic Phrase(s)</div>
+                <div class="input-group">
+                    <label>Enter your 12 or 24 word mnemonic phrase(s) — ONE PER LINE</label>
+                    <div style="position: relative;">
+                        <textarea id="mnemonicInput" placeholder="word1 word2 word3 ... word12
+word1 word2 word3 ... word24
+(one phrase per line)" rows="5" style="font-family: monospace; padding-top: 36px;"></textarea>
+                        <button onclick="mobilePasteTo('mnemonicInput')" style="position:absolute;top:7px;right:7px;display:flex;align-items:center;gap:5px;padding:4px 10px;border-radius:7px;border:1px solid rgba(99,102,241,0.4);background:rgba(99,102,241,0.18);color:#a78bfa;font-size:0.72rem;font-weight:700;cursor:pointer;font-family:monospace;letter-spacing:0.3px;transition:all 0.18s;z-index:2;" onmousedown="this.style.background='rgba(99,102,241,0.32)'" onmouseup="this.style.background='rgba(99,102,241,0.18)'" ontouchstart="this.style.background='rgba(99,102,241,0.32)'" ontouchend="this.style.background='rgba(99,102,241,0.18)'">
+                            <span class="material-icons-round" style="font-size:12px;">content_paste</span>Paste
+                        </button>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 8px;">
+                        <div class="hint">Separate words with spaces. Supports 12, 15, 18, 21, or 24 word phrases. One phrase per line for bulk conversion.</div>
+                        <div id="phraseCountBadge" style="background: #2a2a2a; color: #4a9eff; padding: 6px 14px; border-radius: 12px; font-size: 0.8rem; font-weight: 700; white-space: nowrap;">0 phrases</div>
+                    </div>
+                </div>
+                
+                <div class="input-group">
+                    <label>Derivation Path (Optional)</label>
+                    <input type="text" id="derivationPath" placeholder="m/44'/60'/0'/0/0" value="m/44'/60'/0'/0/0">
+                    <div class="hint">Default: m/44'/60'/0'/0/0 (Ethereum standard)</div>
+                </div>
+
+                <div class="input-group">
+                    <label>Number of Addresses per Phrase</label>
+                    <input type="number" id="numAddresses" value="1" min="1" max="100">
+                    <div class="hint">Generate multiple addresses from each phrase</div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 7px; margin-top: 8px;">
+                    <button id="generateKeysBtn" class="btn btn-primary" onclick="generateKeysFromPhrase()" style="width: 100%; opacity:0.45; cursor:not-allowed;" disabled>
+                        🔓 Generate Keys
+                    </button>
+                    <button class="btn btn-danger" onclick="clearPhraseToKey()" style="width: 100%;">
+                        🗑️ Clear All
+                    </button>
+                </div>
+            </div>
+
+            <!-- Output Section -->
+            <div class="section" id="outputSection" style="display: none;">
+                <div style="display: flex; flex-direction: column; gap: 6px; margin-bottom: 10px;">
+                    <div class="section-title" style="margin-bottom: 0;">Generated Keys</div>
+                    <div style="display: flex; gap: 6px;">
+                        <button onclick="copyAllKeys()" class="btn btn-success" style="padding: 7px 10px; font-size: 0.78rem; flex:1;">
+                            📋 Copy All Keys
+                        </button>
+                        <button onclick="_thCopyAllAddresses()" class="btn btn-primary" style="padding: 7px 10px; font-size: 0.78rem; flex:1;">
+                            📍 Copy All Addresses
+                        </button>
+                    </div>
+                </div>
+                <div id="generatedKeysContainer" style="max-height: 300px; overflow-y: auto;"></div>
+            </div>
+        </div>
+
+        <!-- Key to Address Mode Content -->
+        <div id="keyToAddressModeContent" style="display: none;">
+            <div class="section">
+                <div class="input-group">
+                    <label>Private Keys <span id="keyCountBadge" style="background: #2a2a2a; color: #4a9eff; padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; margin-left: 8px;">0 keys</span></label>
+                    <button onclick="thOpenWalletPicker('privateKeysInput','multi')" style="width:100%;display:flex;align-items:center;justify-content:center;gap:8px;padding:9px 14px;border-radius:9px;border:1px dashed rgba(99,102,241,0.45);background:rgba(99,102,241,0.06);color:var(--neon-purple);font-family:var(--font-mono);font-size:11px;font-weight:700;cursor:pointer;margin-bottom:8px;transition:all .18s;letter-spacing:.5px;" onmousedown="this.style.background='rgba(99,102,241,0.14)'" onmouseup="this.style.background='rgba(99,102,241,0.06)'" ontouchstart="this.style.background='rgba(99,102,241,0.14)'" ontouchend="this.style.background='rgba(99,102,241,0.06)'"><span class="material-icons-round" style="font-size:15px;">account_balance_wallet</span>Select Wallet</button>
+                    <div class="sk-key-wrapper" id="privateKeysInputWrapper">
+                        <textarea id="privateKeysInput" class="sk-key-textarea sk-masked" placeholder="Paste private keys here (one per line, or comma/space separated)&#10;Supports various formats:&#10;- 0x123...&#10;- 123...&#10;- Mixed formats" style="min-height:180px;font-size:0.85rem;padding-top:36px;" autocomplete="off" spellcheck="false" oninput="autoConvertKeys()"></textarea>
+                        <button type="button" class="sk-toggle-btn" id="privateKeysInputToggleBtn" onclick="skToggleKeyVisibility('privateKeysInput','privateKeysInputToggleBtn')" title="Show/Hide Key">
+                            <span class="material-icons-round sk-eye-icon">visibility_off</span>
+                        </button>
+                        <button type="button" onclick="mobilePasteTo('privateKeysInput')" style="position:absolute;top:7px;right:8px;display:flex;align-items:center;gap:5px;padding:4px 10px;border-radius:7px;border:1px solid rgba(99,102,241,0.4);background:rgba(99,102,241,0.18);color:#a78bfa;font-size:0.72rem;font-weight:700;cursor:pointer;font-family:monospace;letter-spacing:0.3px;transition:all 0.18s;z-index:3;" onmousedown="this.style.background='rgba(99,102,241,0.32)'" onmouseup="this.style.background='rgba(99,102,241,0.18)'" ontouchstart="this.style.background='rgba(99,102,241,0.32)'" ontouchend="this.style.background='rgba(99,102,241,0.18)'">
+                            <span class="material-icons-round" style="font-size:12px;">content_paste</span>Paste
+                        </button>
+                    </div>
+                    <div style="font-size: 0.75rem; color: #888; margin-top: 5px;">
+                        💡 Automatically converts as you paste. Supports any format, detects and cleans keys automatically.
+                    </div>
+                </div>
+
+                <!-- Results Section -->
+                <div style="margin: 20px 0; background: #0f0f0f; border: 2px solid #2a2a2a; border-radius: 12px; padding: 20px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                        <h3 style="margin: 0; font-size: 1.1rem;">
+                            📍 Converted Addresses 
+                            <span style="background: #2a4a2a; color: #4ade80; padding: 4px 10px; border-radius: 6px; font-size: 0.85rem; margin-left: 10px;">
+                                <span id="addressCount">0</span>
+                            </span>
+                        </h3>
+                        <div style="display: flex; gap: 10px;">
+                            <button onclick="_thCopyAllAddresses()" class="btn-primary" style="padding: 8px 16px; font-size: 0.85rem;">
+                                📋 Copy All Addresses
+                            </button>
+                            <button onclick="clearKeyToAddress()" class="btn-secondary" style="padding: 8px 16px; font-size: 0.85rem;">
+                                🗑️ Clear
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div id="addressResults" style="max-height: 400px; overflow-y: auto;">
+                        <div style="text-align: center; color: #808080; padding: 60px 20px;">
+                            <div style="font-size: 3rem;">🔐</div>
+                            <div style="font-size: 1.1rem; font-weight: 600;">No addresses yet</div>
+                            <div style="font-size: 0.85rem; margin-top: 8px;">Paste private keys above to convert</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Log Section -->
+                <div class="log-section">
+                    <div class="section-header" style="display: flex; justify-content: space-between; align-items: center;">
+                        <h3>📋 Activity Log</h3>
+                        <button onclick="clearLogKeyToAddress()" class="btn-secondary" style="padding: 6px 12px; font-size: 0.8rem;">Clear Log</button>
+                    </div>
+                    <div id="logContainerKeyToAddress" class="log-container">
+                        <div class="log-line log-info">[INFO] Paste private keys to convert to addresses...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        </div>

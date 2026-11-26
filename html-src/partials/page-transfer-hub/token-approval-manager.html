@@ -1,0 +1,95 @@
+    <!-- Multi Key Native Modal -->
+    <!-- Token Approval Manager - Single Wallet -->
+    <div id="tokenApprovalManagerUI" style="display: none;">
+        <div class="th-section-header"><button class="th-back-btn" onclick="showMainDashboard()" title="Back to Dashboard"><span class="material-icons-round">arrow_back</span></button><h1>🎯 Token Approval</h1><button class="th-header-chain-btn" onclick="thOpenChainPicker('approval')" title="Switch network for Token Approval"><span class="th-hcb-emoji" id="th-net-emoji-approval-hdr">⛓️</span><span class="th-hcb-name" id="th-net-name-approval-hdr">Network</span><span class="material-icons-round">expand_more</span></button></div>
+
+        <!-- FIRST ROW: Wallet -->
+        <div style="display: grid; grid-template-columns: 1fr; gap: 8px; margin-bottom: 8px;">
+            <input type="hidden" id="rpcUrlApproval" value="">
+
+            <!-- Wallet Section -->
+            <div class="section" style="padding:10px;margin-bottom:6px;">
+                <div class="section-title">Wallet (Single or Multi-Key)</div>
+                <div class="input-group" style="margin-bottom:8px;">
+                    <label>Private Keys (With or Without 0x)</label>
+                    <button onclick="thOpenWalletPicker('privateKeyApproval','multi')" style="width:100%;display:flex;align-items:center;justify-content:center;gap:8px;padding:8px 12px;border-radius:9px;border:1px dashed rgba(99,102,241,0.45);background:rgba(99,102,241,0.06);color:var(--neon-purple);font-family:var(--font-mono);font-size:11px;font-weight:700;cursor:pointer;margin-bottom:6px;transition:all .18s;letter-spacing:.5px;" onmousedown="this.style.background='rgba(99,102,241,0.14)'" onmouseup="this.style.background='rgba(99,102,241,0.06)'" ontouchstart="this.style.background='rgba(99,102,241,0.14)'" ontouchend="this.style.background='rgba(99,102,241,0.06)'"><span class="material-icons-round" style="font-size:15px;">account_balance_wallet</span>Select Wallet</button>
+                    <div class="sk-key-wrapper" id="privateKeyApprovalWrapper">
+                        <textarea id="privateKeyApproval" class="sk-key-textarea sk-masked" placeholder="📋 Paste keys (any format):&#10;&#10;0x1234... OR 1234...&#10;Comma, space, or newline separated&#10;&#10;✅ Auto-detects & ignores labels!" style="min-height:100px;max-height:140px;resize:vertical;" autocomplete="off" spellcheck="false" oninput="autoDetectKeysApproval()"></textarea>
+                        <button type="button" class="sk-toggle-btn" id="privateKeyApprovalToggleBtn" onclick="skToggleKeyVisibility('privateKeyApproval','privateKeyApprovalToggleBtn')" title="Show/Hide Key">
+                            <span class="material-icons-round sk-eye-icon">visibility_off</span>
+                        </button>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 6px;">
+                        <div id="autoDetectCountApproval" style="background: #2a2a2a; color: #4a9eff; padding: 3px 10px; border-radius: 10px; font-size: 0.72rem; font-weight: 600;">0 keys</div>
+                    </div>
+                </div>
+                <div class="stats-grid" style="grid-template-columns:1fr;gap:6px;">
+                    <div class="stat-card" style="padding:8px 12px;">
+                        <div class="stat-label">Wallets Loaded</div>
+                        <div class="stat-value" id="walletsLoadedApproval" style="font-size:16px;">0</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECOND ROW: Approval Details & Execute — stacked vertically -->
+        <div class="grid" style="grid-template-columns: 1fr;">
+            <!-- Token & Spender Section -->
+            <div class="section" style="padding:10px;margin-bottom:6px;">
+                <div class="section-title">Approval Details</div>
+                <div class="input-group" style="margin-bottom:8px;">
+                    <label>Token Address</label>
+                    <input type="text" id="tokenAddressApproval" placeholder="0x..." style="padding:9px 10px;font-size:0.85rem;">
+                    <div class="hint" style="font-size:0.7rem;margin-top:3px;">ERC20 token contract address</div>
+                </div>
+                <div class="input-group" style="margin-bottom:8px;">
+                    <label>Spender Address</label>
+                    <input type="text" id="spenderAddressApproval" placeholder="0x..." style="padding:9px 10px;font-size:0.85rem;">
+                    <div class="hint" style="font-size:0.7rem;margin-top:3px;">Contract or address to approve (e.g., DEX router)</div>
+                </div>
+                <div class="input-group" style="margin-bottom:6px;">
+                    <label>Amount to Approve</label>
+                    <input type="text" id="approvalAmount" placeholder="0" value="" style="padding:9px 10px;font-size:0.85rem;">
+                    <div class="hint" style="font-size:0.7rem;margin-top:3px;">Leave empty or 0 for unlimited approval</div>
+                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; margin-top: 6px;">
+                        <button class="btn" onclick="setApprovalAmount('')" style="padding: 8px 6px; font-size: 0.78rem; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff;">Unlimited</button>
+                        <button class="btn" onclick="setApprovalAmount('0')" style="padding: 8px 6px; font-size: 0.78rem; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: #fff;">Revoke (0)</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Execution Section -->
+            <div class="section" style="padding:10px;margin-bottom:6px;">
+                <div class="section-title">Execute</div>
+                <div class="stats-grid" style="margin-bottom: 8px; gap:6px;">
+                    <div class="stat-card" style="padding:8px 10px;">
+                        <div class="stat-label">Success</div>
+                        <div class="stat-value" id="successCountApproval" style="color: #4ead80;font-size:16px;">0</div>
+                    </div>
+                    <div class="stat-card" style="padding:8px 10px;">
+                        <div class="stat-label">Failed</div>
+                        <div class="stat-value" id="failedCountApproval" style="color: #ef4444;font-size:16px;">0</div>
+                    </div>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                    <button class="btn btn-success" id="executeApprovalBtn" onclick="executeApproval()" disabled style="padding:10px 8px;font-size:0.85rem;opacity:0.45;cursor:not-allowed;">
+                        ⚡ Fast Approve
+                    </button>
+                    <button class="btn btn-danger" onclick="clearApprovalData()" style="padding:10px 8px;font-size:0.85rem;">
+                        🗑️ Clear Data
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Log Section -->
+        <div class="log-section" style="margin-top:6px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                <div class="section-title" style="margin-bottom: 0;font-size:0.9rem;">Logs</div>
+                <button class="btn" onclick="clearLogApproval()" style="width: auto; padding: 5px 10px; font-size: 0.75rem; background: #2a2a2a; color: #e0e0e0;">Clear Log</button>
+            </div>
+            <div class="log-container" id="logContainerApproval" style="max-height:200px;">
+                <div class="log-line log-info">[INFO] Enter wallet and approval details...</div>
+            </div>
+        </div>
+    </div>

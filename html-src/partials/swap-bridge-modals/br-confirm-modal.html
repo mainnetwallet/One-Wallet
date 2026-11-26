@@ -1,0 +1,120 @@
+    <div id="br-confirm-modal" onclick="if(event.target===this)brCloseConfirm()" ontouchend="if(event.target===this){event.preventDefault();brCloseConfirm();}">
+      <div id="br-confirm-sheet">
+        <!-- Drag Handle -->
+        <div class="cs-handle"></div>
+        <!-- Scrollable Body -->
+        <div id="br-confirm-scroll">
+          <!-- Header -->
+          <div class="cs-header">
+            <div class="cs-header-left">
+              <div class="cs-icon-wrap">
+                <span class="material-icons-round" id="brc-header-icon" style="font-size:17px;color:#fff;">swap_horiz</span>
+              </div>
+              <div>
+                <div class="cs-title" id="brc-title">Confirm Bridge</div>
+                <div class="cs-subtitle" id="brc-subtitle">REVIEW YOUR ROUTE</div>
+              </div>
+            </div>
+            <div class="cs-close-btn" onclick="brCloseConfirm()">
+              <span class="material-icons-round" style="font-size:15px;color:var(--text-muted);">close</span>
+            </div>
+          </div>
+
+          <!-- Token Flow (You Pay → You Receive) -->
+          <div class="cs-token-card">
+            <div class="cs-token-row">
+              <div class="cs-token-left">
+                <div id="brc-from-icon" class="cs-token-icon" style="background:linear-gradient(135deg,#627EEA,#364FC7);">Ξ</div>
+                <div>
+                  <div id="brc-from-sym" class="cs-token-name">ETH</div>
+                  <div class="cs-token-tag">YOU PAY</div>
+                </div>
+              </div>
+              <div id="brc-from-amt" class="cs-token-amt" style="color:var(--text-primary);">0.00</div>
+            </div>
+            <div class="cs-arrow-row">
+              <div class="cs-arrow-dot">
+                <span class="material-icons-round" style="font-size:13px;color:var(--neon-purple);">arrow_downward</span>
+              </div>
+            </div>
+            <div class="cs-token-row">
+              <div class="cs-token-left">
+                <div id="brc-to-icon" class="cs-token-icon" style="background:linear-gradient(135deg,#2775CA,#1557A0);">$</div>
+                <div>
+                  <div id="brc-to-sym" class="cs-token-name">USDC</div>
+                  <div class="cs-token-tag">YOU RECEIVE (~)</div>
+                </div>
+              </div>
+              <div id="brc-to-amt" class="cs-token-amt" style="color:var(--accent-green);">0.00</div>
+            </div>
+          </div>
+
+          <!-- Chain Flow (only shown for cross-chain) -->
+          <div class="brc-chain-flow" id="brc-chain-flow" style="display:none;">
+            <div class="brc-chain-pill">
+              <div class="brc-chain-icon" id="brc-from-chain-icon">
+                <span class="material-icons-round" style="font-size:14px;">link</span>
+              </div>
+              <div class="brc-chain-name" id="brc-from-chain-name">—</div>
+              <div class="brc-chain-tag">FROM</div>
+            </div>
+            <div class="brc-arrow-mid">
+              <span class="material-icons-round" style="font-size:14px;color:var(--accent-primary);">east</span>
+            </div>
+            <div class="brc-chain-pill">
+              <div class="brc-chain-icon" id="brc-to-chain-icon">
+                <span class="material-icons-round" style="font-size:14px;">link</span>
+              </div>
+              <div class="brc-chain-name" id="brc-to-chain-name">—</div>
+              <div class="brc-chain-tag">TO</div>
+            </div>
+          </div>
+
+          <!-- Details -->
+          <div class="cs-details">
+            <div class="cs-detail-row">
+              <div class="cs-detail-label">
+                <span class="material-icons-round" style="font-size:11px;">price_change</span>Rate
+              </div>
+              <span id="brc-rate" class="cs-detail-val">—</span>
+            </div>
+            <div class="cs-detail-row">
+              <div class="cs-detail-label">
+                <span class="material-icons-round" style="font-size:11px;">shield</span>Min. Received
+              </div>
+              <span id="brc-min" class="cs-detail-val">—</span>
+            </div>
+            <div class="cs-detail-row" id="brc-time-row">
+              <div class="cs-detail-label">
+                <span class="material-icons-round" style="font-size:11px;">schedule</span>Est. Time
+              </div>
+              <span id="brc-time" class="cs-detail-val">—</span>
+            </div>
+            <div class="cs-detail-row">
+              <div class="cs-detail-label">
+                <span class="material-icons-round" style="font-size:11px;">local_gas_station</span>Gas Fee
+              </div>
+              <span id="brc-gas" class="cs-detail-val">—</span>
+            </div>
+          </div>
+
+          <!-- Provider badge -->
+          <div class="cs-dex-badge" id="brc-provider-badge">
+            <span class="material-icons-round" style="font-size:13px;color:var(--accent-primary);">rocket_launch</span>
+            <span id="brc-provider-label">via <strong id="brc-provider">—</strong></span>
+          </div>
+
+        </div><!-- /scroll -->
+
+        <!-- Sticky Footer -->
+        <div id="br-confirm-footer">
+          <button id="brc-execute-btn" class="brc-confirm-btn"
+            onclick="this.disabled=true;this.style.opacity='0.7';this.innerHTML='<span class=\'material-icons-round\' style=\'font-size:15px;animation:swSpin 0.8s linear infinite;\'>sync</span> Confirming…';brCloseConfirm();brExecute();">
+            <span class="material-icons-round" style="font-size:16px;">rocket_launch</span>
+            <span id="brc-execute-label">Confirm &amp; Bridge</span>
+          </button>
+          <div class="cs-cancel-link" onclick="brCloseConfirm()">Cancel</div>
+        </div>
+
+      </div><!-- /sheet -->
+    </div>

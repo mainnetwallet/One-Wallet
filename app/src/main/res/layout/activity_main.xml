@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#050508">
+
+    <WebView
+        android:id="@+id/webView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scrollbars="none"
+        android:overScrollMode="never"
+        android:background="#050508" />
+
+    <!-- App Lock Overlay — shown instantly on resume before biometric prompt -->
+    <RelativeLayout
+        android:id="@+id/appLockOverlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#050508"
+        android:visibility="gone"
+        android:elevation="999dp">
+
+        <ImageView
+            android:id="@+id/lockIcon"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:layout_marginBottom="80dp"
+            android:src="@drawable/ic_lock"
+            android:alpha="0.7"
+            android:tint="#AAAAAA" />
+
+        <TextView
+            android:id="@+id/lockLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/lockIcon"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="16dp"
+            android:text="One Wallet"
+            android:textColor="#FFFFFF"
+            android:textSize="18sp"
+            android:alpha="0.6"
+            android:fontFamily="sans-serif-medium" />
+
+        <TextView
+            android:id="@+id/lockSubLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/lockLabel"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="8dp"
+            android:text="Tap to unlock"
+            android:textColor="#888888"
+            android:textSize="13sp" />
+
+    </RelativeLayout>
+
+</RelativeLayout>

@@ -1,0 +1,103 @@
+  /* ══════ TOKEN MANAGER ══════ */
+  .tm-token-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px 14px; margin-bottom: 8px;
+    background: var(--bg-glass); border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    transition: all 0.2s ease;
+    animation: slideIn 0.25s ease both;
+  }
+  .tm-token-item:hover { border-color: rgba(99,102,241,0.2); }
+  .tm-token-icon {
+    width: 40px; height: 40px; border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; font-weight: 800; flex-shrink: 0;
+    overflow: hidden;
+  }
+  .tm-token-icon img { width: 100%; height: 100%; object-fit: cover; border-radius: 12px; }
+  .tm-token-info { flex: 1; min-width: 0; }
+  .tm-token-name { font-size: 13px; font-weight: 700; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .tm-token-sub { font-size: 10px; color: var(--text-muted); font-family: var(--font-mono); }
+  .tm-add-btn {
+    width: 34px; height: 34px; border-radius: 10px; flex-shrink: 0;
+    background: rgba(99,102,241,0.15); border: 1px solid rgba(99,102,241,0.3);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; transition: all 0.2s ease;
+  }
+  .tm-add-btn:active { transform: scale(0.88); background: rgba(99,102,241,0.3); }
+  .tm-add-btn .material-icons-round { font-size: 18px; color: var(--accent-primary); }
+  .tm-remove-btn {
+    width: 34px; height: 34px; border-radius: 10px; flex-shrink: 0;
+    background: rgba(244,63,94,0.1); border: 1px solid rgba(244,63,94,0.2);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; transition: all 0.2s ease;
+  }
+  .tm-remove-btn:active { transform: scale(0.88); background: rgba(244,63,94,0.25); }
+  .tm-remove-btn .material-icons-round { font-size: 18px; color: var(--accent-red); }
+  .tm-already-badge {
+    font-size: 9px; font-weight: 700; color: var(--accent-green);
+    background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.25);
+    padding: 3px 8px; border-radius: 6px; font-family: var(--font-mono);
+    letter-spacing: 1px;
+  }
+  .tm-price { font-size: 11px; font-weight: 700; font-family: var(--font-mono); color: var(--text-secondary); }
+  .tm-change { font-size: 10px; font-family: var(--font-mono); }
+
+  /* ── ANTI-FLICKER: Full-screen overlay backgrounds ── */
+  /* NOTE: Only will-change:opacity here — NO transform on overlay backgrounds!
+     Adding transform:translateZ(0) to overlay backgrounds causes Android WebView to 
+     create compositor conflicts: opacity transition + child transform transition both
+     run on GPU simultaneously → child modal panel stays stuck at translateY(100%) */
+  .hcp-overlay, .del-group-drawer-overlay, .wg-edit-overlay,
+  .txh-overlay, .send-overlay, .cw-drawer-overlay,
+  #sw-wallet-panel-overlay, #br-chain-overlay, #br-token-overlay,
+  #br-wallet-panel-overlay, #tm-chain-overlay, #hw-group-overlay,
+  #delegation-modal-overlay, #swap-wallet-drawer-overlay, #del-chain-overlay {
+    will-change: opacity;
+    isolation: isolate;
+    /* Remove backdrop-filter from full-screen overlay backgrounds */
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+
+  /* ── ANTI-FLICKER: Modal content panels — GPU promoted ── */
+  /* These slide up via transform, so they NEED translateZ(0) pre-promotion */
+  .hcp-modal, .wg-edit-box,
+  .txh-modal, #sw-settings-sheet,
+  #sw-wallet-panel, #br-wallet-panel {
+    will-change: transform;
+    transform: translateY(100%) translateZ(0);
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+  }
+  /* del-group-drawer & hw-group-modal slide from RIGHT — pre-promote with translateX(100%) */
+  .del-group-drawer, #hw-group-modal {
+    will-change: transform;
+    transform: translateX(100%);
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+  }
+  /* When open: slide up to translateZ(0) only — no Y offset */
+  .hcp-overlay.open .hcp-modal,
+  .wg-edit-overlay.open .wg-edit-box,
+  .txh-overlay.open .txh-modal {
+    transform: translateZ(0) !important;
+  }
+
+  /* ── ANTI-FLICKER: display:none → flex modals ── */
+  #sw-token-modal, #sw-settings-modal, #sw-history-modal {
+    display: flex !important;
+    visibility: hidden;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.22s ease, visibility 0s linear 0.22s;
+  }
+  #sw-token-modal.sw-open,
+  #sw-settings-modal.sw-open,
+  #sw-history-modal.sw-open {
+    visibility: visible;
+    pointer-events: all;
+    opacity: 1;
+    transition: opacity 0.22s ease, visibility 0s linear 0s;
+  }
+

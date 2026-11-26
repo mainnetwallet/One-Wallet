@@ -1,0 +1,136 @@
+name: Build One Wallet APK
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Check HTML partials (html-src/)
+        run: python3 tools/build_html.py --check
+
+      - name: Check frontend assets
+        run: python3 tools/check_assets.py
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v5
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v4
+
+      - name: Make gradlew executable
+        run: chmod +x ./gradlew
+
+      - name: Compute version (run-number based, no file write)
+        id: version
+        run: |
+          python3 - << 'PYEOF'
+          import re, os
+
+          with open("gradle.properties", "r") as f:
+              content = f.read()
+
+          name_m = re.search(r"^VERSION_NAME=(.+)$", content, re.MULTILINE)
+          base_name = name_m.group(1).strip() if name_m else "1.0"
+          # Keep only the major part (e.g. "1.213" -> "1") as the base —
+          # the run number is what actually makes each build unique, so
+          # there's no need to also hand-maintain a minor version anymore.
+          major = base_name.split(".")[0]
+
+          run_number = os.environ["GITHUB_RUN_NUMBER"]
+          new_code = int(run_number)
+          new_name = f"{major}.{run_number}"
+
+          print(f"Version: {new_name} (build {new_code})")
+
+          gho = os.environ.get("GITHUB_OUTPUT", "")
+          if gho:
+              with open(gho, "a") as f:
+                  f.write(f"code={new_code}\n")
+                  f.write(f"name={new_name}\n")
+          PYEOF
+        env:
+          GITHUB_RUN_NUMBER: ${{ github.run_number }}
+
+      - name: Write version into build (not committed back to repo)
+        run: |
+          sed -i "s/^VERSION_CODE=.*/VERSION_CODE=${{ steps.version.outputs.code }}/" gradle.properties
+          sed -i "s/^VERSION_NAME=.*/VERSION_NAME=${{ steps.version.outputs.name }}/" gradle.properties
+          cat gradle.properties
+
+      - name: Restore Keystore from Secret
+        run: |
+          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > one-release.jks
+          echo "Keystore restored ($(stat -c%s one-release.jks) bytes)"
+
+      - name: Build Release APK
+        run: ./gradlew assembleRelease --no-daemon --stacktrace
+        env:
+          KEYSTORE_PATH: ${{ github.workspace }}/one-release.jks
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+          STORE_PASSWORD: ${{ secrets.STORE_PASSWORD }}
+
+      - name: Sign Release APK
+        run: |
+          BUILD_TOOLS=$ANDROID_SDK_ROOT/build-tools/34.0.0
+          UNSIGNED=app/build/outputs/apk/release/app-release-unsigned.apk
+          ALIGNED=app/build/outputs/apk/release/app-release-aligned.apk
+          SIGNED=app/build/outputs/apk/release/app-release-signed.apk
+          $BUILD_TOOLS/zipalign -v -p 4 $UNSIGNED $ALIGNED
+          $BUILD_TOOLS/apksigner sign \
+            --ks one-release.jks \
+            --ks-key-alias ${{ secrets.KEY_ALIAS }} \
+            --ks-pass pass:${{ secrets.STORE_PASSWORD }} \
+            --key-pass pass:${{ secrets.KEY_PASSWORD }} \
+            --out $SIGNED \
+            $ALIGNED
+          $BUILD_TOOLS/apksigner verify $SIGNED && echo "✅ Signature OK"
+
+      - name: Collect APK
+        run: |
+          mkdir -p release
+          cp app/build/outputs/apk/release/app-release-signed.apk \
+             "release/OneWallet-v${{ steps.version.outputs.name }}-release.apk"
+          ls -lh release/
+
+      - name: Create and push tag
+        run: |
+          TAG="v${{ steps.version.outputs.name }}"
+          git tag "$TAG"
+          git push origin "$TAG" --force
+          echo "Tagged $TAG"
+
+      - name: Upload Release APK Artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: OneWallet-v${{ steps.version.outputs.name }}-release
+          path: release/OneWallet-v${{ steps.version.outputs.name }}-release.apk
+          retention-days: 30
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v3
+        with:
+          tag_name: v${{ steps.version.outputs.name }}
+          name: "One Wallet v${{ steps.version.outputs.name }}"
+          files: release/OneWallet-v${{ steps.version.outputs.name }}-release.apk
+          body: |
+            ## One Wallet v${{ steps.version.outputs.name }}
+            Build: ${{ steps.version.outputs.code }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

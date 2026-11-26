@@ -1,0 +1,53 @@
+
+  :root {
+    --bg-void: #050508;
+    --bg-deep: #0a0a12;
+    --bg-surface: #0f0f1a;
+    --bg-raised: #141423;
+    --bg-card: #0f0f1a;
+    --bg-glass: rgba(255,255,255,0.04);
+    --bg-glass-hover: rgba(255,255,255,0.07);
+    --border-subtle: rgba(255,255,255,0.06);
+    --border-glow: rgba(99,102,241,0.4);
+    --accent-primary: #6366f1;
+    --accent-secondary: #8b5cf6;
+    --accent-tertiary: #06b6d4;
+    --accent-green: #10b981;
+    --accent-red: #f43f5e;
+    --accent-amber: #f59e0b;
+    --neon-purple: #a78bfa;
+    --neon-cyan: #22d3ee;
+    --neon-pink: #f472b6;
+    --text-primary: #f1f1f8;
+    --text-secondary: #8b8ba7;
+    --text-muted: #4a4a65;
+    --glow-primary: 0 0 20px rgba(99,102,241,0.3), 0 0 60px rgba(99,102,241,0.1);
+    --glow-cyan: 0 0 20px rgba(34,211,238,0.3), 0 0 60px rgba(34,211,238,0.1);
+    --glow-green: 0 0 20px rgba(16,185,129,0.3);
+    --shadow-card: 0 8px 32px rgba(0,0,0,0.6), 0 2px 8px rgba(0,0,0,0.4);
+    --radius-sm: 10px;
+    --radius-md: 16px;
+    --radius-lg: 24px;
+    --radius-xl: 32px;
+    --font-display: 'Syne', sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+    --nav-height: 72px;
+    --safe-top: env(safe-area-inset-top, 0px);
+    --safe-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  /* ── SAFE AREA: Android gesture nav + notch support ── */
+  body {
+    padding-top: env(safe-area-inset-top, 0px);
+  }
+
+  /* ── WALLET GUARD: no-wallet disabled state ── */
+  .wg-no-wallet {
+    opacity: 0.35 !important;
+    filter: grayscale(0.6) !important;
+    pointer-events: none !important;
+    cursor: not-allowed !important;
+    user-select: none !important;
+    -webkit-user-select: none !important;
+  }
+
