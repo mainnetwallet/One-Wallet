@@ -151,12 +151,10 @@ function receiveCopyAddress() {
   const btn = document.getElementById('receive-copy-btn');
   if (!btn) return;
   const orig = btn.innerHTML;
-  btn.style.background = 'rgba(16,185,129,0.2)';
-  btn.style.borderColor = 'rgba(16,185,129,0.5)';
-  btn.innerHTML = '<span class="material-icons-round" style="font-size:18px;color:var(--accent-green);">check</span><span style="font-size:12px;font-weight:700;color:var(--accent-green);font-family:var(--font-mono);">COPIED!</span>';
+  btn.classList.add('copied');
+  btn.innerHTML = '<span class="material-icons-round">check</span><span>COPIED</span>';
   setTimeout(() => {
-    btn.style.background = 'rgba(99,102,241,0.15)';
-    btn.style.borderColor = 'rgba(99,102,241,0.35)';
+    btn.classList.remove('copied');
     if (btn) btn.innerHTML = orig;
   }, 2000);
   showToast('Address copied!', 'content_copy');

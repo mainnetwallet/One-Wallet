@@ -10,6 +10,9 @@ Per-build release notes are published on the [Releases](../../releases) page.
   `data-no-swipe`); leave with the header back arrow or the hardware back button. Hardware back now closes the
   top layer first: Confirm transaction sheet, then Select token sheet, then the Send screen, then returns to the
   previous page. The bottom nav stays visible while Send is open.
+- **Receive screen polish:** Group and Wallet stay as two dropdowns (taller, rounder, same field style as Send),
+  larger QR with soft glow, balanced address card, COPY / SHARE buttons with a green "COPIED" state (now a CSS
+  class instead of inline colors), and a note that the same address works on all EVM networks. Logic unchanged.
 - **Select token sheet:** swipe down on the handle, header or the list (when scrolled to the top) to close it;
   a short drag snaps back.
 - **Send screen redesign:** amount-first layout (token pill, 25/50/75/Max chips, balance), one From card with a

@@ -8,7 +8,7 @@
       <div class="send-header-title">Receive</div>
       <div style="width:36px;"></div>
     </div>
-    <div class="send-body" style="padding:16px 20px 40px;">
+    <div class="send-body">
 
       <!-- No wallet state -->
       <div id="receive-no-wallet" style="display:none;text-align:center;padding:48px 20px;">
@@ -23,47 +23,46 @@
       <div id="receive-wallet-section" style="display:none;">
 
         <!-- Group + Wallet picker row -->
-        <div style="display:flex;gap:8px;margin-bottom:18px;">
-          <div style="flex:1;">
-            <div style="font-size:9px;font-weight:700;color:var(--text-muted);font-family:var(--font-mono);letter-spacing:1px;margin-bottom:6px;">GROUP</div>
-            <div id="receive-group-select-wrap" style="position:relative;">
-              <select id="receive-group-select" onchange="receiveOnGroupChange()" style="width:100%;padding:9px 30px 9px 12px;background:var(--bg-raised);border:1px solid var(--border-subtle);border-radius:var(--radius-sm);color:var(--text-primary);font-family:var(--font-mono);font-size:11px;font-weight:600;appearance:none;cursor:pointer;outline:none;"></select>
-              <span class="material-icons-round" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);font-size:16px;color:var(--text-muted);pointer-events:none;">expand_more</span>
+        <div class="rcv-pick-row">
+          <div class="rcv-pick">
+            <div class="rcv-label">GROUP</div>
+            <div id="receive-group-select-wrap" class="rcv-select-wrap">
+              <select id="receive-group-select" class="rcv-select" onchange="receiveOnGroupChange()"></select>
+              <span class="material-icons-round">expand_more</span>
             </div>
           </div>
-          <div style="flex:1;">
-            <div style="font-size:9px;font-weight:700;color:var(--text-muted);font-family:var(--font-mono);letter-spacing:1px;margin-bottom:6px;">WALLET</div>
-            <div style="position:relative;">
-              <select id="receive-wallet-select" onchange="receiveOnWalletChange()" style="width:100%;padding:9px 30px 9px 12px;background:var(--bg-raised);border:1px solid var(--border-subtle);border-radius:var(--radius-sm);color:var(--text-primary);font-family:var(--font-mono);font-size:11px;font-weight:600;appearance:none;cursor:pointer;outline:none;"></select>
-              <span class="material-icons-round" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);font-size:16px;color:var(--text-muted);pointer-events:none;">expand_more</span>
+          <div class="rcv-pick">
+            <div class="rcv-label">WALLET</div>
+            <div class="rcv-select-wrap">
+              <select id="receive-wallet-select" class="rcv-select" onchange="receiveOnWalletChange()"></select>
+              <span class="material-icons-round">expand_more</span>
             </div>
           </div>
         </div>
 
         <!-- QR Code box -->
-        <div style="display:flex;justify-content:center;margin-bottom:18px;">
-          <div style="background:#fff;border-radius:20px;padding:16px;box-shadow:0 0 40px rgba(99,102,241,0.25),0 0 80px rgba(99,102,241,0.08);display:inline-block;">
-            <div id="receive-qr-canvas" style="width:200px;height:200px;display:flex;align-items:center;justify-content:center;"></div>
+        <div class="rcv-qr-wrap">
+          <div class="rcv-qr-box">
+            <div id="receive-qr-canvas" class="rcv-qr"></div>
           </div>
         </div>
 
         <!-- Address display -->
-        <div style="background:var(--bg-glass);border:1px solid var(--border-subtle);border-radius:var(--radius-md);padding:14px 16px;margin-bottom:14px;">
-          <div style="font-size:9px;font-weight:700;color:var(--text-muted);font-family:var(--font-mono);letter-spacing:1.5px;margin-bottom:8px;">EVM ADDRESS</div>
-          <div id="receive-addr-text" style="font-size:11px;font-family:var(--font-mono);color:var(--text-primary);word-break:break-all;line-height:1.7;letter-spacing:0.3px;"></div>
+        <div class="rcv-addr-card">
+          <div class="rcv-label">EVM ADDRESS</div>
+          <div id="receive-addr-text" class="rcv-addr"></div>
         </div>
 
         <!-- Action buttons -->
-        <div style="display:flex;gap:10px;">
-          <div id="receive-copy-btn" onclick="receiveCopyAddress()" style="flex:1;display:flex;align-items:center;justify-content:center;gap:8px;padding:13px;background:rgba(99,102,241,0.15);border:1px solid rgba(99,102,241,0.35);border-radius:var(--radius-md);cursor:pointer;transition:all 0.2s;" onmousedown="this.style.transform='scale(0.96)'" onmouseup="this.style.transform=''" ontouchstart="this.style.transform='scale(0.96)'" ontouchend="this.style.transform=''">
-            <span class="material-icons-round" style="font-size:18px;color:var(--neon-purple);">content_copy</span>
-            <span style="font-size:12px;font-weight:700;color:var(--neon-purple);font-family:var(--font-mono);letter-spacing:0.5px;">COPY</span>
+        <div class="rcv-actions">
+          <div id="receive-copy-btn" class="rcv-btn copy" onclick="receiveCopyAddress()">
+            <span class="material-icons-round">content_copy</span><span>COPY</span>
           </div>
-          <div onclick="receiveShareAddress()" style="flex:1;display:flex;align-items:center;justify-content:center;gap:8px;padding:13px;background:rgba(16,185,129,0.12);border:1px solid rgba(16,185,129,0.3);border-radius:var(--radius-md);cursor:pointer;transition:all 0.2s;" onmousedown="this.style.transform='scale(0.96)'" onmouseup="this.style.transform=''" ontouchstart="this.style.transform='scale(0.96)'" ontouchend="this.style.transform=''">
-            <span class="material-icons-round" style="font-size:18px;color:var(--accent-green);">share</span>
-            <span style="font-size:12px;font-weight:700;color:var(--accent-green);font-family:var(--font-mono);letter-spacing:0.5px;">SHARE</span>
+          <div class="rcv-btn share" onclick="receiveShareAddress()">
+            <span class="material-icons-round">share</span><span>SHARE</span>
           </div>
         </div>
+        <div class="rcv-note">Same address works on Base, Ethereum, Arbitrum and other EVM networks.</div>
 
       </div>
     </div>
