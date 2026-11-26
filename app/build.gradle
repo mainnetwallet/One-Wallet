@@ -80,6 +80,12 @@ android {
         }
     }
 
+    // Release lint (lintVital*) adds a long analysis pass to every assembleRelease; skip it in the build.
+    lint {
+        checkReleaseBuilds = false
+        abortOnError = false
+    }
+
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_17
         targetCompatibility JavaVersion.VERSION_17

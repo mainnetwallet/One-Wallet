@@ -30,8 +30,10 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v4
+      - name: Setup Gradle (dependency + wrapper + build cache)
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          cache-read-only: ${{ github.ref != 'refs/heads/main' }}
 
       - name: Make gradlew executable
         run: chmod +x ./gradlew
@@ -79,7 +81,7 @@ jobs:
           echo "Keystore restored ($(stat -c%s one-release.jks) bytes)"
 
       - name: Build Release APK
-        run: ./gradlew assembleRelease --no-daemon --stacktrace
+        run: ./gradlew assembleRelease --parallel --build-cache
         env:
           KEYSTORE_PATH: ${{ github.workspace }}/one-release.jks
           KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
