@@ -150,19 +150,19 @@
         <div class="section-title" style="padding:0;flex-shrink:0;">MY TOKENS</div>
         <!-- Inline token search -->
         <div style="flex:1;position:relative;">
-          <span class="material-icons-round" style="position:absolute;left:8px;top:50%;transform:translateY(-50%);font-size:14px;color:var(--text-muted);pointer-events:none;">search</span>
+          <span class="material-icons-round" style="position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:19px;color:var(--text-secondary);pointer-events:none;">search</span>
           <input id="home-token-search" type="text"
-            style="width:100%;background:var(--bg-glass);border:1px solid var(--border-subtle);border-radius:9px;padding:6px 28px 6px 28px;font-family:var(--font-mono);font-size:11px;color:var(--text-primary);outline:none;"
+            style="width:100%;background:var(--bg-glass);border:1px solid var(--border-subtle);border-radius:10px;height:38px;box-sizing:border-box;padding:0 32px 0 36px;font-family:var(--font-mono);font-size:12px;color:var(--text-primary);outline:none;"
             placeholder="Search tokens…"
             oninput="homeFilterTokens(this.value)"
             autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
           <span id="home-token-search-clear" onclick="homeFilterTokens('');document.getElementById('home-token-search').value='';"
-            style="display:none;position:absolute;right:8px;top:50%;transform:translateY(-50%);cursor:pointer;">
-            <span class="material-icons-round" style="font-size:14px;color:var(--text-muted);">close</span>
+            style="display:none;position:absolute;right:10px;top:50%;transform:translateY(-50%);cursor:pointer;">
+            <span class="material-icons-round" style="font-size:18px;color:var(--text-secondary);">close</span>
           </span>
         </div>
-        <div id="home-manage-btn" onclick="homeManageBtnClick()" style="display:flex;align-items:center;gap:4px;cursor:pointer;padding:5px 10px;background:var(--bg-glass);border:1px solid var(--border-subtle);border-radius:9px;transition:all 0.2s ease;flex-shrink:0;position:relative;z-index:2;" onmousedown="homeManageBtnPress(this,true)" onmouseup="homeManageBtnPress(this,false)" ontouchstart="homeManageBtnPress(this,true);this._tsy=event.touches[0].clientY;" ontouchend="homeManageBtnPress(this,false);event.preventDefault();if(!this.dataset.wgDisabled&&Math.abs(event.changedTouches[0].clientY-(this._tsy||0))<8){openTokenManager();}">
-          <span class="material-icons-round" style="font-size:14px;color:var(--accent-primary)">manage_search</span>
+        <div id="home-manage-btn" onclick="homeManageBtnClick()" style="display:flex;align-items:center;justify-content:center;gap:4px;cursor:pointer;width:38px;height:38px;padding:0;background:var(--bg-glass);border:1px solid var(--border-subtle);border-radius:10px;transition:all 0.2s ease;flex-shrink:0;position:relative;z-index:2;" onmousedown="homeManageBtnPress(this,true)" onmouseup="homeManageBtnPress(this,false)" ontouchstart="homeManageBtnPress(this,true);this._tsy=event.touches[0].clientY;" ontouchend="homeManageBtnPress(this,false);event.preventDefault();if(!this.dataset.wgDisabled&&Math.abs(event.changedTouches[0].clientY-(this._tsy||0))<8){openTokenManager();}">
+          <span class="material-icons-round" style="font-size:22px;color:var(--accent-primary)">manage_search</span>
         </div>
       </div>
 
