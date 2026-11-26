@@ -9,8 +9,8 @@
       <!-- Exchange / Wallet toggle -->
       <div style="display:flex;justify-content:center;padding:8px 16px 2px;">
         <div id="home-mode-toggle" style="display:flex;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);border-radius:22px;padding:3px;gap:2px;">
-          <div id="home-mode-wallet" onclick="homeSetMode('wallet')" style="padding:6px 28px;border-radius:18px;font-size:13px;font-weight:700;font-family:var(--font-mono);letter-spacing:0.5px;cursor:pointer;transition:all 0.22s ease;background:var(--accent-primary);color:#fff;-webkit-tap-highlight-color:transparent;">Wallet</div>
-          <div id="home-mode-exchange" onclick="homeSetMode('exchange')" style="padding:6px 28px;border-radius:18px;font-size:13px;font-weight:700;font-family:var(--font-mono);letter-spacing:0.5px;cursor:pointer;transition:all 0.22s ease;background:transparent;color:rgba(255,255,255,0.45);-webkit-tap-highlight-color:transparent;">Exchange</div>
+          <div id="home-mode-wallet" onclick="homeSetMode('wallet')" style="padding:6px 28px;border-radius:18px;font-size:13px;font-weight:500;font-family:var(--font-ui);cursor:pointer;transition:all 0.22s ease;background:var(--accent-primary);color:#fff;-webkit-tap-highlight-color:transparent;">Wallet</div>
+          <div id="home-mode-exchange" onclick="homeSetMode('exchange')" style="padding:6px 28px;border-radius:18px;font-size:13px;font-weight:500;font-family:var(--font-ui);cursor:pointer;transition:all 0.22s ease;background:transparent;color:rgba(255,255,255,0.45);-webkit-tap-highlight-color:transparent;">Exchange</div>
         </div>
       </div>
 
@@ -33,26 +33,15 @@
             <select id="home-group-select"  onchange="homeOnGroupChange()"  style="display:none;"></select>
             <select id="home-wallet-select" onchange="homeOnWalletChange()" style="display:none;"></select>
 
-            <!-- GROUP pill (group name + wallet address + total value) -->
-            <div id="hw-group-pill" onclick="hwOpenGroupPicker()" style="display:flex;flex-direction:row;align-items:center;gap:0;cursor:pointer;-webkit-tap-highlight-color:transparent;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);border-radius:10px;overflow:hidden;pointer-events:auto;max-width:calc(100vw - 120px);">
-              <!-- Left: Group name + Wallet address stacked -->
-              <div style="display:flex;flex-direction:column;gap:2px;padding:5px 8px 5px 9px;border-right:1px solid rgba(255,255,255,0.08);pointer-events:none;min-width:0;flex:1;">
-                <!-- Group name row -->
-                <div style="display:flex;align-items:center;gap:3px;">
-                  <span style="font-size:6.5px;font-weight:700;font-family:var(--font-mono);color:rgba(255,255,255,0.28);letter-spacing:1px;flex-shrink:0;">GRP</span>
-                  <span id="hw-group-label" style="font-size:9px;font-weight:700;font-family:var(--font-mono);color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:90px;">—</span>
-                </div>
-                <!-- Wallet address row -->
-                <div style="display:flex;align-items:center;gap:3px;">
-                  <span style="font-size:6.5px;font-weight:700;font-family:var(--font-mono);color:rgba(255,255,255,0.28);letter-spacing:1px;flex-shrink:0;">W</span>
-                  <span id="hw-wallet-addr-label" style="font-size:9px;font-weight:600;font-family:var(--font-mono);color:var(--text-secondary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:90px;">—</span>
-                </div>
+            <!-- GROUP pill (wallet icon, group name, address) -->
+            <div id="hw-group-pill" onclick="hwOpenGroupPicker()" style="display:flex;flex-direction:row;align-items:center;gap:8px;cursor:pointer;-webkit-tap-highlight-color:transparent;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);border-radius:12px;padding:6px 10px;pointer-events:auto;max-width:calc(100vw - 150px);">
+              <span class="material-icons-round" style="font-size:18px;color:var(--text-secondary);pointer-events:none;flex-shrink:0;">account_balance_wallet</span>
+              <div style="display:flex;flex-direction:column;gap:1px;pointer-events:none;min-width:0;line-height:1.3;">
+                <span id="hw-group-label" style="font-size:13px;font-weight:500;font-family:var(--font-ui);color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:110px;">—</span>
+                <span id="hw-wallet-addr-label" style="font-size:11px;font-family:var(--font-mono);color:var(--text-secondary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:110px;">—</span>
               </div>
-              <!-- Right: expand icon + Total Value -->
-              <div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px;padding:5px 8px;pointer-events:none;flex-shrink:0;">
-                <span class="material-icons-round" style="font-size:10px;color:rgba(255,255,255,0.3);">expand_more</span>
-                <span id="hw-group-total-value" style="font-size:9px;font-weight:800;font-family:var(--font-mono);color:var(--accent-green);white-space:nowrap;transition:opacity 0.22s ease;">$0.00</span>
-              </div>
+              <span class="material-icons-round" style="font-size:16px;color:var(--text-secondary);pointer-events:none;flex-shrink:0;">expand_more</span>
+              <span id="hw-group-total-value" style="display:none;">$0.00</span>
             </div>
 
             <div id="hw-addr-pill" style="display:none;cursor:pointer;-webkit-tap-highlight-color:transparent;"><div id="hw-addr-text"></div><div id="hw-wallet-index"></div></div>
@@ -70,7 +59,7 @@
         (function(){
           var CHAIN_KEY='one_active_chain';
           var CHAINS=[
-            {chainId:null,   emoji:'🌐',name:'ALL',      color:'#6366f1'},
+            {chainId:null,   emoji:'🌐',name:'All networks', color:'#6366f1'},
             {chainId:8453,   emoji:'🔵',name:'BASE',     color:'#0052ff'},
             {chainId:1,      emoji:'⬡', name:'ETH',      color:'#627eea'},
             {chainId:42161,  emoji:'🔵',name:'ARBITRUM', color:'#28a0f0'},
@@ -87,11 +76,11 @@
           try{var v=localStorage.getItem(CHAIN_KEY);if(v&&v!=='null'){chainId=Number(v);isAll=false;chain=CHAINS.find(function(c){return c.chainId===chainId;})||{emoji:'🔗',name:'CHAIN '+chainId,color:'#6366f1'};}}catch(e){}
           var border=isAll?'rgba(255,255,255,0.12)':'rgba('+rgb(chain.color)+',0.5)';
           var bg=isAll?'rgba(255,255,255,0.07)':'rgba('+rgb(chain.color)+',0.12)';
-          var html='<div class="chain-switch-btn" id="home-chain-btn" onclick="homeChainBtnClick()" style="position:relative;flex-shrink:0;border-radius:10px;padding:6px 10px;gap:6px;align-items:center;border-color:'+border+';background:'+bg+';">'
-            +'<span id="home-chain-emoji" style="font-size:14px;line-height:1;">'+chain.emoji+'</span>'
-            +'<span id="home-chain-name" style="font-size:9px;font-weight:700;font-family:\'JetBrains Mono\',monospace;letter-spacing:0.5px;">'+chain.name+'</span>'
+          var html='<div class="chain-switch-btn" id="home-chain-btn" onclick="homeChainBtnClick()" style="position:relative;flex-shrink:0;border-radius:12px;padding:8px 10px;gap:6px;align-items:center;border-color:'+border+';background:'+bg+';">'
+            +'<span id="home-chain-emoji" style="font-size:14px;line-height:1;display:flex;align-items:center;">'+(isAll?'<span class="material-icons-round" style="font-size:18px;color:var(--text-secondary);">language</span>':chain.emoji)+'</span>'
+            +'<span id="home-chain-name" style="font-size:12px;font-weight:500;font-family:var(--font-ui);">'+chain.name+'</span>'
             +'<span id="home-chain-clear" onclick="event.stopPropagation();clearHomeChain();" style="display:'+(isAll?'none':'flex')+';align-items:center;justify-content:center;width:14px;height:14px;border-radius:50%;background:rgba(255,255,255,0.15);color:rgba(255,255,255,0.8);font-size:11px;line-height:1;cursor:pointer;font-family:sans-serif;flex-shrink:0;">×</span>'
-            +'<span id="home-chain-arrow" class="material-icons-round" style="font-size:11px;color:rgba(255,255,255,0.4);display:'+(isAll?'inline':'none')+';">expand_more</span>'
+            +'<span id="home-chain-arrow" class="material-icons-round" style="font-size:16px;color:rgba(255,255,255,0.4);display:'+(isAll?'inline':'none')+';">expand_more</span>'
             +'<span id="home-chain-dot" style="position:absolute;top:3px;right:3px;width:5px;height:5px;border-radius:50%;background:var(--accent-green);display:none;box-shadow:0 0 6px var(--accent-green);"></span>'
             +'</div>';
           document.currentScript.insertAdjacentHTML('afterend', html);
@@ -104,7 +93,11 @@
       <div id="home-portfolio-card" class="hm-balance">
         <div class="hm-balance-label">Total balance</div>
         <div id="home-portfolio-value" class="hm-balance-value">$0.00</div>
-        <div class="hm-balance-meta">
+        <div id="home-pnl-row" class="hm-pnl">
+          <span id="home-pnl-chip" class="hm-chip"><span id="home-pnl-icon" class="material-icons-round">trending_up</span><span id="home-pnl-pct">0.00%</span></span>
+          <span id="home-pnl-usd" class="hm-pnl-usd"></span>
+        </div>
+        <div id="home-balance-meta" class="hm-balance-meta">
           <span><b id="home-pchip-tokens">—</b> tokens</span>
           <span class="hm-dot"></span>
           <span><b id="home-pchip-chains">—</b> networks</span>
@@ -147,13 +140,13 @@
 
       <!-- Tokens header -->
       <div style="display:flex;align-items:center;gap:8px;padding:0 16px 8px;">
-        <div class="section-title" style="padding:0;flex-shrink:0;">MY TOKENS</div>
+        <div style="padding:0;flex-shrink:0;font-size:13px;font-weight:500;font-family:var(--font-ui);color:var(--text-primary);">My tokens</div>
         <!-- Inline token search -->
         <div style="flex:1;position:relative;">
           <span class="material-icons-round" style="position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:19px;color:var(--text-secondary);pointer-events:none;">search</span>
           <input id="home-token-search" type="text"
-            style="width:100%;background:var(--bg-glass);border:1px solid var(--border-subtle);border-radius:10px;height:38px;box-sizing:border-box;padding:0 32px 0 36px;font-family:var(--font-mono);font-size:12px;color:var(--text-primary);outline:none;"
-            placeholder="Search tokens…"
+            style="width:100%;background:var(--bg-glass);border:1px solid var(--border-subtle);border-radius:10px;height:38px;box-sizing:border-box;padding:0 32px 0 36px;font-family:var(--font-ui);font-size:13px;color:var(--text-primary);outline:none;"
+            placeholder="Search tokens"
             oninput="homeFilterTokens(this.value)"
             autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
           <span id="home-token-search-clear" onclick="homeFilterTokens('');document.getElementById('home-token-search').value='';"

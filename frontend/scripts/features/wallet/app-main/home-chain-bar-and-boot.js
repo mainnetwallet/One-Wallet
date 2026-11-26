@@ -54,10 +54,12 @@ function setActiveChain(chainId) {
     if (chain.logoURI) {
       emojiEl.innerHTML = `<img src="${chain.logoURI}" width="16" height="16" style="border-radius:4px;object-fit:cover;vertical-align:middle;" onerror="if(this.parentNode)this.outerHTML='<span style=\\'font-size:14px;line-height:1;\\'>${chain.emoji}</span>'" />`;
     } else {
-      emojiEl.innerHTML = `<span style="font-size:14px;line-height:1;">${chain.emoji}</span>`;
+      emojiEl.innerHTML = chainId === null
+        ? '<span class="material-icons-round" style="font-size:18px;color:var(--text-secondary);">language</span>'
+        : `<span style="font-size:14px;line-height:1;">${chain.emoji}</span>`;
     }
   }
-  (document.getElementById('home-chain-name') || {}).textContent = chainId === null ? 'ALL' : (chain.name.length > 8 ? chain.name.split(' ')[0].toUpperCase() : chain.name.toUpperCase());
+  (document.getElementById('home-chain-name') || {}).textContent = chainId === null ? 'All networks' : (chain.name.length > 8 ? chain.name.split(' ')[0] : chain.name);
   // Dot indicator — hidden (replaced by clear button)
   const dot = document.getElementById('home-chain-dot');
   if (dot) dot.style.display = 'none';

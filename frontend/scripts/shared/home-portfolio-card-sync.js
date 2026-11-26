@@ -40,6 +40,42 @@
       }
       chipChains.textContent = chainSet.size > 0 ? chainSet.size : '—';
     }
+    _syncPnl();
+  }
+
+  // ── 2b. 24h change from token cards (value now vs value implied by each token's 24h %) ──
+  function _syncPnl() {
+    var row = document.getElementById('home-pnl-row');
+    var meta = document.getElementById('home-balance-meta');
+    if (!row) return;
+    var now = 0, prev = 0;
+    document.querySelectorAll('#token-list .token-card').forEach(function(c) {
+      var usd = parseFloat(c.dataset.usdValue) || 0;
+      if (usd <= 0) return;
+      var chEl = c.querySelector('.tlp-change');
+      var pct = chEl ? parseFloat((chEl.textContent || '').replace(/\u2212/g, '-').replace(/[^0-9.+\-]/g, '')) : NaN;
+      if (isNaN(pct) || pct <= -99.9) return;
+      now += usd;
+      prev += usd / (1 + pct / 100);
+    });
+    if (now <= 0 || prev <= 0) {
+      row.style.display = 'none';
+      if (meta) meta.style.display = 'flex';
+      return;
+    }
+    var diff = now - prev, neg = diff < 0;
+    var pctTot = Math.abs(diff / prev * 100).toFixed(2) + '%';
+    var amt = (typeof _formatCurrencyDisplay === 'function') ? _formatCurrencyDisplay(Math.abs(diff)) : '$' + Math.abs(diff).toFixed(2);
+    var chip = document.getElementById('home-pnl-chip');
+    var icon = document.getElementById('home-pnl-icon');
+    var pEl = document.getElementById('home-pnl-pct');
+    var uEl = document.getElementById('home-pnl-usd');
+    if (chip) chip.classList.toggle('neg', neg);
+    if (icon) icon.textContent = neg ? 'trending_down' : 'trending_up';
+    if (pEl) pEl.textContent = pctTot;
+    if (uEl) uEl.textContent = (neg ? '-' : '+') + amt + ' today';
+    row.style.display = 'flex';
+    if (meta) meta.style.display = 'none';
   }
 
   // ── 3. MutationObserver: watch hw-total-value-text changes ──

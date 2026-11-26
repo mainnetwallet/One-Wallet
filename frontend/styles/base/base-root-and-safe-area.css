@@ -30,6 +30,7 @@
     --radius-lg: 24px;
     --radius-xl: 32px;
     --font-display: 'Syne', sans-serif;
+    --font-ui: 'Roboto', system-ui, -apple-system, 'Segoe UI', sans-serif;
     --font-mono: 'JetBrains Mono', monospace;
     --nav-height: 72px;
     --safe-top: env(safe-area-inset-top, 0px);

@@ -168,7 +168,7 @@
     position: relative;
   }
   .nav-item .material-icons-round { font-size: 22px; color: var(--text-muted); transition: all 0.25s ease; }
-  .nav-item span.label { font-size: 9px; font-weight: 600; color: var(--text-muted); letter-spacing: 1px; transition: all 0.25s ease; }
+  .nav-item span.label { font-family: var(--font-ui); font-size: 11px; font-weight: 400; color: var(--text-muted); letter-spacing: 0; transition: all 0.25s ease; }
   .nav-item.active .material-icons-round { color: var(--accent-primary); }
   .nav-item.active span.label { color: var(--accent-primary); }
   .nav-item.active::before {
