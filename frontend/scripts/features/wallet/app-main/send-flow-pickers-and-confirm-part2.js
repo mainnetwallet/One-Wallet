@@ -6,13 +6,17 @@ var _qrBarcodeDetector = null;
 var _qrCanvasRetry = 0;        // Bug 3 fix: canvas zero-size retry counter
 var _qrCameraStarted = false;  // Bug 1 fix: atomic lock across async paths
 
-function openSendQrScanner() {
+// fromHome=true: opened from the home top bar; a valid scan then opens Send with the address filled in
+function openSendQrScanner(fromHome) {
   var overlay = document.getElementById('send-qr-modal-overlay');
   if (!overlay) return;
+  window._qrFromHome = (fromHome === true);
   overlay.classList.add('open');
   _startQrCamera();
   if (typeof haptic === 'function') haptic();
 }
+
+function homeOpenQrScan() { openSendQrScanner(true); }
 
 function closeSendQrScanner() {
   var overlay = document.getElementById('send-qr-modal-overlay');
@@ -264,11 +268,23 @@ function _handleQrResult(raw) {
   }
 
   // Valid checksum address found
+  var _fromHome = (window._qrFromHome === true);
+  window._qrFromHome = false;
   closeSendQrScanner();
-  var inp = document.getElementById('send-to');
-  if (inp) {
-    inp.value = addr;
-    if (typeof onSendToInput === 'function') onSendToInput();
+  function _fillSendTo() {
+    var inp = document.getElementById('send-to');
+    if (inp && inp.value !== addr) {
+      inp.value = addr;
+      if (typeof onSendToInput === 'function') onSendToInput();
+    }
+  }
+  // Home scan: open Send first (it clears the recipient field), then fill the address
+  if (_fromHome && typeof openSendModal === 'function') {
+    openSendModal();
+    _fillSendTo();
+    setTimeout(_fillSendTo, 300);
+  } else {
+    _fillSendTo();
   }
   if (typeof haptic === 'function') haptic();
 }

@@ -45,6 +45,7 @@
     var hasWallet = _hasWallet();
     _setDisabled(document.getElementById('home-chain-btn'),  !hasWallet);
     _setDisabled(document.getElementById('home-manage-btn'), !hasWallet);
+    _setDisabled(document.getElementById('home-scan-btn'),   !hasWallet);
   }
 
   // ── Inline onclick wrappers — PRIMARY block layer ──
@@ -62,6 +63,13 @@
       haptic(); return;
     }
     openTokenManager();
+  };
+  window.homeScanBtnClick = function() {
+    if (!_hasWallet()) {
+      showToast('Please add a wallet first!', 'account_balance_wallet');
+      haptic(); return;
+    }
+    homeOpenQrScan();
   };
   window.homeManageBtnPress = function(el, pressed) {
     if (!_hasWallet()) return;

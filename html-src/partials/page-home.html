@@ -7,10 +7,16 @@
 
 
       <!-- Exchange / Wallet toggle -->
-      <div style="display:flex;justify-content:center;padding:8px 16px 2px;">
-        <div id="home-mode-toggle" style="display:flex;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);border-radius:22px;padding:3px;gap:2px;">
+      <div style="display:grid;grid-template-columns:38px 1fr 38px;align-items:center;padding:8px 16px 2px;">
+        <div></div>
+        <div style="display:flex;justify-content:center;">
+                <div id="home-mode-toggle" style="display:flex;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);border-radius:22px;padding:3px;gap:2px;">
           <div id="home-mode-wallet" onclick="homeSetMode('wallet')" style="padding:6px 28px;border-radius:18px;font-size:13px;font-weight:500;font-family:var(--font-ui);cursor:pointer;transition:all 0.22s ease;background:var(--accent-primary);color:#fff;-webkit-tap-highlight-color:transparent;">Wallet</div>
           <div id="home-mode-exchange" onclick="homeSetMode('exchange')" style="padding:6px 28px;border-radius:18px;font-size:13px;font-weight:500;font-family:var(--font-ui);cursor:pointer;transition:all 0.22s ease;background:transparent;color:rgba(255,255,255,0.45);-webkit-tap-highlight-color:transparent;">Exchange</div>
+        </div>
+        </div>
+        <div id="home-scan-btn" onclick="homeScanBtnClick()" role="button" aria-label="Scan QR code" style="width:38px;height:38px;display:flex;align-items:center;justify-content:center;background:var(--bg-glass);border:1px solid var(--border-subtle);border-radius:10px;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:transform 0.15s ease;" ontouchstart="this.style.transform='scale(0.93)'" ontouchend="this.style.transform=''">
+          <span class="material-icons-round" style="font-size:22px;color:var(--accent-primary)">qr_code_scanner</span>
         </div>
       </div>
 
