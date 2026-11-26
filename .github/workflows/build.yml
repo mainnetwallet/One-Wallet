@@ -33,7 +33,9 @@ jobs:
       - name: Setup Gradle (dependency + wrapper + build cache)
         uses: gradle/actions/setup-gradle@v4
         with:
-          cache-read-only: ${{ github.ref != 'refs/heads/main' }}
+          # Normal pushes only READ the cache (saving it costs ~16s). A manual "Run workflow"
+          # refreshes the cache - do that after changing dependencies / Gradle / AGP versions.
+          cache-read-only: ${{ github.event_name != 'workflow_dispatch' }}
 
       - name: Make gradlew executable
         run: chmod +x ./gradlew
