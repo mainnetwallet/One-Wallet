@@ -6,6 +6,10 @@ Per-build release notes are published on the [Releases](../../releases) page.
 ## [Unreleased]
 
 ### Changed
+- **Send screen navigation:** swipe-down-to-close is turned off on the Send screen (it opts out with
+  `data-no-swipe`); leave with the header back arrow or the hardware back button. Hardware back now closes the
+  top layer first: Confirm transaction sheet, then Select token sheet, then the Send screen, then returns to the
+  previous page. The bottom nav stays visible while Send is open.
 - **Send screen redesign:** amount-first layout (token pill, 25/50/75/Max chips, balance), one From card with a
   short address, recipient field with paste + QR + "Choose from my wallets", and a state-aware SEND button
   ("Enter an amount" / "Enter recipient address" / "Send ETH"). New **Select token** sheet with an

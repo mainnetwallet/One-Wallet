@@ -22,6 +22,7 @@
     { id: 'pm-overlay',               close: () => typeof closePairManager       === 'function' && closePairManager()       },
     { id: 'tm-overlay',               close: () => typeof closeTokenManager      === 'function' && closeTokenManager()      },
     { id: 'txh-overlay',              close: () => typeof closeTxHistory         === 'function' && closeTxHistory()         },
+    { id: 'send-confirm-overlay',     isOpen: el => el.style.pointerEvents === 'auto' && el.style.display !== 'none', close: () => typeof closeSendConfirmSheet === 'function' && closeSendConfirmSheet() },
     { id: 'send-qr-modal-overlay',    close: () => typeof closeSendQrScanner     === 'function' && closeSendQrScanner()     },
     { id: 'send-token-sheet',         close: () => typeof closeSendTokenSheet    === 'function' && closeSendTokenSheet()    },
     { id: 'send-overlay',             close: () => typeof closeSendModal         === 'function' && closeSendModal()         },
@@ -56,6 +57,7 @@
     MODAL_MAP.forEach(m => {
       const el = document.getElementById(m.id);
       const isOpen = el && (
+        (typeof m.isOpen === 'function' && m.isOpen(el)) ||
         el.classList.contains('open') ||
         el.classList.contains('sw-open') ||
         el.classList.contains('brh-open') ||
