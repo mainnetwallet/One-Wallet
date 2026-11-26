@@ -115,9 +115,7 @@ window.refreshTokenBalance = async function(tokenId) {
 
     if (usdEl && price > 0 && usdEl.dataset.toggled !== '1') {
       const usdVal = balance * price;
-      const usdStr = usdVal > 0
-        ? _formatCurrencyDisplay(usdVal)
-        : _formatCurrencyDisplay(price);
+      const usdStr = usdVal > 0 ? _formatCurrencyDisplay(usdVal) : '';
       _smoothSet(usdEl, usdStr);
       card.dataset.usdValue = (usdVal).toFixed(6);
     }
@@ -372,7 +370,7 @@ async function silentPriceRefresh() {
     if (usdEl) {
       const usdVal = hasBalance
         ? _formatCurrencyDisplay(usdValNum)
-        : _formatCurrencyDisplay(0);
+        : '';
       if (usdEl.textContent !== usdVal) _smoothSet(usdEl, usdVal);
       usdEl.style.color = ''; usdEl.classList.toggle('has-balance', hasBalance);
       if (hasBalance) {

@@ -360,9 +360,7 @@ async function _loadTokensImpl() {
           card.dataset.usdValue = usdValue.toFixed(6);
 
           if (usdEl && price > 0) {
-            const usdValStr = usdValue > 0
-              ? _formatCurrencyDisplay(usdValue)
-              : _formatCurrencyDisplay(price);
+            const usdValStr = usdValue > 0 ? _formatCurrencyDisplay(usdValue) : '';
             _smoothSet(usdEl, usdValStr);
           }
 
@@ -502,9 +500,7 @@ async function _loadTokensImpl() {
       const balRaw = balEl ? parseFloat(balEl.textContent.replace(/,/g,'')) : NaN;
       const hasBalance = !isNaN(balRaw) && balRaw > 0;
       const usdValNum = hasBalance ? balRaw * price : 0;
-      const usdValStr = hasBalance
-        ? _formatCurrencyDisplay(usdValNum)
-        : priceStr;
+      const usdValStr = hasBalance ? _formatCurrencyDisplay(usdValNum) : '';
       const usdEl = card.querySelector('.token-usd');
       if (usdEl) {
         _smoothSet(usdEl, usdValStr);

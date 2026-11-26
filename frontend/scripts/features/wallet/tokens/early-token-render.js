@@ -82,7 +82,7 @@
           '</div>' +
           '<div class="token-value">' +
             '<div class="token-amount">' + (item.amount || '—') + '</div>' +
-            '<div class="token-usd">' + (item.usd || '') + '</div>' +
+            '<div class="token-usd">' + ((item.usdValue > 0 && item.usd) ? item.usd : '') + '</div>' +
           '</div>' +
           '<div class="token-badge" style="background:' + badgeBg + ';"></div>';
 

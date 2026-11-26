@@ -302,3 +302,5 @@
   #page-home .token-usd { font-family: var(--font-ui); font-size: 14px; font-weight: 500; color: var(--text-primary); }
   #page-home .token-usd.has-balance { color: var(--text-primary); }
   #page-home .token-amount { font-family: var(--font-ui); font-size: 12px; color: var(--text-secondary); }
+  #page-home .token-usd:empty { display: none; }
+  #page-home .token-value:has(.token-usd:empty) .token-amount { font-size: 14px; font-weight: 500; color: var(--text-primary); }

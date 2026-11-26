@@ -42,7 +42,7 @@ __NX._restoreTokenList = _restoreTokenList;
         ? '<span class="tlp-change" style="font-size:9px;font-weight:700;color:' + (item.changeColor || 'var(--text-muted)') + ';">' + item.change + '</span>'
         : '<span class="tlp-change" style="font-size:9px;font-weight:700;"></span>';
       var amtText  = item.amount || '—';
-      var usdText  = item.usd || '';
+      var usdText  = (item.usdValue > 0 && item.usd) ? item.usd : '';
       var nameText = item.name || '';
       var subText  = item.sub  || '';
 
