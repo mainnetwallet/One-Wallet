@@ -212,6 +212,18 @@
     margin: 0 16px 8px; height: 58px;
     border-radius: var(--radius-md);
   }
+  .skel-row {
+    display: flex; align-items: center; gap: 12px;
+    height: auto; padding: 12px 0; margin: 0 16px;
+    background: none; animation: none; border-radius: 0;
+    border-bottom: 1px solid var(--border-subtle);
+  }
+  .skel-row .sk-ic { width: 40px; height: 40px; border-radius: 50%; flex-shrink: 0; }
+  .skel-row .sk-col { flex: 1; display: flex; flex-direction: column; gap: 7px; }
+  .skel-row .sk-bar { display: block; height: 12px; border-radius: 6px; }
+  .skel-row .sk-bar.sm { width: 52px; height: 10px; }
+  .skel-row .sk-ic, .skel-row .sk-bar { background: var(--bg-raised); animation: skelPulse 1.4s ease-in-out infinite; }
+  @keyframes skelPulse { 0%, 100% { opacity: .55 } 50% { opacity: 1 } }
 
   /* Activity feed */
   .activity-item {

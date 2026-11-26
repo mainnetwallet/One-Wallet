@@ -186,8 +186,13 @@ window.oneLock = (function() {
       var o=others[0];
       if(o){
         slot.style.display='';
-        slot.textContent=o.label;
+        slot.style.visibility='visible';
+        if(o.id==='bio'){slot.innerHTML='<span class="material-icons-round" style="font-size:28px;color:var(--accent-tertiary);">fingerprint</span>';slot.setAttribute('aria-label','Use biometric');}
+        else{slot.textContent=o.label;}
         (function(id){slot.onclick=function(){oneLock._showPanel(id);};})(o.id);
+      } else {
+        slot.style.visibility='hidden';
+        slot.onclick=null;
       }
     }
   }
