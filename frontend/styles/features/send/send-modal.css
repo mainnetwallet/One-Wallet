@@ -30,68 +30,73 @@
   .send-overlay.open .send-modal { transform: translateY(0) translateZ(0); }
 
   .send-header {
-    padding: 10px 16px 10px;
-    display: flex; align-items: center; gap: 14px;
-    border-bottom: 1px solid var(--border-subtle);
+    padding: 12px 16px;
+    display: flex; align-items: center; gap: 12px;
     background: var(--bg-deep); flex-shrink: 0;
   }
   .send-back-btn {
-    width: 36px; height: 36px; border-radius: 10px;
-    background: var(--bg-glass); border: 1px solid var(--border-subtle);
+    width: 40px; height: 40px; border-radius: 50%;
+    background: var(--bg-raised);
     display: flex; align-items: center; justify-content: center;
-    cursor: pointer; transition: all 0.2s ease; flex-shrink: 0;
+    cursor: pointer; transition: transform 0.15s ease; flex-shrink: 0;
   }
-  .send-back-btn:active { transform: scale(0.88); }
-  .send-back-btn .material-icons-round { font-size: 20px; color: var(--text-secondary); }
-  .send-header-title { font-size: 18px; font-weight: 800; flex: 1; }
+  .send-back-btn:active { transform: scale(0.9); }
+  .send-back-btn .material-icons-round { font-size: 20px; color: var(--text-primary); }
+  .send-header-title { font-family: var(--font-ui); font-size: 21px; font-weight: 500; flex: 1; }
   .send-network-badge {
-    display: inline-flex; align-items: center; gap: 6px;
-    background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.25);
-    border-radius: 8px; padding: 4px 10px;
-    font-size: 10px; font-weight: 600; color: var(--accent-green);
-    font-family: var(--font-mono);
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--bg-raised); border-radius: 16px; padding: 6px 12px;
+    font-family: var(--font-ui); font-size: 13px; font-weight: 500; color: var(--text-primary);
   }
 
   .send-body {
     flex: 1; overflow-y: auto;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
-    padding: 8px 14px 20px;
+    padding: 4px 16px 20px;
     padding-bottom: max(20px, calc(env(safe-area-inset-bottom, 0px) + 12px));
     background: var(--bg-deep);
+    display: flex; flex-direction: column; gap: 12px;
   }
   .send-body::-webkit-scrollbar { display: none; }
 
   .send-field-label {
-    font-size: 10px; font-weight: 700; color: var(--text-muted);
-    letter-spacing: 2px; text-transform: uppercase;
-    font-family: var(--font-mono); margin-bottom: 4px;
+    font-family: var(--font-ui); font-size: 13px; font-weight: 500;
+    color: var(--text-secondary); margin: 0 0 6px 4px;
   }
-  .send-input {
-    width: 100%; background: var(--bg-surface);
-    border: 1px solid var(--border-subtle);
-    border-radius: var(--radius-sm); padding: 10px 40px 10px 14px;
-    font-family: var(--font-mono); font-size: 13px; color: var(--text-primary);
-    outline: none; transition: border-color 0.2s;
-    -webkit-appearance: none;
-  }
-  .send-input:focus { border-color: rgba(245,158,11,0.5); box-shadow: 0 0 0 3px rgba(245,158,11,0.08); }
-  .send-input::placeholder { color: var(--text-muted); font-size: 11px; }
-  .send-input.valid { border-color: rgba(16,185,129,0.4); }
-  .send-input.invalid { border-color: rgba(244,63,94,0.4); }
-
-  /* QR scan button inside send-to field */
-  .send-to-wrap { position: relative; width: 100%; }
-  .send-qr-btn {
-    position: absolute; right: 8px; top: 50%; transform: translateY(-50%);
-    width: 28px; height: 28px; border-radius: 7px;
-    background: rgba(99,102,241,0.13); border: 1px solid rgba(99,102,241,0.28);
-    display: flex; align-items: center; justify-content: center;
-    cursor: pointer; transition: background 0.15s, border-color 0.15s;
+  .send-label-row { display: flex; justify-content: space-between; align-items: center; }
+  .send-link-btn {
+    font-family: var(--font-ui); font-size: 13px; font-weight: 500;
+    color: #a5a8ff; cursor: pointer; padding: 2px 4px;
     -webkit-tap-highlight-color: transparent;
   }
-  .send-qr-btn:active { background: rgba(99,102,241,0.28); border-color: rgba(99,102,241,0.6); }
-  .send-qr-btn .material-icons-round { font-size: 16px; color: var(--neon-purple); pointer-events: none; }
+  .send-link-btn:active { opacity: 0.6; }
+  .send-link-block { margin-top: 8px; display: inline-block; }
+  #send-key-count-badge { display: none !important; }
+
+  /* Recipient field: input + paste + QR share one rounded box */
+  .send-to-wrap {
+    display: flex; align-items: center; gap: 2px;
+    background: var(--bg-surface); border: 0.5px solid rgba(255,255,255,0.08);
+    border-radius: 16px; padding: 4px 8px 4px 14px;
+    transition: border-color 0.2s;
+  }
+  .send-to-wrap:focus-within { border-color: rgba(165,168,255,0.5); }
+  .send-input {
+    flex: 1; min-width: 0; height: 40px; padding: 0;
+    background: transparent; border: none; outline: none;
+    font-family: var(--font-ui); font-size: 15px; color: var(--text-primary);
+    -webkit-appearance: none;
+  }
+  .send-input::placeholder { color: var(--text-muted); }
+  .send-input.invalid { color: var(--accent-red); }
+  .send-icon-btn {
+    width: 36px; height: 36px; border-radius: 50%; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; -webkit-tap-highlight-color: transparent;
+  }
+  .send-icon-btn:active { background: var(--bg-glass); }
+  .send-icon-btn .material-icons-round { font-size: 19px; color: var(--text-primary); pointer-events: none; }
 
   /* QR Scanner Modal */
   #send-qr-modal-overlay {
@@ -134,139 +139,61 @@
     color: var(--text-muted); text-align: center; letter-spacing: 0.5px;
   }
 
-  .send-section { margin-bottom: 7px; }
+  .send-section { margin: 0; }
 
-  /* Chain selector row in send modal */
-  .send-chain-row {
-    display: flex; gap: 8px; margin-bottom: 6px;
-    overflow-x: auto; overflow-y: hidden;
-    scrollbar-width: none; -webkit-overflow-scrolling: touch;
-    padding-bottom: 2px;
-  }
-  .send-chain-row::-webkit-scrollbar { display: none; }
-  .send-chain-chip {
-    display: flex; align-items: center; gap: 7px;
-    padding: 6px 10px; border-radius: 10px;
-    background: var(--bg-surface); border: 2px solid var(--border-subtle);
-    cursor: pointer; transition: all 0.2s ease; flex-shrink: 0;
-    font-size: 12px; font-weight: 700; color: var(--text-secondary);
-  }
-  .send-chain-chip.selected {
-    border-color: rgba(99,102,241,0.55);
-    background: rgba(99,102,241,0.1);
-    color: var(--neon-purple);
-  }
-  .send-chain-chip:active { transform: scale(0.93); }
-  .send-chain-emoji { font-size: 16px; line-height: 1; }
-
-  /* Token selector row */
-  .send-token-row {
-    display: flex; flex-direction: column; gap: 4px; margin-bottom: 7px;
-    max-height: 150px;
-    overflow-y: auto;
-    overflow-x: hidden;
-    scrollbar-width: thin;
-    scrollbar-color: rgba(99,102,241,0.3) transparent;
-    padding-right: 4px;
-    -webkit-overflow-scrolling: touch;
-  }
-  .send-token-row::-webkit-scrollbar { width: 4px; }
-  .send-token-row::-webkit-scrollbar-track { background: transparent; }
-  .send-token-row::-webkit-scrollbar-thumb { background: rgba(99,102,241,0.3); border-radius: 2px; }
-  .send-token-chip {
-    display: flex; align-items: center; gap: 10px;
-    padding: 6px 12px;
-    background: var(--bg-surface); border: 2px solid var(--border-subtle);
-    border-radius: var(--radius-sm); cursor: pointer;
-    transition: all 0.2s ease;
-    flex-shrink: 0;
-  }
-  .send-token-chip.selected {
-    border-color: rgba(245,158,11,0.5);
-    background: rgba(245,158,11,0.06);
-  }
-  .send-token-chip:active { transform: scale(0.96); }
-  .send-token-icon {
-    width: 28px; height: 28px; border-radius: 8px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 12px; font-weight: 800; flex-shrink: 0;
-    overflow: hidden; position: relative;
-  }
-  .send-token-icon > div,
-  .send-token-icon > img {
-    width: 100%; height: 100%; border-radius: 10px;
-  }
-  .send-token-name { font-size: 13px; font-weight: 700; flex: 1; }
-  .send-token-bal { font-size: 11px; color: var(--text-muted); font-family: var(--font-mono); text-align: right; }
-
-  /* Amount box */
+  /* Amount card */
   .send-amount-box {
-    background: var(--bg-raised); border: 1px solid var(--border-subtle);
-    border-radius: var(--radius-md); padding: 6px 10px;
-    margin-bottom: 6px; transition: border-color 0.2s, box-shadow 0.2s;
+    background: var(--bg-surface); border: 0.5px solid rgba(255,255,255,0.07);
+    border-radius: 16px; padding: 10px 12px; text-align: center;
+    transition: border-color 0.2s;
   }
-  .send-amount-box:focus-within { border-color: rgba(245,158,11,0.5); box-shadow: 0 0 0 3px rgba(245,158,11,0.08), 0 0 20px rgba(245,158,11,0.06); }
+  .send-amount-box:focus-within { border-color: rgba(165,168,255,0.4); }
+  .send-token-pill {
+    display: inline-flex; align-items: center; gap: 6px;
+    height: 32px; padding: 0 6px 0 5px; border-radius: 16px;
+    background: var(--bg-raised); border: 0.5px solid rgba(255,255,255,0.08);
+    font-family: var(--font-ui); font-size: 13px; font-weight: 500; color: var(--text-primary);
+    cursor: pointer; -webkit-tap-highlight-color: transparent;
+  }
+  .send-token-pill:active { transform: scale(0.96); }
+  .send-token-pill .material-icons-round { font-size: 18px; color: var(--text-secondary); }
+  .send-pill-icon { width: 22px; height: 22px; border-radius: 50%; overflow: hidden; display: flex; flex-shrink: 0; }
+  .send-pill-icon > div, .send-pill-icon > img { width: 100%; height: 100%; border-radius: 50%; }
   .send-amount-input {
-    width: 100%; background: transparent; border: none; outline: none;
-    font-family: var(--font-mono); font-size: 16px; font-weight: 700;
+    width: 100%; background: transparent; border: none; outline: none; padding: 0; margin-top: 4px;
+    font-family: var(--font-ui); font-size: 36px; font-weight: 500; line-height: 1.2;
     color: var(--text-primary); text-align: center; display: block;
-    caret-color: #f59e0b; letter-spacing: -0.5px; line-height: 1.2;
+    caret-color: var(--accent-amber);
   }
-  .send-amount-input::placeholder { color: var(--text-muted); font-size: 16px; font-weight: 400; text-align: center; }
-  .send-amount-usd {
-    font-family: var(--font-mono); font-size: 11px;
-    color: var(--text-muted); margin-top: 3px; text-align: center;
-    letter-spacing: 0.3px;
+  .send-amount-input::placeholder { color: var(--text-muted); font-weight: 500; text-align: center; }
+  .send-amount-usd { font-family: var(--font-ui); font-size: 13px; color: var(--text-secondary); }
+  .send-pct-chips { display: flex; gap: 8px; margin: 10px 0 8px; }
+  .send-pct-chip {
+    flex: 1; height: 30px; border: none; border-radius: 15px;
+    background: var(--bg-raised); color: var(--text-primary);
+    font-family: var(--font-ui); font-size: 13px; cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
   }
-  /* ── Send % Slider ── */
-  .send-pct-slider-row {
-    margin-top: 4px; padding-top: 5px;
-    border-top: 1px solid var(--border-subtle);
+  .send-pct-chip.max { color: #a5a8ff; }
+  .send-pct-chip:active { transform: scale(0.95); }
+  .send-bal-display { font-family: var(--font-ui); font-size: 12px; color: var(--text-secondary); }
+
+  /* Old slider / chip rows stay in the DOM for the existing JS but are never shown */
+  .send-legacy { display: none !important; }
+
+  /* Network fee row */
+  .send-fee-row { display: flex; align-items: center; justify-content: space-between; margin: 0 4px; }
+  .send-fee-label { font-family: var(--font-ui); font-size: 13px; color: var(--text-secondary); }
+  .send-fee-note { margin-left: 8px; font-size: 12px; color: var(--accent-green); }
+  .send-gas-pill {
+    display: flex; align-items: center; gap: 4px; height: 30px; padding: 0 8px 0 12px;
+    border-radius: 15px; background: var(--bg-raised); border: 0.5px solid rgba(255,255,255,0.08);
+    font-family: var(--font-ui); font-size: 13px; font-weight: 500; color: #a5a8ff;
+    cursor: pointer; -webkit-tap-highlight-color: transparent;
   }
-  .send-pct-labels {
-    display: flex; justify-content: space-between;
-    font-size: 9px; font-family: var(--font-mono); font-weight: 700;
-    color: var(--text-muted); letter-spacing: 1px; margin-bottom: 6px;
-  }
-  .send-pct-track-wrap {
-    position: relative; height: 6px; border-radius: 3px;
-    background: var(--bg-raised); margin-bottom: 8px; cursor: pointer;
-  }
-  .send-pct-fill {
-    position: absolute; left: 0; top: 0; height: 100%;
-    border-radius: 3px;
-    background: linear-gradient(90deg, var(--accent-amber), rgba(245,158,11,0.6));
-    transition: width 0.08s ease; pointer-events: none;
-    width: 0%;
-  }
-  .send-pct-range {
-    position: absolute; inset: 0; width: 100%; height: 100%;
-    opacity: 0; cursor: pointer; margin: 0;
-    -webkit-appearance: none; appearance: none;
-  }
-  .send-pct-track-wrap::after {
-    content: '';
-    position: absolute; top: 50%; transform: translateY(-50%);
-    left: calc(var(--thumb-pct, 0%) - 8px);
-    width: 16px; height: 16px; border-radius: 50%;
-    background: var(--accent-amber);
-    box-shadow: 0 0 8px rgba(245,158,11,0.5);
-    pointer-events: none; transition: left 0.08s ease;
-  }
-  .send-pct-badge-row {
-    display: flex; justify-content: space-between; align-items: center;
-  }
-  .send-pct-badge {
-    font-size: 11px; font-weight: 700; font-family: var(--font-mono);
-    color: var(--accent-amber); min-width: 36px;
-  }
-  .send-max-btn {
-    font-size: 10px; font-weight: 700; color: var(--accent-amber);
-    letter-spacing: 1px; cursor: pointer; padding: 3px 10px;
-    border: 1px solid rgba(245,158,11,0.3); border-radius: 6px;
-    transition: all 0.2s ease; background: rgba(245,158,11,0.05);
-  }
-  .send-max-btn:active { background: rgba(245,158,11,0.15); }
+  .send-gas-pill:active { transform: scale(0.96); }
+  .send-gas-pill .material-icons-round { font-size: 17px; }
+  #one-gas-toggle-send { display: none !important; }
 
   /* Review card */
   .send-review-card {
@@ -283,18 +210,16 @@
 
   /* Send button */
   .send-btn {
-    width: 100%; padding: 14px;
-    background: linear-gradient(135deg, #f59e0b, #d97706);
-    border: none; border-radius: var(--radius-md);
-    font-family: var(--font-display); font-size: 13px; font-weight: 600;
-    color: #fff; letter-spacing: 0.3px; cursor: pointer;
-    transition: all 0.3s cubic-bezier(0.34,1.56,0.64,1);
-    box-shadow: 0 0 20px rgba(245,158,11,0.3), 0 4px 16px rgba(0,0,0,0.4);
+    width: 100%; height: 52px; padding: 0;
+    background: var(--accent-amber); border: none; border-radius: 16px;
+    font-family: var(--font-ui); font-size: 16px; font-weight: 500;
+    color: #1a1000; cursor: pointer;
+    transition: transform 0.15s ease, background 0.2s ease;
     display: flex; align-items: center; justify-content: center; gap: 8px;
     position: relative; overflow: visible;
   }
-  .send-btn:active { transform: scale(0.97); }
-  .send-btn:disabled { cursor: not-allowed; }
+  .send-btn:active { transform: scale(0.98); }
+  .send-btn:disabled { background: rgba(99,102,241,0.14); color: #6d6d96; cursor: not-allowed; }
   .send-btn .material-icons-round { font-size: 18px; }
   .send-btn.sending {
     background: linear-gradient(135deg,#6366f1,#4f46e5) !important;
@@ -333,7 +258,7 @@
   .send-status.success { background: rgba(16,185,129,0.08); border: 1px solid rgba(16,185,129,0.25); color: var(--accent-green); }
   .send-status.error { background: rgba(244,63,94,0.08); border: 1px solid rgba(244,63,94,0.25); color: var(--accent-red); }
 
-  .send-divider { height: 1px; background: var(--border-subtle); margin: 3px 0 7px; }
+  .send-divider { display: none; }
 
   /* Key selector list */
   .send-key-item {
@@ -366,3 +291,70 @@
   .send-key-check .material-icons-round { font-size: 16px; color: var(--accent-amber); opacity: 0; transition: opacity 0.2s; }
   .send-key-item.selected .send-key-check .material-icons-round { opacity: 1; }
 
+  /* Selected wallet card (the unselected key list keeps the compact style above) */
+  #send-sel-wallet-item {
+    padding: 10px 14px; gap: 12px; border-radius: 16px;
+    background: var(--bg-surface); border: 0.5px solid rgba(255,255,255,0.08);
+  }
+  #send-sel-wallet-item .send-key-num {
+    width: 34px; height: 34px; border-radius: 50%; border: none; font-size: 14px;
+    background: rgba(99,102,241,0.22); color: #c7c9ff;
+  }
+  #send-sel-wallet-item .send-key-addr { font-family: var(--font-ui); font-size: 15px; font-weight: 500; }
+  #send-sel-wallet-item .send-key-addr-full { white-space: nowrap; font-size: 12px; color: var(--text-secondary); }
+  #send-sel-wallet-item .send-key-check .material-icons-round { opacity: 1; color: var(--text-secondary); font-size: 20px; }
+
+  /* Select token sheet */
+  .send-sheet-backdrop {
+    position: absolute; inset: 0; z-index: 710; background: rgba(0,0,0,0.55);
+    opacity: 0; pointer-events: none; transition: opacity 0.28s ease;
+  }
+  .send-sheet-backdrop.open { opacity: 1; pointer-events: all; }
+  .send-sheet {
+    position: absolute; left: 0; right: 0; bottom: 0; z-index: 720;
+    height: 80%; padding: 10px 18px 0;
+    background: var(--bg-surface); border-top: 0.5px solid rgba(255,255,255,0.08);
+    border-radius: 24px 24px 0 0;
+    display: flex; flex-direction: column;
+    transform: translateY(100%); visibility: hidden;
+    transition: transform 0.28s ease, visibility 0.28s;
+  }
+  .send-sheet.open { transform: translateY(0); visibility: visible; }
+  .send-sheet-handle { width: 44px; height: 4px; border-radius: 2px; background: rgba(255,255,255,0.14); margin: 0 auto 14px; }
+  .send-sheet-head {
+    display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;
+    font-family: var(--font-ui); font-size: 21px; font-weight: 500;
+  }
+  .send-sheet-head .send-icon-btn .material-icons-round { font-size: 22px; }
+  .send-sheet-chains { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; flex-shrink: 0; }
+  .send-sheet-chains::-webkit-scrollbar { display: none; }
+  .send-sheet-chip {
+    flex-shrink: 0; height: 36px; padding: 0 16px; border-radius: 18px;
+    display: flex; align-items: center;
+    background: var(--bg-raised); color: var(--text-secondary);
+    font-family: var(--font-ui); font-size: 14px; cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .send-sheet-chip.on { background: rgba(99,102,241,0.28); color: #c9cbff; }
+  .send-sheet-hint { font-family: var(--font-ui); font-size: 12px; color: var(--text-secondary); margin: 10px 0 2px; }
+  .send-sheet-list {
+    flex: 1; min-height: 0; overflow-y: auto; scrollbar-width: none;
+    padding-bottom: max(16px, env(safe-area-inset-bottom, 0px));
+  }
+  .send-sheet-list::-webkit-scrollbar { display: none; }
+  .send-sheet-row {
+    display: flex; align-items: center; gap: 14px; padding: 11px 0;
+    border-bottom: 0.5px solid rgba(255,255,255,0.06); cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .send-sheet-row:active { opacity: 0.7; }
+  .send-sheet-icon { width: 42px; height: 42px; border-radius: 50%; overflow: hidden; flex-shrink: 0; display: flex; }
+  .send-sheet-icon > div, .send-sheet-icon > img { width: 100%; height: 100%; border-radius: 50%; }
+  .send-sheet-info { flex: 1; min-width: 0; }
+  .send-sheet-sym { font-family: var(--font-ui); font-size: 16px; font-weight: 500; }
+  .send-sheet-row.sel .send-sheet-sym { color: #c9cbff; }
+  .send-sheet-sub { font-family: var(--font-ui); font-size: 13px; color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .send-sheet-val { text-align: right; flex-shrink: 0; }
+  .send-sheet-bal { font-family: var(--font-ui); font-size: 15px; }
+  .send-sheet-usd { font-family: var(--font-ui); font-size: 13px; color: var(--text-secondary); }
+  .send-sheet-empty { padding: 28px 0; text-align: center; font-family: var(--font-ui); font-size: 14px; color: var(--text-secondary); }

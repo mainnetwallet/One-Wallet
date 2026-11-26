@@ -135,7 +135,7 @@
           sendBtn.classList.remove('sending','confirming');
           sendBtn.style.cssText = '';
           sendBtn.disabled  = true;
-          sendBtn.innerHTML = '<span class="material-icons-round">send</span> SEND';
+          sendBtn.innerHTML = '<span class="material-icons-round">send</span><span id="send-btn-label">Enter an amount</span>';
           if (typeof openSendConfirmSheet === 'function') sendBtn.onclick = () => openSendConfirmSheet();
         }
         // Clear amount (value + fullVal dataset)

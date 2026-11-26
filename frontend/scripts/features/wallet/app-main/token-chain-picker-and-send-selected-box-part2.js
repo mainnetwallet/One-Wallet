@@ -34,13 +34,13 @@ function selectSendChain(chainId) {
   // Update header badge
   const chain = getAllChains().find(c => c.chainId === chainId);
   const nameEl = document.getElementById('send-network-name');
-  if (nameEl && chain) nameEl.textContent = chain.name.toUpperCase();
+  if (nameEl && chain) nameEl.textContent = chain.name;
   // Rebuild token list for new chain
   buildSendTokenList();
   // Reset wallet + balances since chain changed
   sendWallet = null; sendProvider = null; sendBalances = {};
   document.querySelectorAll('.send-token-bal').forEach(el => { el.textContent = '—'; });
-  (document.getElementById('send-bal-display') || {}).textContent = 'Balance: —';
+  (document.getElementById('send-bal-display') || {}).textContent = 'Balance —';
   if (typeof _updateSendSliderUI === 'function') _updateSendSliderUI(0);
   const _src = document.getElementById('send-review-card'); if (_src) _src.style.display = 'none';
   (document.getElementById('send-btn') || {}).disabled = true;
@@ -160,10 +160,11 @@ function buildSendTokenList() {
   const rvNet = document.getElementById('review-network');
   if (rvNet && chain) rvNet.textContent = chain.name;
   const nameEl = document.getElementById('send-network-name');
-  if (nameEl && chain) nameEl.textContent = chain.name.toUpperCase();
+  if (nameEl && chain) nameEl.textContent = chain.name;
 
   // Reset drag scroll
   setTimeout(() => { const r2 = document.getElementById('send-token-row'); if (r2) r2._dragInited = false; }, 50);
+  if (typeof _sendUiRefresh === 'function') _sendUiRefresh();
 }
 
 function selectSendTokenDynamic(tokenId, el) {
@@ -216,7 +217,7 @@ function updateSendBalDisplayDynamic() {
   }
   const balNum = parseFloat(bal);
   const balStr = _fmtBalDisplay(balNum);
-  (document.getElementById('send-bal-display') || {}).textContent = 'Balance: ' + balStr + ' ' + symbol;
+  (document.getElementById('send-bal-display') || {}).textContent = 'Balance ' + balStr + ' ' + symbol;
   // Re-check send readiness — balance may now allow button to enable
   if (typeof checkSendReady === 'function') checkSendReady();
 }
@@ -372,8 +373,9 @@ function openSendModal(preTokenId, preChainId, preFromPk) {
   const _src1 = document.getElementById('send-review-card'); if (_src1) _src1.style.display = 'none';
   (document.getElementById('send-btn') || {}).disabled = true;
   (document.getElementById('send-amount-usd') || {}).textContent = '≈ $0.00';
-  (document.getElementById('send-bal-display') || {}).textContent = 'Balance: —';
+  (document.getElementById('send-bal-display') || {}).textContent = 'Balance —';
   if (typeof _updateSendSliderUI === 'function') _updateSendSliderUI(0);
+  if (typeof _sendUiRefresh === 'function') _sendUiRefresh();
 
   // Build key selector or show manual input
   if (validatedKeys.length > 0) {
@@ -459,6 +461,6 @@ function _updateSendSelectedBox(pk, groupName, walletNum, displayNum) {
       label.innerHTML = '<span style="color:var(--text-secondary);font-weight:600;">Wallet #' + walletNum + '</span>';
     }
   }
-  if (addrEl) addrEl.textContent = addr;
+  if (addrEl) addrEl.textContent = addr ? addr.slice(0, 6) + '…' + addr.slice(-4) : '';
   _showSendSelectedBox();
 }

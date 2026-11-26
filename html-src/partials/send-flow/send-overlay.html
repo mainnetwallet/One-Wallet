@@ -5,109 +5,87 @@
       <div class="send-back-btn" onclick="closeSendModal()">
         <span class="material-icons-round">arrow_back</span>
       </div>
-      <div class="send-header-title">Send Token</div>
+      <div class="send-header-title">Send</div>
       <div class="send-network-badge" id="send-network-badge">
-        <div class="network-dot"></div><span id="send-network-name">BASE</span>
+        <div class="network-dot"></div><span id="send-network-name">Base</span>
       </div>
     </div>
 
     <div class="send-body">
 
-      <!-- Sender private key -->
+      <!-- From -->
       <div class="send-section">
-        <div class="send-field-label" style="display:flex;justify-content:space-between;align-items:center;">
-          <span>FROM (Wallet)</span>
-          <div style="display:flex;align-items:center;gap:7px;">
-            <span id="send-key-count-badge" style="display:none;font-size:9px;background:rgba(99,102,241,0.15);border:1px solid rgba(99,102,241,0.3);color:var(--neon-purple);padding:2px 8px;border-radius:6px;font-family:var(--font-mono);">0 KEYS</span>
-            <div id="send-from-wg-btn"
-              onclick="openSendFromWgPicker()"
-              style="display:flex;align-items:center;gap:5px;cursor:pointer;padding:3px 9px;background:rgba(99,102,241,0.12);border:1px solid rgba(99,102,241,0.3);border-radius:8px;transition:all 0.2s ease;"
-              onmousedown="this.style.transform='scale(0.93)'" onmouseup="this.style.transform=''"
-              ontouchstart="this.style.transform='scale(0.93)'" ontouchend="this.style.transform=''">
-              <span class="material-icons-round" style="font-size:13px;color:var(--neon-purple)">folder</span>
-              <span style="font-size:9px;font-weight:700;color:var(--neon-purple);font-family:var(--font-mono);letter-spacing:1px;">FROM GROUPS</span>
-            </div>
-          </div>
+        <div class="send-field-label send-label-row">
+          <span>From</span>
+          <span id="send-key-count-badge"></span>
+          <div id="send-from-wg-btn" class="send-link-btn" onclick="openSendFromWgPicker()">Change</div>
         </div>
 
-        <!-- Unified selected wallet box (shown after any selection — group picker or key list) -->
-        <div id="send-selected-wallet-box" style="display:none;margin-bottom:6px;">
-          <div class="send-key-item selected" id="send-sel-wallet-item" style="cursor:default;">
+        <div id="send-selected-wallet-box" style="display:none;">
+          <div class="send-key-item selected" id="send-sel-wallet-item" onclick="openSendFromWgPicker()">
             <div class="send-key-num" id="send-sel-wallet-num">1</div>
             <div class="send-key-info">
               <div class="send-key-addr" id="send-sel-wallet-label"></div>
               <div class="send-key-addr-full" id="send-sel-wallet-addr"></div>
             </div>
-            <div class="send-key-check"><span class="material-icons-round">check_circle</span></div>
+            <div class="send-key-check"><span class="material-icons-round">expand_more</span></div>
           </div>
         </div>
 
-        <!-- Key selector list (shown when validatedKeys exist, multiple keys) -->
-        <div id="send-key-selector" style="display:none;margin-bottom:10px;">
+        <div id="send-key-selector" style="display:none;margin-top:8px;">
           <div id="send-key-list" style="display:flex;flex-direction:column;gap:6px;max-height:180px;overflow-y:auto;scrollbar-width:none;"></div>
         </div>
 
-        <!-- send-pk hidden: used internally by wallet selection logic -->
         <input type="hidden" id="send-pk" autocomplete="off" />
-
       </div>
 
-      <!-- Chain select -->
-      <div class="send-field-label">NETWORK</div>
-      <div class="send-chain-row" id="send-chain-row">
-        <!-- Dynamically built -->
-      </div>
-
-      <!-- Token select -->
-      <div class="send-field-label">TOKEN</div>
-      <div class="send-token-row" id="send-token-row">
-        <!-- Dynamically built from MY TOKENS list -->
-      </div>
-
-      <!-- Amount -->
+      <!-- Amount (token pill opens the token sheet) -->
       <div class="send-amount-box">
+        <div class="send-token-pill" id="send-token-pill" onclick="openSendTokenSheet()">
+          <span class="send-pill-icon" id="send-pill-icon"></span>
+          <span id="send-pill-sym">ETH</span>
+          <span class="material-icons-round">expand_more</span>
+        </div>
         <input type="text" inputmode="decimal" id="send-amount" class="send-amount-input"
-          placeholder="0.00"
+          placeholder="0" autocomplete="off"
           oninput="this.dataset.userTyped='1';onSendAmountInput()" />
         <div class="send-amount-usd" id="send-amount-usd">≈ $0.00</div>
-        <div class="send-pct-slider-row">
-          <div class="send-pct-labels">
-            <span>0%</span><span>25%</span><span>50%</span><span>75%</span><span>100%</span>
-          </div>
-          <div class="send-pct-track-wrap">
-            <div class="send-pct-fill" id="send-pct-fill"></div>
-            <input type="range" id="send-pct-range" class="send-pct-range" min="0" max="100" value="0" step="1"
-              oninput="onSendPctSlider(this.value)" />
-          </div>
-          <div class="send-pct-badge-row">
-            <span class="send-pct-badge" id="send-pct-badge">—%</span>
-            <div class="send-max-btn" onclick="setSendMax()">MAX</div>
-          </div>
+        <div class="send-pct-chips">
+          <button type="button" class="send-pct-chip" onclick="onSendPctSlider(25)">25%</button>
+          <button type="button" class="send-pct-chip" onclick="onSendPctSlider(50)">50%</button>
+          <button type="button" class="send-pct-chip" onclick="onSendPctSlider(75)">75%</button>
+          <button type="button" class="send-pct-chip max" onclick="setSendMax()">Max</button>
         </div>
+        <div class="send-bal-display" id="send-bal-display">Balance —</div>
       </div>
 
-      <!-- Recipient -->
-      <div class="send-section">
-        <div class="send-field-label" style="display:flex;justify-content:space-between;align-items:center;">
-          <span>TO (Recipient Address)</span>
-          <div id="send-to-wg-btn"
-            onclick="openSendToWgPicker()"
-            style="display:flex;align-items:center;gap:5px;cursor:pointer;padding:3px 9px;background:rgba(99,102,241,0.12);border:1px solid rgba(99,102,241,0.3);border-radius:8px;transition:all 0.2s ease;"
-            onmousedown="this.style.transform='scale(0.93)'" onmouseup="this.style.transform=''"
-            ontouchstart="this.style.transform='scale(0.93)'" ontouchend="this.style.transform=''">
-            <span class="material-icons-round" style="font-size:13px;color:var(--neon-purple)">account_balance_wallet</span>
-            <span style="font-size:9px;font-weight:700;color:var(--neon-purple);font-family:var(--font-mono);letter-spacing:1px;">FROM GROUPS</span>
-          </div>
+      <!-- Legacy controls: kept hidden so existing JS (slider state, chip builders) keeps working -->
+      <div class="send-legacy" aria-hidden="true">
+        <div id="send-chain-row"></div>
+        <div id="send-token-row"></div>
+        <div class="send-pct-track-wrap">
+          <div class="send-pct-fill" id="send-pct-fill"></div>
+          <input type="range" id="send-pct-range" min="0" max="100" value="0" step="1" oninput="onSendPctSlider(this.value)" />
         </div>
+        <span id="send-pct-badge">—%</span>
+      </div>
+
+      <!-- To -->
+      <div class="send-section">
+        <div class="send-field-label send-label-row"><span>To</span></div>
         <div class="send-to-wrap">
           <input type="text" id="send-to" class="send-input"
-            placeholder="0x... recipient address"
+            placeholder="Recipient address"
             oninput="onSendToInput()" autocomplete="off" autocorrect="off"
             autocapitalize="off" spellcheck="false" />
-          <div class="send-qr-btn" onclick="openSendQrScanner()" title="Scan QR Code">
+          <div class="send-icon-btn" onclick="mobilePasteTo('send-to')" title="Paste">
+            <span class="material-icons-round">content_paste</span>
+          </div>
+          <div class="send-icon-btn send-qr-btn" onclick="openSendQrScanner()" title="Scan QR Code">
             <span class="material-icons-round">qr_code_scanner</span>
           </div>
         </div>
+        <div id="send-to-wg-btn" class="send-link-btn send-link-block" onclick="openSendToWgPicker()">Choose from my wallets</div>
       </div>
 
       <!-- ── FROM Wallet Group Picker Modal ── -->
@@ -148,7 +126,6 @@
 
       <div class="send-divider"></div>
 
-      <!-- Review -->
       <!-- Hidden ghost: keeps existing JS references intact, never shown -->
       <div id="send-review-card" style="display:none!important;visibility:hidden!important;position:absolute;pointer-events:none;height:0;overflow:hidden;">
         <span id="review-from"></span><span id="review-to"></span>
@@ -156,17 +133,36 @@
         <span id="review-network">Base Mainnet</span><span id="review-gas">Estimating…</span>
       </div>
 
+      <!-- Network fee: tap the pill to cycle Auto / EIP-1559 / Legacy -->
+      <div class="send-fee-row">
+        <div class="send-fee-label">Network fee<span class="send-fee-note" id="send-fee-note"></span></div>
+        <div class="send-gas-pill" id="send-gas-pill" onclick="sendCycleGasMode()">
+          <span id="send-gas-mode">Auto</span>
+          <span class="material-icons-round">unfold_more</span>
+        </div>
+      </div>
+
       <!-- Status -->
       <div class="send-status" id="send-status"></div>
 
-      <!-- Send button -->
+      <!-- Send button (label follows the form state) -->
       <button class="send-btn" id="send-btn" onclick="openSendConfirmSheet()" disabled>
-        <span class="material-icons-round">send</span>
-        SEND
+        <span class="material-icons-round">send</span><span id="send-btn-label">Enter an amount</span>
       </button>
 
-
-
     </div>
+  </div>
+
+  <!-- Select token sheet: All networks + per-network tabs, sorted by value -->
+  <div class="send-sheet-backdrop" id="send-sheet-backdrop" onclick="closeSendTokenSheet()"></div>
+  <div class="send-sheet" id="send-token-sheet">
+    <div class="send-sheet-handle"></div>
+    <div class="send-sheet-head">
+      <span>Select token</span>
+      <div class="send-icon-btn" onclick="closeSendTokenSheet()"><span class="material-icons-round">close</span></div>
+    </div>
+    <div class="send-sheet-chains" id="send-sheet-chains"></div>
+    <div class="send-sheet-hint">Highest value first</div>
+    <div class="send-sheet-list" id="send-sheet-list"></div>
   </div>
 </div>

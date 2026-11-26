@@ -114,6 +114,7 @@ async function selectSendKey(index) {
 function closeSendModal() {
   document.getElementById('send-overlay')?.classList.remove('open');
   closeSendToWgPicker();
+  if (typeof closeSendTokenSheet === 'function') closeSendTokenSheet();
   // Stop QR camera if open
   if (typeof closeSendQrScanner === 'function') closeSendQrScanner();
   sendWallet = null; sendProvider = null;

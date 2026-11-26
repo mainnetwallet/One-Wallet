@@ -23,6 +23,7 @@
     { id: 'tm-overlay',               close: () => typeof closeTokenManager      === 'function' && closeTokenManager()      },
     { id: 'txh-overlay',              close: () => typeof closeTxHistory         === 'function' && closeTxHistory()         },
     { id: 'send-qr-modal-overlay',    close: () => typeof closeSendQrScanner     === 'function' && closeSendQrScanner()     },
+    { id: 'send-token-sheet',         close: () => typeof closeSendTokenSheet    === 'function' && closeSendTokenSheet()    },
     { id: 'send-overlay',             close: () => typeof closeSendModal         === 'function' && closeSendModal()         },
     { id: 'br-chain-overlay',         close: () => typeof brCloseChainPicker     === 'function' && brCloseChainPicker()     },
     { id: 'br-token-overlay',         close: () => typeof brCloseTokenPicker     === 'function' && brCloseTokenPicker()     },

@@ -5,7 +5,7 @@ async function onSendPkInput(directPk) {
   const _src2 = document.getElementById('send-review-card'); if (_src2) _src2.style.display = 'none';
   // Reset all dynamic token balance chips
   document.querySelectorAll('.send-token-bal').forEach(el => { el.textContent = '—'; });
-  (document.getElementById('send-bal-display') || {}).textContent = 'Balance: —';
+  (document.getElementById('send-bal-display') || {}).textContent = 'Balance —';
 
   let pk = raw.startsWith('0x') ? raw : '0x' + raw;
   if (pk.length !== 66) { return; }

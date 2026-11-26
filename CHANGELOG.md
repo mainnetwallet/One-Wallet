@@ -6,6 +6,11 @@ Per-build release notes are published on the [Releases](../../releases) page.
 ## [Unreleased]
 
 ### Changed
+- **Send screen redesign:** amount-first layout (token pill, 25/50/75/Max chips, balance), one From card with a
+  short address, recipient field with paste + QR + "Choose from my wallets", and a state-aware SEND button
+  ("Enter an amount" / "Enter recipient address" / "Send ETH"). New **Select token** sheet with an
+  **All networks** tab and per-network tabs, sorted by USD value. Network fee row: tap the pill to cycle
+  Auto / EIP-1559 / Legacy. New file `scripts/features/wallet/app-main/send-token-sheet.js`.
 - **New logo (v3):** blue wallet with card, cash and "1" mark on a rounded-square with the "One Wallet" wordmark;
   launcher icons (square + round), splash, PWA icons, favicon/apple-touch icon, dApp provider icon and
   `docs/branding/` updated.

@@ -460,6 +460,7 @@ function checkSendReady() {
   } else {
     const _src4 = document.getElementById('send-review-card'); if (_src4) _src4.style.display = 'none';
   }
+  if (typeof _sendUiRefresh === 'function') _sendUiRefresh();
 }
 
 async function estimateSendGas(to, amt) {

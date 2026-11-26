@@ -372,7 +372,8 @@ async function executeSend() {
         sendBtn.classList.remove('sending','confirming');
         sendBtn.style.cssText = '';
         sendBtn.disabled = false;
-        sendBtn.innerHTML = '<span class="material-icons-round">send</span> SEND';
+        sendBtn.innerHTML = '<span class="material-icons-round">send</span><span id="send-btn-label">Send</span>';
+        if (typeof _sendUiRefresh === 'function') _sendUiRefresh();
         sendBtn.onclick = () => { openSendConfirmSheet(); };
       }, 2000);
     }

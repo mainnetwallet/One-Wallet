@@ -140,7 +140,7 @@ function _renderSendFromWgList() {
           if (input) input.value = '';
           sendWallet = null; sendProvider = null; sendBalances = {};
           document.querySelectorAll('.send-token-bal').forEach(el => { el.textContent = '—'; });
-          (document.getElementById('send-bal-display') || {}).textContent = 'Balance: —';
+          (document.getElementById('send-bal-display') || {}).textContent = 'Balance —';
           (document.getElementById('send-btn') || {}).disabled = true;
           checkSendReady();
           showToast('Wallet deselected', 'radio_button_unchecked');
