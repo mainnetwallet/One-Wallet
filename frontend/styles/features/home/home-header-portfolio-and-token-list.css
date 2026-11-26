@@ -235,3 +235,41 @@
   .act-sub { font-size: 10px; color: var(--text-muted); font-family: var(--font-mono); }
   .act-amount { font-size: 13px; font-weight: 700; }
 
+
+
+  /* ══════════════ HOME REDESIGN: balance card + 4 main actions ══════════════ */
+  .hm-balance {
+    margin: 6px 16px 0; padding: 18px 18px 16px;
+    background: var(--bg-surface); border: 1px solid rgba(99,102,241,0.35);
+    border-radius: 20px;
+  }
+  .hm-balance-label { font-size: 12px; color: var(--text-secondary); letter-spacing: 0.2px; }
+  .hm-balance-value {
+    font-family: var(--font-display); font-size: 34px; font-weight: 800;
+    letter-spacing: -0.5px; line-height: 1.15; margin-top: 4px; color: var(--text-primary);
+  }
+  .hm-balance-meta {
+    display: flex; align-items: center; gap: 8px; margin-top: 8px;
+    font-size: 12px; color: var(--text-secondary);
+  }
+  .hm-balance-meta b { color: var(--text-primary); font-weight: 700; }
+  .hm-dot { width: 3px; height: 3px; border-radius: 50%; background: var(--text-secondary); opacity: 0.6; }
+
+  .hm-actions {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px;
+    padding: 18px 16px 20px;
+  }
+  .hm-act {
+    display: flex; flex-direction: column; align-items: center; gap: 8px;
+    cursor: pointer; position: relative; overflow: hidden; border-radius: 14px;
+    padding: 2px 0; -webkit-tap-highlight-color: transparent; user-select: none;
+    transition: transform 0.15s ease;
+  }
+  .hm-act:active { transform: scale(0.93); }
+  .hm-act-icon {
+    width: 54px; height: 54px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    border: 1px solid var(--border-subtle);
+  }
+  .hm-act-icon .material-icons-round { font-size: 24px; }
+  .hm-act-label { font-size: 12px; font-weight: 600; color: var(--text-primary); }
