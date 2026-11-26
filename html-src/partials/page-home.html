@@ -7,7 +7,7 @@
 
 
       <!-- Exchange / Wallet toggle -->
-      <div style="display:flex;justify-content:center;padding:8px 16px 2px;">
+      <div style="display:none;">
         <div id="home-mode-toggle" style="display:flex;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);border-radius:22px;padding:3px;gap:2px;">
           <div id="home-mode-wallet" onclick="homeSetMode('wallet')" style="padding:6px 28px;border-radius:18px;font-size:13px;font-weight:700;font-family:var(--font-mono);letter-spacing:0.5px;cursor:pointer;transition:all 0.22s ease;background:var(--accent-primary);color:#fff;-webkit-tap-highlight-color:transparent;">Wallet</div>
           <div id="home-mode-exchange" onclick="homeSetMode('exchange')" style="padding:6px 28px;border-radius:18px;font-size:13px;font-weight:700;font-family:var(--font-mono);letter-spacing:0.5px;cursor:pointer;transition:all 0.22s ease;background:transparent;color:rgba(255,255,255,0.45);-webkit-tap-highlight-color:transparent;">Exchange</div>
@@ -100,19 +100,23 @@
 
       </div>
 
-      <!-- Hidden portfolio value refs for JS (kept for script compatibility) -->
+      <!-- Balance card (IDs are updated by home-portfolio-card-sync.js) -->
+      <div id="home-portfolio-card" class="hm-balance">
+        <div class="hm-balance-label">Total balance</div>
+        <div id="home-portfolio-value" class="hm-balance-value">$0.00</div>
+        <div class="hm-balance-meta">
+          <span><b id="home-pchip-tokens">—</b> tokens</span>
+          <span class="hm-dot"></span>
+          <span><b id="home-pchip-chains">—</b> networks</span>
+        </div>
+      </div>
+
+      <!-- Hidden refs kept for script compatibility -->
       <div style="display:none;">
         <div id="home-greeting-sub"></div>
         <div id="home-greeting-main"></div>
-        <div id="home-portfolio-card">
-          <div id="home-portfolio-value">$0.00</div>
-          <div id="home-portfolio-change"><span id="home-portfolio-change-text">+0.00%</span></div>
-          <div id="home-portfolio-chips">
-            <div id="home-pchip-tokens"></div>
-            <div id="home-pchip-chains"></div>
-            <div id="home-pchip-pnl"></div>
-          </div>
-        </div>
+        <div id="home-portfolio-change"><span id="home-portfolio-change-text">+0.00%</span></div>
+        <div id="home-portfolio-chips"><div id="home-pchip-pnl"></div></div>
       </div>
 
       <!-- price source hidden label -->
@@ -121,66 +125,25 @@
         <span style="font-family:var(--font-mono);font-size:9px;color:var(--text-muted);letter-spacing:1px;">LIVE &middot; <span id="live-countdown">15</span>s</span>
       </div>
 
-      <!-- Quick Actions -->
-      <div class="section-title" style="padding:8px 16px 8px;">QUICK ACTIONS</div>
-      <!-- Row 1: 5 buttons -->
-      <div style="padding:0 16px 7px;display:grid;grid-template-columns:repeat(5,1fr);gap:7px;">
-        <div class="qa-btn" style="min-width:0;" onclick="event.stopPropagation();openSendModal();rippleEffect(this,event)" ontouchend="event.stopPropagation();event.preventDefault();openSendModal();rippleEffect(this,event)">
-          <div class="qa-icon" style="background:rgba(245,158,11,0.15);">
-            <span class="material-icons-round" style="color:var(--accent-amber)">send</span>
-          </div>
-          <span class="qa-label">SEND</span>
+      <!-- Main actions -->
+      <div class="hm-actions">
+        <div class="hm-act" onclick="event.stopPropagation();openSendModal();rippleEffect(this,event)" ontouchend="event.stopPropagation();event.preventDefault();openSendModal();rippleEffect(this,event)">
+          <div class="hm-act-icon hm-act-primary"><span class="material-icons-round">north_east</span></div>
+          <span class="hm-act-label">Send</span>
         </div>
-        <div class="qa-btn" style="min-width:0;" onclick="event.stopPropagation();openReceiveModal();rippleEffect(this,event)" ontouchend="event.stopPropagation();event.preventDefault();openReceiveModal();rippleEffect(this,event)">
-          <div class="qa-icon" style="background:rgba(16,185,129,0.15);">
-            <span class="material-icons-round" style="color:var(--accent-green)">call_received</span>
-          </div>
-          <span class="qa-label">RECEIVE</span>
+        <div class="hm-act" onclick="event.stopPropagation();openReceiveModal();rippleEffect(this,event)" ontouchend="event.stopPropagation();event.preventDefault();openReceiveModal();rippleEffect(this,event)">
+          <div class="hm-act-icon"><span class="material-icons-round">south_west</span></div>
+          <span class="hm-act-label">Receive</span>
         </div>
-        <div class="qa-btn" style="min-width:0;" onclick="event.stopPropagation();switchPage('swap');rippleEffect(this,event)" ontouchend="event.stopPropagation();event.preventDefault();switchPage('swap');rippleEffect(this,event)">
-          <div class="qa-icon" style="background:rgba(99,102,241,0.15);">
-            <span class="material-icons-round" style="color:var(--accent-primary)">swap_horiz</span>
-          </div>
-          <span class="qa-label">SWAP</span>
+        <div class="hm-act" onclick="event.stopPropagation();switchPage('swap');rippleEffect(this,event)" ontouchend="event.stopPropagation();event.preventDefault();switchPage('swap');rippleEffect(this,event)">
+          <div class="hm-act-icon"><span class="material-icons-round">swap_horiz</span></div>
+          <span class="hm-act-label">Swap</span>
         </div>
-        <div class="qa-btn" style="min-width:0;" onclick="event.stopPropagation();switchPage('bridge');rippleEffect(this,event)" ontouchend="event.stopPropagation();event.preventDefault();switchPage('bridge');rippleEffect(this,event)">
-          <div class="qa-icon" style="background:rgba(34,211,238,0.15);">
-            <span class="material-icons-round" style="color:var(--neon-cyan)">alt_route</span>
-          </div>
-          <span class="qa-label">BRIDGE</span>
-        </div>
-        <div class="qa-btn" style="min-width:0;" onclick="event.stopPropagation();switchPage('transfer-hub');rippleEffect(this,event)" ontouchend="event.stopPropagation();event.preventDefault();switchPage('transfer-hub');rippleEffect(this,event)">
-          <div class="qa-icon" style="background:rgba(139,92,246,0.15);">
-            <span class="material-icons-round" style="color:var(--accent-secondary)">hub</span>
-          </div>
-          <span class="qa-label">TRANSFER HUB</span>
+        <div class="hm-act" onclick="event.stopPropagation();switchPage('bridge');rippleEffect(this,event)" ontouchend="event.stopPropagation();event.preventDefault();switchPage('bridge');rippleEffect(this,event)">
+          <div class="hm-act-icon"><span class="material-icons-round">alt_route</span></div>
+          <span class="hm-act-label">Bridge</span>
         </div>
       </div>
-      <!-- Row 2: 3 buttons left, 2 empty right -->
-      <div style="padding:0 16px 4px;display:grid;grid-template-columns:repeat(5,1fr);gap:7px;">
-        <div class="qa-btn" style="min-width:0;" onclick="event.stopPropagation();switchPage('nansen');rippleEffect(this,event)" ontouchend="event.stopPropagation();event.preventDefault();switchPage('nansen');rippleEffect(this,event)">
-          <div class="qa-icon" style="background:rgba(244,114,182,0.15);">
-            <span class="material-icons-round" style="color:var(--neon-pink)">swap_calls</span>
-          </div>
-          <span class="qa-label">NANSEN SWAP</span>
-        </div>
-        <div class="qa-btn" style="min-width:0;" onclick="event.stopPropagation();switchPage('sup-transfer');rippleEffect(this,event)" ontouchend="event.stopPropagation();event.preventDefault();switchPage('sup-transfer');rippleEffect(this,event)">
-          <div class="qa-icon" style="background:rgba(6,182,212,0.15);">
-            <span class="material-icons-round" style="color:var(--accent-tertiary)">moving</span>
-          </div>
-          <span class="qa-label">SUP TRANSFER</span>
-        </div>
-        <div class="qa-btn" style="min-width:0;" onclick="event.stopPropagation();switchPage('base-swap-bot');rippleEffect(this,event)" ontouchend="event.stopPropagation();event.preventDefault();switchPage('base-swap-bot');rippleEffect(this,event)">
-          <div class="qa-icon" style="background:rgba(245,158,11,0.15);">
-            <span class="material-icons-round" style="color:var(--accent-amber)">smart_toy</span>
-          </div>
-          <span class="qa-label">BASE SWAP BOT</span>
-        </div>
-        <div></div>
-        <div></div>
-      </div>
-
-      <div style="height:25px;"></div>
 
       <!-- Tokens header -->
       <div style="display:flex;align-items:center;gap:8px;padding:0 16px 8px;">
@@ -200,7 +163,6 @@
         </div>
         <div id="home-manage-btn" onclick="homeManageBtnClick()" style="display:flex;align-items:center;gap:4px;cursor:pointer;padding:5px 10px;background:var(--bg-glass);border:1px solid var(--border-subtle);border-radius:9px;transition:all 0.2s ease;flex-shrink:0;position:relative;z-index:2;" onmousedown="homeManageBtnPress(this,true)" onmouseup="homeManageBtnPress(this,false)" ontouchstart="homeManageBtnPress(this,true);this._tsy=event.touches[0].clientY;" ontouchend="homeManageBtnPress(this,false);event.preventDefault();if(!this.dataset.wgDisabled&&Math.abs(event.changedTouches[0].clientY-(this._tsy||0))<8){openTokenManager();}">
           <span class="material-icons-round" style="font-size:14px;color:var(--accent-primary)">manage_search</span>
-          <span style="font-size:9px;font-weight:700;color:var(--text-secondary);font-family:var(--font-mono);letter-spacing:1px;">MANAGE</span>
         </div>
       </div>
 
