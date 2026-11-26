@@ -29,8 +29,8 @@
       if (usdVal > 0) {
         usdEl.textContent = _formatCurrencyDisplay(usdVal);
         usdEl.style.color = ''; usdEl.classList.add('has-balance');
-      } else if (marketPrice && marketPrice !== '—') {
-        usdEl.textContent = marketPrice;
+      } else {
+        usdEl.textContent = _formatCurrencyDisplay(0);
         usdEl.style.color = ''; usdEl.classList.remove('has-balance');
       }
     } else {
@@ -51,7 +51,7 @@
           usdEl.textContent = _formatCurrencyDisplay(freshUsdVal);
           usdEl.style.color = ''; usdEl.classList.add('has-balance');
         } else {
-          usdEl.textContent = usdEl.dataset.prevText || marketPrice;
+          usdEl.textContent = _formatCurrencyDisplay(0);
           usdEl.style.color = ''; usdEl.classList.remove('has-balance');
         }
       }, 3000);
@@ -155,9 +155,7 @@
             usdEl.style.color = ''; usdEl.classList.add('has-balance');
             card.dataset.usdValue = usdValNum.toFixed(6);
           } else {
-            const priceStr2 = price >= 1
-              ? _formatCurrencyDisplay(price)
-              : _formatCurrencyDisplay(price);
+            const priceStr2 = _formatCurrencyDisplay(0); // zero balance: show $0, not market price (price already shown on left)
             if (usdEl.textContent !== priceStr2) usdEl.textContent = priceStr2;
             usdEl.style.color = ''; usdEl.classList.remove('has-balance');
           }

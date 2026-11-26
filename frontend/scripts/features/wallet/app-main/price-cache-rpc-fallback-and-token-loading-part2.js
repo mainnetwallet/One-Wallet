@@ -277,9 +277,7 @@ function renderTokenCard(t, price, change24h, balance, list, idx) {
       if (balEl2) balEl2.textContent = balFormatted;
       if (usdEl2 && price > 0 && usdEl2.dataset.toggled !== '1') {
         const usdVal2 = balance * price;
-        const usdStr2 = usdVal2 > 0
-          ? _formatCurrencyDisplay(usdVal2)
-          : _formatCurrencyDisplay(price);
+        const usdStr2 = _formatCurrencyDisplay(usdVal2 > 0 ? usdVal2 : 0);
         _smoothSet(usdEl2, usdStr2);
         existing.dataset.usdValue = (usdVal2).toFixed(6);
       }
@@ -302,10 +300,8 @@ function renderTokenCard(t, price, change24h, balance, list, idx) {
   // Showing priceStr when balance=null causes a value jump (priceStr → balance*priceStr) once balance loads
   // Instead: show priceStr only when balance is actually known (non-null), else show the token price quietly
   const usdStr = usdVal !== null
-    ? (usdVal > 0
-        ? _formatCurrencyDisplay(usdVal)
-        : priceStr)
-    : (price > 0 ? priceStr : '');
+    ? _formatCurrencyDisplay(usdVal > 0 ? usdVal : 0)
+    : '';
 
   const el = document.createElement('div');
   el.className = 'token-card';

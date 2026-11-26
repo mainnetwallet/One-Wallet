@@ -372,7 +372,7 @@ async function silentPriceRefresh() {
     if (usdEl) {
       const usdVal = hasBalance
         ? _formatCurrencyDisplay(usdValNum)
-        : priceStr;
+        : _formatCurrencyDisplay(0);
       if (usdEl.textContent !== usdVal) _smoothSet(usdEl, usdVal);
       usdEl.style.color = ''; usdEl.classList.toggle('has-balance', hasBalance);
       if (hasBalance) {
