@@ -6,6 +6,9 @@ Per-build release notes are published on the [Releases](../../releases) page.
 ## [Unreleased]
 
 ### Fixed
+- **The site name on the dApp approval sheet could belong to a different tab:** the name came from the last page that
+  started loading in any tab, so with several tabs open the sheet could show another site's name. It now shows the
+  address of the tab that actually sent the request.
 - **dApp requests could hang forever when the rejection message contained a quote:** the error text sent back to the
   dApp was escaped in the wrong order, producing a script error, so the dApp's request never finished. The message is
   now safely encoded and the request always ends with the rejection.

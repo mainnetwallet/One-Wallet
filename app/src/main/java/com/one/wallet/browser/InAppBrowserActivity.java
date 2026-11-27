@@ -1089,10 +1089,10 @@ public class InAppBrowserActivity extends AppCompatActivity {
                     view.postDelayed(() -> {
                         // Guard: if page has navigated away since this was scheduled, skip
                         if (!isSeqCurrent(view, host2Seq)) return;
-                        String safeHost2 = host2.replace("\"", "\\\"");
+                        String safeHost2 = jsStr(host2);
                         WebView mv = MainActivity.getMainWebView();
                         if (mv != null) mv.post(() -> mv.evaluateJavascript(
-                            "window._oneActiveBrowserHost = \"" + safeHost2 + "\";", null));
+                            "window._oneActiveBrowserHost = " + safeHost2 + ";", null));
                     }, 500);
                 }
             }
@@ -1525,7 +1525,20 @@ public class InAppBrowserActivity extends AppCompatActivity {
                                      final String bodyHtml, final String approveLabel) {
         final InAppBrowserActivity a = sInstance != null ? sInstance.get() : null;
         if (a == null) return;
-        a.runOnUiThread(() -> a.showNativeTxConfirm(reqId, actionLabel, siteHost, bodyHtml, approveLabel));
+        a.runOnUiThread(() -> {
+            // Show the host of the tab that actually made this request (recorded in sReqTabMap by
+            // handleRequest), not the global "last page started" value the wallet JS passes in:
+            // another tab loading a page in the meantime must not change what the user sees.
+            String originHost = siteHost;
+            WeakReference<WebView> ref = sReqTabMap.get(reqId);
+            WebView originWv = ref != null ? ref.get() : null;
+            if (originWv != null) {
+                String u = originWv.getUrl();
+                String h = u != null ? a.extractDomain(u) : null;
+                if (h != null && !h.isEmpty() && !"New Tab".equals(h)) originHost = h;
+            }
+            a.showNativeTxConfirm(reqId, actionLabel, originHost, bodyHtml, approveLabel);
+        });
     }
 
     // ── Native transaction / signature confirmation ──────────────────────────────────────────
