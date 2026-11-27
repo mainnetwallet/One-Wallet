@@ -365,3 +365,22 @@
 
   * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
 
+
+  /* ── Profile redesign (light mode) ── */
+  body.light-mode .prof-card,
+  body.light-mode .prof-tools {
+    background: #ffffff !important;
+    border-color: rgba(99,102,241,0.14) !important;
+    box-shadow: 0 2px 12px rgba(99,102,241,0.07) !important;
+  }
+  body.light-mode .prof-card-addr,
+  body.light-mode .prof-stat-value,
+  body.light-mode .prof-tool-title { color: #1e1b4b; }
+  body.light-mode .prof-card-label,
+  body.light-mode .prof-stat-label,
+  body.light-mode .prof-tool-sub,
+  body.light-mode .prof-section-label,
+  body.light-mode .prof-hint-text { color: #1e1b4b !important; }
+  body.light-mode .prof-tool + .prof-tool,
+  body.light-mode .prof-stats,
+  body.light-mode .prof-stat--mid { border-color: rgba(99,102,241,0.13); }
