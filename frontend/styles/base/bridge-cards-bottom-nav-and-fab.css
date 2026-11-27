@@ -76,16 +76,6 @@
   .br-chain-item:active { transform: scale(0.97); background: var(--bg-glass-hover); }
   .br-chain-item.active { border-color: rgba(99,102,241,0.5); background: rgba(99,102,241,0.1); }
 
-  /* Bridge token item */
-  .br-token-item {
-    display: flex; align-items: flex-start; gap: 12px;
-    padding: 11px 14px; border-radius: var(--radius-md);
-    background: var(--bg-glass); border: 1px solid var(--border-subtle);
-    cursor: pointer; transition: all 0.2s ease; margin-bottom: 6px;
-  }
-  .br-token-item:active { transform: scale(0.97); }
-  .br-token-item.active { border-color: rgba(99,102,241,0.5); background: rgba(99,102,241,0.1); }
-
   /* Spin animation */
   @keyframes spin { to { transform: rotate(360deg); } }
   @keyframes senderPulse {

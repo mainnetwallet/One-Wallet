@@ -60,8 +60,11 @@
     br.pickerTarget = target;
     const side = target;
     const chainId = side === 'from' ? br.fromChain.id : br.toChain.id;
+    const chainName = side === 'from' ? br.fromChain.name : br.toChain.name;
     const listEl = $e('br-token-list');
-    if (listEl) listEl.innerHTML = '<div style="text-align:center;padding:30px;font-family:var(--font-mono);font-size:11px;color:var(--text-muted);">Loading…</div>';
+    if (listEl) listEl.innerHTML = '<div class="sw-tp-empty">Loading…</div>';
+    const _lbl = $e('br-tp-label');
+    if (_lbl) _lbl.textContent = chainName ? ('All tokens on ' + chainName) : 'All tokens';
     $e('br-token-search').value = '';
     $e('br-token-overlay').classList.add('open');
     haptic && haptic();
@@ -74,7 +77,7 @@
     if (listEl) listEl.innerHTML = '';
     const curAddr = (side === 'from' ? br.fromToken : br.toToken).address.toLowerCase();
     if (!tokens.length) {
-      if (listEl) listEl.innerHTML = '<div style="text-align:center;padding:30px;font-family:var(--font-mono);font-size:11px;color:var(--text-muted);">No tokens</div>';
+      if (listEl) listEl.innerHTML = '<div class="sw-tp-empty">No tokens found</div>';
       return;
     }
 
@@ -144,24 +147,57 @@
       const hasBal = bal !== null && !isNaN(bal) && bal > 0;
       const usdVal = hasBal && price > 0 ? bal * price : 0;
 
-      const _balHtml = hasBal ? `
-        <div style="font-family:var(--font-mono);font-size:11px;color:var(--text-primary);font-weight:600;text-align:right;">${_fmtBal(bal)}</div>
-        <div style="font-family:var(--font-mono);font-size:9px;color:var(--accent-green);text-align:right;">${usdVal > 0 ? _formatCurrencyDisplay(usdVal) : _formatCurrencyDisplay(0)}</div>
-      ` : (active ? '' : '');
-
+      // Row is built with DOM calls (textContent), so token names coming from the API or a contract can never inject markup
       const item = document.createElement('div');
-      item.className = 'br-token-item' + (active ? ' active' : '');
-      item.innerHTML = `
-        ${tokenIconHTML(tok, 32)}
-        <div style="flex:1;min-width:0;padding-top:1px;">
-          <div style="font-size:13px;font-weight:700;">${sym}</div>
-          <div style="font-size:10px;color:var(--text-muted);font-family:var(--font-mono);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${tok.name || ''}</div>
-        </div>
-        <div style="display:flex;flex-direction:column;align-items:flex-end;justify-content:flex-start;flex-shrink:0;gap:2px;padding-top:1px;">
-          ${_balHtml}
-          ${active ? '<span class="material-icons-round" style="font-size:16px;color:var(--accent-primary);margin-top:2px;">check_circle</span>' : ''}
-        </div>
-      `;
+      item.className = 'sw-tp-row' + (active ? ' sel' : '');
+
+      const ico = document.createElement('div');
+      ico.className = 'sw-tp-ico';
+      const _letter = String(sym).charAt(0).toUpperCase();
+      if (tok.logoURI) {
+        const img = document.createElement('img');
+        img.alt = '';
+        img.loading = 'lazy';
+        img.onerror = function () { img.remove(); ico.textContent = _letter; };
+        img.src = tok.logoURI;
+        ico.appendChild(img);
+      } else {
+        ico.textContent = _letter;
+      }
+
+      const main = document.createElement('div');
+      main.className = 'sw-tp-row-main';
+      const symEl = document.createElement('div');
+      symEl.className = 'sw-tp-sym';
+      symEl.textContent = sym;
+      const nameEl = document.createElement('div');
+      nameEl.className = 'sw-tp-name';
+      nameEl.textContent = tok.name || '';
+      main.appendChild(symEl);
+      main.appendChild(nameEl);
+
+      item.appendChild(ico);
+      item.appendChild(main);
+
+      if (hasBal) {
+        const right = document.createElement('div');
+        right.className = 'sw-tp-right';
+        const balEl = document.createElement('div');
+        balEl.className = 'sw-tp-bal has';
+        balEl.textContent = _fmtBal(bal);
+        const usdEl = document.createElement('div');
+        usdEl.className = 'sw-tp-usd has';
+        usdEl.textContent = _formatCurrencyDisplay(usdVal);
+        right.appendChild(balEl);
+        right.appendChild(usdEl);
+        item.appendChild(right);
+      }
+      if (active) {
+        const chk = document.createElement('span');
+        chk.className = 'material-icons-round sw-tp-check';
+        chk.textContent = 'check';
+        item.appendChild(chk);
+      }
       item.addEventListener('click', () => {
         // Resolve live price from cache, fallback to tok.priceUSD
         let _pickPrice = parseFloat(tok.priceUSD || 0);
@@ -231,7 +267,7 @@
     const _isAddr = /^0x[0-9a-f]{40}$/i.test(raw);
     if (_isAddr && !filtered.length) {
       const listEl = $e('br-token-list');
-      if (listEl) listEl.innerHTML = '<div style="text-align:center;padding:24px;font-family:var(--font-mono);font-size:11px;color:var(--text-muted);display:flex;flex-direction:column;align-items:center;gap:8px;"><span class="material-icons-round" style="font-size:20px;animation:spin 0.8s linear infinite;color:var(--accent-primary);">sync</span>Looking up contract…</div>';
+      if (listEl) listEl.innerHTML = '<div class="sw-tp-empty" style="display:flex;flex-direction:column;align-items:center;gap:8px;"><span class="material-icons-round" style="font-size:20px;animation:spin 0.8s linear infinite;color:var(--accent-primary);">sync</span>Looking up contract…</div>';
 
       const chainId = side === 'from' ? br.fromChain.id : br.toChain.id;
       let found = null;
@@ -265,7 +301,7 @@
       if (found) {
         brRenderTokenList([found], side);
       } else {
-        if (listEl) listEl.innerHTML = '<div style="text-align:center;padding:24px;font-family:var(--font-mono);font-size:11px;color:var(--accent-red);">Token not found on this chain</div>';
+        if (listEl) listEl.innerHTML = '<div class="sw-tp-empty" style="color:var(--accent-red);">Token not found on this chain</div>';
       }
       return;
     }
@@ -273,5 +309,19 @@
     brRenderTokenList(filtered, side);
   };
 
-  window.brCloseTokenPicker = function () { $e('br-token-overlay').classList.remove('open'); };
+  window.brPasteTokenSearch = async function () {
+    const inp = $e('br-token-search');
+    if (!inp) return;
+    try {
+      const txt = await navigator.clipboard.readText();
+      if (txt) { inp.value = txt.trim(); brFilterTokens(); return; }
+    } catch (_e) {}
+    inp.focus();
+  };
+
+  window.brCloseTokenPicker = function () {
+    // Drop the keyboard if the search box still has focus
+    try { const _ae = document.activeElement; if (_ae && _ae.id === 'br-token-search') _ae.blur(); } catch (_e) {}
+    $e('br-token-overlay').classList.remove('open');
+  };
 

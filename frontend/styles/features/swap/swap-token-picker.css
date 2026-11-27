@@ -1,4 +1,4 @@
-/* Swap — Select token bottom sheet */
+/* Select token bottom sheet (Swap, Bridge, Send) — shared sw-tp-* classes */
 .sw-tp-sheet {
   width: 100%;
   height: 80%;
@@ -138,3 +138,18 @@
 .sw-tp-usd.has { color: var(--accent-green); }
 .sw-tp-check { font-size: 18px; color: #a5a8ff; flex-shrink: 0; }
 .sw-tp-empty { padding: 28px 8px; text-align: center; font-size: 13px; color: var(--text-muted); }
+.sw-tp-ico {
+  width: 38px;
+  height: 38px;
+  border-radius: 11px;
+  overflow: hidden;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(99, 102, 241, 0.2);
+  color: #a5a8ff;
+  font-size: 15px;
+  font-weight: 800;
+}
+.sw-tp-ico img { width: 100%; height: 100%; object-fit: cover; display: block; }

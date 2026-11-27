@@ -8,6 +8,7 @@
 // ══════════════════════════════════════════════
 
 let _sendSheetView = 'all';    // 'all' or a chainId (number)
+let _sendSheetQuery = '';      // lower-cased search text
 let _sendSheetSession = 0;     // bumped on open / tab change / close so stale RPC results are dropped
 const _sendSheetMemBal = {};   // 'tokenId:chainId' -> balance fetched on demand while the sheet is open
 let _sendPillKey = '';         // 'chainId:tokenId' the pill is currently drawn for
@@ -73,6 +74,7 @@ function _sendTokPrice(t) {
 
 function _sendFmtBal(v) {
   if (v === null) return '—';
+  if (v === 0) return '0';
   return (v < 0.0001 && v > 0) ? v.toExponential(2) : v.toFixed(4);
 }
 
@@ -86,6 +88,10 @@ function _sendSheetRows() {
     const cid = t.chainId || 8453;
     if (!chainName[cid]) return;
     if (_sendSheetView !== 'all' && cid !== _sendSheetView) return;
+    if (_sendSheetQuery) {
+      const hay = ((t.sub || '') + ' ' + (t.name || '') + ' ' + (t.contract || '') + ' ' + chainName[cid]).toLowerCase();
+      if (hay.indexOf(_sendSheetQuery) === -1) return;
+    }
     if (!t.isNative && !(t.contract && /^0x[0-9a-fA-F]{40}$/.test(t.contract))) return;
     const bal = _sendTokBal(t, balMap);
     rows.push({ t: t, cid: cid, chain: chainName[cid], bal: bal, usd: bal ? bal * _sendTokPrice(t) : 0 });
@@ -122,8 +128,8 @@ function _renderSendSheet() {
   const rows = _sendSheetRows();
   if (!rows.length) {
     const empty = document.createElement('div');
-    empty.className = 'send-sheet-empty';
-    empty.textContent = 'No tokens on this network yet.';
+    empty.className = 'sw-tp-empty';
+    empty.textContent = _sendSheetQuery ? 'No tokens found' : 'No tokens on this network yet.';
     listEl.appendChild(empty);
     return;
   }
@@ -132,31 +138,32 @@ function _renderSendSheet() {
     const isSel = r.cid === sendSelectedChainId &&
       (t.id === sendSelectedToken || (t.isNative && sendSelectedToken === 'eth'));
     const row = document.createElement('div');
-    row.className = 'send-sheet-row' + (isSel ? ' sel' : '');
+    row.className = 'sw-tp-row' + (isSel ? ' sel' : '');
 
     const icon = document.createElement('div');
-    icon.className = 'send-sheet-icon';
+    icon.className = 'sw-tp-ico';
     icon.style.background = (t.color || '#6366f1') + '22';
     icon.appendChild(getTokenLogoEl(t));
 
     const info = document.createElement('div');
-    info.className = 'send-sheet-info';
+    info.className = 'sw-tp-row-main';
     const sym = document.createElement('div');
-    sym.className = 'send-sheet-sym';
+    sym.className = 'sw-tp-sym';
     sym.textContent = t.sub;
     const sub = document.createElement('div');
-    sub.className = 'send-sheet-sub';
+    sub.className = 'sw-tp-name';
     sub.textContent = (t.name || t.sub) + (_sendSheetView === 'all' ? ' · ' + r.chain : '');
     info.appendChild(sym);
     info.appendChild(sub);
 
+    const hasBal = r.bal !== null && r.bal > 0;
     const val = document.createElement('div');
-    val.className = 'send-sheet-val';
+    val.className = 'sw-tp-right';
     const bal = document.createElement('div');
-    bal.className = 'send-sheet-bal';
+    bal.className = 'sw-tp-bal' + (hasBal ? ' has' : '');
     bal.textContent = _sendFmtBal(r.bal);
     const usd = document.createElement('div');
-    usd.className = 'send-sheet-usd';
+    usd.className = 'sw-tp-usd' + (hasBal ? ' has' : '');
     usd.textContent = r.bal === null ? '' : _formatCurrencyDisplay(r.usd);
     val.appendChild(bal);
     val.appendChild(usd);
@@ -164,6 +171,12 @@ function _renderSendSheet() {
     row.appendChild(icon);
     row.appendChild(info);
     row.appendChild(val);
+    if (isSel) {
+      const chk = document.createElement('span');
+      chk.className = 'material-icons-round sw-tp-check';
+      chk.textContent = 'check';
+      row.appendChild(chk);
+    }
     row.onclick = () => _sendPickToken(t, r.cid);
     listEl.appendChild(row);
   });
@@ -246,8 +259,27 @@ function _attachSendSheetSwipe(sheet) {
   sheet.addEventListener('touchcancel', function () { dragging = false; locked = false; reset(); }, { passive: true });
 }
 
+function sendSheetFilter(v) {
+  _sendSheetQuery = String(v || '').trim().toLowerCase();
+  _renderSendSheet();
+  _fetchSendSheetMissing();
+}
+
+async function sendSheetPaste() {
+  const inp = document.getElementById('send-sheet-search');
+  if (!inp) return;
+  try {
+    const txt = await navigator.clipboard.readText();
+    if (txt) { inp.value = txt.trim(); sendSheetFilter(inp.value); return; }
+  } catch (_e) {}
+  inp.focus();
+}
+
 function openSendTokenSheet() {
   _sendSheetView = 'all';
+  _sendSheetQuery = '';
+  const _inp = document.getElementById('send-sheet-search');
+  if (_inp) _inp.value = '';
   const sheet = document.getElementById('send-token-sheet');
   const back = document.getElementById('send-sheet-backdrop');
   if (!sheet) return;
@@ -262,6 +294,7 @@ function openSendTokenSheet() {
 
 function closeSendTokenSheet() {
   _sendSheetSession++;
+  try { const ae = document.activeElement; if (ae && ae.id === 'send-sheet-search') ae.blur(); } catch (_e) {}
   const sheet = document.getElementById('send-token-sheet');
   const back = document.getElementById('send-sheet-backdrop');
   if (sheet) sheet.classList.remove('open');

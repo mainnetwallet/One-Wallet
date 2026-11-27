@@ -156,13 +156,18 @@
   <!-- Select token sheet: All networks + per-network tabs, sorted by value -->
   <div class="send-sheet-backdrop" id="send-sheet-backdrop" onclick="closeSendTokenSheet()"></div>
   <div class="send-sheet" id="send-token-sheet">
-    <div class="send-sheet-handle"></div>
-    <div class="send-sheet-head">
-      <span>Select token</span>
-      <div class="send-icon-btn" onclick="closeSendTokenSheet()"><span class="material-icons-round">close</span></div>
+    <div class="sw-tp-grab"><div class="sw-tp-handle"></div></div>
+    <div class="sw-tp-head">
+      <div class="sw-tp-title">Select token</div>
+      <button type="button" class="sw-tp-close" onclick="closeSendTokenSheet()" aria-label="Close"><span class="material-icons-round">close</span></button>
+    </div>
+    <div class="sw-tp-search">
+      <span class="material-icons-round sw-tp-search-ico">search</span>
+      <input id="send-sheet-search" type="text" placeholder="Search name, symbol or paste 0x…" autocomplete="off" autocapitalize="none" spellcheck="false" oninput="sendSheetFilter(this.value)">
+      <button type="button" class="sw-tp-paste" onclick="sendSheetPaste()">Paste</button>
     </div>
     <div class="send-sheet-chains" id="send-sheet-chains"></div>
-    <div class="send-sheet-hint">Highest value first</div>
-    <div class="send-sheet-list" id="send-sheet-list"></div>
+    <div class="sw-tp-label">Highest value first</div>
+    <div class="sw-tp-list" id="send-sheet-list"></div>
   </div>
 </div>

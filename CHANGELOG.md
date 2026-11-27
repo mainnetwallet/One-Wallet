@@ -6,6 +6,12 @@ Per-build release notes are published on the [Releases](../../releases) page.
 ## [Unreleased]
 
 ### Changed
+- **Bridge and Send token pickers now match the Swap one:** same compact **Select token** sheet (handle, header, 38px
+  search with **Paste**, "All tokens on <chain>" label, 38px logos, selected row tinted with a tick, "No tokens found").
+  Bridge keeps its LiFi list, contract-address lookup and balance sort; Send keeps its network tabs and "Highest value
+  first" order and gains search. Token names and logos are now added to the list with DOM calls (no raw HTML), so a
+  token with a crafted name cannot inject markup. The shared sheet classes (`sw-tp-*`) live in
+  `styles/features/swap/swap-token-picker.css`.
 - **Swap token picker redesign:** compact **Select token** sheet (80% height, slimmer handle / header / 38px search with a
   **Paste** button), 38px token logos, selected token highlighted with a tick, "All tokens on <chain>" label and a
   "No tokens found" empty state. New `styles/features/swap/swap-token-picker.css`; the dim backdrop is lighter.

@@ -310,54 +310,28 @@
     opacity: 0; pointer-events: none; transition: opacity 0.28s ease;
   }
   .send-sheet-backdrop.open { opacity: 1; pointer-events: all; }
+  /* Row / header / search look comes from the shared sw-tp-* classes (styles/features/swap/swap-token-picker.css) */
   .send-sheet {
     position: absolute; left: 0; right: 0; bottom: 0; z-index: 720;
-    height: 80%; padding: 10px 18px 0;
-    background: var(--bg-surface); border-top: 0.5px solid rgba(255,255,255,0.08);
-    border-radius: 24px 24px 0 0;
+    height: 80%; padding: 0 14px;
+    background: var(--bg-deep); border-top: 1px solid var(--border-subtle);
+    border-radius: 20px 20px 0 0;
     display: flex; flex-direction: column;
     transform: translateY(100%); visibility: hidden;
     transition: transform 0.28s ease, visibility 0.28s;
   }
   .send-sheet.open { transform: translateY(0); visibility: visible; }
-  .send-sheet-handle { width: 44px; height: 4px; border-radius: 2px; background: rgba(255,255,255,0.14); margin: 0 auto 14px; }
-  .send-sheet-head {
-    display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;
-    font-family: var(--font-ui); font-size: 21px; font-weight: 500;
-  }
-  .send-sheet-head .send-icon-btn .material-icons-round { font-size: 22px; }
-  .send-sheet-chains { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; flex-shrink: 0; }
+  .send-sheet-chains { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; flex-shrink: 0; margin-bottom: 6px; }
   .send-sheet-chains::-webkit-scrollbar { display: none; }
   .send-sheet-chip {
-    flex-shrink: 0; height: 36px; padding: 0 16px; border-radius: 18px;
+    flex-shrink: 0; height: 30px; padding: 0 13px; border-radius: 15px;
     display: flex; align-items: center;
     background: var(--bg-raised); color: var(--text-secondary);
-    font-family: var(--font-ui); font-size: 14px; cursor: pointer;
+    font-size: 12px; font-weight: 600; cursor: pointer;
     -webkit-tap-highlight-color: transparent;
   }
   .send-sheet-chip.on { background: rgba(99,102,241,0.28); color: #c9cbff; }
-  .send-sheet-hint { font-family: var(--font-ui); font-size: 12px; color: var(--text-secondary); margin: 10px 0 2px; }
-  .send-sheet-list {
-    flex: 1; min-height: 0; overflow-y: auto; scrollbar-width: none;
-    padding-bottom: max(16px, env(safe-area-inset-bottom, 0px));
-  }
-  .send-sheet-list::-webkit-scrollbar { display: none; }
-  .send-sheet-row {
-    display: flex; align-items: center; gap: 14px; padding: 11px 0;
-    border-bottom: 0.5px solid rgba(255,255,255,0.06); cursor: pointer;
-    -webkit-tap-highlight-color: transparent;
-  }
-  .send-sheet-row:active { opacity: 0.7; }
-  .send-sheet-icon { width: 42px; height: 42px; border-radius: 50%; overflow: hidden; flex-shrink: 0; display: flex; }
-  .send-sheet-icon > div, .send-sheet-icon > img { width: 100%; height: 100%; border-radius: 50%; }
-  .send-sheet-info { flex: 1; min-width: 0; }
-  .send-sheet-sym { font-family: var(--font-ui); font-size: 16px; font-weight: 500; }
-  .send-sheet-row.sel .send-sheet-sym { color: #c9cbff; }
-  .send-sheet-sub { font-family: var(--font-ui); font-size: 13px; color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .send-sheet-val { text-align: right; flex-shrink: 0; }
-  .send-sheet-bal { font-family: var(--font-ui); font-size: 15px; }
-  .send-sheet-usd { font-family: var(--font-ui); font-size: 13px; color: var(--text-secondary); }
-  .send-sheet-empty { padding: 28px 0; text-align: center; font-family: var(--font-ui); font-size: 14px; color: var(--text-secondary); }
+  #send-sheet-list { padding-bottom: max(16px, env(safe-area-inset-bottom, 0px)); }
 
 
   /* ══════════════ RECEIVE SCREEN ══════════════ */

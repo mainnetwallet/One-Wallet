@@ -28,21 +28,20 @@
     </div>
 
     <!-- ── BRIDGE TOKEN PICKER ── -->
-    <div id="br-token-overlay" style="position:fixed;top:0;left:0;right:0;bottom:0;z-index:25000;background:rgba(5,5,8,0.75);display:flex;flex-direction:column;justify-content:flex-end;align-items:center;opacity:0;will-change:opacity;transform:translateZ(0);-webkit-transform:translateZ(0);pointer-events:none;transition:opacity 0.25s ease;">
-      <div id="br-token-modal-inner" style="width:100%;max-width: 100%;height:60vh;display:flex;flex-direction:column;background:var(--bg-deep);border-radius:24px 24px 0 0;border:1px solid var(--border-subtle);border-bottom:none;margin-bottom:calc(var(--nav-height) + env(safe-area-inset-bottom, 0px));">
-        <div style="padding:16px 20px 12px;display:flex;align-items:center;gap:14px;border-bottom:1px solid var(--border-subtle);background:var(--bg-deep);flex-shrink:0;">
-          <div onclick="brCloseTokenPicker()" style="width:36px;height:36px;border-radius:10px;background:var(--bg-glass);border:1px solid var(--border-subtle);display:flex;align-items:center;justify-content:center;cursor:pointer;">
-            <span class="material-icons-round" style="font-size:20px;color:var(--text-secondary);">arrow_back</span>
-          </div>
-          <div style="font-size:18px;font-weight:800;flex:1;">Select Token</div>
+    <div id="br-token-overlay" style="position:fixed;top:0;left:0;right:0;bottom:0;z-index:25000;background:rgba(5,5,8,0.6);display:flex;flex-direction:column;justify-content:flex-end;align-items:center;opacity:0;will-change:opacity;transform:translateZ(0);-webkit-transform:translateZ(0);pointer-events:none;transition:opacity 0.25s ease;" onclick="if(event.target===this)brCloseTokenPicker()">
+      <div id="br-token-modal-inner" class="sw-tp-sheet" style="height:calc(80% - var(--nav-height) - env(safe-area-inset-bottom, 0px));margin-bottom:calc(var(--nav-height) + env(safe-area-inset-bottom, 0px));">
+        <div class="sw-tp-grab"><div class="sw-tp-handle"></div></div>
+        <div class="sw-tp-head">
+          <div class="sw-tp-title">Select token</div>
+          <button type="button" class="sw-tp-close" onclick="brCloseTokenPicker()" aria-label="Close"><span class="material-icons-round">close</span></button>
         </div>
-        <div style="padding:12px 20px;background:var(--bg-deep);border-bottom:1px solid var(--border-subtle);flex-shrink:0;">
-          <input id="br-token-search" placeholder="Search token…" oninput="brFilterTokens()"
-            style="width:100%;background:var(--bg-raised);border:1px solid var(--border-subtle);border-radius:12px;padding:10px 14px;font-family:var(--font-mono);font-size:12px;color:var(--text-primary);outline:none;">
+        <div class="sw-tp-search">
+          <span class="material-icons-round sw-tp-search-ico">search</span>
+          <input id="br-token-search" type="text" placeholder="Search name, symbol or paste 0x…" autocomplete="off" autocapitalize="none" spellcheck="false" oninput="brFilterTokens()">
+          <button type="button" class="sw-tp-paste" onclick="brPasteTokenSearch()">Paste</button>
         </div>
-        <div style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:12px 20px calc(var(--nav-height) + 20px);background:var(--bg-deep);scrollbar-width:none;" id="br-token-list">
-          <div style="text-align:center;padding:30px;font-family:var(--font-mono);font-size:11px;color:var(--text-muted);">Loading…</div>
-        </div>
+        <div id="br-tp-label" class="sw-tp-label">All tokens</div>
+        <div id="br-token-list" class="sw-tp-list"><div class="sw-tp-empty">Loading…</div></div>
       </div>
     </div>
 
