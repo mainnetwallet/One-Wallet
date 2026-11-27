@@ -29,7 +29,7 @@
     // Cancel any pending close timer (race condition fix)
     if (_brHistCloseTimer) { clearTimeout(_brHistCloseTimer); _brHistCloseTimer = null; }
     brRenderHistDropdown();
-    modal.style.display = 'flex';
+    if (modal.parentElement !== document.body) document.body.appendChild(modal);
     brHistOpen = true;
     // Update clear button visibility — only bridge entries count
     var _brhClearBtn = document.getElementById('brh-clear-btn');
@@ -47,10 +47,6 @@
       _brhClearBtn.style.display = _brhTxs.length > 0 ? 'flex' : 'none';
       _brhClearBtn.style.opacity = '1';
     }
-    // Clear any inline transform left by swipe-to-close gesture,
-    // restore CSS transition so the open animation plays correctly
-    sheet.style.transform = '';
-    sheet.style.transition = '';
     requestAnimationFrame(function () {
       requestAnimationFrame(function () {
         modal.classList.add('brh-open');
@@ -63,19 +59,7 @@
 
   window.brCloseHistory = function () {
     var modal = document.getElementById('br-history-modal');
-    var sheet = document.getElementById('br-history-sheet');
     if (!modal) return;
     brHistOpen = false;
     modal.classList.remove('brh-open');
-    if (sheet) {
-      requestAnimationFrame(function () {
-        sheet.style.transition = 'transform 0.28s cubic-bezier(0.4,0,0.6,1)';
-        sheet.style.transform = 'translateY(100%)';
-      });
-    }
-    _brHistCloseTimer = setTimeout(function () {
-      modal.style.display = 'none';
-      if (sheet) { sheet.style.transform = ''; sheet.style.transition = ''; }
-      _brHistCloseTimer = null;
-    }, 300);
   };

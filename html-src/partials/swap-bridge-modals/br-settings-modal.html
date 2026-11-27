@@ -1,40 +1,39 @@
-    <!-- Bridge Settings Modal -->
-    <div id="br-settings-modal" style="position:fixed;top:0;left:0;right:0;bottom:calc(var(--nav-height) + env(safe-area-inset-bottom, 0px));z-index:9000;background:rgba(0,0,0,0.75);display:none;align-items:flex-end;justify-content:center;" onclick="if(event.target===this)brCloseSettings()">
-      <div id="br-settings-sheet" style="width:100%;max-width: 100%;background:var(--bg-deep);border-radius:24px 24px 0 0;border:1px solid var(--border-subtle);border-bottom:none;padding-bottom:env(safe-area-inset-bottom,0);transform:translateY(100%);transition:transform 0.32s cubic-bezier(0.34,1.1,0.64,1);">
-        <!-- Drag handle -->
-        <div style="display:flex;justify-content:center;padding:12px 0 4px;">
-          <div style="width:36px;height:4px;border-radius:2px;background:var(--border-subtle);"></div>
-        </div>
+    <!-- Bridge Settings Modal (centered popup — same look as Swap Settings) -->
+    <div id="br-settings-modal" style="position:fixed;top:0;left:0;right:0;bottom:calc(var(--nav-height) + env(safe-area-inset-bottom, 0px));z-index:9000;background:rgba(0,0,0,0.72);align-items:center;justify-content:center;padding:0 16px;box-sizing:border-box;" onclick="if(event.target===this)brCloseSettings()" ontouchend="if(event.target===this){event.preventDefault();brCloseSettings();}">
+      <div id="br-settings-sheet" style="width:100%;max-width:420px;max-height:100%;overflow-y:auto;scrollbar-width:none;background:var(--bg-deep);border-radius:22px;border:1px solid var(--border-subtle);">
         <!-- Header -->
-        <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 20px 16px;">
-          <div style="font-size:16px;font-weight:800;font-family:var(--font-display);">Bridge Settings</div>
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:18px 20px 14px;">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <div style="width:32px;height:32px;border-radius:10px;background:rgba(99,102,241,0.15);display:flex;align-items:center;justify-content:center;"><span class="material-icons-round" style="font-size:18px;color:var(--accent-primary);">tune</span></div>
+            <div style="font-size:17px;font-weight:800;font-family:var(--font-display);">Bridge Settings</div>
+          </div>
           <div onclick="brCloseSettings()" ontouchend="event.preventDefault();brCloseSettings();" style="width:32px;height:32px;border-radius:50%;background:var(--bg-raised);border:1px solid var(--border-subtle);display:flex;align-items:center;justify-content:center;cursor:pointer;" onmousedown="this.style.opacity='.6'" onmouseup="this.style.opacity='1'" ontouchstart="this.style.opacity='.6'">
             <span class="material-icons-round" style="font-size:17px;color:var(--text-muted);">close</span>
           </div>
         </div>
         <!-- Content -->
-        <div style="padding:0 20px 32px;display:flex;flex-direction:column;gap:0;">
+        <div style="padding:0 20px 20px;display:flex;flex-direction:column;gap:0;">
           <!-- Slippage -->
           <div style="margin-bottom:20px;">
-            <div style="font-family:var(--font-mono);font-size:9px;color:var(--text-muted);letter-spacing:2px;font-weight:700;margin-bottom:10px;">SLIPPAGE TOLERANCE</div>
-            <div style="display:flex;gap:5px;align-items:center;flex-wrap:wrap;" id="br-slip-chips">
+            <div style="font-family:var(--font-mono);font-size:10px;color:var(--text-muted);letter-spacing:2.2px;font-weight:700;margin-bottom:10px;">SLIPPAGE TOLERANCE</div>
+            <div style="display:flex;gap:7px;align-items:center;" id="br-slip-chips">
               <div class="br-slip-chip selected" id="br-slip-auto" onclick="brSelectSlip(this,'auto')">Auto</div>
               <div class="br-slip-chip" onclick="brSelectSlip(this,'0.5')">0.5%</div>
               <div class="br-slip-chip" onclick="brSelectSlip(this,'1.0')">1%</div>
               <div class="br-slip-chip" id="br-slip-custom-btn" onclick="brToggleCustomSlip()">Custom</div>
             </div>
             <div id="br-slip-custom-wrap" style="display:none;margin-top:8px;">
-              <div style="display:flex;align-items:center;gap:8px;background:var(--bg-raised);border:1px solid rgba(99,102,241,0.3);border-radius:10px;padding:8px 12px;">
-                <input id="br-slip-custom-input" type="number" placeholder="e.g. 1.5" min="0.1" max="50" step="0.1"
-                  style="flex:1;background:transparent;border:none;outline:none;font-family:var(--font-mono);font-size:13px;font-weight:700;color:var(--text-primary);"
+              <div style="display:flex;align-items:center;gap:8px;background:var(--bg-raised);border:1px solid var(--border-subtle);border-radius:12px;padding:10px 14px;">
+                <input id="br-slip-custom-input" type="number" placeholder="Custom %" min="0.1" max="50" step="0.1"
+                  style="flex:1;background:transparent;border:none;outline:none;font-family:var(--font-mono);font-size:14px;color:var(--text-primary);"
                   oninput="brApplyCustomSlip()">
                 <span style="font-family:var(--font-mono);font-size:12px;color:var(--text-muted);">%</span>
               </div>
             </div>
           </div>
           <!-- Gas Mode -->
-          <div style="margin-bottom:20px;">
-            <div style="font-family:var(--font-mono);font-size:9px;color:var(--text-muted);letter-spacing:2px;font-weight:700;margin-bottom:10px;">GAS MODE</div>
+          <div style="margin-bottom:4px;">
+            <div style="font-family:var(--font-mono);font-size:10px;color:var(--text-muted);letter-spacing:2.2px;font-weight:700;margin-bottom:10px;">GAS MODE</div>
             <div id="one-gas-toggle-bridge"></div>
           </div>
         </div>

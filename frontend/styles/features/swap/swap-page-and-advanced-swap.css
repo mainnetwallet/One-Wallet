@@ -201,6 +201,22 @@
   #sw-history-modal.sw-open #sw-history-sheet { transform: none; opacity: 1; }
   #sw-settings-sheet::-webkit-scrollbar { display: none; }
 
+  /* ── Bridge Settings — same centered popup as Swap Settings ── */
+  #br-settings-sheet {
+    transform: scale(0.94) translateY(10px); opacity: 0;
+    transition: transform 0.24s cubic-bezier(0.2,0.9,0.3,1), opacity 0.2s ease;
+  }
+  #br-settings-modal.sw-open #br-settings-sheet { transform: none; opacity: 1; }
+  #br-settings-sheet::-webkit-scrollbar { display: none; }
+  #br-settings-sheet .br-slip-chip {
+    flex:1; text-align:center;
+    font-size:12px; padding:9px 0; border-radius:10px;
+  }
+  #br-settings-sheet .br-slip-chip.selected {
+    background:rgba(99,102,241,0.18); border-color:rgba(99,102,241,0.5);
+    color:var(--accent-primary);
+  }
+
   /* ── SWAP NOW button look — same as BRIDGE NOW (#br-exec-btn) ──
      Compact pill, #e3edb7 soft gradient with dark text, same in dark and light theme.
      !important because swUpdateButton() used to write inline background/shadow on this button. */

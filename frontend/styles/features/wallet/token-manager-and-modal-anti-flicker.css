@@ -85,7 +85,7 @@
   }
 
   /* ── ANTI-FLICKER: display:none → flex modals ── */
-  #sw-token-modal, #sw-settings-modal, #sw-history-modal {
+  #sw-token-modal, #sw-settings-modal, #sw-history-modal, #br-settings-modal {
     display: flex !important;
     visibility: hidden;
     pointer-events: none;
@@ -94,7 +94,8 @@
   }
   #sw-token-modal.sw-open,
   #sw-settings-modal.sw-open,
-  #sw-history-modal.sw-open {
+  #sw-history-modal.sw-open,
+  #br-settings-modal.sw-open {
     visibility: visible;
     pointer-events: all;
     opacity: 1;

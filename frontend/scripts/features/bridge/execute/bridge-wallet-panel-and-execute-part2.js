@@ -321,22 +321,18 @@
   // ════════════════════════════════════════
   window.brOpenSettings = function () {
     const modal = document.getElementById('br-settings-modal');
-    const sheet = document.getElementById('br-settings-sheet');
-    if (!modal || !sheet) return;
-    modal.style.display = 'flex';
-    requestAnimationFrame(function () {
-      requestAnimationFrame(function () {
-        sheet.style.transform = 'translateY(0)';
-      });
-    });
+    if (!modal) return;
+    if (typeof window._swBlurActiveInput === 'function') window._swBlurActiveInput();
+    if (modal.parentElement !== document.body) document.body.appendChild(modal);
+    modal.classList.add('sw-open');
+    document.body.style.overflow = 'hidden';
     haptic && haptic();
   };
   window.brCloseSettings = function () {
     const modal = document.getElementById('br-settings-modal');
-    const sheet = document.getElementById('br-settings-sheet');
-    if (!modal || !sheet) return;
-    sheet.style.transform = 'translateY(100%)';
-    setTimeout(function () { modal.style.display = 'none'; }, 340);
+    if (!modal) return;
+    modal.classList.remove('sw-open');
+    setTimeout(function () { document.body.style.overflow = ''; }, 300);
   };
 
   // ════════════════════════════════════════
