@@ -6,6 +6,8 @@ Per-build release notes are published on the [Releases](../../releases) page.
 ## [Unreleased]
 
 ### Changed
+- **Self transfer layout:** the screen now fills the space down to the bottom nav bar like W2W (cards spread out, Logs strip sits right above the nav bar), no more big empty gap (`th-self-transfer-mobile.css`).
+- **Self transfer + W2W logs:** opening Logs no longer folds / hides the key boxes, hints or amount chips - everything stays where it is and the log box is scrolled into view when it opens (fixes the Logs tap looking like it did nothing on W2W).
 - **NFT Transfer + Self Transfer:** the action button (Transfer NFTs / Collect NFTs / Execute transfer) is now centred on the screen and only a little wider than its label; the gas pill stays on the left. Styling only (`th-nft-transfer-mobile.css`, `th-self-transfer-mobile.css`).
 - **Multi Key Recipients + Batch Transfer:** the Amount per wallet / address label and value are now centred in the amount column (unit pinned to its right edge); the card layout, Send mode and Batch size stay where they were. Styling only (`th-amount-centered.css`), applies to Native and Token.
 - **W2W transfer layout:** the screen now fills the space down to the bottom nav bar (fields spread out, Logs strip sits right above the nav bar), the Amount per transfer value is centred in its card, and the Execute transfer button is centred and only as wide as its label (gas pill stays on the left). Markup untouched; styling only (`th-w2w-compact.css`), applies to Native and Token.

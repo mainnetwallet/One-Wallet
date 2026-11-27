@@ -72,12 +72,10 @@
         #th-wrapper #walletToWalletUI .bt-dock { padding-top: 6px; }
         #th-wrapper #walletToWalletUI .bt-dock .progress-bar { margin: 6px 0 0 !important; }
 
-/* Logs: collapsed strip by default. Opening it folds the key boxes, meta lines and chips so the log box fits on screen. */
+/* Logs: collapsed strip by default. Opening it never hides or folds anything above: the free space between the cards just gets used up. */
         #th-wrapper #walletToWalletUI .bt-logs { padding: 4px 0 0 !important; }
         #th-wrapper #walletToWalletUI .bt-logs .bt-loghead { height: 36px; }
         #th-wrapper #walletToWalletUI .bt-logs .log-container { height: 130px !important; }
-        #th-wrapper #walletToWalletUI.w2w-logs-open .w2w-fold { display: none !important; }
-        #th-wrapper #walletToWalletUI.w2w-logs-open .bt-row .bt-head { margin-bottom: 0; }
 
 /* ══════════════════════════════════════════════════
    LAYOUT POLISH — fill the screen down to the nav bar, centred amount, centred Execute button

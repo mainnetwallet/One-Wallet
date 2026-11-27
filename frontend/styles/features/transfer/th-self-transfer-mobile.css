@@ -68,12 +68,10 @@
         #th-wrapper #selfTransferUI .st-act .bt-actions { flex: 1; min-width: 0; margin: 0 !important; grid-template-columns: 1fr !important; }
         #th-wrapper #selfTransferUI .bt-dock { padding-top: 6px; }
 
-/* Logs: collapsed strip by default. Opening it folds the key box, hint and chips so the log box fits on screen. */
+/* Logs: collapsed strip by default. Opening it never hides or folds anything above: the free space between the cards just gets used up. */
         #th-wrapper #selfTransferUI .bt-logs { padding: 4px 0 0 !important; }
         #th-wrapper #selfTransferUI .bt-logs .bt-loghead { height: 36px; }
         #th-wrapper #selfTransferUI .bt-logs .log-container { height: 130px !important; }
-        #th-wrapper #selfTransferUI.st-logs-open .st-fold { display: none !important; }
-        #th-wrapper #selfTransferUI.st-logs-open .bt-row .bt-head { margin-bottom: 0; }
 
 /* Gas pill on the left, action button in the middle of the screen and only a little wider than its label */
         #th-wrapper #selfTransferUI .st-act {
@@ -94,3 +92,32 @@
             padding: 8px 32px !important;
             white-space: nowrap;
         }
+
+/* ══════════════════════════════════════════════════
+   LAYOUT POLISH — fill the screen down to the nav bar (same as W2W transfer)
+   ══════════════════════════════════════════════════ */
+
+/* The screen is a column as tall as the page (page height minus nav bar + safe areas + page padding):
+   header + switch on top, the cards / summary / action row spread evenly in the middle (auto margins share the free space),
+   the Logs strip sits at the bottom just above the nav bar. Opening Logs uses up some of that free space; nothing is hidden.
+   Visible state is detected from the inline display (same pattern as W2W) because the show/hide helpers set it inline. */
+        #th-wrapper #selfTransferUI {
+            box-sizing: border-box;
+            min-height: calc(100vh - var(--nav-height) - env(safe-area-inset-bottom, 0px) - env(safe-area-inset-top, 0px) - 20px);
+            min-height: calc(100dvh - var(--nav-height) - env(safe-area-inset-bottom, 0px) - env(safe-area-inset-top, 0px) - 20px);
+            padding-bottom: 4px !important;
+        }
+        #th-wrapper #selfTransferUI:not([style*="display:none"]):not([style*="display: none"]) {
+            display: flex !important;
+            flex-direction: column;
+        }
+        #th-wrapper #selfTransferUI > .th-section-header,
+        #th-wrapper #selfTransferUI > .bt-seg-wrap { flex: none; }
+        #th-wrapper #selfTransferUI > .bt-card,
+        #th-wrapper #selfTransferUI > .bt-summary,
+        #th-wrapper #selfTransferUI > .bt-dock {
+            flex: none;
+            margin-top: auto !important;
+            margin-bottom: auto !important;
+        }
+        #th-wrapper #selfTransferUI > .bt-logs { flex: none; margin-top: auto !important; }

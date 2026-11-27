@@ -3,7 +3,7 @@
 // Presentation glue for the compact Self Transfer layout
 // (html-src/partials/page-transfer-hub/self-transfer.html).
 // It never writes to wallet, signing or transfer state: it only
-//   * opens/closes the logs box (and folds the key box while logs are open),
+//   * opens/closes the logs box (nothing above it is hidden; it scrolls into view when opened),
 //   * slides the Native/Token thumb and swaps the native / token amount field,
 //   * mirrors the native coin symbol into the unit label,
 //   * drives the TXs-per-wallet stepper and the quick amount chips by
@@ -30,6 +30,10 @@
     var willOpen = typeof open === 'boolean' ? open : box.classList.contains('collapsed');
     box.classList.toggle('collapsed', !willOpen);
     if (ui) ui.classList.toggle('st-logs-open', willOpen);
+    // Nothing above folds away any more, so if the opened log box ends up below the visible area, bring it into view
+    if (willOpen) setTimeout(function () {
+      try { box.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); } catch (e) { box.scrollIntoView(false); }
+    }, 60);
   };
 
   // TXs per wallet stepper (1 - 100, same limits as the input)
