@@ -23,9 +23,9 @@ Per-build release notes are published on the [Releases](../../releases) page.
   slots are now reused (oldest first) so they keep appearing. The background-service notification is no longer
   restarted by Android after the app is killed. The service still starts at app launch as before; making it start
   only while work is running is not included because background bots do not all report when they start and stop.
-- **Security: screens showing private keys could be captured:** screenshots, screen recording, screen casting and the
-  app-switcher (Recents) preview could capture wallet screens that display private keys and recovery phrases. The main
-  wallet window now blocks all of these. Note: this also means you can no longer take screenshots of the wallet screens.
+- **Screenshots work again inside the app:** the screenshot / screen-recording block (`FLAG_SECURE`) on the main wallet
+  window is removed, so screenshots, screen recording, casting and the Recents preview are allowed. Trade-off: screens
+  that display private keys or recovery phrases can now be captured too, so avoid sharing screenshots of those screens.
 - **Pull-to-refresh could wipe the Bridge form during a bridge, and a cancelled pull left it stuck:** pulling down on
   the Bridge page while a bridge or swap was running cleared the selected route, amount and recipient mid-transaction.
   Pull-to-refresh is now ignored on the Bridge page while a transaction is running. Also, if a pull was interrupted

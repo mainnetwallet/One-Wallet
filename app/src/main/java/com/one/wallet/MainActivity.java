@@ -126,10 +126,8 @@ public class MainActivity extends AppCompatActivity {
         android.webkit.WebView.setWebContentsDebuggingEnabled(
             (getApplicationInfo().flags & android.content.pm.ApplicationInfo.FLAG_DEBUGGABLE) != 0);
 
-        // Wallet screens show private keys and recovery phrases in many places, so block screenshots,
-        // screen recording / casting and the Recents thumbnail for this window.
-        getWindow().setFlags(android.view.WindowManager.LayoutParams.FLAG_SECURE,
-                android.view.WindowManager.LayoutParams.FLAG_SECURE);
+        // Screenshots, screen recording and the Recents thumbnail are allowed (FLAG_SECURE is not set).
+        // Note: wallet screens can show private keys and recovery phrases, so those can be captured.
 
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_main);
