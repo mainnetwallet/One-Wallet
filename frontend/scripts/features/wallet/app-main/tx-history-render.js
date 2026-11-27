@@ -82,215 +82,225 @@ function renderTxHistory() {
     return NAMES[chainId] || fallback || ('Chain ' + chainId);
   }
 
+  const controls = document.getElementById('txh-controls');
+  if (controls) controls.style.display = txs.length === 0 ? 'none' : '';
+
   if (txs.length === 0) {
     body.innerHTML = `
-      <div class="txh-toolbar">
-        <div class="txh-info-text">📋 TRANSACTION HISTORY</div>
-      </div>
       <div class="txh-empty">
         <div class="txh-empty-icon">
           <span class="material-icons-round">receipt_long</span>
         </div>
-        <div class="txh-empty-title">No Transactions Yet</div>
-        <div class="txh-empty-sub">Swaps, sends &amp; bridges appear here.</div>
+        <div class="txh-empty-title">No transactions yet</div>
+        <div class="txh-empty-sub">Swaps, sends and bridges appear here.</div>
       </div>`;
     return;
   }
 
-  // Group by date
-  const groups = {};
-  txs.forEach(tx => {
-    const label = formatTxDate(tx.timestamp);
-    if (!groups[label]) groups[label] = [];
-    groups[label].push(tx);
+  const esc = v => String(v == null ? '' : v).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const short = h => h ? h.slice(0,2) + '…' + h.slice(-4) : null;
+
+  // ── Classify every tx once ──
+  const items = txs.map((tx, idx) => {
+    const isBridge = tx.type === 'bridge';
+    const isSend   = tx.type === 'send' || (!isBridge && tx.type !== 'swap' && !!tx.wallet);
+    const kind     = isBridge ? 'bridge' : (isSend ? 'send' : 'swap');
+    const status   = tx.isDry ? 'dry-run' : (tx.pendingRecv === true ? 'pending' : (tx.failed === true ? 'failed' : 'confirmed'));
+    return { tx, idx, kind, status, key: String(tx.id || ('i' + idx)) };
   });
 
+  const counts = { all: items.length, swap: 0, send: 0, bridge: 0, pending: 0, failed: 0 };
+  items.forEach(it => {
+    counts[it.kind]++;
+    if (it.status === 'pending') counts.pending++;
+    if (it.status === 'failed')  counts.failed++;
+  });
+
+  const filter = window._txhFilter || 'all';
+  const query  = (window._txhQuery || '').trim().toLowerCase();
+
+  // ── Chips ──
+  const chipsEl = document.getElementById('txh-chips');
+  if (chipsEl) {
+    const defs = [['all','All'],['swap','Swap'],['send','Send'],['bridge','Bridge'],['pending','Pending'],['failed','Failed']];
+    chipsEl.innerHTML = defs.map(d =>
+      `<div class="txh-chip ${filter === d[0] ? 'on' : ''}" onclick="txhSetFilter('${d[0]}')">${d[1]} <b>${counts[d[0]]}</b></div>`
+    ).join('');
+  }
+
+  // ── Filter + search ──
+  const visible = items.filter(it => {
+    if (filter === 'pending' && it.status !== 'pending') return false;
+    if (filter === 'failed'  && it.status !== 'failed')  return false;
+    if ((filter === 'swap' || filter === 'send' || filter === 'bridge') && it.kind !== filter) return false;
+    if (query) {
+      const t = it.tx;
+      const hay = [t.pair, t.hash, t.recvHash, t.fromToken, t.toToken, t.fromChain, t.toChain, t.wallet, t.dex].join(' ').toLowerCase();
+      if (hay.indexOf(query) === -1) return false;
+    }
+    return true;
+  });
+
+  // ── Summary ──
+  const weekAgo = Date.now() - 7 * 86400000;
+  const weekCount = items.filter(it => it.tx.timestamp >= weekAgo).length;
   let html = `
-    <div class="txh-toolbar">
-      <div class="txh-info-text">📋 ${txs.length} TX${txs.length !== 1 ? 'S' : ''}</div>
+    <div class="txh-sum">
+      <div class="txh-sum-i"><span>This week</span><div>${weekCount} tx${weekCount !== 1 ? 's' : ''}</div></div>
+      <div class="txh-sum-i"><span>Pending</span><div>${counts.pending}</div></div>
     </div>`;
 
+  if (visible.length === 0) {
+    html += `
+      <div class="txh-empty">
+        <div class="txh-empty-icon"><span class="material-icons-round">search_off</span></div>
+        <div class="txh-empty-title">No matching transactions</div>
+        <div class="txh-empty-sub">Try another filter or search.</div>
+      </div>`;
+    body.innerHTML = html;
+    return;
+  }
+
+  // ── Group by day ──
+  const groups = {};
+  visible.forEach(it => {
+    const label = formatTxDate(it.tx.timestamp);
+    (groups[label] = groups[label] || []).push(it);
+  });
+
+  const openMap = window._txhOpen || (window._txhOpen = {});
+  const STATUS_LABEL = { 'confirmed': 'CONFIRMED', 'pending': 'PENDING', 'failed': 'FAILED', 'dry-run': 'DRY RUN' };
+  const KIND_LABEL   = { swap: 'Swap', send: 'Sent', bridge: 'Bridge' };
+  const KIND_ICON    = { swap: 'swap_horiz', send: 'north_east', bridge: 'alt_route' };
+
+  function detailRow(label, hash, url) {
+    if (!hash) return '';
+    const acts = `<span class="txh-acts">
+        <span class="txh-act" data-hash="${esc(hash)}" onclick="event.stopPropagation();txhCopyHash(this)"><span class="material-icons-round">content_copy</span></span>
+        ${url ? `<span class="txh-act" data-url="${esc(url)}" onclick="event.stopPropagation();txhOpenUrl(this)"><span class="material-icons-round">open_in_new</span></span>` : ''}
+      </span>`;
+    return `<div class="txh-dr"><span>${label}</span><span style="display:flex;align-items:center;gap:6px;"><code>${esc(short(hash))}</code>${acts}</span></div>`;
+  }
+
   for (const [dateLabel, group] of Object.entries(groups)) {
-    html += `<div class="txh-day-label">${dateLabel}</div>`;
+    html += `<div class="txh-day"><span>${dateLabel}</span><span>${group.length} TX${group.length !== 1 ? 'S' : ''}</span></div>`;
 
-    group.forEach(tx => {
-      const isBridge  = tx.type === 'bridge';
-      const isSend    = tx.type === 'send' || (!isBridge && tx.type !== 'swap' && !!tx.wallet);
-      const isPending = tx.pendingRecv === true;
-      const isFailed  = tx.failed === true;
-      const iconClass = tx.isDry ? 'dry' : (isPending ? 'pending' : (isFailed ? 'failed' : 'success'));
-      const iconName  = tx.isDry ? 'science'
-                      : isPending ? 'hourglass_top'
-                      : isFailed  ? 'error_outline'
-                      : isBridge  ? 'alt_route'
-                      : 'check_circle';
+    group.forEach(it => {
+      const tx = it.tx, kind = it.kind, status = it.status;
+      const isBridge = kind === 'bridge', isSend = kind === 'send';
+      const isPending = status === 'pending', isFailed = status === 'failed';
 
-      // Status badge
-      const statusKey   = tx.isDry ? 'dry-run' : (isPending ? 'pending' : (isFailed ? 'failed' : 'confirmed'));
-      const statusLabel = tx.isDry ? 'DRY RUN' : (isPending ? 'PENDING'  : (isFailed ? 'FAILED'  : 'CONFIRMED'));
-      const statusIcon  = tx.isDry ? 'science' : (isPending ? 'hourglass_top' : (isFailed ? 'error_outline' : 'check_circle'));
-
-      // Item class
-      const itemClass = tx.isDry ? 'txh-dry' : (isPending ? 'txh-pending' : (isFailed ? 'txh-failed' : 'txh-success'));
-
-      // Short hash helper
-      const short = h => h ? h.slice(0,2) + '…' + h.slice(-4) : null;
-
-      // Explorer URLs
       const fromChainId = tx.fromChainId || tx.chainId || (!isBridge ? 8453 : null);
       const toChainId   = tx.toChainId || null;
-      const srcUrl  = getExplorerUrl(fromChainId, tx.hash);
-      const recvUrl = getExplorerUrl(toChainId,   tx.recvHash);
+      const fromName = getChainName(isBridge ? tx.fromChainId : fromChainId, isBridge ? tx.fromChain : 'Base');
+      const toName   = getChainName(tx.toChainId, tx.toChain);
+      const srcUrl  = tx.isDry ? null : getExplorerUrl(fromChainId, tx.hash);
+      const recvUrl = getExplorerUrl(toChainId, tx.recvHash);
 
-      // Chain pills
-      let chainPillsHtml = '';
-      if (isBridge) {
-        const fromName = getChainName(tx.fromChainId, tx.fromChain);
-        const toName   = getChainName(tx.toChainId,   tx.toChain);
-        const fromClick = srcUrl  ? `onclick="event.stopPropagation();window.open('${srcUrl}','_blank','noopener');showToast('Opening sender TX','open_in_new');"` : '';
-        const toClick   = recvUrl ? `onclick="event.stopPropagation();window.open('${recvUrl}','_blank','noopener');showToast('Opening receiver TX','open_in_new');"` : '';
+      const fromAmt = tx.fromAmt ? txhFmtAmt(tx.fromAmt) : null;
+      const toAmt   = tx.toAmt   ? txhFmtAmt(tx.toAmt)   : null;
+      const fromSym = tx.fromToken || '';
+      const toSym   = tx.toToken   || '';
+      const pairParts = (tx.pair || '').split(' → ');
 
-        // Sender hash chip
-        const senderChip = short(tx.hash)
-          ? `<span class="txh-hash-chip" ${srcUrl && !tx.isDry ? `onclick="event.stopPropagation();window.open('${srcUrl}','_blank','noopener');showToast('Opening TX','open_in_new');"` : ''}>
-               <span class="material-icons-round" style="font-size:9px;">${srcUrl && !tx.isDry ? 'open_in_new' : 'tag'}</span>${short(tx.hash)}
-             </span>`
-          : '';
+      // Sub line
+      let sub;
+      if (isBridge)      sub = `${esc(fromName)} → ${esc(toName)}`;
+      else if (isSend)   sub = `To ${esc(pairParts[1] || '—')} · ${esc(fromName)}`;
+      else               sub = `${esc(fromSym || pairParts[0] || '—')} → ${esc(toSym || pairParts[1] || '—')} · ${esc(fromName)}`;
+      sub += ` · ${formatTxTime(tx.timestamp)}`;
 
-        // Receiver chip or pending badge
-        const receiverChip = isPending && !short(tx.recvHash)
-          ? `<span class="txh-hash-chip txh-pending-badge" style="cursor:default;background:rgba(245,158,11,0.10);color:var(--accent-amber);border:1px solid rgba(245,158,11,0.22);pointer-events:none;">
-               <span class="material-icons-round" style="font-size:9px;animation:spin 1.4s linear infinite;">sync</span>PENDING
-             </span>`
-          : short(tx.recvHash) && recvUrl
-            ? `<span class="txh-hash-chip recv-chip" onclick="event.stopPropagation();window.open('${recvUrl}','_blank','noopener');showToast('Opening receiver TX','open_in_new');">
-                 <span class="material-icons-round" style="font-size:9px;">open_in_new</span>${short(tx.recvHash)}
-               </span>`
-            : short(tx.recvHash)
-              ? `<span class="txh-hash-chip recv-chip"><span class="material-icons-round" style="font-size:9px;">tag</span>${short(tx.recvHash)}</span>`
-              : '';
-
-        chainPillsHtml = `
-          <div class="txh-bridge-cols">
-            <div class="txh-bridge-col">
-              <span class="txh-chain-pill from-pill" ${fromClick}>
-                ${txhChainLogoHtml(tx.fromChainId, 12)}
-                ${fromName}
-              </span>
-              ${senderChip}
-            </div>
-            <span class="txh-bridge-arrow" style="flex-shrink:0;">→</span>
-            <div class="txh-bridge-col">
-              <span class="txh-chain-pill to-pill" ${toClick}>
-                ${txhChainLogoHtml(tx.toChainId, 12)}
-                ${toName}
-              </span>
-              ${receiverChip}
-            </div>
-          </div>`;
+      // Right-hand amounts
+      let a1 = '', a2 = '', a1cls = '';
+      if (isSend) {
+        a1 = fromAmt ? `-${fromAmt} ${esc(fromSym)}` : esc(pairParts[0] || tx.pair || '—');
+      } else if (isFailed) {
+        a1 = fromAmt ? `-${fromAmt} ${esc(fromSym)}` : esc(tx.pair || '—');
+      } else if (isPending && isBridge) {
+        a1 = fromAmt ? `-${fromAmt} ${esc(fromSym)}` : esc(tx.pair || '—');
+        a2 = toAmt ? `≈ ${toAmt} ${esc(toSym)}` : '';
+      } else if (toAmt) {
+        a1 = `+${toAmt} ${esc(toSym)}`; a1cls = 'pos';
+        a2 = fromAmt ? `-${fromAmt} ${esc(fromSym)}` : '';
       } else {
-        const chainName = getChainName(fromChainId, 'Base');
-        chainPillsHtml = `
-          <div class="txh-chain-row">
-            <span class="txh-chain-pill swap-pill">
-              ${txhChainLogoHtml(fromChainId, 12)}
-              ${chainName}
-            </span>
-          </div>`;
+        a1 = esc(tx.pair || '—');
       }
 
-      // Hash chips (non-bridge only; bridge hashes are embedded in chainPillsHtml cols)
-      let hashChipsHtml = '';
-      if (!isBridge) {
-        if (short(tx.hash)) {
-          const clickAttr = srcUrl && !tx.isDry
-            ? `onclick="event.stopPropagation();window.open('${srcUrl}','_blank','noopener');showToast('Opening TX','open_in_new');"`
-            : `onclick="event.stopPropagation();${tx.isDry ? "showToast('Dry run — no real TX','science');" : ''}"`;
-          hashChipsHtml += `<span class="txh-hash-chip" ${clickAttr}>
-            <span class="material-icons-round">${srcUrl && !tx.isDry ? 'open_in_new' : 'tag'}</span>${short(tx.hash)}
-          </span>`;
-        }
-        if (isPending && !short(tx.recvHash)) {
-          hashChipsHtml += `<span class="txh-hash-chip txh-pending-badge" style="cursor:default;background:rgba(245,158,11,0.10);color:var(--accent-amber);border:1px solid rgba(245,158,11,0.22);pointer-events:none;">
-            <span class="material-icons-round" style="font-size:9px;animation:spin 1.4s linear infinite;">sync</span>PENDING
-          </span>`;
-        } else if (short(tx.recvHash) && recvUrl) {
-          hashChipsHtml += `<span class="txh-hash-chip recv-chip" onclick="event.stopPropagation();window.open('${recvUrl}','_blank','noopener');showToast('Opening receiver TX','open_in_new');">
-            <span class="material-icons-round">open_in_new</span>${short(tx.recvHash)}
-          </span>`;
-        } else if (short(tx.recvHash) && !recvUrl) {
-          hashChipsHtml += `<span class="txh-hash-chip recv-chip">
-            <span class="material-icons-round">tag</span>${short(tx.recvHash)}
-          </span>`;
-        }
+      // Pending / failed notes
+      let note = '';
+      if (isPending) {
+        note = `<div class="txh-prog"><i></i></div><div class="txh-prog-t">Waiting for funds on ${esc(toName)}</div>`;
+      } else if (isFailed) {
+        note = `<div class="txh-err">${esc(tx.failReason || tx.error || 'Transaction failed')}</div>`;
       }
 
-      // Wallet chip — group name + wallet index + swap/bridge count for this wallet
-      let walletChip = '';
+      // Wallet label
+      let walletLabel = '';
       if (tx.walletIndex) {
-        // Resolve group name from localStorage
-        let _grpName = '';
+        let grp = '';
         try {
-          const _groups = (typeof loadWalletGroups === 'function') ? loadWalletGroups() : [];
-          const _activeGrpId = localStorage.getItem('one_hw_group_id_v2') || localStorage.getItem('one_active_group') || '';
-          // Try to find group by groupId stored on tx, else fallback to active group
-          const _txGrpId = tx.groupId || _activeGrpId;
-          const _grp = _groups.find(g => g.id === _txGrpId) || (_groups.length === 1 ? _groups[0] : null);
-          if (_grp && _grp.name) _grpName = _grp.name;
+          const groups_ = (typeof loadWalletGroups === 'function') ? loadWalletGroups() : [];
+          const activeId = localStorage.getItem('one_hw_group_id_v2') || localStorage.getItem('one_active_group') || '';
+          const g = groups_.find(g => g.id === (tx.groupId || activeId)) || (groups_.length === 1 ? groups_[0] : null);
+          if (g && g.name) grp = g.name + ' · ';
         } catch(_e) {}
-
-        // Count swap+bridge txs from same walletIndex (and same groupId if available)
-        const _wIdx = tx.walletIndex;
-        const _wGrpId = tx.groupId || null;
-        const _grpLabel = _grpName
-          ? `<span class="twc-grp" title="${_grpName}">${_grpName}</span><span class="twc-sep">·</span>`
-          : '';
-        walletChip = `<span class="txh-wallet-chip"><span class="material-icons-round">account_balance_wallet</span>${_grpLabel}<span class="twc-widx">W${_wIdx}</span></span>`;
+        walletLabel = `${esc(grp)}W${esc(tx.walletIndex)}`;
       }
+
+      // Details
+      let details = '';
+      details += detailRow(isBridge ? 'Sent' : 'Hash', tx.hash, srcUrl);
+      if (isBridge) {
+        details += short(tx.recvHash)
+          ? detailRow('Received', tx.recvHash, recvUrl)
+          : `<div class="txh-dr"><span>Received</span><code style="color:var(--text-muted)">${isPending ? 'waiting…' : '—'}</code></div>`;
+      }
+      if (!tx.hash && !isBridge) details += `<div class="txh-dr"><span>Hash</span><code style="color:var(--text-muted)">${tx.isDry ? 'dry run' : '—'}</code></div>`;
+      if (!isBridge && !isSend && tx.dex) details += `<div class="txh-dr"><span>Route</span><code>${esc(tx.dex)}</code></div>`;
+      if (walletLabel) details += `<div class="txh-dr"><span>Wallet</span><code>${walletLabel}</code></div>`;
+      details += `<div class="txh-dr"><span>Time</span><code>${esc(new Date(tx.timestamp).toLocaleString())}</code></div>`;
 
       html += `
-        <div class="txh-item ${itemClass}">
-          <div class="txh-item-icon ${iconClass}">
-            <span class="material-icons-round">${iconName}</span>
+        <div class="txh-card s-${status} ${openMap[it.key] ? 'open' : ''}" data-key="${esc(it.key)}" onclick="txhToggleCard(this)">
+          <div class="txh-row">
+            <div class="txh-ico k-${kind}"><span class="material-icons-round">${isFailed ? 'error_outline' : KIND_ICON[kind]}</span></div>
+            <div class="txh-mid">
+              <div class="txh-t1">${KIND_LABEL[kind]} <span class="txh-st ${status}">${STATUS_LABEL[status]}</span></div>
+              <div class="txh-t2">${sub}</div>
+            </div>
+            <div class="txh-rt">
+              <div class="txh-a1 ${a1cls}">${a1}</div>
+              ${a2 ? `<div class="txh-a2">${a2}</div>` : ''}
+            </div>
           </div>
-          <div class="txh-item-info">
-            ${isSend ? `
-              <div class="txh-item-pair txh-sent-label">${tx.pair || 'Transfer'}</div>
-              <div class="txh-hash-row txh-send-row">${chainPillsHtml}${hashChipsHtml}</div>
-            ` : isBridge ? `
-              <div class="txh-type-tag txh-bridge-tag" style="margin-bottom:6px;">Bridge</div>
-              <div class="txh-bridge-amounts">
-                ${(() => {
-                  const p = (tx.pair||'').split(' → ');
-                  const fromAmt = tx.fromAmt ? txhFmtAmt(tx.fromAmt) : (p[0] || '—');
-                  const fromSym = tx.fromAmt ? (tx.fromToken || '') : '';
-                  const toAmt   = tx.toAmt   ? txhFmtAmt(tx.toAmt)   : (p[1] || '—');
-                  const toSym   = tx.toAmt   ? (tx.toToken   || '') : '';
-                  return `<span><span class="bamt-num">${fromAmt}</span>${fromSym ? ` <span class="bamt-sym">${fromSym}</span>` : ''}</span><span class="txh-bridge-amt-arrow">→</span><span><span class="bamt-num">${toAmt}</span>${toSym ? ` <span class="bamt-sym">${toSym}</span>` : ''}</span>`;
-                })()}
-              </div>
-              <div class="txh-hash-row txh-send-row">${chainPillsHtml}${hashChipsHtml}</div>
-            ` : `
-              <div class="txh-type-tag txh-swap-tag">Swap</div>
-              <div class="txh-item-pair">${tx.pair || '—'}</div>
-              <div class="txh-hash-row txh-send-row">
-                ${chainPillsHtml}
-                ${statusKey !== 'confirmed' ? `<span class="txh-status-badge ${statusKey}"><span class="material-icons-round" style="font-size:9px;">${statusIcon}</span>${statusLabel}</span>` : ''}
-                ${hashChipsHtml}
-              </div>
-            `}
-          </div>
-          <div class="txh-item-right">
-            <div class="txh-item-time">${formatTxTime(tx.timestamp)}</div>
-            ${walletChip ? walletChip : ''}
-          </div>
+          ${note}
+          <div class="txh-dt">${details}</div>
         </div>`;
     });
   }
 
-  html += ``;
+  html += `<div class="txh-foot">Showing ${visible.length} of ${items.length} transaction${items.length !== 1 ? 's' : ''}</div>`;
   if (body) body.innerHTML = html;
 }
+
+// ── Interactions ──
+window.txhSetFilter = function(f) { window._txhFilter = f; renderTxHistory(); };
+window.txhSetQuery  = function(q) { window._txhQuery = q || ''; renderTxHistory(); };
+window.txhToggleCard = function(el) {
+  const k = el.getAttribute('data-key');
+  const map = window._txhOpen || (window._txhOpen = {});
+  const open = el.classList.toggle('open');
+  if (open) map[k] = true; else delete map[k];
+};
+window.txhCopyHash = function(el) {
+  const h = el.getAttribute('data-hash') || '';
+  try { navigator.clipboard.writeText(h); } catch(_) {}
+  if (typeof showToast === 'function') showToast('Hash copied', 'content_copy');
+};
+window.txhOpenUrl = function(el) {
+  const u = el.getAttribute('data-url');
+  if (u) window.open(u, '_blank', 'noopener');
+};
 
 // Init badge on load
 updateTxMenuBadge();

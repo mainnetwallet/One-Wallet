@@ -28,8 +28,15 @@
       <div class="txh-back-btn" onclick="closeTxHistory()">
         <span class="material-icons-round">arrow_back</span>
       </div>
-      <div class="txh-title">Transaction History</div>
+      <div class="txh-title">Transaction history</div>
       <div class="txh-count-badge" id="txh-count-badge">0 TXs</div>
+    </div>
+    <div class="txh-controls" id="txh-controls" style="display:none;">
+      <div class="txh-search">
+        <span class="material-icons-round">search</span>
+        <input id="txh-search" type="text" placeholder="Search token, address or hash" autocomplete="off" autocapitalize="none" spellcheck="false" oninput="txhSetQuery(this.value)">
+      </div>
+      <div class="txh-chips" id="txh-chips"></div>
     </div>
     <div class="txh-body" id="txh-body">
       <!-- Filled by JS -->
