@@ -42,15 +42,50 @@ window.oneLock = (function() {
   // ── Master secret: one shared AES key for all lock methods ──
   // PIN, Pattern, and Biometric all use the same master secret to en/decrypt wallets.
   // This means switching unlock methods never loses wallet data.
+  //
+  // The secret is stored wrapped by a non-exportable Android Keystore key ("ks1:<iv>.<ct>"), not in
+  // plaintext next to the data it protects (BUG-002). Where the Keystore bridge is unavailable
+  // (e.g. opened in a desktop browser) it falls back to the old plaintext value.
+  var _msCache = null;
+  function _ksReady() {
+    return !!(window.OneAndroid && typeof window.OneAndroid.keystoreWrap === 'function' &&
+              typeof window.OneAndroid.keystoreUnwrap === 'function');
+  }
+  // Wrap with the Keystore and verify the round trip; returns the wrapped string or '' on failure.
+  function _ksWrap(secret) {
+    if (!_ksReady()) return '';
+    try {
+      var w = window.OneAndroid.keystoreWrap(secret) || '';
+      if (w && window.OneAndroid.keystoreUnwrap(w) === secret) return w;
+    } catch (e) {}
+    return '';
+  }
   function _getMasterSecret() {
-    return _get(SK.masterSecret);
+    if (_msCache) return _msCache;
+    var v = _get(SK.masterSecret);
+    if (!v) return null;
+    if (v.indexOf('ks1:') === 0) {
+      var plain = '';
+      if (_ksReady()) { try { plain = window.OneAndroid.keystoreUnwrap(v) || ''; } catch (e) {} }
+      // Wrapped but unreadable: return null and never regenerate it — a new secret would orphan the wallets.
+      if (!plain) return null;
+      _msCache = plain;
+      return plain;
+    }
+    // Plaintext secret from an older version: migrate it into the Keystore
+    var wrapped = _ksWrap(v);
+    if (wrapped) _set(SK.masterSecret, wrapped);
+    _msCache = v;
+    return v;
   }
   function _ensureMasterSecret() {
     var existing = _getMasterSecret();
     if (existing) return existing;
+    if (_get(SK.masterSecret)) return null; // stored but unreadable (see above) — do not overwrite
     // Generate fresh master secret on first lock setup
     var secret = 'one:master:' + _genSalt() + ':' + _genSalt();
-    _set(SK.masterSecret, secret);
+    _set(SK.masterSecret, _ksWrap(secret) || secret);
+    _msCache = secret;
     return secret;
   }
   // Apply master secret to OneCrypto so wallet decrypt works

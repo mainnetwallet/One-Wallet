@@ -11,6 +11,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
+import android.security.keystore.KeyGenParameterSpec;
+import android.security.keystore.KeyProperties;
+import android.util.Base64;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebView;
 import android.widget.Toast;
@@ -20,7 +23,13 @@ import androidx.biometric.BiometricPrompt;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import java.lang.ref.WeakReference;
+import java.nio.charset.StandardCharsets;
+import java.security.KeyStore;
 import java.util.concurrent.Executor;
+import javax.crypto.Cipher;
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.GCMParameterSpec;
 
 /**
  * JavaScript <-> Java interface exposed to the main WebView as {@code OneAndroid}
@@ -589,5 +598,65 @@ public class OneAndroidBridge {
                     + callbackId + "', '" + escaped + "');";
             a.webView.evaluateJavascript(js, null);
         });
+    }
+
+    // ── Android Keystore wrapping for the wallet master secret (BUG-002) ──
+    // The JS lock code keeps one random "master secret" that the wallet keys are encrypted with.
+    // It used to sit in localStorage in plaintext, next to the ciphertext. It is now stored wrapped
+    // (AES-256-GCM) with a non-exportable key that lives in the Android Keystore, so reading the
+    // app's storage files alone does not reveal it.
+    private static final String KS_ALIAS = "one_master_wrap_v1";
+    private static final String KS_PREFIX = "ks1:";
+
+    private static SecretKey getOrCreateWrapKey() throws Exception {
+        KeyStore ks = KeyStore.getInstance("AndroidKeyStore");
+        ks.load(null);
+        if (ks.containsAlias(KS_ALIAS)) {
+            KeyStore.Entry entry = ks.getEntry(KS_ALIAS, null);
+            if (entry instanceof KeyStore.SecretKeyEntry) {
+                return ((KeyStore.SecretKeyEntry) entry).getSecretKey();
+            }
+        }
+        KeyGenerator kg = KeyGenerator.getInstance(KeyProperties.KEY_ALGORITHM_AES, "AndroidKeyStore");
+        kg.init(new KeyGenParameterSpec.Builder(KS_ALIAS,
+                KeyProperties.PURPOSE_ENCRYPT | KeyProperties.PURPOSE_DECRYPT)
+                .setBlockModes(KeyProperties.BLOCK_MODE_GCM)
+                .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_NONE)
+                .setKeySize(256)
+                .build());
+        return kg.generateKey();
+    }
+
+    /** Wraps {@code plain}; returns "ks1:&lt;iv&gt;.&lt;ciphertext&gt;" or "" when the Keystore is unusable. */
+    @JavascriptInterface
+    public String keystoreWrap(String plain) {
+        if (plain == null || plain.isEmpty()) return "";
+        try {
+            Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
+            cipher.init(Cipher.ENCRYPT_MODE, getOrCreateWrapKey());
+            byte[] iv = cipher.getIV();
+            byte[] ct = cipher.doFinal(plain.getBytes(StandardCharsets.UTF_8));
+            return KS_PREFIX + Base64.encodeToString(iv, Base64.NO_WRAP)
+                    + "." + Base64.encodeToString(ct, Base64.NO_WRAP);
+        } catch (Exception e) {
+            return "";
+        }
+    }
+
+    /** Reverses {@link #keystoreWrap}; returns "" if the value is not a valid wrapped secret. */
+    @JavascriptInterface
+    public String keystoreUnwrap(String wrapped) {
+        if (wrapped == null || !wrapped.startsWith(KS_PREFIX)) return "";
+        try {
+            String[] parts = wrapped.substring(KS_PREFIX.length()).split("\\.");
+            if (parts.length != 2) return "";
+            byte[] iv = Base64.decode(parts[0], Base64.NO_WRAP);
+            byte[] ct = Base64.decode(parts[1], Base64.NO_WRAP);
+            Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
+            cipher.init(Cipher.DECRYPT_MODE, getOrCreateWrapKey(), new GCMParameterSpec(128, iv));
+            return new String(cipher.doFinal(ct), StandardCharsets.UTF_8);
+        } catch (Exception e) {
+            return "";
+        }
     }
 }

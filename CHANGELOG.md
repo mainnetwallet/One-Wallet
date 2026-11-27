@@ -6,6 +6,13 @@ Per-build release notes are published on the [Releases](../../releases) page.
 ## [Unreleased]
 
 ### Fixed
+- **Security: the wallet encryption secret was stored in plaintext next to the encrypted keys:** the random secret that
+  the wallet keys are encrypted with was kept as plain text in the app's storage, right beside the data it protects, so
+  anyone able to read that storage could decrypt the keys. The secret is now stored wrapped (AES-256-GCM) by a key held
+  in the Android Keystore that cannot be exported from the device. Existing installs are migrated automatically on the
+  next launch; if the Keystore is unavailable the app keeps working with the previous behaviour. If the wrapped secret
+  can ever not be read, the app never creates a new one over it, so stored wallets are not orphaned. Note: this protects
+  against reading the storage files, not against code running inside the app itself.
 - **Security: wallet private keys were stored as plaintext on the device in several cases:** every save first wrote
   all keys as plain JSON to a backup entry, and the encrypt step silently returned the plaintext whenever no secret
   was available (for example with no app lock set), so keys could stay unencrypted on disk. Keys are now only ever
