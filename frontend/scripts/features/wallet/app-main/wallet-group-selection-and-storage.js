@@ -182,9 +182,18 @@ function loadWalletGroups() {
   } catch { return []; }
 }
 
+// True while the stored wallet keys could not be decrypted (wrong/missing secret).
+// saveWalletGroups refuses to write in that state so the stored ciphertexts are never
+// overwritten with an empty or partial list (BUG-011).
+let _wgLoadFailed = false;
+
 // ── loadWalletGroupsAsync: true AES-GCM decrypt → populates cache ──
 async function loadWalletGroupsAsync() {
   try {
+    // No lock enabled → make sure the master secret is applied before decrypting
+    if (window.oneLock && typeof window.oneLock._applySecretIfNoLock === 'function') {
+      window.oneLock._applySecretIfNoLock();
+    }
     const raw = localStorage.getItem(WG_STORAGE_KEY);
     if (!raw) {
       // Fix: try plain backup if main key missing (app closed during async encrypt)
@@ -193,21 +202,23 @@ async function loadWalletGroupsAsync() {
         if (_backup) {
           const _bg = JSON.parse(_backup);
           if (Array.isArray(_bg) && _bg.length > 0) {
+            _wgLoadFailed = false;
             OneCrypto.setPlaintextCache(_bg);
             saveWalletGroups(_bg); // re-encrypt and save properly
             return _bg;
           }
         }
       } catch(_) {}
+      _wgLoadFailed = false;
       OneCrypto.setPlaintextCache([]); return [];
     }
     const parsed = JSON.parse(raw);
-    if (!Array.isArray(parsed)) { OneCrypto.setPlaintextCache([]); return []; }
+    if (!Array.isArray(parsed)) { _wgLoadFailed = false; OneCrypto.setPlaintextCache([]); return []; }
     const groups = await OneCrypto.decryptGroups(parsed);
-    // ── FIX: If secret wasn't set yet (race), groups will have _decryptFailed=true and 0 keys.
-    // Don't overwrite cache with empty result — keep existing cache if any.
-    const allFailed = groups && groups.length > 0 && groups.every(g => g._decryptFailed);
-    if (allFailed) {
+    // ── FIX: If the secret wasn't set (or is wrong), groups come back with _decryptFailed=true and 0 keys.
+    // Never cache such a result: a later save would overwrite the stored ciphertexts with empty keys.
+    const anyFailed = !!groups && groups.some(g => g && g._decryptFailed);
+    if (anyFailed) {
       const existing = OneCrypto.getPlaintextCache();
       if (existing && existing.length > 0) return existing; // keep current cache
       // else fall through — check backup below
@@ -219,6 +230,7 @@ async function loadWalletGroupsAsync() {
         if (_backup) {
           const _bg = JSON.parse(_backup);
           if (Array.isArray(_bg) && _bg.length > 0) {
+            _wgLoadFailed = false;
             OneCrypto.setPlaintextCache(_bg);
             saveWalletGroups(_bg);
             return _bg;
@@ -226,6 +238,13 @@ async function loadWalletGroupsAsync() {
         }
       } catch(_) {}
     }
+    if (anyFailed) {
+      // Could not decrypt: leave storage and cache untouched, and block saves until a load succeeds.
+      _wgLoadFailed = true;
+      try { console.warn('[wallet] stored wallets could not be decrypted — not cached, saves blocked'); } catch(_) {}
+      return [];
+    }
+    _wgLoadFailed = false;
     OneCrypto.setPlaintextCache(groups);
     return groups;
   } catch { return []; }
@@ -233,6 +252,11 @@ async function loadWalletGroupsAsync() {
 
 // ── saveWalletGroups: update plaintext cache + AES-encrypt to localStorage ──
 function saveWalletGroups(groups) {
+  // Stored keys could not be decrypted: writing now would overwrite them with an empty/partial list.
+  if (_wgLoadFailed) {
+    if (typeof showToast === 'function') showToast('Wallets are locked — restart the app and unlock before changing wallets', 'error');
+    return;
+  }
   // Update in-memory plaintext cache immediately (sync, used by loadWalletGroups)
   OneCrypto.setPlaintextCache(groups);
   // AES-encrypt async then persist

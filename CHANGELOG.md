@@ -6,6 +6,11 @@ Per-build release notes are published on the [Releases](../../releases) page.
 ## [Unreleased]
 
 ### Fixed
+- **Removing App Lock could make wallets unreadable, and a later save could erase them:** removing the lock left the
+  wallet keys encrypted with the lock's master secret, but on the next launch that secret was no longer applied, so the
+  keys could not be decrypted. The app then cached the wallets with no keys, and the next save wrote that empty list over
+  the stored keys. The master secret is now kept in use while no lock is enabled, and a wallet list that could not be
+  decrypted is never cached or saved (changes are blocked with a message instead of overwriting the stored keys).
 - **Security: WebView remote debugging was on in release builds:** `setWebContentsDebuggingEnabled(true)` ran
   unconditionally, so anyone with USB / ADB access to an unlocked phone could attach Chrome DevTools to the wallet view
   and read its storage. It is now enabled only when the app is debuggable (debug builds).

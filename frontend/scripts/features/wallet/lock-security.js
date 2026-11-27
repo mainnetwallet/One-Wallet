@@ -60,6 +60,13 @@ window.oneLock = (function() {
       OneCrypto.setSecret(secret);
     }
   }
+  // No lock is enabled, but wallets saved while a lock was on are still encrypted with the
+  // master secret (removing the lock does not re-encrypt them). Keep using that secret so they
+  // stay readable after a restart; clearing it made them undecryptable (BUG-011).
+  function _applySecretIfNoLock() {
+    if (_isEnabled()) return; // with a lock on, the secret is applied after the user unlocks
+    if (_getMasterSecret()) _applyMasterSecret();
+  }
   function _get(k){try{return localStorage.getItem(k);}catch(e){return null;}}
   function _set(k,v){try{localStorage.setItem(k,v);}catch(e){}}
   function _del(k){try{localStorage.removeItem(k);}catch(e){}}
@@ -201,8 +208,10 @@ window.oneLock = (function() {
   function _checkOnOpen(){
     if(_isUnlocked)return;
     if(!_isEnabled()){
-      // No lock — use device fingerprint as secret (OneCrypto default)
-      if(typeof OneCrypto!=='undefined') OneCrypto.clearSecret();
+      // No lock. If an earlier lock left wallets encrypted with the master secret, keep using it
+      // (clearing it made them undecryptable — BUG-011); otherwise there is no secret to apply.
+      if(_getMasterSecret()) _applyMasterSecret();
+      else if(typeof OneCrypto!=='undefined') OneCrypto.clearSecret();
       return;
     }
     _lockPin='';_resetLockPinDots();
@@ -788,6 +797,7 @@ window.oneLock = (function() {
     _syncToggleUI(_isEnabled());
     _updateSetupUI();
     // If no lock is set, populate plaintext cache immediately on boot
+    _applySecretIfNoLock();
     if(!_isEnabled() && typeof loadWalletGroupsAsync==='function'){
       loadWalletGroupsAsync().then(function(){
         if(typeof _hwRestoreSelection==='function') _hwRestoreSelection();
@@ -798,7 +808,7 @@ window.oneLock = (function() {
 
 
   return{
-    _checkOnOpen:_checkOnOpen,_triggerBio:_triggerBio,_pinKey:_pinKey,_pinBackspace:_pinBackspace,
+    _checkOnOpen:_checkOnOpen,_applySecretIfNoLock:_applySecretIfNoLock,_triggerBio:_triggerBio,_pinKey:_pinKey,_pinBackspace:_pinBackspace,
     _showPanel:_showPanel,_initLockPatternCanvas:_initLockPatternCanvas,
     openSetup:openSetup,closeSetup:closeSetup,_setupChoose:_setupChoose,
     _setupPinKey:_setupPinKey,_setupPinBackspace:_setupPinBackspace,
