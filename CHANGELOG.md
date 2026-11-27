@@ -6,6 +6,11 @@ Per-build release notes are published on the [Releases](../../releases) page.
 ## [Unreleased]
 
 ### Changed
+- **Swap token picker redesign:** compact **Select token** sheet (80% height, slimmer handle / header / 38px search with a
+  **Paste** button), 38px token logos, selected token highlighted with a tick, "All tokens on <chain>" label and a
+  "No tokens found" empty state. New `styles/features/swap/swap-token-picker.css`; the dim backdrop is lighter.
+- **Swipe down to close (token picker and other sheets):** the sheet now closes with a swipe on the handle, header, or by
+  pulling the token list down from its top; `touch-action` set so the WebView no longer cancels the gesture.
 - **Swap screen polish:** same layout and features, cleaner look. Larger header chips, bigger FROM / TO labels,
   borderless large amount text (24px in, 22px out), taller percent slider (1 / 25 / 50 / 75 / 100%) and MAX button,
   softer Swap button glow. **Live router** rows are now flat and inset 6% from both sides (neutral border; purple border and tick on

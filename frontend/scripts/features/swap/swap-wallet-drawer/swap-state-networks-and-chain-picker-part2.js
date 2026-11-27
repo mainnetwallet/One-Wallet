@@ -214,19 +214,20 @@ window.swCloseWalletPanel = function() {
     if (!sheet) return;
     var _sy = 0, _sx = 0, _prevY = 0, _prevT = 0;
     var _dragging = false;
+    var _candidate = false, _scroller = null; // drag starting on a scroll list that sits at its top
     var _THRESHOLD = 75;
     var _VEL_THRESHOLD = 0.45; // px/ms
 
     var _SNAP_EASE  = 'transform 0.3s cubic-bezier(0.25,1,0.5,1)';
     var _CLOSE_EASE = 'transform 0.28s cubic-bezier(0.4,0,0.6,1)';
 
-    function _isInsideScrollable(el) {
+    function _findScrollable(el) {
       while (el && el !== sheet) {
         var ov = window.getComputedStyle(el).overflowY;
-        if ((ov === 'auto' || ov === 'scroll') && el.scrollHeight > el.clientHeight + 2) return true;
+        if ((ov === 'auto' || ov === 'scroll') && el.scrollHeight > el.clientHeight + 2) return el;
         el = el.parentElement;
       }
-      return false;
+      return null;
     }
 
     sheet.addEventListener('touchstart', function(e) {
@@ -234,13 +235,28 @@ window.swCloseWalletPanel = function() {
       _sy = e.touches[0].clientY;
       _sx = e.touches[0].clientX;
       _prevY = _sy; _prevT = e.timeStamp;
-      _dragging = false;
-      if (_isInsideScrollable(e.target)) return;
+      _dragging = false; _candidate = false;
+      _scroller = _findScrollable(e.target);
+      if (_scroller) {
+        // Scrolled list: only a pull-down from its very top may drag the sheet
+        if (_scroller.scrollTop <= 0) _candidate = true;
+        return;
+      }
       _dragging = true;
       sheet.style.transition = 'none';
     }, { passive: true });
 
     sheet.addEventListener('touchmove', function(e) {
+      if (_candidate && !_dragging && e.touches.length === 1) {
+        var _cy0 = e.touches[0].clientY;
+        var _dy0 = _cy0 - _sy;
+        var _dx0 = Math.abs(e.touches[0].clientX - _sx);
+        if (_dy0 < -4 || _dx0 > 20 || (_scroller && _scroller.scrollTop > 0)) { _candidate = false; return; }
+        if (_dy0 <= 10) return;
+        _candidate = false; _dragging = true;
+        _sy = _cy0; _prevY = _cy0; _prevT = e.timeStamp; // start from here, no jump
+        sheet.style.transition = 'none';
+      }
       if (!_dragging || e.touches.length !== 1) return;
       var cy = e.touches[0].clientY;
       var dy = cy - _sy;
@@ -261,6 +277,7 @@ window.swCloseWalletPanel = function() {
     }, { passive: true });
 
     sheet.addEventListener('touchend', function(e) {
+      _candidate = false;
       if (!_dragging) return;
       _dragging = false;
       var cy = e.changedTouches[0] ? e.changedTouches[0].clientY : _sy;
@@ -279,6 +296,7 @@ window.swCloseWalletPanel = function() {
     }, { passive: true });
 
     sheet.addEventListener('touchcancel', function() {
+      _candidate = false;
       _dragging = false;
       sheet.style.transition = _SNAP_EASE;
       sheet.style.transform = 'translateY(0)';

@@ -97,6 +97,8 @@ window.swOpenTokenPicker = function(side) {
   // Clear search
   const search = document.getElementById('sw-token-search');
   if (search) search.value = '';
+  const _lbl = document.getElementById('sw-tp-label');
+  if (_lbl) _lbl.textContent = (SW.network && SW.network.name) ? ('All tokens on ' + SW.network.name) : 'All tokens';
   swRenderTokenList(_swAllTokens);
   // Reset contract fetch state
   _swPendingContractToken = null;
@@ -104,6 +106,15 @@ window.swOpenTokenPicker = function(side) {
   const _scp = document.getElementById('sw-contract-preview');
   if (_scs) { _scs.style.display = 'none'; _scs.textContent = ''; }
   if (_scp) _scp.style.display = 'none';
+};
+window.swPasteTokenSearch = async function() {
+  const inp = document.getElementById('sw-token-search');
+  if (!inp) return;
+  try {
+    const txt = await navigator.clipboard.readText();
+    if (txt) { inp.value = txt.trim(); swFilterTokens(inp.value); return; }
+  } catch (_e) {}
+  inp.focus();
 };
 window.swCloseTokenPicker = function() {
   const modal = document.getElementById('sw-token-modal');
@@ -203,37 +214,37 @@ function swRenderTokenList(tokens) {
     });
   }
 
+  const _selTok = (_swPickerSide === 'from') ? SW.fromToken : SW.toToken;
+  const _selSym = _selTok ? _selTok.sym : '';
+
+  if (!enriched.length) {
+    list.innerHTML = '<div class="sw-tp-empty">No tokens found</div>';
+    return;
+  }
+
   list.innerHTML = enriched.map(t => {
     const bal    = t._liveBal;
     const usdVal = t._usdVal;
     const hasBal = _walletOk && bal > 0;
-    const priceStr = _formatCurrencyDisplay(t.price||0);
+    const isSel  = t.sym === _selSym;
 
     let rightHtml;
     if (!_walletOk) {
-      // Wallet নেই — শুধু price দেখাও
-      rightHtml = '<div style="text-align:right;">'
-        + '<div style="font-family:var(--font-mono);font-size:11px;color:var(--text-secondary);">' + priceStr + '</div>'
-        + '</div>';
+      rightHtml = '<div class="sw-tp-right"><div class="sw-tp-bal">' + _formatCurrencyDisplay(t.price||0) + '</div></div>';
     } else {
-      // Wallet আছে — price এর মতো same format এ balance + USD দেখাও
       const balStr = bal >= 1000 ? bal.toLocaleString('en-US',{maximumFractionDigits:2})
                    : bal >= 0.01 ? bal.toFixed(4)
                    : bal > 0     ? bal.toFixed(6) : '0';
-      const usdStr = _formatCurrencyDisplay(usdVal);
-      // Price এর exact style: font-mono, 11px, text-secondary — balance ও same
-      const usdColor = hasBal ? 'var(--accent-green)' : 'var(--text-muted)';
-      rightHtml = '<div style="text-align:right;">'
-        + '<div style="font-family:var(--font-mono);font-size:11px;color:' + (hasBal ? 'var(--text-primary)' : 'var(--text-muted)') + ';">' + balStr + '</div>'
-        + '<div style="font-family:var(--font-mono);font-size:9px;color:' + usdColor + ';margin-top:1px;">' + usdStr + '</div>'
+      rightHtml = '<div class="sw-tp-right">'
+        + '<div class="sw-tp-bal' + (hasBal ? ' has' : '') + '">' + balStr + '</div>'
+        + '<div class="sw-tp-usd' + (hasBal ? ' has' : '') + '">' + _formatCurrencyDisplay(usdVal) + '</div>'
         + '</div>';
     }
-    const rowBorder = hasBal ? 'border:1px solid rgba(99,102,241,0.18);' : 'border:1px solid transparent;';
-    const rowBg     = hasBal ? 'background:var(--bg-glass);' : '';
-    return '<div class="sw-token-row" onclick="swSelectToken(\'' + t.sym + '\')" style="' + rowBorder + rowBg + 'border-radius:12px;padding:10px 12px;display:flex;align-items:center;gap:10px;cursor:pointer;transition:all 0.15s;margin-bottom:2px;" onmouseenter="this.style.background=\'var(--bg-glass-hover)\'" onmouseleave="this.style.background=\'' + (hasBal ? 'var(--bg-glass)' : '') + '\'">'
-      + _swTokenIconHtml(t, 40)
-      + '<div style="flex:1;min-width:0;"><div style="font-size:13px;font-weight:700;color:var(--text-primary);">' + t.sym + '</div><div style="font-family:var(--font-mono);font-size:10px;color:var(--text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + t.name + '</div></div>'
+    return '<div class="sw-tp-row' + (isSel ? ' sel' : '') + '" onclick="swSelectToken(\'' + t.sym + '\')">'
+      + _swTokenIconHtml(t, 38)
+      + '<div class="sw-tp-row-main"><div class="sw-tp-sym">' + t.sym + '</div><div class="sw-tp-name">' + t.name + '</div></div>'
       + rightHtml
+      + (isSel ? '<span class="material-icons-round sw-tp-check">check</span>' : '')
       + '</div>';
   }).join('');
 }
