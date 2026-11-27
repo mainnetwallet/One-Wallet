@@ -393,9 +393,7 @@ window.swCloseWalletPanel = function() {
 
     // ── BOTTOM SHEETS (swipe down → close) ──
     _attachBottomSwipe('sw-token-sheet',     function() { if (typeof window.swCloseTokenPicker === 'function') window.swCloseTokenPicker(); });
-    _attachBottomSwipe('sw-settings-sheet',    function() { if (typeof window.swCloseSettings  === 'function') window.swCloseSettings(); });
     _attachBottomSwipe('br-settings-sheet',    function() { if (typeof window.brCloseSettings  === 'function') window.brCloseSettings(); });
-    _attachBottomSwipe('sw-history-sheet',     function() { if (typeof window.swCloseHistory   === 'function') window.swCloseHistory(); });
     _attachBottomSwipe('br-history-sheet',     function() { if (typeof window.brCloseHistory   === 'function') window.brCloseHistory(); });
     _attachBottomSwipe('sw-confirm-sheet',     function() { if (typeof window.swCloseConfirm   === 'function') window.swCloseConfirm(); });
     _attachBottomSwipe('send-confirm-sheet',   function() {

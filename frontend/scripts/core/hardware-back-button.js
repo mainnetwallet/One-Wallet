@@ -40,6 +40,7 @@
     { id: 'rpc-manager-overlay',          close: () => typeof closeRpcManager         === 'function' && closeRpcManager()         },
     { id: 'wgm-delete-sheet',               close: () => { const s = document.getElementById('wgm-delete-sheet'); if (s) { s.classList.remove('open'); if (s.parentNode) s.parentNode.removeChild(s); } } },
     { id: 'sw-settings-modal',            close: () => typeof window.swCloseSettings  === 'function' && window.swCloseSettings()  },
+    { id: 'sw-history-modal',             close: () => typeof window.swCloseHistory   === 'function' && window.swCloseHistory()   },
     { id: 'br-settings-modal',            close: () => typeof window.brCloseSettings  === 'function' && window.brCloseSettings()  },
     { id: 'br-history-modal',             close: () => typeof window.brCloseHistory   === 'function' && window.brCloseHistory()   },
     { id: 'sw-chain-overlay',             close: () => typeof closeSwapChainPicker    === 'function' && closeSwapChainPicker()    },

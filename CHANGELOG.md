@@ -14,6 +14,11 @@ Per-build release notes are published on the [Releases](../../releases) page.
 - **Swap router list height:** the Live router list now measures the space between its top and the bottom nav
   (`swFitDexScroll`, re-run on resize and whenever the swap card changes), so the last router card is no longer
   hidden under the nav bar. Replaced the old fixed `calc(100vh - 420px ...)` guess and the 72px bottom padding.
+- **Swap popups:** **Swap Settings** and **Recent Swaps** now open as centered popups (fade + scale) above the bottom
+  nav instead of bottom sheets; tap outside, the X, or hardware back closes them (hardware back now also closes Recent
+  Swaps). Opening either one drops focus from the amount field, so the keyboard no longer pops up. Slippage chips
+  share the row evenly, history rows get a green check, larger text and a proper empty state. Swipe-down-to-close
+  was removed for these two popups.
 - **Swap gas type:** the three-button Gas Type row is now one compact "Network fee" pill above the Swap button.
   Default is AUTO; tap the pill to cycle AUTO / 1559 / LEGACY (`window._ngCycle`, same `OneGasMode` as before).
 - **Send screen navigation:** swipe-down-to-close is turned off on the Send screen (it opts out with

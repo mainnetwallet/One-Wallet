@@ -42,22 +42,18 @@
     <!--@include partials/swap-bridge-modals/br-history-modal.html-->
 
     <!-- History Modal -->
-    <div id="sw-history-modal" style="position:fixed;top:0;left:0;right:0;bottom:calc(var(--nav-height) + env(safe-area-inset-bottom, 0px));z-index:9000;background:rgba(0,0,0,0.75);align-items:flex-end;justify-content:center;" onclick="if(event.target===this)swCloseHistory()" ontouchend="if(event.target===this){event.preventDefault();swCloseHistory();}">
-      <div id="sw-history-sheet" style="width:100%;max-width: 100%;background:var(--bg-deep);border-radius:24px 24px 0 0;border:1px solid var(--border-subtle);border-bottom:none;height:50vh;max-height:50vh;display:flex;flex-direction:column;padding-bottom:env(safe-area-inset-bottom,0);transform:translateY(100%);transition:transform 0.32s cubic-bezier(0.34,1.1,0.64,1);">
-        <!-- Drag handle -->
-        <div style="display:flex;justify-content:center;padding:12px 0 4px;flex-shrink:0;">
-          <div style="width:36px;height:4px;border-radius:2px;background:var(--border-subtle);"></div>
-        </div>
+    <div id="sw-history-modal" style="position:fixed;top:0;left:0;right:0;bottom:calc(var(--nav-height) + env(safe-area-inset-bottom, 0px));z-index:9000;background:rgba(0,0,0,0.72);align-items:center;justify-content:center;padding:0 16px;box-sizing:border-box;" onclick="if(event.target===this)swCloseHistory()" ontouchend="if(event.target===this){event.preventDefault();swCloseHistory();}">
+      <div id="sw-history-sheet" style="width:100%;max-width:420px;max-height:100%;background:var(--bg-deep);border-radius:22px;border:1px solid var(--border-subtle);display:flex;flex-direction:column;overflow:hidden;">
         <!-- Header -->
-        <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 20px 14px;flex-shrink:0;">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:18px 20px 14px;flex-shrink:0;">
           <div style="display:flex;align-items:center;gap:8px;">
-            <span class="material-icons-round" style="font-size:18px;color:var(--accent-primary);">history</span>
-            <div style="font-size:16px;font-weight:800;font-family:var(--font-display);">Recent Swaps</div>
+            <div style="width:32px;height:32px;border-radius:10px;background:rgba(99,102,241,0.15);display:flex;align-items:center;justify-content:center;"><span class="material-icons-round" style="font-size:18px;color:var(--accent-primary);">history</span></div>
+            <div style="font-size:17px;font-weight:800;font-family:var(--font-display);">Recent Swaps</div>
           </div>
           <div style="display:flex;align-items:center;gap:8px;">
             <div id="sw-recent-clear-btn" onclick="swClearRecent()" ontouchend="event.preventDefault();swClearRecent();" style="display:none;align-items:center;gap:4px;padding:4px 10px;border-radius:20px;background:rgba(244,63,94,0.08);border:1px solid rgba(244,63,94,0.22);cursor:pointer;transition:opacity 0.15s;" onmousedown="this.style.opacity='.6'" onmouseup="this.style.opacity='1'" ontouchstart="this.style.opacity='.6'" onmouseleave="this.style.opacity='1'">
-              <span class="material-icons-round" style="font-size:11px;color:var(--accent-red);pointer-events:none;">delete_outline</span>
-              <span style="font-family:var(--font-mono);font-size:9px;font-weight:700;color:var(--accent-red);pointer-events:none;">CLEAR</span>
+              <span class="material-icons-round" style="font-size:13px;color:var(--accent-red);pointer-events:none;">delete_outline</span>
+              <span style="font-family:var(--font-mono);font-size:10px;font-weight:700;color:var(--accent-red);pointer-events:none;">CLEAR</span>
             </div>
             <div onclick="swCloseHistory()" ontouchend="event.preventDefault();swCloseHistory();" style="width:32px;height:32px;border-radius:50%;background:var(--bg-raised);border:1px solid var(--border-subtle);display:flex;align-items:center;justify-content:center;cursor:pointer;" onmousedown="this.style.opacity='.6'" onmouseup="this.style.opacity='1'" ontouchstart="this.style.opacity='.6'">
               <span class="material-icons-round" style="font-size:17px;color:var(--text-muted);">close</span>
@@ -65,7 +61,7 @@
           </div>
         </div>
         <!-- List -->
-        <div id="sw-history-list" style="flex:1;overflow-y:auto;scrollbar-width:none;padding:0 16px 24px;display:flex;flex-direction:column;gap:8px;"></div>
+        <div id="sw-history-list" style="flex:1;min-height:0;max-height:60vh;overflow-y:auto;scrollbar-width:none;padding:0 16px 18px;display:flex;flex-direction:column;gap:8px;"></div>
       </div>
     </div>
 

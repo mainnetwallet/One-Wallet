@@ -154,38 +154,28 @@ window.swSelectToken = function(sym) {
 };
 
 /* ── Settings ── */
+// Drop focus from any text field first, so the keyboard does not pop up behind the popup
+function _swBlurActiveInput() {
+  try {
+    var a = document.activeElement;
+    if (a && a !== document.body && /^(INPUT|TEXTAREA)$/.test(a.tagName)) a.blur();
+  } catch (e) {}
+}
+window._swBlurActiveInput = _swBlurActiveInput;
+
 window.swOpenSettings = function() {
   const m = document.getElementById('sw-settings-modal');
-  const sheet = document.getElementById('sw-settings-sheet');
   if (!m) return;
+  _swBlurActiveInput();
   if (m.parentElement !== document.body) document.body.appendChild(m);
-  if (sheet) { sheet.style.transform = ''; sheet.style.transition = ''; }
   m.classList.add('sw-open');
   document.body.style.overflow = 'hidden';
-  requestAnimationFrame(function() {
-    requestAnimationFrame(function() {
-      if (sheet) {
-        sheet.style.transition = 'transform 0.32s cubic-bezier(0.34,1.12,0.64,1)';
-        sheet.style.transform = 'translateY(0)';
-      }
-    });
-  });
 };
 window.swCloseSettings = function() {
   const m = document.getElementById('sw-settings-modal');
-  const sheet = document.getElementById('sw-settings-sheet');
   if (!m) return;
   m.classList.remove('sw-open');
-  requestAnimationFrame(function() {
-    if (sheet) {
-      sheet.style.transition = 'transform 0.28s cubic-bezier(0.4,0,0.6,1)';
-      sheet.style.transform = 'translateY(100%)';
-    }
-  });
-  setTimeout(function() {
-    document.body.style.overflow = '';
-    if (sheet) { sheet.style.transform = ''; sheet.style.transition = ''; }
-  }, 300);
+  setTimeout(function() { document.body.style.overflow = ''; }, 300);
 };
 window.swSelectSlipAdv = function(el, val) {
   document.querySelectorAll('.sw-slip-chip-lg').forEach(c => c.classList.remove('selected'));

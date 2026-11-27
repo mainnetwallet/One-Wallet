@@ -104,7 +104,7 @@ function swRenderHistoryList() {
 
   list.innerHTML = '';
   if (!recents.length) {
-    list.innerHTML = '<div style="text-align:center;padding:32px 16px;font-family:var(--font-mono);font-size:11px;color:var(--text-muted);line-height:1.8;">No recent swaps.</div>';
+    list.innerHTML = '<div style="text-align:center;padding:36px 16px 28px;"><div style="width:46px;height:46px;border-radius:14px;background:rgba(99,102,241,0.12);display:flex;align-items:center;justify-content:center;margin:0 auto 12px;"><span class="material-icons-round" style="font-size:24px;color:var(--accent-primary);">history</span></div><div style="font-size:14px;font-weight:700;">No recent swaps</div><div style="font-family:var(--font-mono);font-size:11px;color:var(--text-muted);margin-top:4px;">Your swaps will show up here.</div></div>';
     return;
   }
   recents.slice().reverse().forEach(function(s) {
@@ -130,16 +130,16 @@ function swRenderHistoryList() {
       row.addEventListener('mouseleave', function(){ this.style.borderColor=''; });
     }
     row.innerHTML =
-      '<div style="width:38px;height:38px;border-radius:11px;background:rgba(99,102,241,0.12);border:1px solid rgba(99,102,241,0.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;">' +
-        '<span class="material-icons-round" style="font-size:18px;color:var(--accent-primary);pointer-events:none;">swap_horiz</span>' +
+      '<div style="width:38px;height:38px;border-radius:11px;background:rgba(16,185,129,0.12);border:1px solid rgba(16,185,129,0.22);display:flex;align-items:center;justify-content:center;flex-shrink:0;">' +
+        '<span class="material-icons-round" style="font-size:20px;color:var(--accent-green);pointer-events:none;">check</span>' +
       '</div>' +
       '<div style="flex:1;min-width:0;">' +
-        '<div style="font-size:12px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + (s.fromSym||'?') + ' → ' + (s.toSym||'?') + '</div>' +
-        '<div style="font-family:var(--font-mono);font-size:9px;color:var(--text-muted);margin-top:3px;">' + (s.dex||'DEX') + ' · ' + (s.date||'') + '</div>' +
+        '<div style="font-size:14px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + (s.fromSym||'?') + ' → ' + (s.toSym||'?') + '</div>' +
+        '<div style="font-family:var(--font-mono);font-size:11px;color:var(--text-muted);margin-top:3px;">' + (s.dex||'DEX') + ' · ' + (s.date||'') + '</div>' +
       '</div>' +
       '<div style="text-align:right;flex-shrink:0;display:flex;flex-direction:column;align-items:flex-end;gap:2px;">' +
-        '<div style="font-size:11px;font-weight:700;color:var(--accent-green);">+' + (parseFloat(s.toAmt||0).toFixed(4)) + ' ' + (s.toSym||'') + '</div>' +
-        '<div style="font-family:var(--font-mono);font-size:9px;color:var(--text-muted);margin-top:2px;">' + (parseFloat(s.fromAmt||0).toFixed(4)) + ' ' + (s.fromSym||'') + '</div>' +
+        '<div style="font-size:13px;font-weight:700;color:var(--accent-green);">+' + (parseFloat(s.toAmt||0).toFixed(4)) + ' ' + (s.toSym||'') + '</div>' +
+        '<div style="font-family:var(--font-mono);font-size:11px;color:var(--text-muted);margin-top:2px;">' + (parseFloat(s.fromAmt||0).toFixed(4)) + ' ' + (s.fromSym||'') + '</div>' +
         (hasHash ? '<span class="material-icons-round" style="font-size:11px;color:var(--accent-primary);opacity:0.55;margin-top:1px;pointer-events:none;">open_in_new</span>' : '') +
       '</div>';
     list.appendChild(row);
@@ -149,43 +149,17 @@ function swRenderHistoryList() {
 // ── History Modal ──
 window.swOpenHistory = function() {
   const modal = document.getElementById('sw-history-modal');
-  const sheet = document.getElementById('sw-history-sheet');
   if (!modal) return;
+  if (typeof _swBlurActiveInput === 'function') _swBlurActiveInput();
 
   // Render list with cleared_ts filter + show/hide clear button
   swRenderHistoryList();
 
-  // Open sheet
-  if (sheet) {
-    sheet.style.maxHeight = '100vh';
-    sheet.style.transition = '';
-    sheet.style.transform = 'translateY(100%)';
-  }
   modal.classList.add('sw-open');
-  requestAnimationFrame(function() {
-    requestAnimationFrame(function() {
-      if (sheet) {
-        sheet.style.transition = 'transform 0.32s cubic-bezier(0.34,1.12,0.64,1)';
-        sheet.style.transform = 'translateY(0)';
-      }
-    });
-  });
   if (typeof haptic === 'function') haptic();
 };
 
 window.swCloseHistory = function() {
   const modal = document.getElementById('sw-history-modal');
-  const sheet = document.getElementById('sw-history-sheet');
-  // First remove open class (backdrop fade)
-  modal.classList.remove('sw-open');
-  // Then animate sheet sliding down in next frame
-  requestAnimationFrame(function() {
-    if (sheet) {
-      sheet.style.transition = 'transform 0.28s cubic-bezier(0.4,0,0.6,1)';
-      sheet.style.transform = 'translateY(100%)';
-    }
-  });
-  setTimeout(function() {
-    if (sheet) { sheet.style.transform = ''; sheet.style.transition = ''; }
-  }, 300);
+  if (modal) modal.classList.remove('sw-open');
 };
