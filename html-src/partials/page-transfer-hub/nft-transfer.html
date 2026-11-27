@@ -1,172 +1,204 @@
-        <!-- NFT Transfer UI -->
-        <div id="nftTransferUI" style="display: none;">
+        <!-- NFT Transfer UI — compact single-screen layout shared with W2W / Self Transfer (bt-* classes)
+             UI-only helpers: scripts/features/transfer/nft-transfer-ui-sync.js · styles: styles/features/transfer/th-nft-transfer-mobile.css -->
+        <div id="nftTransferUI" data-nft-mode="distribute" style="display: none;">
 
-        <!-- Header -->
-        <div class="th-section-header"><button class="th-back-btn" onclick="showMainDashboard()" title="Back to Dashboard"><span class="material-icons-round">arrow_back</span></button><h1 style="margin-bottom:0;font-size:1.3rem;color:#78c8ff;font-weight:700;">🎨 NFT Transfer</h1><button class="th-header-chain-btn" onclick="thOpenHeaderChainPicker('nftDist')" title="Switch network"><span class="th-hcb-emoji" id="th-net-emoji-nftDist-hdr">⛓️</span><span class="th-hcb-name" id="th-net-name-nftDist-hdr">Network</span><span class="material-icons-round">expand_more</span></button></div>
+            <div class="th-section-header"><button class="th-back-btn" onclick="showMainDashboard()" title="Back to Dashboard"><span class="material-icons-round">arrow_back</span></button><h1>NFT transfer</h1><button class="th-header-chain-btn" onclick="thOpenHeaderChainPicker('nftDist')" title="Switch network"><span class="th-hcb-emoji" id="th-net-emoji-nftDist-hdr">⛓️</span><span class="th-hcb-name" id="th-net-name-nftDist-hdr">Network</span><span class="material-icons-round">expand_more</span></button></div>
 
-        <!-- Mode Toggle -->
-        <div style="display:flex;justify-content:center;margin-bottom:12px;">
-            <div style="background:rgba(0,26,51,0.8);border:1px solid rgba(120,200,255,0.3);border-radius:10px;padding:3px;display:inline-flex;gap:3px;">
-                <button id="nftDistributeModeCard" onclick="selectNftTransferMode('distribute')" style="padding:7px 20px;border:none;background:linear-gradient(135deg,#4a90e2,#357abd);color:#fff;border-radius:7px;cursor:pointer;font-weight:700;font-size:0.8rem;">🚀 1 → Many</button>
-                <button id="nftCollectModeCard" onclick="selectNftTransferMode('collect')" style="padding:7px 20px;border:none;background:transparent;color:#78c8ff;border-radius:7px;cursor:pointer;font-weight:700;font-size:0.8rem;">🧲 Many → 1</button>
-            </div>
-        </div>
-
-        <!-- ══ DISTRIBUTE MODE (1 → Many) ══ -->
-        <div id="nftDistributeSection" style="display:block;">
-            <input type="hidden" id="rpcUrlNft" value="">
-
-            <!-- Box 1: Sender Wallet -->
-            <div style="background:var(--bg-raised);border:1px solid var(--border-subtle);border-radius:10px;padding:10px 12px;margin-bottom:8px;">
-                <div style="font-size:0.72rem;font-weight:700;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.8px;margin-bottom:7px;">👛 Sender Wallet</div>
-                <button onclick="thOpenWalletPicker('nftSenderKey','single')" style="width:100%;display:flex;align-items:center;justify-content:center;gap:6px;padding:7px 12px;border-radius:8px;border:1px dashed rgba(99,102,241,0.45);background:rgba(99,102,241,0.06);color:var(--neon-purple);font-family:var(--font-mono);font-size:10px;font-weight:700;cursor:pointer;margin-bottom:6px;transition:all .18s;" onmousedown="this.style.background='rgba(99,102,241,0.14)'" onmouseup="this.style.background='rgba(99,102,241,0.06)'" ontouchstart="this.style.background='rgba(99,102,241,0.14)'" ontouchend="this.style.background='rgba(99,102,241,0.06)'"><span class="material-icons-round" style="font-size:13px;">account_balance_wallet</span>Select Wallet</button>
-                <div class="sk-key-wrapper" id="nftSenderKeyWrapper">
-                    <textarea id="nftSenderKey" class="sk-key-textarea sk-masked" placeholder="with or without 0x..." autocomplete="off" rows="2" spellcheck="false" style="font-size:0.75rem;"></textarea>
-                    <button type="button" class="sk-toggle-btn" id="nftSenderKeyToggleBtn" onclick="skToggleKeyVisibility('nftSenderKey','nftSenderKeyToggleBtn')" title="Show/Hide Key"><span class="material-icons-round sk-eye-icon">visibility_off</span></button>
-                </div>
-                <div class="wallet-info" id="nftSenderWalletInfo" style="display:none;margin-top:8px;">
-                    <div class="wallet-info-item"><span class="wallet-info-label">Address:</span><span class="wallet-info-value" id="nftSenderAddress" style="color:#4ade80;font-family:monospace;font-size:0.78rem;">-</span></div>
-                    <div class="wallet-info-item"><span class="wallet-info-label">Status:</span><span class="wallet-info-value" id="nftSenderStatus" style="color:#10b981;">✅ Valid</span></div>
+            <!-- Mode switch -->
+            <div class="bt-seg-wrap">
+                <div class="bt-seg" data-mode="native">
+                    <button id="nftDistributeModeCard" class="mode-toggle-btn active" onclick="selectNftTransferMode('distribute')">1 → Many</button>
+                    <button id="nftCollectModeCard" class="mode-toggle-btn" onclick="selectNftTransferMode('collect')">Many → 1</button>
                 </div>
             </div>
 
-            <!-- Box 2: Recipients -->
-            <div style="background:var(--bg-raised);border:1px solid var(--border-subtle);border-radius:10px;padding:5px 8px;margin-bottom:4px;">
-                <div style="font-size:0.72rem;font-weight:700;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.8px;margin-bottom:3px;">📮 Recipients <span id="nftDistributeRecipientsCount" style="background:rgba(6,182,212,0.12);color:var(--neon-cyan);padding:1px 6px;border-radius:6px;font-size:0.68rem;margin-left:4px;">0</span></div>
-                <button onclick="thOpenWalletPicker('nftRecipientsDistribute','addresses')" style="width:100%;display:flex;align-items:center;justify-content:center;gap:6px;padding:4px 12px;border-radius:8px;border:1px dashed rgba(6,182,212,0.45);background:rgba(6,182,212,0.06);color:var(--neon-cyan);font-family:var(--font-mono);font-size:10px;font-weight:700;cursor:pointer;margin-bottom:3px;transition:all .18s;" onmousedown="this.style.background='rgba(6,182,212,0.14)'" onmouseup="this.style.background='rgba(6,182,212,0.06)'" ontouchstart="this.style.background='rgba(6,182,212,0.14)'" ontouchend="this.style.background='rgba(6,182,212,0.06)'"><span class="material-icons-round" style="font-size:13px;">account_balance_wallet</span>Select Wallet</button>
-                <textarea id="nftRecipientsDistribute" rows="2" placeholder="0xRecipient1&#10;0xRecipient2&#10;0xRecipient3" style="width:100%;padding:4px 8px;background:var(--bg-surface);border:1px solid var(--border-subtle);border-radius:8px;color:var(--text-primary);font-family:monospace;font-size:0.75rem;box-sizing:border-box;resize:none;height:52px;overflow-y:auto;" oninput="autoValidateNftDistributeRecipients()"></textarea>
-                <div style="font-size:0.67rem;color:var(--text-muted);margin-top:2px;">NFTs distributed sequentially · Auto-validates addresses</div>
-            </div>
+            <!-- ══ DISTRIBUTE MODE (1 → Many) ══ -->
+            <div id="nftDistributeSection" style="display:block;">
+                <input type="hidden" id="rpcUrlNft" value="">
 
-            <!-- Box 3: NFT Contract -->
-            <div style="background:var(--bg-raised);border:1px solid var(--border-subtle);border-radius:10px;padding:10px 12px;margin-bottom:8px;">
-                <div style="font-size:0.72rem;font-weight:700;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.8px;margin-bottom:7px;">🎨 NFT Contract</div>
-                <input type="text" id="nftContractAddress" placeholder="Contract Address (0x...)" style="width:100%;padding:7px 10px;background:var(--bg-surface);border:1px solid var(--border-subtle);border-radius:8px;color:var(--text-primary);font-size:0.8rem;font-family:monospace;box-sizing:border-box;margin-bottom:6px;">
-                <textarea id="nftTokenIds" rows="1" placeholder="Token IDs: 123 456 789 (optional)" style="width:100%;padding:7px 10px;background:var(--bg-surface);border:1px solid var(--border-subtle);border-radius:8px;color:var(--text-primary);font-family:monospace;font-size:0.78rem;box-sizing:border-box;margin-bottom:6px;resize:none;height:100px;overflow-y:auto;"></textarea>
-                <select id="nftStandard" style="width:100%;padding:7px 10px;background:var(--bg-surface);border:1px solid var(--border-subtle);border-radius:8px;color:var(--text-primary);font-size:0.8rem;">
-                    <option value="ERC721">ERC721</option>
-                    <option value="ERC1155">ERC1155</option>
-                </select>
-            </div>
+                <!-- Sender + Recipients -->
+                <div class="bt-card">
+                    <div class="bt-row">
+                        <div class="bt-head">
+                            <span class="bt-cap">Sender wallet</span>
+                            <button type="button" class="bt-select" onclick="thOpenWalletPicker('nftSenderKey','single')"><span class="material-icons-round">account_balance_wallet</span>Select</button>
+                        </div>
+                        <div class="sk-key-wrapper" id="nftSenderKeyWrapper">
+                            <textarea id="nftSenderKey" class="sk-key-textarea sk-masked" placeholder="with or without 0x..." autocomplete="off" rows="1" spellcheck="false"></textarea>
+                            <button type="button" class="sk-toggle-btn" id="nftSenderKeyToggleBtn" onclick="skToggleKeyVisibility('nftSenderKey','nftSenderKeyToggleBtn')" title="Show/Hide Key"><span class="material-icons-round sk-eye-icon">visibility_off</span></button>
+                        </div>
+                        <div class="wallet-info bt-info nft-info-row" id="nftSenderWalletInfo" style="display:none;">
+                            <div class="wallet-info-item"><span class="wallet-info-label">Address:</span><span class="wallet-info-value" id="nftSenderAddress">-</span></div>
+                            <div class="wallet-info-item"><span class="wallet-info-label">Status:</span><span class="wallet-info-value" id="nftSenderStatus">✅ Valid</span></div>
+                        </div>
+                    </div>
 
-            <!-- Box 4: NFT Selection -->
-            <div style="background:var(--bg-raised);border:1px solid var(--border-subtle);border-radius:10px;padding:10px 12px;margin-bottom:8px;">
-                <div style="font-size:0.72rem;font-weight:700;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.8px;margin-bottom:7px;">🖼️ NFT Selection</div>
-                <div id="nftGridDistribute" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(90px,1fr));gap:7px;margin-bottom:8px;min-height:100px;max-height:260px;overflow-y:auto;padding:8px;background:rgba(0,0,0,0.2);border-radius:8px;">
-                    <div style="grid-column:1/-1;text-align:center;padding:20px 10px;color:#808080;">
-                        <div style="font-size:2rem;margin-bottom:6px;">🎨</div>
-                        <div style="font-size:0.8rem;">No NFTs loaded</div>
-                        <div style="font-size:0.72rem;margin-top:4px;color:#606060;">Click "Fetch" to load</div>
+                    <div class="bt-row">
+                        <div class="bt-head">
+                            <span class="bt-cap">Recipients · <span id="nftDistributeRecipientsCount">0</span></span>
+                            <button type="button" class="bt-select" onclick="thOpenWalletPicker('nftRecipientsDistribute','addresses')"><span class="material-icons-round">account_balance_wallet</span>Select</button>
+                        </div>
+                        <textarea id="nftRecipientsDistribute" class="nft-ta" rows="2" placeholder="0xRecipient1&#10;0xRecipient2&#10;0xRecipient3" spellcheck="false" oninput="autoValidateNftDistributeRecipients()"></textarea>
+                        <div class="mk-meta"><span class="st-hint">Sent in order · invalid addresses are removed</span></div>
                     </div>
                 </div>
-                <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:5px;margin-bottom:7px;">
-                    <div style="background:var(--bg-surface);border:1px solid var(--border-subtle);border-radius:7px;padding:5px 8px;text-align:center;">
-                        <div style="font-size:0.62rem;color:var(--text-muted);text-transform:uppercase;">Total</div>
-                        <div style="font-size:0.9rem;font-weight:700;color:var(--accent-primary);" id="totalCountDistribute">0</div>
-                    </div>
-                    <div style="background:var(--bg-surface);border:1px solid var(--border-subtle);border-radius:7px;padding:5px 8px;text-align:center;">
-                        <div style="font-size:0.62rem;color:var(--text-muted);text-transform:uppercase;">Selected</div>
-                        <div style="font-size:0.9rem;font-weight:700;color:#10b981;" id="selectedCountDistribute">0</div>
-                    </div>
-                    <div style="background:var(--bg-surface);border:1px solid var(--border-subtle);border-radius:7px;padding:5px 8px;text-align:center;">
-                        <div style="font-size:0.62rem;color:var(--text-muted);text-transform:uppercase;">To Send</div>
-                        <div style="font-size:0.9rem;font-weight:700;color:#f59e0b;" id="nftDistributeTokenCount">0</div>
-                    </div>
-                </div>
-                <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:5px;">
-                    <button onclick="fetchNFTsDistribute()" id="fetchNftsDistributeBtn" style="padding:6px 4px;font-size:0.72rem;font-weight:700;background:linear-gradient(135deg,#4a90e2,#357abd);color:#fff;border:none;border-radius:7px;cursor:pointer;">🔍 Fetch</button>
-                    <button onclick="selectAllNFTs('distribute')" style="padding:6px 4px;font-size:0.72rem;background:var(--bg-surface);border:1px solid var(--border-subtle);color:var(--text-primary);border-radius:7px;cursor:pointer;">✅ All</button>
-                    <button onclick="deselectAllNFTs('distribute')" style="padding:6px 4px;font-size:0.72rem;background:var(--bg-surface);border:1px solid var(--border-subtle);color:var(--text-primary);border-radius:7px;cursor:pointer;">❌ Clear</button>
-                </div>
-            </div>
 
-            <!-- Execute -->
-            <button class="btn btn-success" id="executeNftDistributeBtn" onclick="executeNftDistribute()" disabled style="width:100%;padding:13px;font-size:0.95rem;font-weight:700;margin-bottom:8px;border-radius:10px;opacity:0.45;cursor:not-allowed;">📤 Transfer Selected NFTs to Recipients</button>
-        </div>
-
-        <!-- ══ COLLECT MODE (Many → 1) ══ -->
-        <div id="nftCollectSection" style="display:none;">
-            <input type="hidden" id="rpcUrlNftCollect" value="">
-
-
-            <!-- Box 4: Source Wallets -->
-            <div style="background:var(--bg-raised);border:1px solid var(--border-subtle);border-radius:10px;padding:10px 12px;margin-bottom:8px;">
-                <div style="font-size:0.72rem;font-weight:700;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.8px;margin-bottom:7px;">👛 Source Wallets <span id="nftCollectWalletCount" style="background:rgba(74,158,255,0.12);color:#4a9eff;padding:2px 8px;border-radius:6px;font-size:0.68rem;margin-left:4px;">0</span></div>
-                <button onclick="thOpenWalletPicker('nftSenderKeys','multi')" style="width:100%;display:flex;align-items:center;justify-content:center;gap:6px;padding:7px 12px;border-radius:8px;border:1px dashed rgba(99,102,241,0.45);background:rgba(99,102,241,0.06);color:var(--neon-purple);font-family:var(--font-mono);font-size:10px;font-weight:700;cursor:pointer;margin-bottom:6px;transition:all .18s;" onmousedown="this.style.background='rgba(99,102,241,0.14)'" onmouseup="this.style.background='rgba(99,102,241,0.06)'" ontouchstart="this.style.background='rgba(99,102,241,0.14)'" ontouchend="this.style.background='rgba(99,102,241,0.06)'"><span class="material-icons-round" style="font-size:13px;">account_balance_wallet</span>Select Wallet</button>
-                <div class="sk-key-wrapper" id="nftSenderKeysWrapper">
-                    <textarea id="nftSenderKeys" class="sk-key-textarea sk-masked" placeholder="0xprivatekey1...&#10;0xprivatekey2...&#10;0xprivatekey3..." style="min-height:100px;font-size:0.75rem;resize:vertical;" autocomplete="off" spellcheck="false" oninput="autoValidateNftSenderKeys()"></textarea>
-                    <button type="button" class="sk-toggle-btn" id="nftSenderKeysToggleBtn" onclick="skToggleKeyVisibility('nftSenderKeys','nftSenderKeysToggleBtn')" title="Show/Hide Key"><span class="material-icons-round sk-eye-icon">visibility_off</span></button>
-                </div>
-                <div style="font-size:0.67rem;color:var(--text-muted);margin-top:4px;">Wallets holding NFTs to collect · Auto-validates keys</div>
-            </div>
-
-            <!-- Box 2: Recipient -->
-            <div style="background:var(--bg-raised);border:1px solid var(--border-subtle);border-radius:10px;padding:10px 12px;margin-bottom:8px;">
-                <div style="font-size:0.72rem;font-weight:700;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.8px;margin-bottom:7px;">📮 Recipient Address</div>
-                <input type="text" id="nftCollectRecipient" placeholder="0x... (wallet to receive all NFTs)" style="width:100%;padding:7px 10px;background:var(--bg-surface);border:1px solid var(--border-subtle);border-radius:8px;color:var(--text-primary);font-size:0.8rem;font-family:monospace;box-sizing:border-box;" oninput="autoValidateNftCollectRecipient()">
-                <div class="wallet-info" id="nftCollectRecipientInfo" style="display:none;margin-top:8px;">
-                    <div class="wallet-info-item"><span class="wallet-info-label">Address:</span><span class="wallet-info-value" id="nftCollectRecipientAddress" style="color:#4ade80;font-family:monospace;font-size:0.78rem;">-</span></div>
-                    <div class="wallet-info-item"><span class="wallet-info-label">Status:</span><span class="wallet-info-value" id="nftCollectRecipientStatus" style="color:#10b981;">✅ Valid</span></div>
-                </div>
-            </div>
-
-            <!-- Box 1: NFT Contract -->
-            <div style="background:var(--bg-raised);border:1px solid var(--border-subtle);border-radius:10px;padding:10px 12px;margin-bottom:8px;">
-                <div style="font-size:0.72rem;font-weight:700;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.8px;margin-bottom:7px;">🎨 NFT Contract</div>
-                <input type="text" id="nftContractAddressCollect" placeholder="Contract Address (0x...)" style="width:100%;padding:7px 10px;background:var(--bg-surface);border:1px solid var(--border-subtle);border-radius:8px;color:var(--text-primary);font-size:0.8rem;font-family:monospace;box-sizing:border-box;margin-bottom:6px;">
-                <textarea id="nftTokenIdsCollect" rows="1" placeholder="Token IDs: 123 456 789 (optional)" style="width:100%;padding:7px 10px;background:var(--bg-surface);border:1px solid var(--border-subtle);border-radius:8px;color:var(--text-primary);font-family:monospace;font-size:0.78rem;box-sizing:border-box;margin-bottom:6px;resize:none;overflow:hidden;" oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'"></textarea>
-                <select id="nftStandardCollect" style="width:100%;padding:7px 10px;background:var(--bg-surface);border:1px solid var(--border-subtle);border-radius:8px;color:var(--text-primary);font-size:0.8rem;">
-                    <option value="ERC721">ERC721</option>
-                    <option value="ERC1155">ERC1155</option>
-                </select>
-            </div>
-
-            <!-- Box 3: NFT Selection -->
-            <div style="background:var(--bg-raised);border:1px solid var(--border-subtle);border-radius:10px;padding:10px 12px;margin-bottom:8px;">
-                <div style="font-size:0.72rem;font-weight:700;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.8px;margin-bottom:7px;">🖼️ NFT Selection</div>
-                <div id="nftGridCollect" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(90px,1fr));gap:7px;margin-bottom:8px;min-height:100px;max-height:260px;overflow-y:auto;padding:8px;background:rgba(0,0,0,0.2);border-radius:8px;">
-                    <div style="grid-column:1/-1;text-align:center;padding:20px 10px;color:#808080;">
-                        <div style="font-size:2rem;margin-bottom:6px;">🎨</div>
-                        <div style="font-size:0.8rem;">No NFTs loaded</div>
-                        <div style="font-size:0.72rem;margin-top:4px;color:#606060;">Click "Fetch" to load</div>
+                <!-- NFT contract -->
+                <div class="bt-card">
+                    <div class="bt-row">
+                        <div class="bt-head">
+                            <label class="bt-cap" for="nftContractAddress">NFT contract</label>
+                            <select id="nftStandard" class="nft-std" aria-label="Token standard">
+                                <option value="ERC721">ERC721</option>
+                                <option value="ERC1155">ERC1155</option>
+                            </select>
+                        </div>
+                        <input type="text" id="nftContractAddress" placeholder="0x... contract address" autocomplete="off" spellcheck="false">
+                        <textarea id="nftTokenIds" class="nft-ta nft-ids" rows="1" placeholder="Token IDs: 123 456 789" spellcheck="false"></textarea>
                     </div>
                 </div>
-                <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:7px;">
-                    <div style="background:var(--bg-surface);border:1px solid var(--border-subtle);border-radius:7px;padding:5px 8px;text-align:center;">
-                        <div style="font-size:0.62rem;color:var(--text-muted);text-transform:uppercase;">Total</div>
-                        <div style="font-size:0.9rem;font-weight:700;color:var(--accent-primary);" id="totalCountCollect">0</div>
-                    </div>
-                    <div style="background:var(--bg-surface);border:1px solid var(--border-subtle);border-radius:7px;padding:5px 8px;text-align:center;">
-                        <div style="font-size:0.62rem;color:var(--text-muted);text-transform:uppercase;">Selected</div>
-                        <div style="font-size:0.9rem;font-weight:700;color:#10b981;" id="selectedCountCollect">0</div>
+
+                <!-- NFT selection -->
+                <div class="bt-card">
+                    <div class="bt-row">
+                        <div class="bt-head">
+                            <span class="bt-cap">NFTs</span>
+                            <button type="button" class="bt-select" id="fetchNftsDistributeBtn" onclick="fetchNFTsDistribute()"><span class="material-icons-round">search</span>Fetch</button>
+                            <button type="button" class="nft-mini" onclick="selectAllNFTs('distribute')">All</button>
+                            <button type="button" class="nft-mini" onclick="deselectAllNFTs('distribute')">Clear</button>
+                        </div>
+                        <div id="nftGridDistribute" class="nft-pick">
+                            <div style="grid-column:1/-1;text-align:center;padding:20px 10px;color:#808080;">
+                                <div style="font-size:2rem;margin-bottom:6px;">🎨</div>
+                                <div style="font-size:0.8rem;">No NFTs loaded</div>
+                                <div style="font-size:0.72rem;margin-top:4px;color:#606060;">Click "Fetch" to load</div>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:5px;">
-                    <button onclick="fetchNFTsCollect()" id="fetchNftsCollectBtn" style="padding:6px 4px;font-size:0.72rem;font-weight:700;background:linear-gradient(135deg,#4a90e2,#357abd);color:#fff;border:none;border-radius:7px;cursor:pointer;">🔍 Fetch</button>
-                    <button onclick="selectAllNFTs('collect')" style="padding:6px 4px;font-size:0.72rem;background:var(--bg-surface);border:1px solid var(--border-subtle);color:var(--text-primary);border-radius:7px;cursor:pointer;">✅ All</button>
-                    <button onclick="deselectAllNFTs('collect')" style="padding:6px 4px;font-size:0.72rem;background:var(--bg-surface);border:1px solid var(--border-subtle);color:var(--text-primary);border-radius:7px;cursor:pointer;">❌ Clear</button>
+
+                <!-- Summary -->
+                <div class="bt-summary">
+                    <span><b id="selectedCountDistribute">0</b> of <b id="totalCountDistribute">0</b> selected</span>
+                    <span class="bt-total">Sending <b id="nftDistributeTokenCount">0</b> NFTs</span>
+                </div>
+
+                <!-- Gas pill + Execute -->
+                <div class="bt-dock">
+                    <div class="st-act">
+                        <div class="bt-gasrow" id="one-gas-toggle-th-nft-dist">
+                            <button type="button" class="bt-gaspill" onclick="window._ngCycle()" aria-label="Gas type, tap to change" title="Gas type - tap to change">
+                                <span class="material-icons-round bt-gaspill-ico">local_gas_station</span>
+                                <span class="sw-gas-pill-label bt-gaspill-label">AUTO</span>
+                            </button>
+                        </div>
+                        <div class="execute-section bt-actions">
+                            <button class="btn btn-success execute-btn" id="executeNftDistributeBtn" onclick="executeNftDistribute()" disabled style="opacity:0.45;cursor:not-allowed;">Transfer NFTs</button>
+                        </div>
+                    </div>
                 </div>
             </div>
 
+            <!-- ══ COLLECT MODE (Many → 1) ══ -->
+            <div id="nftCollectSection" style="display:none;">
+                <input type="hidden" id="rpcUrlNftCollect" value="">
 
-            <!-- Execute -->
-            <button class="btn btn-success" id="executeNftCollectBtn" onclick="executeNftCollect()" disabled style="width:100%;padding:13px;font-size:0.95rem;font-weight:700;margin-bottom:8px;border-radius:10px;opacity:0.45;cursor:not-allowed;">📥 Collect Selected NFTs (Many → 1)</button>
-        </div>
+                <!-- Source wallets + Recipient -->
+                <div class="bt-card">
+                    <div class="bt-row">
+                        <div class="bt-head">
+                            <span class="bt-cap">Source wallets · <span id="nftCollectWalletCount">0</span></span>
+                            <button type="button" class="bt-select" onclick="thOpenWalletPicker('nftSenderKeys','multi')"><span class="material-icons-round">account_balance_wallet</span>Select</button>
+                        </div>
+                        <div class="sk-key-wrapper nft-keys-multi" id="nftSenderKeysWrapper">
+                            <textarea id="nftSenderKeys" class="sk-key-textarea sk-masked" placeholder="0xabc123...&#10;0xdef456..." autocomplete="off" spellcheck="false" oninput="autoValidateNftSenderKeys()"></textarea>
+                            <button type="button" class="sk-toggle-btn" id="nftSenderKeysToggleBtn" onclick="skToggleKeyVisibility('nftSenderKeys','nftSenderKeysToggleBtn')" title="Show/Hide Key"><span class="material-icons-round sk-eye-icon">visibility_off</span></button>
+                        </div>
+                        <div class="mk-meta"><span class="st-hint">Wallets holding the NFTs · invalid keys are removed</span></div>
+                    </div>
 
-        <!-- Progress Bar -->
-        <div class="progress-container" style="margin-top:6px;margin-bottom:8px;">
-            <div class="progress-fill" id="progressFillNft"></div>
-        </div>
+                    <div class="bt-row">
+                        <div class="bt-head">
+                            <label class="bt-cap" for="nftCollectRecipient">Recipient address</label>
+                        </div>
+                        <input type="text" id="nftCollectRecipient" placeholder="0x... wallet that receives all NFTs" autocomplete="off" spellcheck="false" oninput="autoValidateNftCollectRecipient()">
+                        <div class="wallet-info bt-info nft-info-row" id="nftCollectRecipientInfo" style="display:none;">
+                            <div class="wallet-info-item"><span class="wallet-info-label">Address:</span><span class="wallet-info-value" id="nftCollectRecipientAddress">-</span></div>
+                            <div class="wallet-info-item"><span class="wallet-info-label">Status:</span><span class="wallet-info-value" id="nftCollectRecipientStatus">✅ Valid</span></div>
+                        </div>
+                    </div>
+                </div>
 
-        <!-- Log Section -->
-        <div style="background:var(--bg-raised);border:1px solid var(--border-subtle);border-radius:10px;padding:10px 12px;">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
-                <div style="font-size:0.72rem;font-weight:700;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.8px;">📋 Logs</div>
-                <button onclick="clearLogNft()" style="padding:4px 10px;font-size:0.72rem;background:var(--bg-surface);border:1px solid var(--border-subtle);border-radius:6px;color:var(--text-secondary);cursor:pointer;">🗑️ Clear</button>
+                <!-- NFT contract -->
+                <div class="bt-card">
+                    <div class="bt-row">
+                        <div class="bt-head">
+                            <label class="bt-cap" for="nftContractAddressCollect">NFT contract</label>
+                            <select id="nftStandardCollect" class="nft-std" aria-label="Token standard">
+                                <option value="ERC721">ERC721</option>
+                                <option value="ERC1155">ERC1155</option>
+                            </select>
+                        </div>
+                        <input type="text" id="nftContractAddressCollect" placeholder="0x... contract address" autocomplete="off" spellcheck="false">
+                        <textarea id="nftTokenIdsCollect" class="nft-ta nft-ids" rows="1" placeholder="Token IDs: 123 456 789 (optional)" spellcheck="false"></textarea>
+                    </div>
+                </div>
+
+                <!-- NFT selection -->
+                <div class="bt-card">
+                    <div class="bt-row">
+                        <div class="bt-head">
+                            <span class="bt-cap">NFTs</span>
+                            <button type="button" class="bt-select" id="fetchNftsCollectBtn" onclick="fetchNFTsCollect()"><span class="material-icons-round">search</span>Fetch</button>
+                            <button type="button" class="nft-mini" onclick="selectAllNFTs('collect')">All</button>
+                            <button type="button" class="nft-mini" onclick="deselectAllNFTs('collect')">Clear</button>
+                        </div>
+                        <div id="nftGridCollect" class="nft-pick nft-pick-multi">
+                            <div style="grid-column:1/-1;text-align:center;padding:20px 10px;color:#808080;">
+                                <div style="font-size:2rem;margin-bottom:6px;">🎨</div>
+                                <div style="font-size:0.8rem;">No NFTs loaded</div>
+                                <div style="font-size:0.72rem;margin-top:4px;color:#606060;">Click "Fetch" to load</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Summary -->
+                <div class="bt-summary">
+                    <span><b id="selectedCountCollect">0</b> of <b id="totalCountCollect">0</b> selected</span>
+                    <span class="bt-total">All to 1 recipient</span>
+                </div>
+
+                <!-- Gas pill + Execute -->
+                <div class="bt-dock">
+                    <div class="st-act">
+                        <div class="bt-gasrow" id="one-gas-toggle-th-nft-coll">
+                            <button type="button" class="bt-gaspill" onclick="window._ngCycle()" aria-label="Gas type, tap to change" title="Gas type - tap to change">
+                                <span class="material-icons-round bt-gaspill-ico">local_gas_station</span>
+                                <span class="sw-gas-pill-label bt-gaspill-label">AUTO</span>
+                            </button>
+                        </div>
+                        <div class="execute-section bt-actions">
+                            <button class="btn btn-success execute-btn" id="executeNftCollectBtn" onclick="executeNftCollect()" disabled style="opacity:0.45;cursor:not-allowed;">Collect NFTs</button>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="log-container" id="logContainerNft" style="max-height:180px;overflow-y:auto;">
-                <div class="log-line log-info">[INFO] Ready to transfer NFTs...</div>
-            </div>
-        </div>
 
+            <!-- Progress bar -->
+            <div class="progress-container nft-progress">
+                <div class="progress-fill" id="progressFillNft"></div>
+            </div>
+
+            <!-- Logs: collapsed by default, same strip as W2W / Self Transfer -->
+            <div class="log-section bt-logs collapsed" id="nftLogs">
+                <div class="bt-loghead" onclick="nftToggleLogs()" role="button" aria-label="Show or hide logs">
+                    <span class="material-icons-round bt-logchev">expand_more</span>
+                    <span class="bt-cap">Logs</span>
+                    <button type="button" class="bt-link" onclick="event.stopPropagation();clearLogNft()">Clear</button>
+                </div>
+                <div class="log-container" id="logContainerNft">
+                    <div class="log-line log-info">[INFO] Ready to transfer NFTs...</div>
+                </div>
+            </div>
         </div>

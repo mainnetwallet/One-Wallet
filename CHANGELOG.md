@@ -6,6 +6,11 @@ Per-build release notes are published on the [Releases](../../releases) page.
 ## [Unreleased]
 
 ### Changed
+- **NFT Transfer UI:** now uses the same compact layout as W2W and Self Transfer - a 1 -> Many / Many -> 1 switch, grouped
+  cards (Sender wallet + Recipients, or Source wallets + Recipient; NFT contract with a compact ERC721 / ERC1155 picker),
+  flat 3-per-row NFT tiles with Fetch / All / Clear in the card header, a `selected of loaded` summary, gas pill and
+  Transfer / Collect button on one row, and a collapsible Logs strip. Markup/styling only; element IDs and transfer logic
+  unchanged (button labels no longer use emoji).
 - **Self Transfer UI:** now uses the same compact layout as Multi Key Recipients and W2W so everything fits on one phone
   screen - Native / Token switch, one Wallets card ("Select" button, short masked key box; Token mode adds the token
   contract on top), an amount field with a TXs-per-wallet stepper and quick amount chips, a `wallets x TXs / Est. total`

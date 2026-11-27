@@ -148,7 +148,7 @@
                 if (selectorEl) selectorEl.style.display = 'block';
             } finally {
                 btn.disabled = false;
-                btn.innerHTML = '🔍 Fetch NFTs';
+                btn.innerHTML = '<span class="material-icons-round">search</span>Fetch';
             }
         }
         

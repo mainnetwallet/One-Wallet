@@ -143,7 +143,7 @@
                 logMessageNft('error', `❌ Error: ${error.message}`);
             } finally {
                 btn.disabled = false;
-                btn.innerHTML = '📤 Distribute Selected NFTs (1 → Many)';
+                btn.innerHTML = 'Transfer NFTs';
                 if (typeof window.OneBGGuard !== 'undefined') window.OneBGGuard.txEnd(); // BG: release wake lock
             }
         }
@@ -285,7 +285,7 @@
                 logMessageNft('error', `❌ Error: ${error.message}`);
             } finally {
                 btn.disabled = false;
-                btn.innerHTML = '📥 Collect Selected NFTs (Many → 1)';
+                btn.innerHTML = 'Collect NFTs';
                 if (typeof window.OneBGGuard !== 'undefined') window.OneBGGuard.txEnd(); // BG: release wake lock
             }
         }

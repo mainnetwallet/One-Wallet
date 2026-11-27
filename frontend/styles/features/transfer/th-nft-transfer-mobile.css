@@ -1,0 +1,166 @@
+/* ══════════════════════════════════════════════════
+   NFT TRANSFER — additions on top of the shared compact layout
+   The bt-* rules live in transfer-hub-base-form-styles.css (scoped to Batch Transfer, Multi Key Recipients, W2W, Self Transfer and this screen).
+   Markup: html-src/partials/page-transfer-hub/nft-transfer.html
+   UI-only helpers: scripts/features/transfer/nft-transfer-ui-sync.js
+   ══════════════════════════════════════════════════ */
+
+/* Inputs fill the card */
+        #th-wrapper #nftTransferUI .bt-row input[type="text"] {
+            width: 100%;
+            box-sizing: border-box;
+            text-overflow: ellipsis;
+        }
+        #th-wrapper #nftTransferUI .bt-row input[type="text"] + .nft-ta { margin-top: 6px; }
+
+/* Recipients / Token IDs: short boxes */
+        #th-wrapper #nftTransferUI textarea.nft-ta {
+            height: 52px !important;
+            min-height: 52px !important;
+        }
+        #th-wrapper #nftTransferUI textarea.nft-ids {
+            height: 40px !important;
+            min-height: 40px !important;
+        }
+
+/* Collect: several keys, short multi-line masked box */
+        #th-wrapper #nftTransferUI .nft-keys-multi .sk-key-textarea {
+            width: 100%;
+            box-sizing: border-box;
+            height: 64px !important;
+            min-height: 64px !important;
+            max-height: 140px !important;
+            padding: 6px 40px 6px 10px !important;
+            font-family: var(--font-mono);
+            font-size: 0.72rem !important;
+            line-height: 1.55 !important;
+            resize: vertical;
+        }
+        #th-wrapper #nftTransferUI .nft-keys-multi .sk-toggle-btn {
+            top: 4px !important;
+            transform: none !important;
+        }
+
+/* Plain counts inside captions ("Recipients · 3") */
+        #th-wrapper #nftTransferUI :is(#nftDistributeRecipientsCount, #nftCollectWalletCount) {
+            background: transparent !important;
+            padding: 0 !important;
+            margin: 0 !important;
+            color: inherit !important;
+            font-size: inherit !important;
+            font-weight: inherit !important;
+        }
+        #th-wrapper #nftTransferUI .mk-meta {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 5px;
+            font-size: 0.72rem;
+            line-height: 1.3;
+        }
+        #th-wrapper #nftTransferUI .st-hint { color: var(--text-muted); }
+        #th-wrapper #nftTransferUI .nft-info-row { margin-top: 5px !important; max-width: none; }
+        #th-wrapper #nftTransferUI .nft-info-row .wallet-info-value { color: #4ade80 !important; }
+
+/* Token standard select (ERC721 / ERC1155) in the card header */
+        #th-wrapper #nftTransferUI select.nft-std {
+            flex: 0 0 auto;
+            width: auto !important;
+            min-width: 88px;
+            height: 30px;
+            padding: 0 24px 0 10px;
+            border-radius: 9px;
+            border: 1px solid var(--border-subtle);
+            background-color: var(--bg-surface);
+            color: var(--text-primary);
+            font-size: 0.72rem;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+/* NFT grid: flat small tiles, 3 per row on a phone */
+        #th-wrapper #nftTransferUI .nft-mini {
+            flex-shrink: 0;
+            height: 30px;
+            padding: 0 11px;
+            border-radius: 9px;
+            border: 1px solid var(--border-subtle);
+            background: var(--bg-surface);
+            color: var(--text-primary);
+            font-size: 0.72rem;
+            font-weight: 700;
+            cursor: pointer;
+            -webkit-tap-highlight-color: transparent;
+        }
+        #th-wrapper #nftTransferUI .nft-mini:active { transform: scale(0.96); }
+        #th-wrapper #nftTransferUI .bt-select:disabled { opacity: 0.6; }
+
+        #th-wrapper #nftTransferUI .nft-pick {
+            min-height: 96px;
+            max-height: 230px;
+            overflow-y: auto;
+            padding: 6px;
+            background: var(--bg-surface);
+            border: 1px solid var(--border-subtle);
+            border-radius: 10px;
+        }
+        #th-wrapper #nftTransferUI #nftGridDistribute.nft-pick {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(92px, 1fr));
+            gap: 6px;
+        }
+        /* Collect keeps its per-wallet groups (JS rewrites this box's inline style) */
+        #th-wrapper #nftTransferUI #nftGridCollect.nft-pick { max-height: 300px; }
+
+        #th-wrapper #nftTransferUI #nftGridDistribute .nft-card {
+            background: var(--bg-raised);
+            border: 1px solid var(--border-subtle);
+            border-radius: 10px;
+            padding: 5px;
+            box-shadow: none;
+            transform: none;
+        }
+        #th-wrapper #nftTransferUI #nftGridDistribute .nft-card:hover { transform: none; box-shadow: none; border-color: var(--border-strong, var(--border-subtle)); }
+        #th-wrapper #nftTransferUI #nftGridDistribute .nft-card.selected {
+            background: var(--bg-raised);
+            border: 2px solid var(--accent-primary);
+            padding: 4px;
+            box-shadow: none;
+            transform: none;
+        }
+        #th-wrapper #nftTransferUI #nftGridDistribute .nft-card.selected::before {
+            top: 4px;
+            right: 4px;
+            width: 18px;
+            height: 18px;
+            font-size: 12px;
+            background: var(--accent-primary);
+            box-shadow: none;
+        }
+        #th-wrapper #nftTransferUI #nftGridDistribute :is(.nft-image, .nft-placeholder) {
+            height: auto;
+            aspect-ratio: 1 / 1;
+            margin-bottom: 4px;
+            border-radius: 7px;
+            font-size: 1.6rem;
+        }
+        #th-wrapper #nftTransferUI #nftGridDistribute .nft-name { font-size: 0.68rem; margin-bottom: 1px; }
+        #th-wrapper #nftTransferUI #nftGridDistribute .nft-id { font-size: 0.66rem; }
+
+/* Gas pill + Execute on one row */
+        #th-wrapper #nftTransferUI .st-act {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        #th-wrapper #nftTransferUI .st-act .bt-gasrow { margin: 0; flex: none; }
+        #th-wrapper #nftTransferUI .st-act .bt-actions { flex: 1; min-width: 0; margin: 0 !important; grid-template-columns: 1fr !important; }
+        #th-wrapper #nftTransferUI .bt-dock { padding-top: 6px; }
+        #th-wrapper #nftTransferUI .bt-summary { margin-top: 2px; }
+        #th-wrapper #nftTransferUI .nft-progress { margin: 4px 0 !important; }
+
+/* Logs: collapsed strip by default. Opening it folds the long inputs so the log box fits on screen. */
+        #th-wrapper #nftTransferUI .bt-logs { padding: 4px 0 0 !important; }
+        #th-wrapper #nftTransferUI .bt-logs .bt-loghead { height: 36px; }
+        #th-wrapper #nftTransferUI .bt-logs .log-container { height: 130px !important; max-height: none !important; }
+        #th-wrapper #nftTransferUI.nft-logs-open :is(.nft-pick, .mk-meta, .nft-ids) { display: none !important; }
