@@ -6,6 +6,11 @@ Per-build release notes are published on the [Releases](../../releases) page.
 ## [Unreleased]
 
 ### Changed
+- **Withdraw Manager UI:** now uses the same compact layout as W2W, Self Transfer, NFT Transfer and Token Approval - a selected-contract
+  card (type tag, tappable address, Native and Token balances), one Developer wallet + Recipient card with "Select" buttons and
+  a slim ownership strip, a `Native / Token` summary, gas pill + one Withdraw button on a row, compact contract rows with
+  Add / Refresh / Clear icons, and a collapsible Logs strip. Token contracts get a Native / Token switch (Native clears the token
+  address, because Withdraw Native only enables while it is empty). Markup/styling only; element IDs and withdraw logic unchanged.
 - **Token Approval UI:** now uses the same compact layout as W2W, Self Transfer and NFT Transfer - one Wallets card
   ("Select" button, short masked key box, key count in the caption), one Approval card (Token contract, Spender, Amount
   with Unlimited / Custom / Revoke chips), a `wallets / ok / failed` summary, gas pill + Approve button + Clear icon on

@@ -191,33 +191,30 @@
                             }
                         };
                         
-                        const typeIcon = contract.type === 'native' || contract.type === 'NATIVE' ? '💵' : '🪙';
                         const typeText = contract.type === 'native' || contract.type === 'NATIVE' ? 'Native' : 'Token';
                         const typeColor = contract.type === 'native' || contract.type === 'NATIVE' ? '#10b981' : '#f59e0b';
+                        const _wdHasBal = parseFloat(nativeBalanceEth) > 0;
+                        const _wdOwnerShort = ownerAddress.length > 12 ? ownerAddress.slice(0,6)+'...'+ownerAddress.slice(-4) : ownerAddress;
+                        const _wdAddrShort = contract.address.length > 14 ? contract.address.slice(0,8)+'...'+contract.address.slice(-6) : contract.address;
                         
+                        // Compact row (styles: th-withdraw-manager-theme.css). Handlers and arguments are unchanged.
+                        card.className = 'wd-crow';
                         card.innerHTML = `
-                            <div style="display:flex;align-items:center;gap:10px;min-width:0;">
-                                <div style="flex-shrink:0;width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,${typeColor}28 0%,${typeColor}10 100%);border:1px solid ${typeColor}55;display:flex;align-items:center;justify-content:center;font-size:1rem;box-shadow:0 2px 8px ${typeColor}20;">${typeIcon}</div>
-                                <div style="flex:1;min-width:0;">
-                                    <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px;">
-                                        <span style="font-weight:800;color:#e8f4ff;font-size:0.8rem;letter-spacing:0.2px;">Contract <span style="color:#4a9eff;">#${i + 1}</span></span>
-                                        <span style="background:linear-gradient(135deg,${typeColor}30,${typeColor}18);color:${typeColor};padding:1px 7px;border-radius:20px;font-size:0.57rem;font-weight:800;letter-spacing:0.5px;border:1px solid ${typeColor}40;">${typeText.toUpperCase()}</span>
-                                        <span style="margin-left:auto;font-size:0.75rem;font-weight:800;color:${parseFloat(nativeBalanceEth)>0?'#34d399':'#444'};flex-shrink:0;letter-spacing:-0.3px;">${parseFloat(nativeBalanceEth).toFixed(4)} <span style="font-size:0.6rem;font-weight:600;color:${parseFloat(nativeBalanceEth)>0?'#10b981':'#333'};">${contract.symbol||'ETH'}</span></span>
-                                    </div>
-                                    <div style="display:flex;align-items:center;gap:4px;margin-bottom:4px;">
-                                        <div style="font-family:'Courier New',monospace;font-size:0.6rem;color:#5b9bd5;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;padding:3px 6px;background:#0d1520;border-radius:5px;border:1px solid #1a2840;">${contract.address}</div>
-                                        <button onclick="event.stopPropagation();(function(){var _cid=${contract.chainId||0};var _exp=_cid&&window.getTHExplorer?window.getTHExplorer(_cid):'https://etherscan.io';window.open(_exp+'/address/${contract.address}','_blank','noopener');})();" style="flex-shrink:0;background:#0d1520;border:1px solid #1a2840;border-radius:5px;padding:2px 5px;cursor:pointer;color:#4a9eff;font-size:0.7rem;line-height:1;transition:all 0.15s;" onmouseover="this.style.borderColor='#4a9eff';this.style.color='#7db8ff'" onmouseout="this.style.borderColor='#1a2840';this.style.color='#4a9eff'" title="View contract on explorer"><span class="material-icons-round" style="font-size:0.75rem;vertical-align:middle;">open_in_new</span></button>
-                                    </div>
-                                    <div style="display:flex;align-items:center;gap:5px;">
-                                        <span style="font-size:0.58rem;color:#4a9eff99;font-weight:600;flex-shrink:0;">${contract.chainName||contract.chain||'Unknown'}</span>
-                                        <span style="color:#222;flex-shrink:0;font-size:0.7rem;">|</span>
-                                        <span style="font-size:0.57rem;color:#445;font-family:'Courier New',monospace;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;cursor:pointer;" title="${ownerAddress}" onclick="event.stopPropagation();(function(){var _cid=${contract.chainId||0};var _exp=_cid&&window.getTHExplorer?window.getTHExplorer(_cid):'https://etherscan.io';if('${ownerAddress}'.startsWith('0x')){window.open(_exp+'/address/${ownerAddress}','_blank','noopener');}})();">${ownerAddress.length > 12 ? ownerAddress.slice(0,6)+'...'+ownerAddress.slice(-4) : ownerAddress}</span>
-                                        <span style="display:flex;gap:3px;flex-shrink:0;">
-                                            <button onclick="selectContractForWithdraw('${contract.address}','${contract.type}','${contract.chainName||contract.chain||'Unknown'}','${contract.symbol||'ETH'}','${contract.rpcUrl||''}')" style="background:linear-gradient(135deg,#1a3a5c,#0f2540);color:#4a9eff;border:1px solid #2a5080;padding:3px 9px;border-radius:6px;cursor:pointer;font-size:0.62rem;font-weight:700;letter-spacing:0.3px;transition:all 0.15s;" onmouseover="this.style.background='linear-gradient(135deg,#1e4570,#12305a)';this.style.borderColor='#4a9eff'" onmouseout="this.style.background='linear-gradient(135deg,#1a3a5c,#0f2540)';this.style.borderColor='#2a5080'">💰</button>
-                                            <button onclick="deleteFromWithdrawManager('${contract.address}')" style="background:linear-gradient(135deg,#3a1a1a,#2a0f0f);color:#f87171;border:1px solid #5c2020;padding:3px 9px;border-radius:6px;cursor:pointer;font-size:0.62rem;font-weight:700;transition:all 0.15s;" onmouseover="this.style.background='linear-gradient(135deg,#4a1e1e,#3a1212)';this.style.borderColor='#ef4444'" onmouseout="this.style.background='linear-gradient(135deg,#3a1a1a,#2a0f0f)';this.style.borderColor='#5c2020'">🗑️</button>
-                                        </span>
-                                    </div>
+                            <div class="wd-cmain">
+                                <div class="wd-ctop">
+                                    <span class="wd-cname">Contract #${i + 1}</span>
+                                    <span class="wd-ctype" style="background:${typeColor}22;color:${typeColor};">${typeText.toUpperCase()}</span>
+                                    <span class="wd-cbal" style="color:${_wdHasBal?'#34d399':'#666'};">${parseFloat(nativeBalanceEth).toFixed(4)} <small>${contract.symbol||'ETH'}</small></span>
                                 </div>
+                                <div class="wd-caddr">
+                                    <span class="wd-caddr-t" title="${contract.address}">${_wdAddrShort}</span>
+                                    <button type="button" class="wd-cbtn wd-cbtn-ext" onclick="event.stopPropagation();(function(){var _cid=${contract.chainId||0};var _exp=_cid&&window.getTHExplorer?window.getTHExplorer(_cid):'https://etherscan.io';window.open(_exp+'/address/${contract.address}','_blank','noopener');})();" title="View contract on explorer" aria-label="View contract on explorer"><span class="material-icons-round">open_in_new</span></button>
+                                </div>
+                                <div class="wd-cmeta">${contract.chainName||contract.chain||'Unknown'} · owner <span class="wd-cowner" title="${ownerAddress}" onclick="event.stopPropagation();(function(){var _cid=${contract.chainId||0};var _exp=_cid&&window.getTHExplorer?window.getTHExplorer(_cid):'https://etherscan.io';if('${ownerAddress}'.startsWith('0x')){window.open(_exp+'/address/${ownerAddress}','_blank','noopener');}})();">${_wdOwnerShort}</span></div>
+                            </div>
+                            <div class="wd-cacts">
+                                <button type="button" class="wd-cbtn" onclick="selectContractForWithdraw('${contract.address}','${contract.type}','${contract.chainName||contract.chain||'Unknown'}','${contract.symbol||'ETH'}','${contract.rpcUrl||''}')" title="Select for withdraw" aria-label="Select for withdraw"><span class="material-icons-round">account_balance_wallet</span></button>
+                                <button type="button" class="wd-cbtn wd-cbtn-del" onclick="deleteFromWithdrawManager('${contract.address}')" title="Delete contract" aria-label="Delete contract"><span class="material-icons-round">delete_outline</span></button>
                             </div>
                         `;
                         

@@ -1,147 +1,243 @@
-        /* ══════════════════════════════════════════
-           WITHDRAW MANAGER — One Theme Redesign
-           ══════════════════════════════════════════ */
-        #withdrawManagerUI {
-            font-family: var(--font-display);
+/* ══════════════════════════════════════════════════
+   WITHDRAW MANAGER — additions on top of the shared compact layout
+   The bt-* rules live in transfer-hub-base-form-styles.css (scoped to Batch Transfer, Multi Key Recipients, W2W, Self Transfer, NFT Transfer, Token Approval and this screen).
+   Markup: html-src/partials/page-transfer-hub/withdraw-manager.html (contract rows: scripts/features/transfer/transfer-hub/load-all-contracts.js)
+   UI-only helpers: scripts/features/transfer/withdraw-manager-ui-sync.js
+   Goal: selected contract, wallet, recipient and Withdraw fit on one phone screen; contracts and logs sit below as compact strips.
+   ══════════════════════════════════════════════════ */
+
+#withdrawManagerUI { font-family: var(--font-display); }
+
+/* Title stays on one line next to the network button */
+        #th-wrapper #withdrawManagerUI .th-section-header h1 {
+            font-size: 1rem !important;
+            white-space: nowrap;
         }
 
-        #withdrawManagerUI > div[style*="font-size: 0.9rem"] {
+/* Inputs fill the card */
+        #th-wrapper #withdrawManagerUI .bt-row input[type="text"] {
+            width: 100%;
+            box-sizing: border-box;
+            text-overflow: ellipsis;
+        }
+
+/* Developer key box: short masked box */
+        #th-wrapper #withdrawManagerUI .wd-keys .sk-key-textarea {
+            width: 100%;
+            box-sizing: border-box;
+            height: 44px !important;
+            min-height: 44px !important;
+            max-height: 120px !important;
+            padding: 6px 40px 6px 10px !important;
+            font-family: var(--font-mono);
             font-size: 0.72rem !important;
-            color: var(--text-muted) !important;
-            margin-bottom: 8px !important;
-            letter-spacing: 0.3px;
+            line-height: 1.55 !important;
+            resize: vertical;
+        }
+        #th-wrapper #withdrawManagerUI .wd-keys .sk-toggle-btn {
+            top: 4px !important;
+            transform: none !important;
         }
 
-        /* ── Mobile-first: single column stacked layout ── */
-        #withdrawManagerUI .section {
-            background: var(--bg-raised) !important;
-            border: 1px solid var(--border-subtle) !important;
-            border-radius: var(--radius-sm) !important;
-            padding: 10px !important;
-            box-shadow: var(--shadow-card) !important;
-            position: relative;
+/* Selected contract card */
+        #th-wrapper #withdrawManagerUI .wd-selected {
+            border-color: var(--border-glow) !important;
+            padding: 10px 12px !important;
+        }
+        #th-wrapper #withdrawManagerUI .wd-tag {
+            font-size: 0.6rem;
+            font-weight: 800;
+            letter-spacing: 0.6px;
+            padding: 2px 8px;
+            border-radius: 20px;
+            background: rgba(74,158,255,0.14);
+            color: #7db8ff;
+        }
+        #th-wrapper #withdrawManagerUI .wd-addr {
+            margin: 6px 0 8px;
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: #7db8ff;
+            white-space: nowrap;
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+        #th-wrapper #withdrawManagerUI .wd-addr::-webkit-scrollbar { display: none; }
+        #th-wrapper #withdrawManagerUI .wd-bal {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 6px;
+        }
+        #th-wrapper #withdrawManagerUI .wd-bal-cell {
+            display: flex;
+            flex-direction: column;
+            gap: 1px;
+            min-width: 0;
+            padding: 6px 9px;
+            border-radius: 8px;
+        }
+        #th-wrapper #withdrawManagerUI .wd-bal-cell b {
+            font-size: 0.8rem;
+            font-weight: 700;
             overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
-        #withdrawManagerUI .section::before {
-            content: '';
-            position: absolute;
-            top: 0 !important;
-            left: 0 !important;
-            right: 0 !important;
-            bottom: auto !important;
-            height: 2px !important;
-            width: auto !important;
-            background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary)) !important;
-            border-radius: var(--radius-sm) var(--radius-sm) 0 0 !important;
-            transform: none !important;
-            transition: none !important;
+        #th-wrapper #withdrawManagerUI .wd-bal-cap {
+            font-size: 0.6rem;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            color: var(--text-muted);
         }
-        #withdrawManagerUI .section:hover::before {
-            width: auto !important;
-            height: 2px !important;
-            top: 0 !important;
-            left: 0 !important;
-            transform: none !important;
+        #th-wrapper #withdrawManagerUI .wd-bal-native { background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.25); }
+        #th-wrapper #withdrawManagerUI .wd-bal-native b { color: #10b981; }
+        #th-wrapper #withdrawManagerUI .wd-bal-token { background: rgba(245,158,11,0.1); border: 1px solid rgba(245,158,11,0.25); }
+        #th-wrapper #withdrawManagerUI .wd-chain {
+            margin-top: 7px;
+            font-size: 0.66rem;
+            color: var(--text-muted);
         }
+        #th-wrapper #withdrawManagerUI .wd-chain span { color: #4ade80; font-weight: 600; }
 
-        #withdrawManagerUI .section-title {
-            font-family: var(--font-display) !important;
-            font-size: 0.65rem !important;
-            font-weight: 700 !important;
-            text-transform: uppercase !important;
-            letter-spacing: 1px !important;
-            color: var(--text-secondary) !important;
-            margin-bottom: 8px !important;
-        }
-
-        /* Selected contract info box */
-        #selectedContractInfoBox {
-            background: linear-gradient(135deg, rgba(99,102,241,0.08) 0%, rgba(139,92,246,0.08) 100%) !important;
-            border: 1px solid var(--border-glow) !important;
-            border-radius: var(--radius-sm) !important;
-            padding: 8px !important;
-            margin-bottom: 8px !important;
-        }
-
-        /* No contract selected */
-        #noContractSelected {
-            border: 1px dashed var(--border-subtle) !important;
-            border-radius: var(--radius-sm) !important;
-            color: var(--text-muted) !important;
-            padding: 14px 10px !important;
+/* No contract selected */
+        #th-wrapper #withdrawManagerUI .wd-empty {
             text-align: center;
+            padding: 12px 10px !important;
+            border-style: dashed !important;
         }
-        #noContractSelected > div:first-child {
-            font-size: 1.5rem !important;
-            margin-bottom: 4px !important;
-        }
-        #noContractSelected > div:nth-child(2) {
-            font-size: 0.75rem !important;
-            margin-bottom: 3px !important;
-        }
-        #noContractSelected > div:nth-child(3) {
-            font-size: 0.68rem !important;
-        }
+        #th-wrapper #withdrawManagerUI .wd-empty .material-icons-round { font-size: 26px; color: var(--text-muted); opacity: 0.6; }
+        #th-wrapper #withdrawManagerUI .wd-empty-t { font-size: 0.76rem; font-weight: 600; color: var(--text-secondary); margin-top: 2px; }
+        #th-wrapper #withdrawManagerUI .wd-empty-s { font-size: 0.66rem; color: var(--text-muted); margin-top: 2px; }
 
-        /* Input group */
-        #withdrawManagerUI .input-group {
-            margin-bottom: 7px !important;
-        }
-        #withdrawManagerUI .input-group label {
-            font-size: 0.65rem !important;
-            font-weight: 700 !important;
-            color: var(--text-secondary) !important;
-            text-transform: uppercase !important;
-            letter-spacing: 0.5px !important;
-            display: block;
-            margin-bottom: 4px;
-        }
-        #withdrawManagerUI .input-group input,
-        #withdrawManagerUI .input-group textarea {
+/* Ownership status: slim strip (JS writes icon, text and colours; the old gradient box is flattened) */
+        #th-wrapper #withdrawManagerUI .wd-owner {
+            margin-top: 6px;
+            padding: 6px 10px !important;
             background: var(--bg-surface) !important;
             border: 1px solid var(--border-subtle) !important;
-            border-radius: var(--radius-sm) !important;
-            color: var(--text-primary) !important;
-            font-family: var(--font-mono) !important;
-            font-size: 0.72rem !important;
-            padding: 6px 10px !important;
-            width: 100% !important;
-            box-sizing: border-box !important;
-            transition: border-color 0.2s;
+            border-radius: 8px !important;
+            align-items: center;
+            gap: 8px;
         }
-        #withdrawManagerUI .input-group input:focus,
-        #withdrawManagerUI .input-group textarea:focus {
-            border-color: var(--border-glow) !important;
-            outline: none !important;
-            box-shadow: 0 0 0 2px rgba(99,102,241,0.12) !important;
-        }
+        #th-wrapper #withdrawManagerUI .wd-owner:not([style*="display: none"]) { display: flex !important; }
+        #th-wrapper #withdrawManagerUI .wd-owner-ico { font-size: 0.95rem !important; line-height: 1; flex: none; }
+        #th-wrapper #withdrawManagerUI .wd-owner-txt { min-width: 0; flex: 1; }
+        #th-wrapper #withdrawManagerUI .wd-owner-t { font-size: 0.74rem !important; font-weight: 700 !important; margin: 0 !important; }
+        #th-wrapper #withdrawManagerUI .wd-owner-m { font-size: 0.64rem !important; line-height: 1.35; margin: 1px 0 0 !important; word-break: break-word; }
 
-        #withdrawManagerUI .hint {
-            font-size: 0.62rem !important;
-            color: var(--text-muted) !important;
-            margin-top: 3px !important;
+/* Gas pill + Withdraw on one row; only the active action button is shown */
+        #th-wrapper #withdrawManagerUI .st-act {
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
+        #th-wrapper #withdrawManagerUI .st-act .bt-gasrow { margin: 0; flex: none; }
+        #th-wrapper #withdrawManagerUI .st-act .bt-actions {
+            flex: 1;
+            min-width: 0;
+            margin: 0 !important;
+            grid-template-columns: minmax(0, 1fr) !important;
+        }
+        #th-wrapper #withdrawManagerUI[data-mode="native"] #withdrawTokenBtn,
+        #th-wrapper #withdrawManagerUI[data-mode="token"] #withdrawNativeBtn { display: none !important; }
+        #th-wrapper #withdrawManagerUI .bt-dock { padding-top: 6px; margin-bottom: 10px; }
+        #th-wrapper #withdrawManagerUI .bt-summary { margin-top: 2px; }
 
-        /* Contracts grid — compact mobile cards */
-        #contractsList {
-            background: var(--bg-deep) !important;
-            border: 1px solid var(--border-subtle) !important;
-            border-radius: var(--radius-sm) !important;
-            display: grid !important;
-            grid-template-columns: 1fr !important;
-            gap: 6px !important;
-            max-height: 340px !important;
-            padding: 6px !important;
+/* Contracts card: icon tools + compact rows */
+        #th-wrapper #withdrawManagerUI .wd-contracts { padding: 10px 12px 4px !important; }
+        #th-wrapper #withdrawManagerUI .wd-contracts .bt-head { margin-bottom: 4px; }
+        #th-wrapper #withdrawManagerUI .wd-tools { display: inline-flex; gap: 4px; }
+        #th-wrapper #withdrawManagerUI .wd-ibtn {
+            width: 30px;
+            height: 30px;
+            padding: 0;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            border: 1px solid var(--border-subtle);
+            background: transparent;
+            color: var(--text-secondary);
+            cursor: pointer;
         }
+        #th-wrapper #withdrawManagerUI .wd-ibtn .material-icons-round { font-size: 18px; }
+        #th-wrapper #withdrawManagerUI .wd-ibtn:active { background: rgba(255,255,255,0.06); }
+        #th-wrapper #withdrawManagerUI .wd-ibtn-del .material-icons-round { color: #f87171; }
 
-        /* Log section */
-        #withdrawManagerUI .log-section {
-            background: var(--bg-deep) !important;
-            border: 1px solid var(--border-subtle) !important;
-            border-radius: var(--radius-sm) !important;
-            padding: 8px !important;
+        #th-wrapper #withdrawManagerUI #contractsList {
+            display: block !important;
+            max-height: 300px !important;
+            overflow-y: auto;
+            padding: 0 !important;
+            background: transparent !important;
+            border: 0 !important;
+            border-radius: 0 !important;
         }
-        #withdrawManagerUI .log-section .section-title {
-            color: var(--text-secondary) !important;
-        }
+        #th-wrapper #withdrawManagerUI .wd-none { text-align: center; padding: 18px 8px; }
+        #th-wrapper #withdrawManagerUI .wd-none-t { font-size: 0.76rem; font-weight: 600; color: var(--text-secondary); }
+        #th-wrapper #withdrawManagerUI .wd-none-s { font-size: 0.66rem; color: var(--text-muted); margin-top: 2px; }
 
+        #th-wrapper #withdrawManagerUI #contractsList [data-contract-addr] {
+            background: transparent !important;
+            border: 0 !important;
+            border-top: 1px solid var(--border-subtle) !important;
+            border-radius: 0 !important;
+            box-shadow: none !important;
+            transform: none !important;
+            padding: 9px 4px !important;
+        }
+        #th-wrapper #withdrawManagerUI #contractsList [data-contract-addr]:first-child { border-top: 0 !important; }
+        #th-wrapper #withdrawManagerUI #contractsList [data-contract-addr].wd-sel {
+            background: rgba(74,158,255,0.08) !important;
+            border-radius: 8px !important;
+        }
+        #th-wrapper #withdrawManagerUI .wd-crow { display: flex; align-items: center; gap: 8px; min-width: 0; }
+        #th-wrapper #withdrawManagerUI .wd-cmain { flex: 1; min-width: 0; }
+        #th-wrapper #withdrawManagerUI .wd-ctop { display: flex; align-items: center; gap: 6px; }
+        #th-wrapper #withdrawManagerUI .wd-cname { font-size: 0.78rem; font-weight: 700; color: var(--text-primary); }
+        #th-wrapper #withdrawManagerUI .wd-ctype {
+            font-size: 0.56rem;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+            padding: 1px 7px;
+            border-radius: 20px;
+        }
+        #th-wrapper #withdrawManagerUI .wd-cbal { margin-left: auto; font-size: 0.74rem; font-weight: 700; white-space: nowrap; }
+        #th-wrapper #withdrawManagerUI .wd-cbal small { font-size: 0.6rem; font-weight: 600; opacity: 0.8; }
+        #th-wrapper #withdrawManagerUI .wd-caddr {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            margin-top: 3px;
+            font-family: var(--font-mono);
+            font-size: 0.64rem;
+            color: #7db8ff;
+            min-width: 0;
+        }
+        #th-wrapper #withdrawManagerUI .wd-caddr-t { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        #th-wrapper #withdrawManagerUI .wd-cmeta { margin-top: 2px; font-size: 0.6rem; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        #th-wrapper #withdrawManagerUI .wd-cmeta .wd-cowner { font-family: var(--font-mono); cursor: pointer; }
+        #th-wrapper #withdrawManagerUI .wd-cacts { display: flex; flex-direction: column; gap: 4px; flex: none; }
+        #th-wrapper #withdrawManagerUI .wd-cbtn {
+            width: 30px;
+            height: 30px;
+            padding: 0;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            border: 1px solid var(--border-subtle);
+            background: transparent;
+            color: #7db8ff;
+            cursor: pointer;
+        }
+        #th-wrapper #withdrawManagerUI .wd-cbtn .material-icons-round { font-size: 17px; }
+        #th-wrapper #withdrawManagerUI .wd-cbtn-del { color: #f87171; }
+        #th-wrapper #withdrawManagerUI .wd-cbtn-ext { width: 20px; height: 20px; flex: none; border-radius: 5px; }
+        #th-wrapper #withdrawManagerUI .wd-cbtn-ext .material-icons-round { font-size: 13px; }
+
+/* Logs: collapsed strip by default */
+        #th-wrapper #withdrawManagerUI .bt-logs { padding: 4px 0 0 !important; }
+        #th-wrapper #withdrawManagerUI .bt-logs .bt-loghead { height: 36px; }
+        #th-wrapper #withdrawManagerUI .bt-logs .log-container { height: 130px !important; max-height: none !important; }
