@@ -28,14 +28,43 @@
   __NX.fromDashSymbol = fromDashSymbol;
 
 
-  // ── Key storage (AES via SubtleCrypto) ──
+  // ── Key storage ──
+  // The {apiKey, secret, passphrase} map is stored wrapped by a non-exportable Android Keystore key
+  // ("ks1:<iv>.<ct>", see OneAndroid.keystoreWrap), not as plain JSON (BUG-010). The Keystore calls are
+  // synchronous, so getKeys()/saveKeys() stay synchronous. Where the bridge is unavailable (desktop
+  // browser) it falls back to plain JSON as before.
   var KEY_STORE = 'one_exc_keys_v1';
+  var KS_PREFIX = 'ks1:';
+
+  function _ks() {
+    var b = window.OneAndroid;
+    return (b && typeof b.keystoreWrap === 'function' && typeof b.keystoreUnwrap === 'function') ? b : null;
+  }
 
   function getKeys() {
-    try { return JSON.parse(localStorage.getItem(KEY_STORE) || '{}'); } catch(e) { return {}; }
+    try {
+      var raw = localStorage.getItem(KEY_STORE);
+      if (!raw) return {};
+      if (raw.indexOf(KS_PREFIX) === 0) {
+        var b = _ks();
+        var plain = b ? (b.keystoreUnwrap(raw) || '') : '';
+        return plain ? JSON.parse(plain) : {}; // unreadable (Keystore key lost) -> treat as no keys saved
+      }
+      var obj = JSON.parse(raw);
+      // Plain JSON saved by an older version: re-save wrapped (only replaces it after a verified round trip)
+      if (_ks() && obj && typeof obj === 'object' && Object.keys(obj).length) saveKeys(obj);
+      return obj;
+    } catch(e) { return {}; }
   }
   function saveKeys(obj) {
-    try { localStorage.setItem(KEY_STORE, JSON.stringify(obj)); } catch(e) {}
+    try {
+      var json = JSON.stringify(obj), out = json, b = _ks();
+      if (b) {
+        var w = b.keystoreWrap(json) || '';
+        if (w && b.keystoreUnwrap(w) === json) out = w;
+      }
+      localStorage.setItem(KEY_STORE, out);
+    } catch(e) {}
   }
   function getExchangeKey(exchId) {
     var keys = getKeys();

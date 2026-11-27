@@ -6,6 +6,12 @@ Per-build release notes are published on the [Releases](../../releases) page.
 ## [Unreleased]
 
 ### Fixed
+- **Security: exchange API keys and secrets were stored as plain text:** the API key, secret and passphrase for each
+  connected exchange were saved as plain JSON in the app's storage, although the code comment said they were encrypted.
+  They are now stored wrapped by a non-exportable Android Keystore key, the same way as the wallet secret. Keys saved
+  by earlier versions are converted the next time they are read. If the Keystore is unavailable the previous behaviour is
+  used. Use API keys with only the permissions you need (for example, no withdrawal permission if you do not use
+  withdrawals in the app).
 - **Security: swaps and bridges approved an unlimited token amount to an address supplied by the quote service:** the
   approval was for the maximum possible amount, to a spender taken from the aggregator's response, and if the approval
   timed out or failed to confirm the swap was still sent. Swap, Bridge and Pair-swap now approve only the amount being
