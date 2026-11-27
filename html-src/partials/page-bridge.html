@@ -1,202 +1,166 @@
-        <!-- ╔══════ BRIDGE PAGE — LiFi Powered ══════╗ -->
+        <!-- ╔══════ BRIDGE PAGE — LiFi Powered (redesign) ══════╗ -->
     <div class="page" id="page-bridge">
+      <link rel="stylesheet" href="styles/features/bridge/bridge-inputs.css">
+      <link rel="stylesheet" href="styles/features/bridge/bridge-slider.css">
+      <link rel="stylesheet" href="styles/features/bridge/bridge-page.css">
 
       <!-- Header -->
-      <div style="padding:12px 20px 8px;display:flex;align-items:center;justify-content:space-between;">
-        <div style="display:flex;align-items:center;gap:10px;">
-          <div style="width:40px;height:40px;border-radius:13px;background:linear-gradient(135deg,var(--accent-primary),var(--accent-secondary));display:flex;align-items:center;justify-content:center;box-shadow:var(--glow-primary);">
-            <span class="material-icons-round" style="font-size:20px;color:#fff;">alt_route</span>
-          </div>
-          <div>
-            <div style="font-size:20px;font-weight:800;">Bridge</div>
+      <div class="br-head">
+        <div class="br-logo"><span class="material-icons-round">alt_route</span></div>
+        <div class="br-title">Bridge</div>
+        <div id="br-connect-btn" class="br-wallet-pill" onclick="brOpenWalletPanel()">
+          <span class="br-avatar"><span class="material-icons-round" id="br-connect-icon">account_balance_wallet</span></span>
+          <div class="br-wallet-txt">
+            <span id="br-connect-label">Connect</span>
+            <span id="br-connect-addr"></span>
           </div>
         </div>
-        <div style="display:flex;align-items:center;gap:8px;">
-          <div id="br-connect-btn" onclick="brOpenWalletPanel()" style="display:flex;align-items:center;gap:6px;padding:7px 13px;background:var(--bg-glass);border:1px solid var(--border-subtle);border-radius:12px;cursor:pointer;transition:all 0.2s;" onmousedown="this.style.opacity='0.7'" onmouseup="this.style.opacity='1'" ontouchstart="this.style.opacity='0.7'" ontouchend="this.style.opacity='1'">
-            <span class="material-icons-round" id="br-connect-icon" style="font-size:16px;color:var(--accent-primary);pointer-events:none;flex-shrink:0;">account_balance_wallet</span>
-            <div style="display:flex;flex-direction:column;align-items:flex-start;pointer-events:none;min-width:0;">
-              <span id="br-connect-label" style="font-size:11px;font-weight:700;color:var(--text-primary);line-height:1.3;white-space:nowrap;">Connect</span>
-              <span id="br-connect-addr" style="display:none;font-family:var(--font-mono);font-size:9px;font-weight:600;color:var(--neon-cyan);line-height:1.3;letter-spacing:0.3px;white-space:nowrap;"></span>
-            </div>
-          </div>
+        <div class="br-circle-btn" aria-label="History" onclick="brToggleHistDropdown()" ontouchend="event.preventDefault();brToggleHistDropdown();">
+          <span class="material-icons-round">history</span>
+          <span id="br-hist-pending-dot" class="br-pending-dot"></span>
+        </div>
+        <div class="br-circle-btn" aria-label="Settings" onclick="brOpenSettings()">
+          <span class="material-icons-round">tune</span>
         </div>
       </div>
 
-      <div class="glow-line"></div>
-
       <div id="br-static-area">
 
-        <!-- ══ FROM BOX ══ -->
         <!-- hidden element for JS compatibility -->
         <div id="br-sender-addr" style="display:none;"></div>
-        <div style="background:var(--bg-surface);border:1px solid var(--border-subtle);border-radius:var(--radius-lg);padding:8px 12px;margin-bottom:3px;position:relative;">
-          <!-- FROM label -->
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:5px;">
-            <div style="font-family:var(--font-mono);font-size:9px;color:var(--text-muted);letter-spacing:2px;font-weight:700;">FROM</div>
-            <div style="display:flex;align-items:center;gap:6px;">
-              <div class="settings-btn" onclick="brToggleHistDropdown()" ontouchend="event.preventDefault();brToggleHistDropdown();" style="width:30px;height:30px;border-radius:9px;position:relative;">
-                <span class="material-icons-round" style="font-size:16px;">history</span>
-                <span id="br-hist-pending-dot" style="display:none;position:absolute;top:4px;right:4px;width:7px;height:7px;border-radius:50%;background:var(--accent-amber);box-shadow:0 0 6px rgba(245,158,11,0.7);pointer-events:none;"></span>
-              </div>
-              <div class="settings-btn" onclick="brOpenSettings()" style="width:30px;height:30px;border-radius:9px;">
-                <span class="material-icons-round" style="font-size:16px;">tune</span>
-              </div>
-            </div>
-          </div>
 
-          <!-- Chain + Token + Amount row -->
-          <div style="display:flex;align-items:center;gap:8px;">
-            <div id="br-from-chain-btn" onclick="brOpenChainPicker('from')" style="display:flex;align-items:center;gap:5px;background:var(--bg-raised);border:1px solid var(--border-subtle);border-radius:11px;padding:7px 10px;cursor:pointer;flex-shrink:0;">
-              <span id="br-from-chain-emoji" style="font-size:15px;">🔵</span>
-              <span id="br-from-chain-name" style="font-size:11px;font-weight:700;">Base</span>
-              <span class="material-icons-round" style="font-size:12px;color:var(--text-muted);">expand_more</span>
-            </div>
-            <div id="br-from-token-btn" onclick="brOpenTokenPicker('from')" style="display:flex;align-items:center;gap:5px;background:var(--bg-raised);border:1px solid var(--border-subtle);border-radius:11px;padding:7px 10px;cursor:pointer;flex-shrink:0;">
-              <div id="br-from-token-icon" style="width:20px;height:20px;border-radius:6px;background:rgba(99,102,241,0.2);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:var(--accent-primary);">E</div>
-              <span id="br-from-token-sym" style="font-size:11px;font-weight:700;">ETH</span>
-              <span class="material-icons-round" style="font-size:12px;color:var(--text-muted);">expand_more</span>
-            </div>
-            <div style="flex:1;text-align:right;">
-              <input id="br-from-amount" type="number" placeholder="0.0" oninput="brOnAmountChange()"
-                style="width:100%;background:transparent;border:none;outline:none;font-family:var(--font-mono);font-size:13px;font-weight:800;color:var(--text-secondary);text-align:right;-moz-appearance:textfield;appearance:textfield;">
-              <link rel="stylesheet" href="styles/features/bridge/bridge-inputs.css">
-              <div id="br-from-usd" style="font-size:10px;color:var(--text-secondary);font-family:var(--font-mono);text-align:right;margin-top:1px;">≈ $0.00</div>
-            </div>
-          </div>
-
-          <!-- Balance row -->
-          <div id="br-from-balance-row" style="margin-top:3px;padding-top:3px;border-top:1px solid var(--border-subtle);display:flex;flex-direction:column;gap:2px;">
+        <!-- ══ YOU SEND ══ -->
+        <div class="br-card">
+          <div id="br-from-balance-row" class="br-card-head">
+            <span class="br-lbl">You send</span>
+            <span class="br-bal">
+              <span class="material-icons-round br-bal-ico">account_balance_wallet</span>
+              <span id="br-from-balance-val" onclick="brForceRefreshBalance()" title="Tap to refresh via RPC">—&nbsp;<span class="material-icons-round">refresh</span></span>
+            </span>
             <!-- Hidden legacy elements for JS compatibility -->
             <span id="br-bal-status-icon" style="display:none;"></span>
             <div id="br-bal-max-btn" style="display:none;"></div>
-
-            <!-- Always-visible balance tap row — RPC refresh on tap -->
-            <div style="display:flex;align-items:center;justify-content:space-between;">
-              <span style="font-size:8px;font-family:var(--font-mono);color:var(--text-muted);letter-spacing:1.5px;font-weight:700;">BALANCE</span>
-              <span id="br-from-balance-val" onclick="brForceRefreshBalance()" title="Tap to refresh via RPC" style="font-size:10px;font-weight:700;font-family:var(--font-mono);color:var(--text-secondary);cursor:pointer;user-select:none;-webkit-user-select:none;white-space:nowrap;padding:2px 6px;border-radius:6px;border:1px solid var(--border-subtle);background:var(--bg-glass);transition:background 0.15s,border-color 0.15s;display:inline-flex;align-items:center;gap:3px;" onmouseenter="this.style.background='rgba(99,102,241,0.10)';this.style.borderColor='rgba(99,102,241,0.35)'" onmouseleave="this.style.background='var(--bg-glass)';this.style.borderColor='var(--border-subtle)'" ontouchstart="this.style.background='rgba(99,102,241,0.10)';this.style.borderColor='rgba(99,102,241,0.35)'" ontouchend="this.style.background='var(--bg-glass)';this.style.borderColor='var(--border-subtle)'">—&nbsp;<span class="material-icons-round" style="font-size:10px;color:var(--text-muted);pointer-events:none;">refresh</span></span>
-            </div>
-
-            <!-- Slider row — only shown when balance > 0 -->
-            <div id="br-pct-row" style="display:flex;align-items:center;gap:6px;">
-              <!-- Pct label -->
-              <span id="br-pct-label" style="font-size:9px;font-weight:700;font-family:var(--font-mono);color:var(--accent-primary);min-width:28px;text-align:left;">0%</span>
-              <!-- Slider track -->
-              <div style="flex:1;position:relative;height:16px;display:flex;align-items:center;isolation:isolate;">
-                <div id="br-slider-track-bg" style="position:absolute;left:0;right:0;height:3px;border-radius:4px;background:rgba(99,102,241,0.15);pointer-events:none;z-index:1;"></div>
-                <div id="br-slider-track-fill" style="position:absolute;left:0;width:0%;height:3px;border-radius:4px;background:linear-gradient(90deg,#6366f1,#8b5cf6);pointer-events:none;transition:none;z-index:2;"></div>
-                <input id="br-pct-slider" type="range" min="0" max="100" value="0" oninput="brOnSliderInput(this.value)"
-                  style="width:100%;height:16px;-webkit-appearance:none;appearance:none;background:transparent;cursor:pointer;position:relative;z-index:10;margin:0;touch-action:none;"
-                  ontouchstart="event.stopPropagation();window._brSD=true;window._brSX=event.touches[0].clientX;window._brSY=event.touches[0].clientY;window._brPY=event.touches[0].clientY;window._brAxis=null;"
-                  ontouchmove="(function(el,e){if(!window._brSD)return;e.preventDefault();var cx=e.touches[0].clientX,cy=e.touches[0].clientY;var dx=Math.abs(cx-window._brSX),dy=Math.abs(cy-window._brSY);if(!window._brAxis&&(dx>3||dy>3)){window._brAxis=dx>=dy?'h':'v';}if(window._brAxis==='h'){var rect=el.getBoundingClientRect();var pct=Math.max(0,Math.min(100,Math.round((cx-rect.left)/rect.width*100)));el.value=pct;brOnSliderInput(pct);}else if(window._brAxis==='v'){var delta=window._brPY-cy;window._brPY=cy;var sc=el.parentElement;while(sc&&sc!==document.body){var ov=window.getComputedStyle(sc).overflowY;if((ov==='auto'||ov==='scroll')&&sc.scrollHeight>sc.clientHeight){sc.scrollTop+=delta;break;}sc=sc.parentElement;}if(!sc||sc===document.body)window.scrollBy(0,delta);}})(this,event);"
-                  ontouchend="(function(el,e){e.stopPropagation();window._brSD=false;if(window._brAxis===null){var rect=el.getBoundingClientRect();var tx=e.changedTouches&&e.changedTouches[0]?e.changedTouches[0].clientX:window._brSX;var pct=Math.max(0,Math.min(100,Math.round((tx-rect.left)/rect.width*100)));el.value=pct;brOnSliderInput(pct);}else{brOnSliderInput(parseInt(el.value)||0);}window._brAxis=null;})(this,event);"
-                  onwheel="event.preventDefault();var v=Math.max(0,Math.min(100,(parseInt(this.value)||0)+(event.deltaY<0?1:-1)));this.value=v;brOnSliderInput(v);">
-              </div>
-              <!-- MAX button -->
-              <button onclick="brSetPct(100)" id="br-pct-100" style="padding:2px 6px;border:1px solid rgba(99,102,241,0.35);border-radius:5px;background:rgba(99,102,241,0.07);color:var(--accent-primary);font-family:var(--font-mono);font-size:9px;font-weight:700;cursor:pointer;white-space:nowrap;transition:all 0.18s;">MAX</button>
-            </div>
-
-
           </div>
 
-          <link rel="stylesheet" href="styles/features/bridge/bridge-slider.css">
+          <div class="br-tok-line">
+            <div class="br-tok">
+              <div class="br-tok-ico" onclick="brOpenTokenPicker('from')">
+                <div id="br-from-token-icon" class="br-ti"><span class="br-ti-fb">E</span></div>
+                <div id="br-from-chain-emoji" class="br-badge">🔵</div>
+              </div>
+              <div class="br-tok-txt">
+                <div id="br-from-token-btn" class="br-sym" onclick="brOpenTokenPicker('from')">
+                  <span id="br-from-token-sym">ETH</span><span class="material-icons-round">expand_more</span>
+                </div>
+                <div id="br-from-chain-btn" class="br-on" onclick="brOpenChainPicker('from')">on <span id="br-from-chain-name">Base</span></div>
+              </div>
+            </div>
+            <div class="br-amt-col">
+              <input id="br-from-amount" class="br-amt" type="number" inputmode="decimal" placeholder="0" oninput="brOnAmountChange()">
+              <div id="br-from-usd" class="br-usd">≈ $0.00</div>
+            </div>
+          </div>
 
+          <!-- Quick amount chips -->
+          <div id="br-pct-row" class="br-pct-row">
+            <button type="button" class="br-pct" onclick="brSetPct(25)">25%</button>
+            <button type="button" class="br-pct" onclick="brSetPct(50)">50%</button>
+            <button type="button" class="br-pct" onclick="brSetPct(75)">75%</button>
+            <button type="button" id="br-pct-100" class="br-pct br-pct-max" onclick="brSetPct(100)">Max</button>
+          </div>
+
+          <!-- Legacy slider kept in DOM (hidden) so existing JS keeps working -->
+          <div style="display:none;">
+            <span id="br-pct-label">0%</span>
+            <div id="br-slider-track-bg"></div>
+            <div id="br-slider-track-fill"></div>
+            <input id="br-pct-slider" type="range" min="0" max="100" value="0" oninput="brOnSliderInput(this.value)">
+          </div>
         </div>
 
         <!-- Flip -->
-        <div style="display:flex;align-items:center;justify-content:center;height:16px;position:relative;z-index:2;">
-          <div id="br-flip-btn" onclick="brFlipChains()" style="width:28px;height:28px;border-radius:10px;background:var(--bg-raised);border:2px solid var(--border-subtle);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all 0.3s cubic-bezier(0.34,1.56,0.64,1);">
-            <span class="material-icons-round" style="font-size:17px;color:var(--accent-primary);">swap_vert</span>
+        <div class="br-flip-wrap">
+          <div id="br-flip-btn" class="br-flip" aria-label="Flip chains" onclick="brFlipChains()">
+            <span class="material-icons-round">swap_vert</span>
           </div>
         </div>
 
-        <!-- ══ TO BOX ══ -->
-        <div style="background:var(--bg-surface);border:1px solid var(--border-subtle);border-radius:var(--radius-lg);padding:8px 12px;margin-top:3px;">
-          <div style="font-family:var(--font-mono);font-size:9px;color:var(--text-muted);letter-spacing:2px;font-weight:700;margin-bottom:5px;">TO</div>
+        <!-- ══ YOU RECEIVE ══ -->
+        <div class="br-card">
+          <div class="br-card-head"><span class="br-lbl">You receive</span></div>
 
-          <div style="display:flex;align-items:center;gap:8px;margin-bottom:5px;">
-            <div id="br-to-chain-btn" onclick="brOpenChainPicker('to')" style="display:flex;align-items:center;gap:5px;background:var(--bg-raised);border:1px solid var(--border-subtle);border-radius:11px;padding:7px 10px;cursor:pointer;flex-shrink:0;max-width:38%;overflow:hidden;">
-              <span id="br-to-chain-emoji" style="font-size:15px;flex-shrink:0;">🔷</span>
-              <span id="br-to-chain-name" style="font-size:11px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;">Ethereum</span>
-              <span class="material-icons-round" style="font-size:12px;color:var(--text-muted);flex-shrink:0;">expand_more</span>
-            </div>
-            <div id="br-to-token-btn" onclick="brOpenTokenPicker('to')" style="display:flex;align-items:center;gap:5px;background:var(--bg-raised);border:1px solid var(--border-subtle);border-radius:11px;padding:7px 10px;cursor:pointer;flex-shrink:0;max-width:28%;overflow:hidden;">
-              <div id="br-to-token-icon" style="width:20px;height:20px;border-radius:6px;background:rgba(99,102,241,0.2);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:var(--accent-primary);">E</div>
-              <span id="br-to-token-sym" style="font-size:11px;font-weight:700;">ETH</span>
-              <span class="material-icons-round" style="font-size:12px;color:var(--text-muted);">expand_more</span>
-            </div>
-            <div style="flex:1;min-width:0;text-align:right;overflow:hidden;">
-              <div id="br-to-amount" style="font-size:13px;font-weight:800;font-family:var(--font-mono);color:var(--text-secondary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;">—</div>
-              <div id="br-to-usd" style="font-size:10px;color:var(--text-secondary);font-family:var(--font-mono);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">≈ $0.00</div>
-            </div>
-          </div>
-
-          <!-- TO Balance row -->
-          <div id="br-to-balance-row" style="margin-bottom:5px;padding-bottom:5px;border-bottom:1px solid var(--border-subtle);display:flex;align-items:center;justify-content:space-between;">
-            <div style="display:flex;align-items:center;gap:5px;">
-              <span class="material-icons-round" style="font-size:13px;color:var(--text-muted);">account_balance_wallet</span>
-              <span style="font-size:10px;color:var(--text-muted);font-family:var(--font-mono);letter-spacing:1px;">BALANCE</span>
-            </div>
-            <span id="br-to-balance-val" style="font-size:12px;font-weight:700;font-family:var(--font-mono);color:var(--text-secondary);">—</span>
-          </div>
-
-          <!-- Recipient row -->
-          <div style="display:flex;justify-content:center;width:100%;">
-          <div id="br-recipient-row" style="display:flex;align-items:center;gap:4px;background:var(--bg-raised);border:1px solid var(--border-subtle);border-radius:8px;padding:0 6px;width:234px;height:20px;overflow:hidden;transition:border-color 0.2s;box-sizing:border-box;">
-            <span class="material-icons-round" style="font-size:11px;color:var(--neon-cyan);flex-shrink:0;line-height:1;">send</span>
-            <div style="flex:1;min-width:0;position:relative;">
-              <input id="br-recipient" placeholder="Default: same as sender"
-                autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
-                inputmode="none" readonly
-                style="width:100%;background:transparent;border:none;outline:none;font-family:var(--font-mono);font-size:9px;color:transparent;-webkit-text-fill-color:transparent;caret-color:var(--neon-cyan);padding:0;height:20px;line-height:20px;cursor:pointer;"
-                onfocus="this.blur();"
-                onblur="document.getElementById('br-recipient-row').style.borderColor=''; brUpdateRecipientDisplay(false);">
-              <div id="br-recipient-display" style="position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;font-family:var(--font-mono);font-size:9px;white-space:nowrap;overflow-x:auto;overflow-y:hidden;display:flex;align-items:center;scrollbar-width:none;-webkit-overflow-scrolling:touch;">
-                <span id="br-recipient-display-text" style="color:var(--text-muted);font-size:9px;">Default: same as sender</span>
+          <div class="br-tok-line">
+            <div class="br-tok">
+              <div class="br-tok-ico" onclick="brOpenTokenPicker('to')">
+                <div id="br-to-token-icon" class="br-ti"><span class="br-ti-fb">E</span></div>
+                <div id="br-to-chain-emoji" class="br-badge">🔷</div>
+              </div>
+              <div class="br-tok-txt">
+                <div id="br-to-token-btn" class="br-sym" onclick="brOpenTokenPicker('to')">
+                  <span id="br-to-token-sym">ETH</span><span class="material-icons-round">expand_more</span>
+                </div>
+                <div id="br-to-chain-btn" class="br-on" onclick="brOpenChainPicker('to')">on <span id="br-to-chain-name">Ethereum</span></div>
               </div>
             </div>
-            <!-- Clear button — visible only when a value is set -->
-            <div id="br-recipient-clear" onclick="brClearRecipient()" style="display:none;width:14px;height:14px;border-radius:50%;background:rgba(255,255,255,0.08);align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;" title="Clear recipient">
-              <span class="material-icons-round" style="font-size:10px;color:var(--text-muted);">close</span>
+            <div class="br-amt-col">
+              <div id="br-to-amount" class="br-amt br-amt-out">—</div>
+              <div id="br-to-usd" class="br-usd">≈ $0.00</div>
             </div>
-            <div onclick="brOpenRecipientPanel()" style="padding:1px 5px;border:1px solid rgba(34,211,238,0.3);border-radius:4px;font-size:8px;font-weight:700;color:var(--neon-cyan);font-family:var(--font-mono);cursor:pointer;flex-shrink:0;line-height:14px;">SELECT</div>
           </div>
+
+          <!-- Legacy TO balance row (hidden) -->
+          <div id="br-to-balance-row"><span id="br-to-balance-val">—</span></div>
+
+          <!-- Recipient -->
+          <div id="br-recipient-row" class="br-recip">
+            <span class="material-icons-round br-recip-ico">send</span>
+            <div class="br-recip-field">
+              <input id="br-recipient" placeholder="To your wallet"
+                autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
+                inputmode="none" readonly
+                onfocus="this.blur();"
+                onblur="document.getElementById('br-recipient-row').style.borderColor=''; brUpdateRecipientDisplay(false);">
+              <div id="br-recipient-display">
+                <span id="br-recipient-display-text">To your wallet</span>
+              </div>
+            </div>
+            <div id="br-recipient-clear" onclick="brClearRecipient()" title="Clear recipient">
+              <span class="material-icons-round">close</span>
+            </div>
+            <div class="br-recip-change" onclick="brOpenRecipientPanel()">Change</div>
           </div>
         </div>
 
-        <!-- BRIDGE / SWAP execute button — always visible, disabled when no wallet -->
-        <button id="br-exec-btn" onclick="brOpenConfirm()" style="width:100%;margin-top:5px;padding:9px 14px;background:linear-gradient(135deg,#6366f1,#8b5cf6,#a78bfa);border:1.5px solid rgba(167,139,250,0.6);border-radius:var(--radius-md);font-family:var(--font-display);font-size:14px;font-weight:800;color:#fff;letter-spacing:1.5px;cursor:pointer;transition:all 0.3s cubic-bezier(0.34,1.56,0.64,1);box-shadow:0 0 18px rgba(99,102,241,0.45),0 0 40px rgba(139,92,246,0.2),0 4px 16px rgba(0,0,0,0.45);display:flex;align-items:center;justify-content:center;gap:8px;min-height:42px;position:relative;overflow:hidden;">
-          <span class="material-icons-round" id="br-exec-icon" style="font-size:17px;color:#fff;">rocket_launch</span>
-          <span id="br-exec-spin" style="display:none;width:15px;height:15px;border:2px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin 0.75s linear infinite;flex-shrink:0;"></span>
-          <span id="br-exec-label" style="font-size:13px;letter-spacing:1.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:220px;color:#fff;">BRIDGE NOW</span>
-        </button>
       </div><!-- /br-static-area -->
 
-
-
-      <!-- ROUTES FOUND label — fixed between static and scroll, shown when routes loaded -->
-      <div id="br-routes-found-label" style="display:none;align-items:center;gap:8px;padding:8px 12px 3px;flex-shrink:0;">
-        <div style="flex:1;height:1px;background:rgba(255,255,255,0.06);"></div>
-        <div id="br-routes-found-text" style="font-size:9px;font-weight:800;color:var(--text-muted);font-family:var(--font-mono);letter-spacing:2px;white-space:nowrap;">0 ROUTES FOUND</div>
-        <div style="flex:1;height:1px;background:rgba(255,255,255,0.06);"></div>
+      <!-- Routes label — shown when routes loaded -->
+      <div id="br-routes-found-label" class="br-routes-label">
+        <div id="br-routes-found-text">0 routes</div>
       </div>
 
       <!-- Scrollable routes area -->
       <div id="br-routes-scroll-area">
-        <div id="br-quote-loading" style="display:none;margin-top:12px;padding:14px 16px;background:var(--bg-glass);border:1px solid var(--border-subtle);border-radius:var(--radius-md);align-items:center;gap:10px;">
-          <div style="width:16px;height:16px;border:2px solid rgba(99,102,241,0.3);border-top-color:var(--accent-primary);border-radius:50%;animation:spin 0.8s linear infinite;flex-shrink:0;"></div>
-          <div style="font-family:var(--font-mono);font-size:11px;color:var(--text-muted);">Finding best routes…</div>
+        <div id="br-quote-loading" class="br-quote-loading">
+          <div class="br-spinner"></div>
+          <div>Finding best routes…</div>
         </div>
 
         <!-- Error -->
-        <div id="br-quote-error" style="display:none;margin-top:12px;padding:12px 14px;background:rgba(244,63,94,0.08);border:1px solid rgba(244,63,94,0.25);border-radius:var(--radius-md);font-family:var(--font-mono);font-size:11px;color:var(--accent-red);line-height:1.6;"></div>
+        <div id="br-quote-error" class="br-quote-error"></div>
 
         <!-- GET QUOTE button — hidden, auto-quote triggers on amount input -->
         <button id="br-quote-btn" onclick="brFetchRoutes()" style="display:none;"></button>
 
         <!-- Routes list — multiple selectable routes -->
         <div id="br-routes-list" style="display:none;width:100%;"></div>
-
-        <!-- ── Recent Bridge/Swap (inline on bridge page) ── -->
-
       </div><!-- /br-routes-scroll-area -->
+
+      <!-- Review button — pinned above the bottom nav -->
+      <div id="br-exec-wrap">
+        <button id="br-exec-btn" onclick="brOpenConfirm()">
+          <span id="br-exec-spin"></span>
+          <span id="br-exec-label">Review bridge</span>
+          <span class="material-icons-round" id="br-exec-icon">arrow_forward</span>
+        </button>
+      </div>
     </div>

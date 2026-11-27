@@ -25,9 +25,10 @@
       }
       const c = document.querySelector(`.br-route-card[data-idx="${i}"]`);
       if (c) {
-        c.style.borderColor = i === idx ? 'rgba(99,102,241,0.7)' : i === 0 ? 'rgba(99,102,241,0.35)' : 'rgba(255,255,255,0.07)';
-        c.style.background  = i === idx ? 'rgba(99,102,241,0.08)' : 'var(--bg-surface)';
-        c.style.boxShadow   = i === idx ? '0 0 0 1px rgba(99,102,241,0.2), 0 8px 24px rgba(99,102,241,0.12)' : '';
+        c.classList.toggle('br-route-selected', i === idx);
+        c.style.borderColor = '';
+        c.style.background = '';
+        c.style.boxShadow = '';
       }
     });
 
@@ -39,7 +40,8 @@
       : '—';
     const _toUsdNum = parseFloat(est.toAmountUSD || 0);
     const toUSD = (_toUsdNum > 0) ? '≈ ' + _formatCurrencyDisplay(_toUsdNum) : '≈ $—';
-    $e('br-to-amount').textContent = toAmt + ' ' + br.toToken.symbol;
+    $e('br-to-amount').textContent = toAmt;
+    $e('br-to-amount').classList.add('br-has-val');
     $e('br-to-usd').textContent = toUSD;
 
     // ── Sync _brProvider with selected route's provider ──
@@ -47,7 +49,7 @@
 
     // Determine if bridge or swap
     const isSame = br.fromChain.id === br.toChain.id;
-    $e('br-exec-label').textContent = isSame ? 'SWAP NOW' : 'BRIDGE NOW';
+    $e('br-exec-label').textContent = isSame ? 'Review swap' : 'Review bridge';
     brUpdateExecBtn(true);
     haptic && haptic();
   }

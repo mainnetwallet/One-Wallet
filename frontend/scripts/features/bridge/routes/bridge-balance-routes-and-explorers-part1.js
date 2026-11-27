@@ -429,17 +429,17 @@
     const ico  = document.getElementById('br-connect-icon');
     if (br.senderAddr) {
       const short = br.senderAddr.slice(0,6) + '…' + br.senderAddr.slice(-4);
-      if (el)   { el.textContent = short; el.style.color = 'var(--accent-primary)'; }
-      if (lbl)  { lbl.textContent = 'Connected'; lbl.style.color = 'var(--text-primary)'; }
-      if (addr) { addr.textContent = short; addr.style.display = 'block'; }
-      if (ico)  { ico.style.color = 'var(--accent-green)'; ico.textContent = 'check_circle'; }
-      if (btn)  { btn.style.border = '1px solid rgba(16,185,129,0.4)'; btn.style.background = 'rgba(16,185,129,0.08)'; }
+      if (el)   { el.textContent = short; }
+      if (lbl)  { lbl.textContent = 'Connected'; }
+      if (addr) { addr.textContent = short; }
+      if (ico)  { ico.textContent = 'check'; }
+      if (btn)  { btn.classList.add('connected'); }
     } else {
-      if (el)   { el.textContent = 'Tap to select wallet'; el.style.color = 'var(--text-secondary)'; }
-      if (lbl)  { lbl.textContent = 'Connect'; lbl.style.color = 'var(--text-primary)'; }
-      if (addr) { addr.textContent = ''; addr.style.display = 'none'; }
-      if (ico)  { ico.style.color = 'var(--accent-primary)'; ico.textContent = 'account_balance_wallet'; }
-      if (btn)  { btn.style.border = '1px solid var(--border-subtle)'; btn.style.background = 'var(--bg-glass)'; }
+      if (el)   { el.textContent = 'Tap to select wallet'; }
+      if (lbl)  { lbl.textContent = 'Connect'; }
+      if (addr) { addr.textContent = ''; }
+      if (ico)  { ico.textContent = 'account_balance_wallet'; }
+      if (btn)  { btn.classList.remove('connected'); }
     }
   }
   window.brUpdateSenderRow = brUpdateSenderRow;
@@ -549,7 +549,7 @@
       inp.style.color = 'transparent';
       inp.style.webkitTextFillColor = 'transparent';
       display.style.color = 'var(--text-primary)';
-      display.textContent = 'Default: same as sender';
+      display.textContent = 'To your wallet';
       return;
     }
     // Always transparent input — overlay handles display
@@ -584,6 +584,7 @@
     brUpdateExecBtn(false);
     $e('br-quote-error').style.display = 'none';
     $e('br-to-amount').textContent = '—';
+    $e('br-to-amount').classList.remove('br-has-val');
     $e('br-to-usd').textContent = '≈ $0.00';
     const slipRow = $e('br-slippage-row');
     if (slipRow) slipRow.style.display = 'none';
