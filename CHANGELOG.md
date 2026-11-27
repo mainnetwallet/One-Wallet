@@ -6,6 +6,12 @@ Per-build release notes are published on the [Releases](../../releases) page.
 ## [Unreleased]
 
 ### Fixed
+- **Security: a dApp page could approve its own transactions and signatures:** the Confirm / Reject sheet for dApp
+  requests was drawn inside the dApp page, and the approve call it used (`OneWeb3Bridge.modalApprove`) was callable by
+  the page itself, so a malicious site could send a request and approve it without any tap. The confirmation is now a
+  native sheet that the page cannot see or press: Approve / Reject are native buttons, the request id they act on is
+  fixed when the sheet opens, and `modalApprove` / `modalReject` are no longer exposed to pages. The request summary is
+  shown in a script-less view. Back, tapping outside the sheet, or navigating the tab rejects or closes it as before.
 - **Security: a web page in the in-app browser could run code inside the wallet:** the wallet address, chain id and
   request method that a dApp page sends to the browser bridge were put into JavaScript run in the main wallet view with
   only the `"` character escaped, so a `\` in the input could break out of the string. These values are now validated

@@ -154,26 +154,6 @@ public class InAppBrowserActivity extends AppCompatActivity {
                 .replace(String.valueOf((char) 0x2029), "\\u2029");
     }
 
-    /** Escapes {@code s} for use as HTML text inside a single-quoted JS string literal. */
-    private static String escForInjectedHtml(String s) {
-        if (s == null) return "";
-        StringBuilder sb = new StringBuilder(s.length() + 16);
-        for (int i = 0; i < s.length(); i++) {
-            char c = s.charAt(i);
-            switch (c) {
-                case '&':  sb.append("&amp;");  break;
-                case '<':  sb.append("&lt;");   break;
-                case '>':  sb.append("&gt;");   break;
-                case '"':  sb.append("&quot;"); break;
-                case '\'': sb.append("&#39;");  break;
-                case '\\': sb.append("\\\\"); break;
-                case '\n': case '\r': case 0x2028: case 0x2029: sb.append(' '); break;
-                default:   sb.append(c);
-            }
-        }
-        return sb.toString();
-    }
-
     public void saveSelectedChain(String id, String name, String logoURI) {
         selectedChainId      = id;
         selectedChainName    = name;
@@ -1106,9 +1086,9 @@ public class InAppBrowserActivity extends AppCompatActivity {
                     WebView ref = e.getValue() != null ? e.getValue().get() : null;
                     return ref == null || ref == view;
                 });
-                // Restore any blocked site overlays from previous injectTxModal
-                view.post(() -> view.evaluateJavascript(
-                    "(function(){ try{if(window._oneNxRestore)window._oneNxRestore();}catch(_){} window._oneNxRestore=null; })()", null));
+                // The main-side pending request was just cleared above; close the native confirmation
+                // if the tab that is navigating is the one the user is looking at.
+                if (view == activeWebView()) dismissNativeTxConfirm();
                 final String host2 = extractDomain(url);
                 // Snapshot seq AFTER nextPageSeq() was already called above for this navigation
                 final int host2Seq = mPageSeq.getOrDefault(view, 0);
@@ -1463,23 +1443,8 @@ public class InAppBrowserActivity extends AppCompatActivity {
                 "  } catch(e) { console.error('[OneWeb3] dispatch error:', e); }\n})()", null));
         }
 
-        @JavascriptInterface
-        public void modalApprove(final int reqId) {
-            WebView mv = MainActivity.getMainWebView();
-            if (mv == null) return;
-            mv.post(() -> mv.evaluateJavascript(
-                "(function(){ try { window._oneModalApproveFromBrowser(" + reqId + "); } catch(e){} })()", null));
-        }
-
-        @JavascriptInterface
-        public void modalReject(final int reqId) {
-            WebView mv = MainActivity.getMainWebView();
-            if (mv == null) return;
-            mv.post(() -> mv.evaluateJavascript(
-                "(function(){ try { window._oneModalRejectFromBrowser(" + reqId + "); } catch(e){} })()", null));
-        }
-
-
+        // NOTE: there is deliberately no modalApprove()/modalReject() here. The confirmation UI is
+        // native (see showNativeTxConfirm) so page JS can neither see nor press Approve.
 
         /**
          * Returns the persisted browser wallet address (from SharedPreferences).
@@ -1573,83 +1538,197 @@ public class InAppBrowserActivity extends AppCompatActivity {
 
     public static void injectTxModal(final int reqId, final String actionLabel, final String siteHost,
                                      final String bodyHtml, final String approveLabel) {
-        InAppBrowserActivity a = sInstance != null ? sInstance.get() : null;
+        final InAppBrowserActivity a = sInstance != null ? sInstance.get() : null;
         if (a == null) return;
-        WebView wv = a.activeWebView();
-        if (wv == null) return;
-        String safeBody    = bodyHtml    == null ? "" : bodyHtml.replace("\\","\\\\").replace("`","\\`").replace("$","\\$");
-        String safeAction  = actionLabel == null ? "REQUEST" : escForInjectedHtml(actionLabel);
-        String safeHost    = siteHost    == null ? "dApp"    : escForInjectedHtml(siteHost);
-        String safeApprove = approveLabel== null ? "Confirm" : escForInjectedHtml(approveLabel);
-        StringBuilder sb = new StringBuilder();
-        sb.append("(function(){");
-        sb.append("var _MID='_one_tx_modal_overlay';");
-        sb.append("var existing=document.getElementById(_MID); if(existing)existing.remove();");
-        sb.append("var ov=document.createElement('div'); ov.id=_MID; ov.setAttribute('data-reqid','").append(reqId).append("');");
-        sb.append("ov.style.cssText='position:fixed;inset:0;z-index:2147483647;background:rgba(4,4,10,0.88);display:flex;align-items:flex-end;justify-content:center;font-family:-apple-system,BlinkMacSystemFont,sans-serif;animation:_nfadein .2s ease;';");
-        sb.append("var sheet=document.createElement('style'); sheet.textContent='@keyframes _nfadein{from{opacity:0}to{opacity:1}}@keyframes _nslideup{from{transform:translateY(100%)}to{transform:translateY(0)}}@keyframes _nspin{to{transform:rotate(360deg)}}'; document.head.appendChild(sheet);");
-        sb.append("ov.innerHTML='<div style=\\'width:100%;max-width:480px;background:#0c0c18;border:1px solid rgba(99,102,241,0.25);border-bottom:none;border-radius:20px 20px 0 0;padding:0 0 env(safe-area-inset-bottom,16px);box-shadow:0 -20px 60px rgba(0,0,0,0.7);max-height:80vh;display:flex;flex-direction:column;animation:_nslideup .28s cubic-bezier(0.34,1.15,0.64,1);\\'>'+");
-        sb.append("'<div style=\\'width:40px;height:4px;background:rgba(255,255,255,0.15);border-radius:2px;margin:12px auto 0;flex-shrink:0;\\'></div>'+");
-        sb.append("'<div style=\\'display:flex;align-items:center;gap:10px;padding:14px 18px 10px;border-bottom:1px solid rgba(255,255,255,0.06);flex-shrink:0;\\'>'+");
-        sb.append("'<div style=\\'width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#6366f1,#8b5cf6);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;\\'>&#x1F510;</div>'+");
-        sb.append("'<div style=\\'flex:1;min-width:0;\\'>'+");
-        sb.append("'<div style=\\'font-size:13px;font-weight:700;color:#e5e7eb;\\'>").append(safeHost).append("</div>'+");
-        sb.append("'<div style=\\'font-size:10px;color:#6b7280;font-family:monospace;\\'>").append(safeAction).append("</div></div></div>'+");
-        sb.append("'<div style=\\'flex:1;overflow-y:auto;padding:14px 18px;\\'>'+`").append(safeBody).append("`+'</div>'+");
-        sb.append("'<div style=\\'display:flex;gap:10px;padding:10px 18px 8px;border-top:1px solid rgba(255,255,255,0.05);flex-shrink:0;\\'>'+");
-        sb.append("'<button id=\\'_nxrej\\' style=\\'flex:1;padding:13px;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.25);border-radius:12px;color:#f87171;font-size:14px;font-weight:700;cursor:pointer;\\'>Reject</button>'+");
-        sb.append("'<button id=\\'_nxapr\\' style=\\'flex:1.4;padding:13px;background:linear-gradient(135deg,#6366f1,#8b5cf6);border:none;border-radius:12px;color:#fff;font-size:14px;font-weight:700;cursor:pointer;box-shadow:0 4px 20px rgba(99,102,241,0.35);\\'>").append(safeApprove).append("</button>'+");
-        sb.append("'</div></div>';");
-        sb.append("document.body.appendChild(ov);");
-        // After appending, disable pointer-events on any pre-existing fixed/high-z overlays
-        // so they cannot intercept touches on One modal buttons (e.g. OpenSea portals).
-        sb.append("var _nxBlocked=[];");
-        sb.append("(function(){");
-        sb.append("var all=document.querySelectorAll('body > *:not(#_one_tx_modal_overlay)');");
-        sb.append("for(var i=0;i<all.length;i++){");
-        sb.append("  var el=all[i];if(el===ov||el.contains(ov))continue;");
-        sb.append("  var cs=window.getComputedStyle(el);");
-        sb.append("  var pos=cs.position;var zi=parseInt(cs.zIndex)||0;");
-        sb.append("  if((pos==='fixed'||pos==='sticky')&&zi>9000&&el.style.pointerEvents!=='none'){");
-        sb.append("    _nxBlocked.push({el:el,pe:el.style.pointerEvents});");
-        sb.append("    el.style.pointerEvents='none';");
-        sb.append("  }");
-        sb.append("}})();");
-        sb.append("function _nxRestore(){for(var i=0;i<_nxBlocked.length;i++){try{_nxBlocked[i].el.style.pointerEvents=_nxBlocked[i].pe;}catch(e){}}  _nxBlocked=[];} window._oneNxRestore=_nxRestore;");
-        sb.append("ov.onclick=function(e){if(e.target===ov){_nxRestore();clearTimeout(window._oneTxModalTimeout);ov.remove();try{window.OneWeb3Bridge.modalReject(").append(reqId).append(");}catch(e2){}}};");
-        sb.append("document.getElementById('_nxrej').onclick=function(e){e.stopPropagation();_nxRestore();clearTimeout(window._oneTxModalTimeout);ov.remove();try{window.OneWeb3Bridge.modalReject(").append(reqId).append(");}catch(e2){}};");
-        sb.append("document.getElementById('_nxapr').onclick=function(e){");
-        sb.append("e.stopPropagation();");
-        sb.append("_nxRestore();");
-        sb.append("try{window.OneWeb3Bridge.modalApprove(").append(reqId).append(");}catch(e2){ov.remove();return;}");
-        sb.append("var btn=document.getElementById('_nxapr'); if(btn){btn.disabled=true;btn.innerHTML='<span style=\\'display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:_nspin .6s linear infinite;vertical-align:middle;margin-right:6px;\\'></span>Processing';}");
-        sb.append("var rej=document.getElementById('_nxrej');if(rej){rej.disabled=true;rej.style.opacity='0.4';}");
-        sb.append("window._oneTxModalTimeout=setTimeout(function(){");
-        sb.append("var o=document.getElementById('_one_tx_modal_overlay');if(!o)return;");
-        sb.append("var b=document.getElementById('_nxapr');if(b){b.disabled=false;b.style.background='rgba(239,68,68,0.15)';b.style.color='#f87171';b.innerHTML='Try Again';}");
-        sb.append("var r=document.getElementById('_nxrej');if(r){r.disabled=false;r.style.opacity='1';}");
-        sb.append("var err=o.querySelector('#_nxErr');if(!err){err=document.createElement('div');err.id='_nxErr';");
-        sb.append("err.style.cssText='color:#f87171;font-size:11px;text-align:center;padding:4px 18px 0;';");
-        sb.append("err.textContent='Wallet did not respond. Please try again.';");
-        sb.append("var body=o.querySelector('div[style*=overflow-y]');if(body)body.after(err);}");
-        sb.append("},60000);");
-        sb.append("};");
-        sb.append("})();");
-        wv.post(() -> wv.evaluateJavascript(sb.toString(), null));
+        a.runOnUiThread(() -> a.showNativeTxConfirm(reqId, actionLabel, siteHost, bodyHtml, approveLabel));
+    }
+
+    // ── Native transaction / signature confirmation ──────────────────────────────────────────
+    // Rendered natively, NOT inside the dApp page, so page JS can neither see nor press the
+    // Approve button. The request id that Approve/Reject act on is the one captured when the
+    // sheet was opened, never a value supplied by page JS. The request summary is shown in a
+    // JS-disabled WebView whose CSP forbids scripts, frames and navigation.
+    private FrameLayout txConfirmOverlay;
+    private WebView txConfirmBody;
+    private int txConfirmReqId = -1;
+    private final android.os.Handler txConfirmHandler =
+        new android.os.Handler(android.os.Looper.getMainLooper());
+    private Runnable txConfirmTimeout;
+
+    private int txDp(int v) { return Math.round(v * getResources().getDisplayMetrics().density); }
+
+    private android.widget.Button txButton(String label, int fill, int textColor, int stroke) {
+        android.widget.Button btn = new android.widget.Button(this);
+        btn.setAllCaps(false);
+        btn.setText(label);
+        btn.setTextColor(textColor);
+        btn.setTextSize(14f);
+        btn.setTypeface(btn.getTypeface(), android.graphics.Typeface.BOLD);
+        btn.setStateListAnimator(null);
+        btn.setFilterTouchesWhenObscured(true); // ignore taps while another app draws over us
+        android.graphics.drawable.GradientDrawable bg = new android.graphics.drawable.GradientDrawable();
+        bg.setColor(fill);
+        bg.setCornerRadius(txDp(12));
+        if (stroke != 0) bg.setStroke(txDp(1), stroke);
+        btn.setBackground(bg);
+        return btn;
+    }
+
+    private void showNativeTxConfirm(final int reqId, String actionLabel, String siteHost,
+                                     String bodyHtml, String approveLabel) {
+        dismissNativeTxConfirm();
+        ViewGroup content = findViewById(android.R.id.content);
+        if (content == null) return;
+        txConfirmReqId = reqId;
+
+        final FrameLayout overlay = new FrameLayout(this);
+        overlay.setBackgroundColor(0xE004040A);
+        overlay.setClickable(true);
+        overlay.setFocusable(true);
+        overlay.setElevation(txDp(64));
+        overlay.setOnClickListener(v -> rejectNativeTxConfirm());
+
+        LinearLayout sheet = new LinearLayout(this);
+        sheet.setOrientation(LinearLayout.VERTICAL);
+        android.graphics.drawable.GradientDrawable sheetBg = new android.graphics.drawable.GradientDrawable();
+        sheetBg.setColor(0xFF0C0C18);
+        float r = txDp(20);
+        sheetBg.setCornerRadii(new float[]{r, r, r, r, 0, 0, 0, 0});
+        sheetBg.setStroke(txDp(1), 0x406366F1);
+        sheet.setBackground(sheetBg);
+        sheet.setPadding(txDp(18), txDp(16), txDp(18), txDp(12));
+        sheet.setClickable(true); // swallow taps so they don't fall through to the dim area
+        overlay.addView(sheet, new FrameLayout.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT,
+            android.view.Gravity.BOTTOM));
+
+        TextView host = new TextView(this);
+        host.setText(siteHost == null || siteHost.isEmpty() ? "dApp" : siteHost);
+        host.setTextColor(0xFFE5E7EB);
+        host.setTextSize(13f);
+        host.setTypeface(host.getTypeface(), android.graphics.Typeface.BOLD);
+        host.setSingleLine(true);
+        host.setEllipsize(android.text.TextUtils.TruncateAt.END);
+        sheet.addView(host);
+
+        TextView action = new TextView(this);
+        action.setText(actionLabel == null || actionLabel.isEmpty() ? "REQUEST" : actionLabel);
+        action.setTextColor(0xFF6B7280);
+        action.setTextSize(10f);
+        action.setTypeface(android.graphics.Typeface.MONOSPACE);
+        action.setSingleLine(true);
+        action.setEllipsize(android.text.TextUtils.TruncateAt.END);
+        sheet.addView(action);
+
+        WebView body = new WebView(this);
+        WebSettings bs = body.getSettings();
+        bs.setJavaScriptEnabled(false);
+        bs.setAllowFileAccess(false);
+        bs.setAllowContentAccess(false);
+        bs.setDomStorageEnabled(false);
+        bs.setSupportMultipleWindows(false);
+        bs.setJavaScriptCanOpenWindowsAutomatically(false);
+        body.setBackgroundColor(0);
+        body.setWebViewClient(new WebViewClient() {
+            @Override public boolean shouldOverrideUrlLoading(WebView v, WebResourceRequest rq) { return true; }
+        });
+        String html = "<!doctype html><html><head><meta charset=\"utf-8\">"
+            + "<meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; img-src https: data:; "
+            + "style-src 'unsafe-inline'; base-uri 'none'; form-action 'none'\">"
+            + "<meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">"
+            + "<style>html,body{margin:0;padding:0;background:transparent;color:#e5e7eb;"
+            + "font-family:-apple-system,BlinkMacSystemFont,sans-serif;font-size:14px;word-break:break-word}</style>"
+            + "</head><body>" + (bodyHtml == null ? "" : bodyHtml) + "</body></html>";
+        body.loadDataWithBaseURL(null, html, "text/html", "utf-8", null);
+        LinearLayout.LayoutParams blp = new LinearLayout.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            Math.round(getResources().getDisplayMetrics().heightPixels * 0.42f));
+        blp.topMargin = txDp(10);
+        sheet.addView(body, blp);
+        txConfirmBody = body;
+
+        final TextView err = new TextView(this);
+        err.setText("Wallet did not respond. Please try again.");
+        err.setTextColor(0xFFF87171);
+        err.setTextSize(11f);
+        err.setGravity(android.view.Gravity.CENTER);
+        err.setVisibility(View.GONE);
+        sheet.addView(err);
+
+        LinearLayout row = new LinearLayout(this);
+        row.setOrientation(LinearLayout.HORIZONTAL);
+        final android.widget.Button rej = txButton("Reject", 0x1AEF4444, 0xFFF87171, 0x40EF4444);
+        final android.widget.Button apr = txButton(
+            approveLabel == null || approveLabel.isEmpty() ? "Confirm" : approveLabel,
+            0xFF6366F1, 0xFFFFFFFF, 0);
+        LinearLayout.LayoutParams rlp = new LinearLayout.LayoutParams(0, txDp(48), 1f);
+        LinearLayout.LayoutParams alp = new LinearLayout.LayoutParams(0, txDp(48), 1.4f);
+        alp.leftMargin = txDp(10);
+        row.addView(rej, rlp);
+        row.addView(apr, alp);
+        LinearLayout.LayoutParams rowLp = new LinearLayout.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        rowLp.topMargin = txDp(10);
+        sheet.addView(row, rowLp);
+
+        rej.setOnClickListener(v -> rejectNativeTxConfirm());
+        apr.setOnClickListener(v -> {
+            WebView mv = MainActivity.getMainWebView();
+            if (mv == null) { rejectNativeTxConfirm(); return; }
+            apr.setEnabled(false);
+            apr.setText("Processing…");
+            rej.setEnabled(false);
+            rej.setAlpha(0.4f);
+            err.setVisibility(View.GONE);
+            final int id = txConfirmReqId;
+            mv.post(() -> mv.evaluateJavascript(
+                "(function(){ try { window._oneModalApproveFromBrowser(" + id + "); } catch(e){} })()", null));
+            if (txConfirmTimeout != null) txConfirmHandler.removeCallbacks(txConfirmTimeout);
+            txConfirmTimeout = () -> {
+                apr.setEnabled(true);
+                apr.setText("Try Again");
+                rej.setEnabled(true);
+                rej.setAlpha(1f);
+                err.setVisibility(View.VISIBLE);
+            };
+            txConfirmHandler.postDelayed(txConfirmTimeout, 60000);
+        });
+
+        txConfirmOverlay = overlay;
+        content.addView(overlay, new FrameLayout.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+    }
+
+    private void dismissNativeTxConfirm() {
+        if (txConfirmTimeout != null) { txConfirmHandler.removeCallbacks(txConfirmTimeout); txConfirmTimeout = null; }
+        if (txConfirmOverlay != null) {
+            ViewGroup parent = (ViewGroup) txConfirmOverlay.getParent();
+            if (parent != null) parent.removeView(txConfirmOverlay);
+            txConfirmOverlay = null;
+        }
+        if (txConfirmBody != null) { txConfirmBody.destroy(); txConfirmBody = null; }
+        txConfirmReqId = -1;
+    }
+
+    private void rejectNativeTxConfirm() {
+        final int id = txConfirmReqId;
+        dismissNativeTxConfirm();
+        if (id < 0) return;
+        WebView mv = MainActivity.getMainWebView();
+        if (mv == null) return;
+        mv.post(() -> mv.evaluateJavascript(
+            "(function(){ try { window._oneModalRejectFromBrowser(" + id + "); } catch(e){} })()", null));
     }
 
     public static void dismissTxModal() { dismissTxModal(-1); }
     public static void dismissTxModal(final int reqId) {
-        InAppBrowserActivity a = sInstance != null ? sInstance.get() : null;
+        final InAppBrowserActivity a = sInstance != null ? sInstance.get() : null;
         if (a == null) return;
-        WebView wv = a.activeWebView();
-        if (wv == null) return;
         // If reqId given, only dismiss the modal that belongs to that request.
         // Prevents race where permit sign dismiss removes the follow-up TX modal.
-        String js = reqId < 0
-            ? "(function(){ clearTimeout(window._oneTxModalTimeout); try{if(window._oneNxRestore)window._oneNxRestore();}catch(_){} var o=document.getElementById('_one_tx_modal_overlay'); if(o)o.remove(); })()"
-            : "(function(){ var o=document.getElementById('_one_tx_modal_overlay'); if(!o)return; if(o.getAttribute('data-reqid')==='" + reqId + "'){clearTimeout(window._oneTxModalTimeout);try{if(window._oneNxRestore)window._oneNxRestore();}catch(_){} o.remove();} })()" ;
-        wv.post(() -> wv.evaluateJavascript(js, null));
+        a.runOnUiThread(() -> {
+            if (reqId < 0 || reqId == a.txConfirmReqId) a.dismissNativeTxConfirm();
+        });
     }
 
     /**
@@ -1993,6 +2072,7 @@ public class InAppBrowserActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
+        dismissNativeTxConfirm();
         saveTabs();
         mPageSeq.clear();
         WebView _mvDestroy = MainActivity.getMainWebView();
@@ -2067,6 +2147,7 @@ public class InAppBrowserActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
+        if (txConfirmOverlay != null) { rejectNativeTxConfirm(); return; }
         if (nativeChainPickerOverlay != null && nativeChainPickerOverlay.getVisibility() == View.VISIBLE) { hideNativeChainPicker(); return; }
         if (nativeWalletDrawerOverlay != null && nativeWalletDrawerOverlay.getVisibility() == View.VISIBLE) { hideNativeWalletDrawer(); return; }
         if (historyOverlay.getVisibility() == View.VISIBLE) { hideHistoryPanel(); return; }
