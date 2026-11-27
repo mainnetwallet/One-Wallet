@@ -5,6 +5,10 @@ Per-build release notes are published on the [Releases](../../releases) page.
 
 ## [Unreleased]
 
+### Changed
+- **Transfer Hub home redesigned:** the 3×3 emoji icon grid is replaced by a clean list with Send / Manage / Tools tabs,
+  a short description under each tool, and theme-aware colors (works in dark and light mode). All tools open exactly as before.
+
 ### Fixed
 - **Explorer links were matched by text anywhere in the address:** a link was opened in the system browser if an
   explorer name appeared anywhere in it, even in a query like `?u=etherscan.io`. Only links whose host is an explorer
