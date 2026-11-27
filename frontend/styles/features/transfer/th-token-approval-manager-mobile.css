@@ -1,73 +1,106 @@
-        /* ===== TOKEN APPROVAL MANAGER — MOBILE PHONE OPTIMIZED ===== */
-        /* Force single-column layout, compact spacing, smaller boxes */
-        #th-wrapper #tokenApprovalManagerUI .grid,
-        #th-wrapper #tokenApprovalManagerUI [style*="grid-template-columns: 1fr 1fr"],
-        #th-wrapper #tokenApprovalManagerUI [style*="grid-template-columns: repeat(2"] {
-            grid-template-columns: 1fr !important;
-            gap: 8px !important;
+/* ══════════════════════════════════════════════════
+   TOKEN APPROVAL — additions on top of the shared compact layout
+   The bt-* rules live in transfer-hub-base-form-styles.css (scoped to Batch Transfer, Multi Key Recipients, W2W, Self Transfer, NFT Transfer and this screen).
+   Markup: html-src/partials/page-transfer-hub/token-approval-manager.html
+   UI-only helpers: scripts/features/transfer/token-approval-ui-sync.js
+   ══════════════════════════════════════════════════ */
+
+/* Title stays on one line next to the network button */
+        #th-wrapper #tokenApprovalManagerUI .th-section-header h1 {
+            font-size: 1rem !important;
+            white-space: nowrap;
         }
 
-        #th-wrapper #tokenApprovalManagerUI .section {
-            padding: 10px !important;
-            margin-bottom: 6px !important;
+/* Inputs fill the card */
+        #th-wrapper #tokenApprovalManagerUI .bt-row input[type="text"] {
+            width: 100%;
+            box-sizing: border-box;
+            text-overflow: ellipsis;
         }
 
-        #th-wrapper #tokenApprovalManagerUI .section-title {
-            font-size: 0.88rem !important;
-            padding: 7px 10px !important;
-            margin: -10px -10px 8px -10px !important;
-        }
-
-        #th-wrapper #tokenApprovalManagerUI .input-group {
-            margin-bottom: 8px !important;
-        }
-
-        #th-wrapper #tokenApprovalManagerUI input[type="text"] {
-            padding: 9px 10px !important;
-            font-size: 0.82rem !important;
-            min-height: 40px !important;
-        }
-
-        #th-wrapper #tokenApprovalManagerUI .sk-key-textarea {
-            min-height: 100px !important;
+/* Key box: short masked multi-line box */
+        #th-wrapper #tokenApprovalManagerUI .ap-keys .sk-key-textarea {
+            width: 100%;
+            box-sizing: border-box;
+            height: 64px !important;
+            min-height: 64px !important;
             max-height: 140px !important;
-            font-size: 0.8rem !important;
+            padding: 6px 40px 6px 10px !important;
+            font-family: var(--font-mono);
+            font-size: 0.72rem !important;
+            line-height: 1.55 !important;
+            resize: vertical;
+        }
+        #th-wrapper #tokenApprovalManagerUI .ap-keys .sk-toggle-btn {
+            top: 4px !important;
+            transform: none !important;
         }
 
-        #th-wrapper #tokenApprovalManagerUI .stat-card {
-            padding: 7px 10px !important;
+/* Key count JS writes inside the caption ("3 keys"): keep it plain (JS paints a pill) */
+        #th-wrapper #tokenApprovalManagerUI #autoDetectCountApproval {
+            background: transparent !important;
+            padding: 0 !important;
+            color: inherit !important;
+            font-size: inherit !important;
+            font-weight: inherit !important;
+        }
+        #th-wrapper #tokenApprovalManagerUI .mk-meta {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 5px;
+            font-size: 0.72rem;
+            line-height: 1.3;
+        }
+        #th-wrapper #tokenApprovalManagerUI .st-hint {
+            color: var(--text-muted);
+            font-size: 0.68rem;
+            font-weight: 400;
         }
 
-        #th-wrapper #tokenApprovalManagerUI .stat-value {
-            font-size: 15px !important;
+/* Amount chips: three in a row; Revoke turns red when active */
+        #th-wrapper #tokenApprovalManagerUI .ap-chips {
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            margin-top: 6px;
+        }
+        #th-wrapper #tokenApprovalManagerUI .ap-chips .btn {
+            min-height: 32px !important;
+            font-size: 0.72rem !important;
+        }
+        #th-wrapper #tokenApprovalManagerUI .ap-chips #approvalChipRevoke.active {
+            background: rgba(239,68,68,0.14) !important;
+            border-color: #ef4444 !important;
+            color: #fca5a5 !important;
         }
 
-        #th-wrapper #tokenApprovalManagerUI .stat-label {
-            font-size: 0.68rem !important;
-        }
+/* Summary: ok / failed counts */
+        #th-wrapper #tokenApprovalManagerUI .bt-summary { margin-top: 2px; }
 
-        #th-wrapper #tokenApprovalManagerUI .btn {
-            padding: 10px 8px !important;
-            font-size: 0.82rem !important;
-            min-height: 40px !important;
+/* Gas pill + Approve + Clear on one row */
+        #th-wrapper #tokenApprovalManagerUI .st-act {
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
-
-        #th-wrapper #tokenApprovalManagerUI .hint {
-            font-size: 0.7rem !important;
-            margin-top: 3px !important;
+        #th-wrapper #tokenApprovalManagerUI .st-act .bt-gasrow { margin: 0; flex: none; }
+        #th-wrapper #tokenApprovalManagerUI .st-act .bt-actions {
+            flex: 1;
+            min-width: 0;
+            margin: 0 !important;
+            grid-template-columns: minmax(0, 1fr) 42px !important;
         }
-
-        #th-wrapper #tokenApprovalManagerUI .log-section {
-            margin-top: 6px !important;
+        #th-wrapper #tokenApprovalManagerUI .ap-clear {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 !important;
+            width: 42px;
         }
+        #th-wrapper #tokenApprovalManagerUI .ap-clear .material-icons-round { font-size: 20px; color: #f87171; }
+        #th-wrapper #tokenApprovalManagerUI .bt-dock { padding-top: 6px; }
 
-        #th-wrapper #tokenApprovalManagerUI .log-container {
-            max-height: 200px !important;
-            font-size: 0.75rem !important;
-        }
-
-        #th-wrapper #tokenApprovalManagerUI .stats-grid {
-            gap: 6px !important;
-        }
-        /* ===== END TOKEN APPROVAL MANAGER ===== */
-
+/* Logs: collapsed strip by default. Opening it folds the key box and hints so the log box fits on screen. */
+        #th-wrapper #tokenApprovalManagerUI .bt-logs { padding: 4px 0 0 !important; }
+        #th-wrapper #tokenApprovalManagerUI .bt-logs .bt-loghead { height: 36px; }
+        #th-wrapper #tokenApprovalManagerUI .bt-logs .log-container { height: 130px !important; max-height: none !important; }
+        #th-wrapper #tokenApprovalManagerUI.ap-logs-open :is(.ap-keys, .mk-meta) { display: none !important; }

@@ -6,6 +6,11 @@ Per-build release notes are published on the [Releases](../../releases) page.
 ## [Unreleased]
 
 ### Changed
+- **Token Approval UI:** now uses the same compact layout as W2W, Self Transfer and NFT Transfer - one Wallets card
+  ("Select" button, short masked key box, key count in the caption), one Approval card (Token contract, Spender, Amount
+  with Unlimited / Custom / Revoke chips), a `wallets / ok / failed` summary, gas pill + Approve button + Clear icon on
+  one row (the button reads "Revoke N wallets" when the amount is 0) and a collapsible Logs strip. Markup/styling
+  only; element IDs and approval logic unchanged.
 - **NFT Transfer UI:** now uses the same compact layout as W2W and Self Transfer - a 1 -> Many / Many -> 1 switch, grouped
   cards (Sender wallet + Recipients, or Source wallets + Recipient; NFT contract with a compact ERC721 / ERC1155 picker),
   flat 3-per-row NFT tiles with Fetch / All / Clear in the card header, a `selected of loaded` summary, gas pill and
