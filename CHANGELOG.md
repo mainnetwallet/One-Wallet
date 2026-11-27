@@ -15,6 +15,12 @@ Per-build release notes are published on the [Releases](../../releases) page.
   swiping the dim area above the sheet closes it too. Bridge pickers keep their `!important` CSS states.
 
 ### Changed
+- **Bridge page layout:** FROM and TO now sit in one swap panel with the flip button on the divider between them.
+  Chain and token pills are side by side on the left and the amount is on the right (FROM and TO); the balance
+  (left) and USD value (right) share one row under them. The % slider and MAX stay in the FROM section, and the
+  recipient row is now full width (34px tall) with a larger SELECT tag. The BRIDGE NOW button has more padding.
+  Look and feel are unchanged, and every element id and handler is kept (`br-from-amount`, `br-pct-slider`,
+  `br-flip-btn`, `br-exec-btn`, ...), so no script changes.
 - **Bridge and Send token pickers now match the Swap one:** same compact **Select token** sheet (handle, header, 38px
   search with **Paste**, "All tokens on <chain>" label, 38px logos, selected row tinted with a tick, "No tokens found").
   Bridge keeps its LiFi list, contract-address lookup and balance sort; Send keeps its network tabs and "Highest value
