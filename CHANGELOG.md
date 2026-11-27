@@ -6,6 +6,10 @@ Per-build release notes are published on the [Releases](../../releases) page.
 ## [Unreleased]
 
 ### Changed
+- **Batch Transfer fits above the bottom nav (Token especially):** the single gas pill moved up to the right of the
+  Native / Token switch (saves a whole row), cards/rows/summary use tighter spacing, the recipients box is shorter and
+  the wallet balance / address / gas show on one wrapped line - so Deploy / Execute transfer and the collapsed Logs bar
+  sit above the nav without scrolling.
 - **Batch Transfer buttons scroll again:** Deploy / Execute transfer are no longer pinned; they scroll with the form
   like before (gas pill above them, Logs below, collapsed by default). The page keeps its bottom padding so they
   can always be scrolled fully above the bottom nav.
