@@ -100,6 +100,23 @@ public class MainActivity extends AppCompatActivity {
         "explorer.rango.exchange"
     };
 
+    /**
+     * True when the URL's host is one of EXTERNAL_BROWSER_DOMAINS or a subdomain of one. Matches the parsed
+     * host only, so a URL that merely contains an explorer name in its path or query (for example
+     * https://example.com/?u=etherscan.io) is not treated as an explorer link.
+     */
+    public static boolean isExternalBrowserUrl(String url) {
+        if (url == null) return false;
+        String host;
+        try { host = Uri.parse(url.trim()).getHost(); } catch (Exception e) { return false; }
+        if (host == null) return false;
+        host = host.toLowerCase(java.util.Locale.ROOT);
+        for (String domain : EXTERNAL_BROWSER_DOMAINS) {
+            if (host.equals(domain) || host.endsWith("." + domain)) return true;
+        }
+        return false;
+    }
+
     @SuppressLint({"SetJavaScriptEnabled", "JavascriptInterface"})
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -300,16 +317,13 @@ public class MainActivity extends AppCompatActivity {
                 if (url.startsWith("file://")) return false;
                 if (url.startsWith("one://")) return true;
                 if (url.startsWith("http://") || url.startsWith("https://")) {
-                    String urlLower = url.toLowerCase();
-                    for (String domain : EXTERNAL_BROWSER_DOMAINS) {
-                        if (urlLower.contains(domain)) {
-                            try {
-                                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-                                browserIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                                startActivity(browserIntent);
-                            } catch (Exception ignored) {}
-                            return true;
-                        }
+                    if (isExternalBrowserUrl(url)) {
+                        try {
+                            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                            browserIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                            startActivity(browserIntent);
+                        } catch (Exception ignored) {}
+                        return true;
                     }
                     openInAppBrowser(url, null);
                     return true;

@@ -6,6 +6,10 @@ Per-build release notes are published on the [Releases](../../releases) page.
 ## [Unreleased]
 
 ### Fixed
+- **Explorer links were matched by text anywhere in the address:** a link was opened in the system browser if an
+  explorer name appeared anywhere in it, even in a query like `?u=etherscan.io`. Only links whose host is an explorer
+  (or a subdomain of one) are now treated as explorer links. Also removed an unused public CORS-proxy entry from the
+  network configuration and a meaningless `autoVerify` flag from the `one://wallet` link.
 - **Notifications stopped appearing after 50, and the "running" notification could come back after the app was killed:**
   after 50 notifications in one session every further transaction notification was silently dropped. Notification
   slots are now reused (oldest first) so they keep appearing. The background-service notification is no longer

@@ -195,17 +195,15 @@ public class OneAndroidBridge {
         String lower = url.toLowerCase().trim();
         if (!lower.startsWith("https://") && !lower.startsWith("http://")) return;
         MainActivity a = getActivity(); if (a == null) return;
-        for (String domain : MainActivity.EXTERNAL_BROWSER_DOMAINS) {
-            if (lower.contains(domain)) {
-                a.runOnUiThread(() -> {
-                    try {
-                        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-                        browserIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                        a.startActivity(browserIntent);
-                    } catch (Exception ignored) {}
-                });
-                return;
-            }
+        if (MainActivity.isExternalBrowserUrl(url)) {
+            a.runOnUiThread(() -> {
+                try {
+                    Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                    browserIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    a.startActivity(browserIntent);
+                } catch (Exception ignored) {}
+            });
+            return;
         }
         a.openInAppBrowser(url, null);
     }
