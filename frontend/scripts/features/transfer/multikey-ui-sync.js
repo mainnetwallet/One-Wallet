@@ -6,7 +6,8 @@
 //   * opens/closes the saved-contracts panel and the logs box,
 //   * slides the Native/Token thumb and highlights the Direct/Contract choice,
 //   * mirrors units, sender counts and the active contract into labels,
-//   * highlights the quick-amount chip that matches the amount input.
+//   * highlights the quick-amount chip that matches the amount input,
+//   * sizes the open Logs box so it reaches down to the bottom nav bar.
 // ══════════════════════════════════════════════════════
 (function () {
   'use strict';
@@ -114,6 +115,28 @@
     }
   }
 
+  // Open Logs box: grow to the bottom nav bar (scroll-invariant, min 80px; collapsed = untouched)
+  function fitLogs() {
+    var tok = $('multiKeyTokenModeBtn');
+    var box = $(tok && tok.classList.contains('active') ? 'mkLogsToken' : 'mkLogsNative');
+    var nav = document.querySelector('.bottom-nav');
+    if (!box) return;
+    var cont = box.querySelector('.log-container');
+    if (!cont) return;
+    if (box.classList.contains('collapsed') || !nav || nav.getClientRects().length === 0) {
+      cont.style.removeProperty('height');
+      return;
+    }
+    var st = window.pageYOffset || 0;
+    for (var el = cont.parentElement; el; el = el.parentElement) st += el.scrollTop || 0;
+    var h = Math.floor(nav.getBoundingClientRect().top - cont.getBoundingClientRect().top - st - 14);
+    h = Math.max(80, h);
+    if (cont.getAttribute('data-fit') !== String(h)) {
+      cont.setAttribute('data-fit', String(h));
+      cont.style.setProperty('height', h + 'px', 'important');
+    }
+  }
+
   function sync() {
     var ui = $('multiKeyNativeUI');
     if (!ui || ui.getClientRects().length === 0) return; // not on screen
@@ -136,8 +159,10 @@
 
     markChips('amountPerAddressMultiKeyNative');
     markChips('amountPerAddressMultiKeyToken');
+    fitLogs();
   }
 
+  window.addEventListener('resize', function () { setTimeout(sync, 60); });
   setInterval(sync, 600);
   document.addEventListener('input', function () { setTimeout(sync, 0); }, true);
   document.addEventListener('click', function () { setTimeout(sync, 60); }, true);
