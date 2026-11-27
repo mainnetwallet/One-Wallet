@@ -19,16 +19,17 @@
                 
                 // Add contract address if available (for multi-contract display)
                 const contractInfo = nft.contractAddress 
-                    ? `<div class="nft-contract" style="font-size: 0.7rem; color: #888; margin-top: 2px;">${nft.contractName || nft.contractAddress.substring(0, 8)}...</div>` 
+                    ? `<div class="nft-contract" style="font-size: 0.7rem; color: #888; margin-top: 2px;">${oneSanitize(nft.contractName || nft.contractAddress.substring(0, 8))}...</div>` 
                     : '';
                 
-                if (nft.image) {
+                const _nftImg = oneSafeImgUrl(nft.image);
+                if (_nftImg) {
                     card.innerHTML = `
-                        <img src="${nft.image}" class="nft-image" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                        <img src="${oneSanitize(_nftImg)}" class="nft-image" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
                         <div class="nft-placeholder" style="display: none;">🎨</div>
                         <div class="nft-info">
-                            <div class="nft-name">${nft.name}</div>
-                            <div class="nft-id">#${nft.tokenId}</div>
+                            <div class="nft-name">${oneSanitize(nft.name)}</div>
+                            <div class="nft-id">#${oneSanitize(nft.tokenId)}</div>
                             ${contractInfo}
                         </div>
                     `;
@@ -36,8 +37,8 @@
                     card.innerHTML = `
                         <div class="nft-placeholder">🎨</div>
                         <div class="nft-info">
-                            <div class="nft-name">${nft.name}</div>
-                            <div class="nft-id">#${nft.tokenId}</div>
+                            <div class="nft-name">${oneSanitize(nft.name)}</div>
+                            <div class="nft-id">#${oneSanitize(nft.tokenId)}</div>
                             ${contractInfo}
                         </div>
                     `;

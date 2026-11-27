@@ -80,21 +80,22 @@
                         -webkit-touch-callout: none;
                     `;
                     
-                    if (nft.image) {
+                    const _nftImg = oneSafeImgUrl(nft.image);
+                if (_nftImg) {
                         card.innerHTML = `
-                            <img src="${nft.image}" style="width: 100%; height: 120px; object-fit: cover; border-radius: 8px; margin-bottom: 8px; background: #0a0a0a;" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                            <img src="${oneSanitize(_nftImg)}" style="width: 100%; height: 120px; object-fit: cover; border-radius: 8px; margin-bottom: 8px; background: #0a0a0a;" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
                             <div style="display: none; width: 100%; height: 120px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 8px; align-items: center; justify-content: center; font-size: 2.5rem; margin-bottom: 8px;">🎨</div>
                             <div style="text-align: center;">
-                                <div style="font-size: 0.85rem; font-weight: 600; color: #ffffff; margin-bottom: 4px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${nft.name}</div>
-                                <div style="font-size: 0.75rem; color: #4a9eff; font-family: monospace;">#${nft.tokenId}</div>
+                                <div style="font-size: 0.85rem; font-weight: 600; color: #ffffff; margin-bottom: 4px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${oneSanitize(nft.name)}</div>
+                                <div style="font-size: 0.75rem; color: #4a9eff; font-family: monospace;">#${oneSanitize(nft.tokenId)}</div>
                             </div>
                         `;
                     } else {
                         card.innerHTML = `
                             <div style="width: 100%; height: 120px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; margin-bottom: 8px;">🎨</div>
                             <div style="text-align: center;">
-                                <div style="font-size: 0.85rem; font-weight: 600; color: #ffffff; margin-bottom: 4px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${nft.name}</div>
-                                <div style="font-size: 0.75rem; color: #4a9eff; font-family: monospace;">#${nft.tokenId}</div>
+                                <div style="font-size: 0.85rem; font-weight: 600; color: #ffffff; margin-bottom: 4px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${oneSanitize(nft.name)}</div>
+                                <div style="font-size: 0.75rem; color: #4a9eff; font-family: monospace;">#${oneSanitize(nft.tokenId)}</div>
                             </div>
                         `;
                     }

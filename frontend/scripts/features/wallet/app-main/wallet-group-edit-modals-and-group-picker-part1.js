@@ -403,8 +403,8 @@ function renderSavedPairs() {
         <span class="material-icons-round" style="font-size:16px;color:${isActive ? 'var(--accent-primary)' : 'var(--text-muted)'}">swap_horiz</span>
       </div>
       <div style="flex:1;min-width:0;">
-        <div style="font-size:13px;font-weight:700;color:${isActive ? 'var(--text-primary)' : 'var(--text-secondary)'};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${p.label || (p.fromSym + ' ↔ ' + p.toSym)}</div>
-        <div style="font-size:10px;color:var(--text-muted);font-family:var(--font-mono);margin-top:2px;">${p.fromSym} ↔ ${p.toSym}</div>
+        <div style="font-size:13px;font-weight:700;color:${isActive ? 'var(--text-primary)' : 'var(--text-secondary)'};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${oneSanitize(p.label || (p.fromSym + ' ↔ ' + p.toSym))}</div>
+        <div style="font-size:10px;color:var(--text-muted);font-family:var(--font-mono);margin-top:2px;">${oneSanitize(p.fromSym)} ↔ ${oneSanitize(p.toSym)}</div>
       </div>
       ${isActive ? '<div style="font-size:9px;font-weight:700;color:var(--accent-primary);font-family:var(--font-mono);letter-spacing:1px;background:rgba(99,102,241,0.15);padding:3px 8px;border-radius:6px;border:1px solid rgba(99,102,241,0.3);flex-shrink:0;">ACTIVE</div>' : '<div style="width:34px;height:34px;border-radius:10px;background:transparent;flex-shrink:0;"></div>'}
     `;
@@ -451,8 +451,8 @@ function renderPmList() {
         <span class="material-icons-round" style="font-size:18px;">swap_horiz</span>
       </div>
       <div class="tm-token-info">
-        <div class="tm-token-name">${p.label || (p.fromSym + ' ↔ ' + p.toSym)}</div>
-        <div class="tm-token-sub">${p.fromSym} ↔ ${p.toSym}${isActive ? ' · ACTIVE' : ''}</div>
+        <div class="tm-token-name">${oneSanitize(p.label || (p.fromSym + ' ↔ ' + p.toSym))}</div>
+        <div class="tm-token-sub">${oneSanitize(p.fromSym)} ↔ ${oneSanitize(p.toSym)}${isActive ? ' · ACTIVE' : ''}</div>
       </div>
       ${isActive
         ? `<div class="tm-already-badge" style="color:var(--accent-primary);background:rgba(99,102,241,0.12);border-color:rgba(99,102,241,0.3);">ACTIVE</div>`

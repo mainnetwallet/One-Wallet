@@ -6,6 +6,12 @@ Per-build release notes are published on the [Releases](../../releases) page.
 ## [Unreleased]
 
 ### Fixed
+- **Security: NFT names, token symbols and chain names could run code in the wallet:** values that come from the chain
+  or from remote metadata (NFT name / image / token id / collection name, ERC-20 `symbol()`, chain name / symbol, saved
+  swap-pair labels) were put into `innerHTML` unescaped, so a spam NFT or token could run script in the view that holds
+  the keys. They are now HTML-escaped at the NFT grids, the NFT chain pickers (which also no longer build `onclick`
+  strings from chain data), the swap-pair preview and lists, and the dApp transaction summary; NFT image URLs must be
+  `http(s)` or `data:image/*`. This covers the places named in the audit, not every `innerHTML` in the app.
 - **Security: a dApp page could approve its own transactions and signatures:** the Confirm / Reject sheet for dApp
   requests was drawn inside the dApp page, and the approve call it used (`OneWeb3Bridge.modalApprove`) was callable by
   the page itself, so a malicious site could send a request and approve it without any tap. The confirmation is now a
