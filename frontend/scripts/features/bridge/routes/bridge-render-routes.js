@@ -18,7 +18,7 @@
       const toRaw = est.toAmount || est.toAmountMin
         || lastStep?.estimate?.toAmount || lastStep?.estimate?.toAmountMin || null;
       const toAmtNum = toRaw ? Number(toRaw) / 10 ** toDecim : 0;
-      const toAmt = toRaw ? (window.brFmtAmt ? window.brFmtAmt(toAmtNum) : toAmtNum.toFixed(4)) : '—';
+      const toAmt = toRaw ? (toAmtNum < 0.000001 ? toAmtNum.toExponential(3) : toAmtNum < 1 ? toAmtNum.toFixed(6) : toAmtNum.toFixed(4)) : '—';
       const toUSD = (est.toAmountUSD || lastStep?.estimate?.toAmountUSD)
         ? _formatCurrencyDisplay(parseFloat(est.toAmountUSD || lastStep?.estimate?.toAmountUSD)) : '';
 
@@ -53,7 +53,7 @@
         route._socketBridgeFeeUsd   != null ? route._socketBridgeFeeUsd   :
         null;
       const protoFeeDisplay = _protoFeeUsd != null
-        ? (_protoFeeUsd <= 0.01 ? 'FREE' : '$' + _protoFeeUsd.toFixed(2))
+        ? (_protoFeeUsd <= 0.01 ? 'FREE' : '$' + _protoFeeUsd.toFixed(3))
         : null;
 
       // TIME
