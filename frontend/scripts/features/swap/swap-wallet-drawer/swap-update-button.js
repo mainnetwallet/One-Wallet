@@ -7,18 +7,17 @@ function swUpdateButton() {
   if (!btn) return;
 
   function _dim(text, icon, clickable) {
-    btn.style.background = 'var(--bg-raised)';
-    btn.style.opacity    = clickable ? '1' : '0.55';
+    // Colours/shape come from CSS (#sw-action-btn) — same look as BRIDGE NOW.
+    btn.style.opacity    = clickable ? '1' : '0.4';
+    btn.style.filter     = clickable ? '' : 'grayscale(0.5)';
     btn.style.cursor     = clickable ? 'pointer' : 'not-allowed';
-    btn.style.boxShadow  = 'none';
     if (lbl) lbl.textContent = text;
     if (ico) ico.textContent = icon;
     btn.onclick = null;
   }
   function _active(text, icon, fn, color) {
-    btn.style.background = color || 'linear-gradient(135deg,var(--accent-primary),var(--accent-secondary))';
-    btn.style.boxShadow  = color ? '0 0 20px rgba(245,158,11,0.35)' : 'var(--glow-primary)';
     btn.style.opacity    = '1';
+    btn.style.filter     = '';
     btn.style.cursor     = 'pointer';
     if (lbl) lbl.textContent = text;
     if (ico) ico.textContent = icon;
@@ -59,7 +58,7 @@ function swUpdateButton() {
 
   // Ready: show Swap button
   if (SW._cachedSwapTx) {
-    _active('Swap', 'swap_horiz', () => swHandleAction());
+    _active('SWAP NOW', 'rocket_launch', () => swHandleAction());
     return;
   }
 
@@ -69,5 +68,5 @@ function swUpdateButton() {
     return;
   }
 
-  _active('Swap', 'swap_horiz', () => swHandleAction());
+  _active('SWAP NOW', 'rocket_launch', () => swHandleAction());
 }

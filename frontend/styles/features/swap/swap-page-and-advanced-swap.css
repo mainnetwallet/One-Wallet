@@ -200,3 +200,30 @@
   #sw-settings-modal.sw-open #sw-settings-sheet,
   #sw-history-modal.sw-open #sw-history-sheet { transform: none; opacity: 1; }
   #sw-settings-sheet::-webkit-scrollbar { display: none; }
+
+  /* ── SWAP NOW button look — same as BRIDGE NOW (#br-exec-btn) ──
+     Compact pill, #e3edb7 soft gradient with dark text, same in dark and light theme.
+     !important because swUpdateButton() used to write inline background/shadow on this button. */
+  #sw-action-btn {
+    width: fit-content !important;
+    max-width: 100%;
+    margin: 12px auto 0 !important;
+    padding: 11px 26px !important;
+    border-radius: 999px !important;
+    background: linear-gradient(135deg, #e3edb7, #a1a882) !important;
+    border: 1.5px solid #ebf2cd !important;
+    box-shadow: 0 4px 18px rgba(227,237,183,0.28) !important;
+    color: #0a0a12 !important;
+    font-size: 14px !important;
+    letter-spacing: 1.5px !important;
+  }
+  #sw-action-btn #sw-btn-label {
+    font-size: 13px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    white-space: nowrap;
+    color: inherit;
+  }
+  body.light-mode #sw-action-btn {
+    box-shadow: 0 4px 14px rgba(120,130,70,0.3) !important;
+  }
