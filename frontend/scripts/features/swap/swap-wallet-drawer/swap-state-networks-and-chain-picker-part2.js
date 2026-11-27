@@ -212,11 +212,13 @@ window.swCloseWalletPanel = function() {
   function _attachBottomSwipe(sheetId, closeFn) {
     var sheet = document.getElementById(sheetId);
     if (!sheet) return;
-    var _sy = 0, _sx = 0, _prevY = 0, _prevT = 0;
+    var _sy = 0, _sx = 0, _prevY = 0, _prevT = 0, _vel = 0;
     var _dragging = false;
+    var _axis = null;                         // null until the gesture direction is known: 'v' | 'h'
     var _candidate = false, _scroller = null; // drag starting on a scroll list that sits at its top
-    var _THRESHOLD = 75;
-    var _VEL_THRESHOLD = 0.45; // px/ms
+    var _timer = null;                        // pending transition-reset timer of the previous gesture
+    var _THRESHOLD = 60;
+    var _VEL_THRESHOLD = 0.35; // px/ms
 
     var _SNAP_EASE  = 'transform 0.3s cubic-bezier(0.25,1,0.5,1)';
     var _CLOSE_EASE = 'transform 0.28s cubic-bezier(0.4,0,0.6,1)';
@@ -229,50 +231,69 @@ window.swCloseWalletPanel = function() {
       }
       return null;
     }
+    function _snapBack() {
+      sheet.style.transition = _SNAP_EASE;
+      sheet.style.transform = 'translateY(0)';
+      clearTimeout(_timer);
+      _timer = setTimeout(function() { sheet.style.transition = ''; }, 320);
+    }
+    function _startDrag(y, t) {
+      _dragging = true; _axis = null; _vel = 0;
+      _sy = y; _prevY = y; _prevT = t;
+      clearTimeout(_timer);       // a leftover timer from the last gesture must not touch this drag
+      sheet.style.transition = 'none';
+    }
 
     sheet.addEventListener('touchstart', function(e) {
       if (e.touches.length !== 1) return;
       _sy = e.touches[0].clientY;
       _sx = e.touches[0].clientX;
-      _prevY = _sy; _prevT = e.timeStamp;
-      _dragging = false; _candidate = false;
+      _prevY = _sy; _prevT = e.timeStamp; _vel = 0;
+      _dragging = false; _candidate = false; _axis = null;
       _scroller = _findScrollable(e.target);
       if (_scroller) {
         // Scrolled list: only a pull-down from its very top may drag the sheet
         if (_scroller.scrollTop <= 0) _candidate = true;
         return;
       }
-      _dragging = true;
-      sheet.style.transition = 'none';
+      _startDrag(_sy, e.timeStamp);
     }, { passive: true });
 
     sheet.addEventListener('touchmove', function(e) {
-      if (_candidate && !_dragging && e.touches.length === 1) {
-        var _cy0 = e.touches[0].clientY;
-        var _dy0 = _cy0 - _sy;
-        var _dx0 = Math.abs(e.touches[0].clientX - _sx);
-        if (_dy0 < -4 || _dx0 > 20 || (_scroller && _scroller.scrollTop > 0)) { _candidate = false; return; }
+      if (e.touches.length !== 1) return;
+      var cy = e.touches[0].clientY, cx = e.touches[0].clientX;
+      if (_candidate && !_dragging) {
+        var _dy0 = cy - _sy, _dx0 = Math.abs(cx - _sx);
+        if (_dy0 < -12 || (_scroller && _scroller.scrollTop > 0)) { _candidate = false; return; }
+        if (_dx0 > 24 && _dx0 > Math.abs(_dy0)) { _candidate = false; return; }
         if (_dy0 <= 10) return;
-        _candidate = false; _dragging = true;
-        _sy = _cy0; _prevY = _cy0; _prevT = e.timeStamp; // start from here, no jump
-        sheet.style.transition = 'none';
+        _candidate = false;
+        _startDrag(cy, e.timeStamp);   // start from here so the sheet does not jump
+        _sx = cx; _axis = 'v';
       }
-      if (!_dragging || e.touches.length !== 1) return;
-      var cy = e.touches[0].clientY;
+      if (!_dragging) return;
       var dy = cy - _sy;
-      var dx = Math.abs(e.touches[0].clientX - _sx);
-      if (dx > 38) {
-        _dragging = false;
-        sheet.style.transition = _SNAP_EASE;
-        sheet.style.transform = 'translateY(0)';
-        return;
+      var dx = cx - _sx;
+      if (!_axis) {
+        // Lock direction once the finger has moved a little: thumbs swipe in arcs, so a bit of sideways drift is fine
+        if (Math.abs(dx) < 8 && Math.abs(dy) < 8) return;
+        if (Math.abs(dx) > Math.abs(dy) * 1.5) {   // clearly sideways — not ours
+          _dragging = false; _axis = 'h';
+          _snapBack();
+          return;
+        }
+        _axis = 'v';
       }
       if (dy > 0) {
         // Rubber-band: slight resistance past 50% sheet height
         var h = sheet.offsetHeight || 400;
         var res = dy < h * 0.5 ? dy : h * 0.5 + (dy - h * 0.5) * 0.3;
         sheet.style.transform = 'translateY(' + res + 'px)';
+      } else {
+        sheet.style.transform = 'translateY(0)';
       }
+      var dt = e.timeStamp - _prevT;
+      if (dt > 0) _vel = 0.7 * ((cy - _prevY) / dt) + 0.3 * _vel;   // smoothed, so one noisy sample cannot decide
       _prevY = cy; _prevT = e.timeStamp;
     }, { passive: true });
 
@@ -282,26 +303,43 @@ window.swCloseWalletPanel = function() {
       _dragging = false;
       var cy = e.changedTouches[0] ? e.changedTouches[0].clientY : _sy;
       var dy = cy - _sy;
-      var dt = e.timeStamp - _prevT;
-      var vel = dt > 0 ? (cy - _prevY) / dt : 0;
-      if (dy >= _THRESHOLD || vel >= _VEL_THRESHOLD) {
+      var paused = (e.timeStamp - _prevT) > 120;   // finger rested before lifting: ignore velocity
+      var vel = paused ? 0 : _vel;
+      if (dy >= _THRESHOLD || (dy > 12 && vel >= _VEL_THRESHOLD)) {
         sheet.style.transition = _CLOSE_EASE;
         sheet.style.transform = 'translateY(110%)';
-        setTimeout(function() { sheet.style.transition = ''; closeFn(); }, 280);
+        clearTimeout(_timer);
+        _timer = setTimeout(function() { sheet.style.transition = ''; closeFn(); }, 280);
       } else {
-        sheet.style.transition = _SNAP_EASE;
-        sheet.style.transform = 'translateY(0)';
-        setTimeout(function() { sheet.style.transition = ''; }, 320);
+        _snapBack();
       }
     }, { passive: true });
 
     sheet.addEventListener('touchcancel', function() {
       _candidate = false;
       _dragging = false;
-      sheet.style.transition = _SNAP_EASE;
-      sheet.style.transform = 'translateY(0)';
-      setTimeout(function() { sheet.style.transition = ''; }, 320);
+      _snapBack();
     }, { passive: true });
+  }
+
+  // Swipe down on the dim area above a bottom sheet also closes it
+  function _attachBackdropSwipeDown(modalId, closeFn) {
+    var modal = document.getElementById(modalId);
+    if (!modal) return;
+    var _y = 0, _x = 0, _on = false;
+    modal.addEventListener('touchstart', function(e) {
+      _on = (e.target === modal && e.touches.length === 1);
+      if (_on) { _y = e.touches[0].clientY; _x = e.touches[0].clientX; }
+    }, { passive: true });
+    modal.addEventListener('touchend', function(e) {
+      if (!_on) return;
+      _on = false;
+      var t = e.changedTouches[0];
+      if (!t) return;
+      var dy = t.clientY - _y, dx = Math.abs(t.clientX - _x);
+      if (dy >= 40 && dx < dy) closeFn();
+    }, { passive: true });
+    modal.addEventListener('touchcancel', function() { _on = false; }, { passive: true });
   }
 
   // ── send-modal / hcp-modal bottom sheet swipe ──
@@ -411,6 +449,7 @@ window.swCloseWalletPanel = function() {
 
     // ── BOTTOM SHEETS (swipe down → close) ──
     _attachBottomSwipe('sw-token-sheet',     function() { if (typeof window.swCloseTokenPicker === 'function') window.swCloseTokenPicker(); });
+    _attachBackdropSwipeDown('sw-token-modal', function() { if (typeof window.swCloseTokenPicker === 'function') window.swCloseTokenPicker(); });
     _attachBottomSwipe('br-settings-sheet',    function() { if (typeof window.brCloseSettings  === 'function') window.brCloseSettings(); });
     _attachBottomSwipe('br-history-sheet',     function() { if (typeof window.brCloseHistory   === 'function') window.brCloseHistory(); });
     _attachBottomSwipe('sw-confirm-sheet',     function() { if (typeof window.swCloseConfirm   === 'function') window.swCloseConfirm(); });

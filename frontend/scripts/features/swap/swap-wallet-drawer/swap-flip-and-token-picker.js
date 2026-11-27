@@ -117,6 +117,8 @@ window.swPasteTokenSearch = async function() {
   inp.focus();
 };
 window.swCloseTokenPicker = function() {
+  // Drop the keyboard if the search box still has focus
+  try { const _ae = document.activeElement; if (_ae && _ae.id === 'sw-token-search') _ae.blur(); } catch (_e) {}
   const modal = document.getElementById('sw-token-modal');
   if (modal) { modal.classList.remove('sw-open'); document.body.style.overflow = ''; }
   // Reset sheet transform so next open starts clean
