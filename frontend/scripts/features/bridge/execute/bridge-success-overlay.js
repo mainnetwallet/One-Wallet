@@ -328,11 +328,11 @@
         // Reset pct slider to 0
         if (typeof window.brUpdateSliderUI === 'function') window.brUpdateSliderUI(0);
         var toDisplay = document.getElementById('br-to-amount');
-        if (toDisplay) { toDisplay.textContent = '—'; toDisplay.classList.remove('br-has-val'); }
+        if (toDisplay) { toDisplay.textContent = '—'; }
         var foundLabel = document.getElementById('br-routes-found-label');
         if (foundLabel) { foundLabel.style.display = 'none'; }
         var foundText = document.getElementById('br-routes-found-text');
-        if (foundText) { foundText.textContent = '0 routes'; }
+        if (foundText) { foundText.textContent = '0 ROUTES FOUND'; }
         var routesList = document.getElementById('br-routes-list');
         if (routesList) { routesList.style.display = 'none'; routesList.innerHTML = ''; }
 
@@ -446,11 +446,11 @@
           var _brFromInput = document.getElementById('br-from-amount');
           if (_brFromInput) { _brFromInput.value = ''; }
           var _brToDisplay = document.getElementById('br-to-amount');
-          if (_brToDisplay) { _brToDisplay.textContent = '—'; _brToDisplay.classList.remove('br-has-val'); }
+          if (_brToDisplay) { _brToDisplay.textContent = '—'; }
           var _brFoundLabel = document.getElementById('br-routes-found-label');
           if (_brFoundLabel) { _brFoundLabel.style.display = 'none'; }
           var _brFoundText = document.getElementById('br-routes-found-text');
-          if (_brFoundText) { _brFoundText.textContent = '0 routes'; }
+          if (_brFoundText) { _brFoundText.textContent = '0 ROUTES FOUND'; }
           var _brRoutesList = document.getElementById('br-routes-list');
           if (_brRoutesList) { _brRoutesList.style.display = 'none'; _brRoutesList.innerHTML = ''; }
           if (typeof window.brUpdateSliderUI === 'function') window.brUpdateSliderUI(0);
@@ -472,7 +472,7 @@
           if (_execBtn) {
             _execBtn.disabled        = false;
             _execBtn.style.opacity   = '1';
-            _execBtn.style.background = '';
+            _execBtn.style.background = 'linear-gradient(135deg,#6366f1,#8b5cf6,#a78bfa)';
             _execBtn.style.cursor    = '';
             _execBtn.style.filter    = '';
             _execBtn.style.pointerEvents = '';
@@ -482,7 +482,7 @@
           // Label: reflect same/cross chain correctly
           if (_labelEl) {
             var _isSame = (typeof br !== 'undefined') && br.fromChain && br.toChain && br.fromChain.id === br.toChain.id;
-            _labelEl.textContent = _isSame ? 'Review swap' : 'Review bridge';
+            _labelEl.textContent = _isSame ? 'SWAP NOW' : 'BRIDGE NOW';
           }
           // Re-evaluate button state (disabled/enabled) based on current form state
           if (typeof brUpdateExecBtn === 'function') {
@@ -524,7 +524,7 @@
           if (_execBtn2) {
             _execBtn2.disabled         = false;
             _execBtn2.style.opacity    = '1';
-            _execBtn2.style.background = '';
+            _execBtn2.style.background = 'linear-gradient(135deg,#6366f1,#8b5cf6,#a78bfa)';
             _execBtn2.style.cursor     = '';
             _execBtn2.style.filter     = '';
             _execBtn2.style.pointerEvents = '';
@@ -533,7 +533,7 @@
           if (_execSpin2) _execSpin2.style.display = 'none';
           if (_labelEl2) {
             var _isSame2 = (typeof br !== 'undefined') && br.fromChain && br.toChain && br.fromChain.id === br.toChain.id;
-            _labelEl2.textContent = _isSame2 ? 'Review swap' : 'Review bridge';
+            _labelEl2.textContent = _isSame2 ? 'SWAP NOW' : 'BRIDGE NOW';
           }
           if (typeof brUpdateExecBtn === 'function') {
             var _hasRoute2 = (typeof br !== 'undefined') && br.routes && br.routes.length > 0 && br.selectedRoute !== null;

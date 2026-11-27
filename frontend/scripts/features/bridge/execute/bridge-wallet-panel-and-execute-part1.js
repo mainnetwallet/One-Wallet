@@ -69,7 +69,7 @@
     execSpin.style.display = 'block';
     execBtn.disabled       = true;
     execBtn.style.opacity  = '0.85';
-    execBtn.style.background = '';
+    execBtn.style.background = 'linear-gradient(135deg,rgba(99,102,241,0.9),rgba(139,92,246,0.85))';
     if (labelEl) labelEl.textContent = 'Preparing…';
     br._recvHash = null;
     br.txHash    = null;
@@ -85,8 +85,8 @@
       execSpin.style.display   = 'none';
       execBtn.disabled         = false;
       execBtn.style.opacity    = '1';
-      execBtn.style.background = '';
-      if (labelEl) labelEl.textContent = isSameChain ? 'Review swap' : 'Review bridge';
+      execBtn.style.background = 'linear-gradient(135deg,#6366f1,#8b5cf6,#a78bfa)';
+      if (labelEl) labelEl.textContent = isSameChain ? 'SWAP NOW' : 'BRIDGE NOW';
       window.brRunning = false;
       if (typeof window.OneBGGuard !== 'undefined') window.OneBGGuard.txEnd(); // BG: release wake lock
       if (typeof window._updateAllToolBadges === 'function') window._updateAllToolBadges();
