@@ -1,7 +1,7 @@
 
 // ══════════════════════════════════════════════════════
 // TRANSFER HUB — SWIPE TO SWITCH MODE
-// Batch Transfer: Native→Token = swipe left→right, Token→Native = swipe right→left
+// Batch Transfer + Multi Key Recipients: Native→Token = swipe left→right, Token→Native = swipe right→left
 //   (the Native/Token thumb follows the finger while dragging)
 // Other sections: Left→Right : first mode, Right→Left : next mode
 // Axis-lock: horizontal swipe only (vertical scroll preserved)
@@ -31,6 +31,8 @@
     {
       id: 'multiKeyNativeUI',
       modes: ['native', 'token'],
+      reverse: true,   // left→right = token, right→left = native (no wrap-around)
+      threshold: 64,
       switcher: function(m) { if (typeof switchMultiKeyMode === 'function') switchMultiKeyMode(m); },
       getCurrent: function() {
         var btn = document.getElementById('multiKeyNativeModeBtn');

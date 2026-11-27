@@ -1,336 +1,284 @@
-        <!-- Multi Key Recipients UI (Unified: Native + Token) -->
+        <!-- Multi Key Recipients UI (Unified: Native + Token) — compact layout shared with Batch Transfer (bt-* classes)
+             UI-only helpers: scripts/features/transfer/multikey-ui-sync.js -->
         <div id="multiKeyNativeUI" style="display: none;">
 
-        <div class="th-section-header"><button class="th-back-btn" onclick="showMainDashboard()" title="Back to Dashboard"><span class="material-icons-round">arrow_back</span></button><h1>🔑 Multi Key Recipients</h1><button class="th-header-chain-btn" onclick="thOpenHeaderChainPicker('mkNative')" title="Switch network"><span class="th-hcb-emoji" id="th-net-emoji-mkNative-hdr">⛓️</span><span class="th-hcb-name" id="th-net-name-mkNative-hdr">Network</span><span class="material-icons-round">expand_more</span></button></div>
+                <div class="th-section-header"><button class="th-back-btn" onclick="showMainDashboard()" title="Back to Dashboard"><span class="material-icons-round">arrow_back</span></button><h1>Multi key recipients</h1><button class="th-header-chain-btn" onclick="thOpenHeaderChainPicker('mkNative')" title="Switch network"><span class="th-hcb-emoji" id="th-net-emoji-mkNative-hdr">⛓️</span><span class="th-hcb-name" id="th-net-name-mkNative-hdr">Network</span><span class="material-icons-round">expand_more</span></button></div>
 
         <!-- Transfer Mode Toggle -->
-        <div style="display: flex; justify-content: center; margin-bottom: 20px;">
-            <div style="background: #1a1a1a; border: 2px solid #2a2a2a; border-radius: 12px; padding: 4px; display: inline-flex; gap: 4px;">
-                <button id="multiKeyNativeModeBtn" class="mode-toggle-btn active" onclick="switchMultiKeyMode('native')" style="padding: 10px 24px; border-radius: 8px; border: none; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; font-weight: 600; cursor: pointer; transition: all 0.3s;">
-                    🔑 Native (ETH/BNB)
-                </button>
-                <button id="multiKeyTokenModeBtn" class="mode-toggle-btn" onclick="switchMultiKeyMode('token')" style="padding: 10px 24px; border-radius: 8px; border: none; background: transparent; color: #888; font-weight: 600; cursor: pointer; transition: all 0.3s;">
-                    🔐 Token (ERC20)
-                </button>
+        <div class="bt-seg-wrap">
+            <div class="bt-seg">
+                <button id="multiKeyNativeModeBtn" class="mode-toggle-btn active" onclick="switchMultiKeyMode('native')">Native</button>
+                <button id="multiKeyTokenModeBtn" class="mode-toggle-btn" onclick="switchMultiKeyMode('token')">Token</button>
             </div>
         </div>
 
         <!-- Native Mode Content -->
         <div id="multiKeyNativeModeContent" style="display: block;">
-        <div style="font-size: 0.9rem; color: #a0a0a0; margin-bottom: 20px;">Multiple wallets consolidate native coins to one recipient address</div>
-
-        <!-- Wallet Section — সবার উপরে -->
-        <div class="section">
-            <div class="section-title">Wallet</div>
             <input type="hidden" id="rpcUrlMultiKeyNative" value="">
-            <div class="input-group">
-                <label>Developer Private Key</label>
-                <button onclick="thOpenWalletPicker('privateKeyMultiKeyNative','single')" style="width:100%;display:flex;align-items:center;justify-content:center;gap:8px;padding:9px 14px;border-radius:9px;border:1px dashed rgba(99,102,241,0.45);background:rgba(99,102,241,0.06);color:var(--neon-purple);font-family:var(--font-mono);font-size:11px;font-weight:700;cursor:pointer;margin-bottom:8px;transition:all .18s;letter-spacing:.5px;" onmousedown="this.style.background='rgba(99,102,241,0.14)'" onmouseup="this.style.background='rgba(99,102,241,0.06)'" ontouchstart="this.style.background='rgba(99,102,241,0.14)'" ontouchend="this.style.background='rgba(99,102,241,0.06)'"><span class="material-icons-round" style="font-size:15px;">account_balance_wallet</span>Select Wallet</button>
-                <div class="sk-key-wrapper" id="privateKeyMultiKeyNativeWrapper">
-                    <textarea id="privateKeyMultiKeyNative" class="sk-key-textarea sk-masked" placeholder="0xabcd... or abcd... (with/without 0x)" autocomplete="off" rows="2" spellcheck="false" oninput="mkNativeDevKeySync(this)" ondblclick="mkNativeDevKeyClear(this)"></textarea>
-                    <button type="button" class="sk-toggle-btn" id="privateKeyMultiKeyNativeToggleBtn" onclick="skToggleKeyVisibility('privateKeyMultiKeyNative','privateKeyMultiKeyNativeToggleBtn')" title="Show/Hide Key">
-                        <span class="material-icons-round sk-eye-icon">visibility_off</span>
-                    </button>
-                </div>
-            </div>
-            <div class="wallet-info" id="walletInfoBoxMultiKeyNative">
-                <div class="wallet-info-item">
-                    <span class="wallet-info-label">Address:</span>
-                    <span class="wallet-info-value" id="walletAddressMultiKeyNative">-</span>
-                </div>
-                <div class="wallet-info-item">
-                    <span class="wallet-info-label">Balance:</span>
-                    <span class="wallet-info-value" id="walletBalanceMultiKeyNative">-</span>
-                </div>
-            </div>
-        </div>
 
-        <!-- Sender Keys Section -->
-        <div class="section">
-            <div class="section-title">🔐 Sender Keys</div>
-            <div class="input-group">
-                <label>Private Keys (one per line)</label>
-                <button onclick="thOpenWalletPicker('senderPrivateKeysMultiKeyNative','multi')" style="width:100%;display:flex;align-items:center;justify-content:center;gap:8px;padding:9px 14px;border-radius:9px;border:1px dashed rgba(99,102,241,0.45);background:rgba(99,102,241,0.06);color:var(--neon-purple);font-family:var(--font-mono);font-size:11px;font-weight:700;cursor:pointer;margin-bottom:8px;transition:all .18s;letter-spacing:.5px;" onmousedown="this.style.background='rgba(99,102,241,0.14)'" onmouseup="this.style.background='rgba(99,102,241,0.06)'" ontouchstart="this.style.background='rgba(99,102,241,0.14)'" ontouchend="this.style.background='rgba(99,102,241,0.06)'"><span class="material-icons-round" style="font-size:15px;">account_balance_wallet</span>Select Wallet</button>
-                <div class="sk-key-wrapper" id="senderPrivateKeysMultiKeyNativeWrapper">
-                    <textarea id="senderPrivateKeysMultiKeyNative" class="sk-key-textarea sk-masked" placeholder="0xabcd1234...
-abcd1234...
-0xef567890...
-..." autocomplete="off" spellcheck="false" oninput="if(!this.value.trim()&&window.actualKeysStorage)window.actualKeysStorage['senderPrivateKeysMultiKeyNative']='';autoValidateNativeKeys();"></textarea>
-                    <button type="button" class="sk-toggle-btn" id="senderPrivateKeysMultiKeyNativeToggleBtn" onclick="skToggleKeyVisibility('senderPrivateKeysMultiKeyNative','senderPrivateKeysMultiKeyNativeToggleBtn')" title="Show/Hide Key">
-                        <span class="material-icons-round sk-eye-icon">visibility_off</span>
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Recipient -->
-        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 15px;">
-
-            <!-- Recipient Section -->
-            <div class="section">
-                <div class="section-title">Recipient</div>
-                <div class="input-group">
-                    <label>Recipient Address</label>
-                    <button onclick="thOpenWalletPicker('recipientAddressMultiKeyNative','address')" style="width:100%;display:flex;align-items:center;justify-content:center;gap:8px;padding:9px 14px;border-radius:9px;border:1px dashed rgba(6,182,212,0.45);background:rgba(6,182,212,0.06);color:var(--neon-cyan);font-family:var(--font-mono);font-size:11px;font-weight:700;cursor:pointer;margin-bottom:8px;transition:all .18s;letter-spacing:.5px;" onmousedown="this.style.background='rgba(6,182,212,0.14)'" onmouseup="this.style.background='rgba(6,182,212,0.06)'" ontouchstart="this.style.background='rgba(6,182,212,0.14)'" ontouchend="this.style.background='rgba(6,182,212,0.06)'"><span class="material-icons-round" style="font-size:15px;">account_balance_wallet</span>Select Wallet</button>
-                    <input type="text" id="recipientAddressMultiKeyNative" placeholder="0x..." oninput="if(typeof updateButtonStates==='function')updateButtonStates();">
-                </div>
-                <div class="wallet-info" id="recipientInfoBoxMultiKeyNative" style="display: none;">
-                    <div class="wallet-info-item">
-                        <span class="wallet-info-label">Address:</span>
-                        <span class="wallet-info-value" id="recipientAddressDisplayMultiKeyNative">-</span>
+            <!-- Developer wallet + Sender keys + Recipient -->
+            <div class="bt-card">
+                <div class="bt-row">
+                    <div class="bt-head">
+                        <span class="bt-cap">Developer wallet</span>
+                        <div class="wallet-info bt-info" id="walletInfoBoxMultiKeyNative">
+                            <div class="wallet-info-item bt-bal">
+                                <span class="wallet-info-label">Balance</span>
+                                <span class="wallet-info-value" id="walletBalanceMultiKeyNative">-</span>
+                            </div>
+                            <div class="wallet-info-item bt-addr">
+                                <span class="wallet-info-label">Address</span>
+                                <span class="wallet-info-value" id="walletAddressMultiKeyNative">-</span>
+                            </div>
+                        </div>
+                        <button type="button" class="bt-select" onclick="thOpenWalletPicker('privateKeyMultiKeyNative','single')"><span class="material-icons-round">account_balance_wallet</span>Select</button>
                     </div>
-                    <div class="wallet-info-item">
-                        <span class="wallet-info-label">Balance:</span>
-                        <span class="wallet-info-value" id="recipientBalanceMultiKeyNative">-</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Amount Section -->
-        <div class="section">
-                <div class="section-title">Amount</div>
-                
-                <div class="stats-grid" style="grid-template-columns: repeat(2, 1fr);">
-                    <div class="stat-card">
-                        <div class="stat-label">Sender Wallets</div>
-                        <div class="stat-value" id="totalSendersMultiKeyNative">0</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-label">Total Balance</div>
-                        <div class="stat-value" id="totalBalanceMultiKeyNative" style="color: #43e97b;">0</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-label">Per Wallet</div>
-                        <div class="stat-value" id="perAddressDisplayMultiKeyNative">0</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-label">Total Amount</div>
-                        <div class="stat-value" id="totalAmountMultiKeyNative">0</div>
+                    <div class="sk-key-wrapper" id="privateKeyMultiKeyNativeWrapper">
+                        <textarea id="privateKeyMultiKeyNative" class="sk-key-textarea sk-masked" placeholder="0xabcd... or abcd... (with/without 0x)" autocomplete="off" rows="1" spellcheck="false" oninput="mkNativeDevKeySync(this)" ondblclick="mkNativeDevKeyClear(this)"></textarea>
+                        <button type="button" class="sk-toggle-btn" id="privateKeyMultiKeyNativeToggleBtn" onclick="skToggleKeyVisibility('privateKeyMultiKeyNative','privateKeyMultiKeyNativeToggleBtn')" title="Show/Hide Key">
+                            <span class="material-icons-round sk-eye-icon">visibility_off</span>
+                        </button>
                     </div>
                 </div>
 
-                <div class="input-group">
-                    <label>Amount per wallet</label>
-                    <input type="text" id="amountPerAddressMultiKeyNative" placeholder="0" value="" oninput="if(typeof updateButtonStates==='function')updateButtonStates();">
-                    <div class="hint">Amount each sender wallet will send in native coins</div>
-                    
-                    <!-- Quick preset buttons with MAX -->
-                    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-top: 8px;">
-                        <button class="btn" onclick="setMaxAmountMultiKeyNative()" style="padding: 6px; font-size: 0.78rem; font-weight: 700; background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: #fff; box-shadow: 0 2px 8px rgba(245,158,11,0.4); letter-spacing: 0.04em;">⚡ MAX</button>
-                        <button class="btn" onclick="setAmountMultiKeyNative('0.00000001')" style="padding: 6px; font-size: 0.75rem; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: #fff;">0.00000001</button>
-                        <button class="btn" onclick="setAmountMultiKeyNative('0.1')" style="padding: 6px; font-size: 0.75rem; background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: #fff;">0.1</button>
-                        <button class="btn" onclick="setAmountMultiKeyNative('1')" style="padding: 6px; font-size: 0.75rem; background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); color: #fff;">1</button>
+                <div class="bt-row">
+                    <div class="bt-head">
+                        <span class="bt-cap">Sender keys · <span id="mkSendersCountNative">0</span> wallets</span>
+                        <button type="button" class="bt-select" onclick="thOpenWalletPicker('senderPrivateKeysMultiKeyNative','multi')"><span class="material-icons-round">account_balance_wallet</span>Select</button>
                     </div>
+                    <div class="sk-key-wrapper mk-keys" id="senderPrivateKeysMultiKeyNativeWrapper">
+                        <textarea id="senderPrivateKeysMultiKeyNative" class="sk-key-textarea sk-masked" placeholder="0xabcd1234...&#10;abcd1234...&#10;0xef567890...&#10;..." autocomplete="off" spellcheck="false" oninput="if(!this.value.trim()&&window.actualKeysStorage)window.actualKeysStorage['senderPrivateKeysMultiKeyNative']='';autoValidateNativeKeys();"></textarea>
+                        <button type="button" class="sk-toggle-btn" id="senderPrivateKeysMultiKeyNativeToggleBtn" onclick="skToggleKeyVisibility('senderPrivateKeysMultiKeyNative','senderPrivateKeysMultiKeyNativeToggleBtn')" title="Show/Hide Key">
+                            <span class="material-icons-round sk-eye-icon">visibility_off</span>
+                        </button>
+                    </div>
+                    <div class="mk-meta">
+                        <span class="mk-valid"><b id="mkValidNative">0</b> valid</span>
+                        <span class="mk-pool">Pool <b id="totalBalanceMultiKeyNative">0</b> <span class="bt-unit bt-unit-native">ETH</span></span>
+                    </div>
+                </div>
+
+                <div class="bt-row">
+                    <div class="bt-head">
+                        <span class="bt-cap">Recipient · one address</span>
+                        <div class="wallet-info bt-info" id="recipientInfoBoxMultiKeyNative" style="display: none;">
+                            <div class="wallet-info-item bt-bal">
+                                <span class="wallet-info-label">Balance</span>
+                                <span class="wallet-info-value" id="recipientBalanceMultiKeyNative">-</span>
+                            </div>
+                            <div class="wallet-info-item bt-addr">
+                                <span class="wallet-info-label">Address</span>
+                                <span class="wallet-info-value" id="recipientAddressDisplayMultiKeyNative">-</span>
+                            </div>
+                        </div>
+                        <button type="button" class="bt-select" onclick="thOpenWalletPicker('recipientAddressMultiKeyNative','address')"><span class="material-icons-round">account_balance_wallet</span>Select</button>
+                    </div>
+                    <input type="text" id="recipientAddressMultiKeyNative" placeholder="0x..." autocomplete="off" spellcheck="false" oninput="if(typeof updateButtonStates==='function')updateButtonStates();">
                 </div>
             </div>
 
-
-        <!-- Transfer Actions Section -->
-        <div class="section">
-            <div class="section-title">⚡ Transfer Actions</div>
-            
-            <!-- Mode Selection Tabs -->
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px;">
-                <button id="directTransferModeCard" onclick="selectTransferMode('direct')" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); border: 3px solid #10b981; border-radius: 10px; padding: 12px; cursor: pointer; transition: all 0.3s; color: white; font-weight: 600; font-size: 0.9rem;">
-                    ⚡ Direct Transfer
-                </button>
-                <button id="contractTransferModeCard" onclick="selectTransferMode('contract')" style="background: #1a2a3a; border: 2px solid #2a3a4a; border-radius: 10px; padding: 12px; cursor: pointer; transition: all 0.3s; color: #4a9eff; font-weight: 600; font-size: 0.9rem;">
-                    📦 Via Contract
-                </button>
+            <!-- Amount + send mode -->
+            <div class="bt-card bt-amount">
+                <div class="bt-amt-grid">
+                    <div class="bt-amt-main">
+                        <label class="bt-cap" for="amountPerAddressMultiKeyNative">Amount per wallet</label>
+                        <div class="bt-amt-input">
+                            <input type="text" id="amountPerAddressMultiKeyNative" placeholder="0" value="" inputmode="decimal" autocomplete="off" oninput="if(typeof updateButtonStates==='function')updateButtonStates();">
+                            <span class="bt-unit bt-unit-native">ETH</span>
+                        </div>
+                    </div>
+                    <div class="mk-send">
+                        <span class="bt-cap">Send mode</span>
+                        <div class="mk-send-seg" id="mkSendSeg" data-send="direct">
+                            <button type="button" id="directTransferModeCard" class="mk-send-btn active" onclick="selectTransferMode('direct')">Direct</button>
+                            <button type="button" id="contractTransferModeCard" class="mk-send-btn" onclick="selectTransferMode('contract')">Contract</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="bt-chips">
+                    <button class="btn mk-max" onclick="setMaxAmountMultiKeyNative()">MAX</button>
+                    <button class="btn" onclick="setAmountMultiKeyNative('0.00000001')">0.00000001</button>
+                    <button class="btn" onclick="setAmountMultiKeyNative('0.1')">0.1</button>
+                    <button class="btn" onclick="setAmountMultiKeyNative('1')">1</button>
+                </div>
             </div>
-            
-            <!-- Direct Transfer Section -->
+
+            <!-- Summary -->
+            <div class="bt-summary">
+                <span><b id="totalSendersMultiKeyNative">0</b> senders × <b id="perAddressDisplayMultiKeyNative">0</b></span>
+                <span class="bt-total">Total <b id="totalAmountMultiKeyNative">0</b> <span class="bt-unit bt-unit-native">ETH</span></span>
+            </div>
+
+            <!-- Direct send (Send mode = Direct) -->
             <div id="directTransferSection" style="display: block;">
-                <button class="btn btn-success" id="executeDirectBtnMultiKeyNative" onclick="executeDirectTransferMultiKeyRecipients()" disabled style="width: 100%; padding: 15px; font-size: 1rem; font-weight: 700;">
-                    ⚡ Execute Direct Transfer
-                </button>
+                <div class="bt-gasrow" id="one-gas-toggle-th-mkn-direct">
+                    <button type="button" class="bt-gaspill" onclick="window._ngCycle()" aria-label="Gas type, tap to change" title="Gas type - tap to change">
+                        <span class="material-icons-round bt-gaspill-ico">local_gas_station</span>
+                        <span class="sw-gas-pill-label bt-gaspill-label">AUTO</span>
+                    </button>
+                </div>
+                <div class="execute-section bt-actions" style="grid-template-columns: 1fr;">
+                    <button class="btn btn-success" id="executeDirectBtnMultiKeyNative" onclick="executeDirectTransferMultiKeyRecipients()" disabled>Execute direct transfer</button>
+                </div>
             </div>
-            
-            <!-- Contract Transfer Section -->
+
+            <!-- Contract send (Send mode = Contract) -->
             <div id="contractTransferSection" style="display: none;">
-                <!-- Contract Info -->
-                <!-- Saved Contracts -->
-                <div id="savedContractsHeaderMultiKeyNative" style="display: none; margin-bottom: 8px;">
-                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <label style="margin-bottom: 0; font-size: 0.85rem; color: #888;">Saved Contracts (<span id="savedContractsCountMultiKeyNative">0</span>)</label>
-                        <button onclick="openContractDeleteModalMKN()" title="Delete all saved contracts" style="background:linear-gradient(135deg,#ef4444,#b91c1c);color:#fff;border:none;padding:5px 12px;border-radius:7px;font-size:0.75rem;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:4px;letter-spacing:0.03em;transition:opacity 0.15s;" onmouseover="this.style.opacity='0.82'" onmouseout="this.style.opacity='1'">🗑 Delete</button>
+                <div class="bt-card bt-contract" id="mkContractCardNative">
+                    <div class="bt-crow">
+                        <span class="material-icons-round bt-cicon">description</span>
+                        <span class="bt-clabel"><span id="mkContractPrefix">Contract</span> <b id="mkContractVal">-</b></span>
+                        <span class="bt-ver" id="mkContractVer">v3.6</span>
+                        <button type="button" class="bt-iconbtn" aria-label="Show saved contracts" onclick="mkToggleContracts()"><span class="material-icons-round bt-chev">expand_more</span></button>
+                        <button type="button" class="bt-iconbtn bt-del" id="mkDeleteContractsBtn" aria-label="Delete contracts" onclick="openContractDeleteModalMKN()"><span class="material-icons-round">delete</span></button>
+                    </div>
+                    <div class="bt-cpanel">
+                        <div id="savedContractsHeaderMultiKeyNative" style="display: none;">
+                            <div style="margin-bottom: 6px;">
+                                <label style="margin-bottom: 0; font-size: 0.82rem; color: #888;">Saved Contracts (<span id="savedContractsCountMultiKeyNative">0</span>)</label>
+                            </div>
+                        </div>
+                        <div class="saved-contracts" id="savedContractsListMultiKeyNative"></div>
                     </div>
                 </div>
-                <div class="saved-contracts" id="savedContractsListMultiKeyNative"></div>
-
-                <!-- Gas Type Box -->
-                <div id="one-gas-toggle-th-mkn-contract-static" style="padding: 0 0 8px 0; display: flex; justify-content: flex-end; margin-top: 12px;"></div>
-
-                <!-- Buttons -->
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                    <button class="btn btn-primary" id="deployBtnMultiKeyNative" onclick="deployMultiRecipientContract()" disabled style="padding: 12px; font-weight: 600;">📦 Deploy New Contract</button>
-                    <button class="btn btn-success" id="executeBtnMultiKeyNative" onclick="executeContractTransferMultiKeyRecipients()" disabled style="padding: 12px; font-weight: 600;">✓ Execute Transfer</button>
+                <div class="bt-gasrow" id="one-gas-toggle-th-mkn-contract">
+                    <button type="button" class="bt-gaspill" onclick="window._ngCycle()" aria-label="Gas type, tap to change" title="Gas type - tap to change">
+                        <span class="material-icons-round bt-gaspill-ico">local_gas_station</span>
+                        <span class="sw-gas-pill-label bt-gaspill-label">AUTO</span>
+                    </button>
+                </div>
+                <div class="execute-section bt-actions">
+                    <button class="btn btn-primary" id="deployBtnMultiKeyNative" onclick="deployMultiRecipientContract()" disabled>Deploy</button>
+                    <button class="btn btn-success" id="executeBtnMultiKeyNative" onclick="executeContractTransferMultiKeyRecipients()" disabled>Execute transfer</button>
                 </div>
             </div>
-            
-            <div class="progress-bar" id="progressBarMultiKeyNative" style="margin-top: 15px;">
-                <div class="progress-fill" id="progressFillMultiKeyNative"></div>
-            </div>
-        </div>
 
-        <!-- Log Section -->
-        <div class="log-section">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                <div class="section-title" style="margin-bottom: 0;">Logs</div>
-                <button class="btn" onclick="clearLogMultiKeyNative()" style="width: auto; padding: 6px 12px; font-size: 0.8rem; background: #2a2a2a; color: #e0e0e0;">Clear Log</button>
+            <div class="bt-dock">
+                <div class="progress-bar" id="progressBarMultiKeyNative">
+                    <div class="progress-fill" id="progressFillMultiKeyNative"></div>
+                </div>
             </div>
-            <div class="log-container" id="logContainerMultiKeyNative">
-                <div class="log-line log-info">[INFO] Ready to configure multi-key native transfer...</div>
+
+            <!-- Log Section -->
+            <div class="log-section bt-logs collapsed" id="mkLogsNative">
+                <div class="bt-loghead" onclick="mkToggleLogs('native')" role="button" aria-label="Show or hide logs">
+                    <span class="material-icons-round bt-logchev">expand_more</span>
+                    <span class="bt-cap">Logs</span>
+                    <button type="button" class="bt-link" onclick="event.stopPropagation();clearLogMultiKeyNative()">Clear</button>
+                </div>
+                <div class="log-container" id="logContainerMultiKeyNative">
+                    <div class="log-line log-info">[INFO] Ready to configure multi-key native transfer...</div>
+                </div>
             </div>
-        </div>
         </div>
 
         <!-- Token Mode Content -->
         <div id="multiKeyTokenModeContent" style="display: none;">
-        <div style="font-size: 0.9rem; color: #a0a0a0; margin-bottom: 20px;">Multiple wallets transfer ERC20 tokens to one recipient address</div>
-
-        <!-- Sender Keys — সবার উপরে -->
-        <div class="section">
-            <div class="section-title">🔐 Sender Keys</div>
-            <div class="input-group">
-                <label>Private Keys (one per line)</label>
-                <button onclick="thOpenWalletPicker('senderKeysMultiKeyToken','multi')" style="width:100%;display:flex;align-items:center;justify-content:center;gap:8px;padding:9px 14px;border-radius:9px;border:1px dashed rgba(99,102,241,0.45);background:rgba(99,102,241,0.06);color:var(--neon-purple);font-family:var(--font-mono);font-size:11px;font-weight:700;cursor:pointer;margin-bottom:8px;transition:all .18s;letter-spacing:.5px;" onmousedown="this.style.background='rgba(99,102,241,0.14)'" onmouseup="this.style.background='rgba(99,102,241,0.06)'" ontouchstart="this.style.background='rgba(99,102,241,0.14)'" ontouchend="this.style.background='rgba(99,102,241,0.06)'"><span class="material-icons-round" style="font-size:15px;">account_balance_wallet</span>Select Wallet</button>
-                <div class="sk-key-wrapper" id="senderKeysMultiKeyTokenWrapper">
-                    <textarea id="senderKeysMultiKeyToken" class="sk-key-textarea sk-masked" placeholder="0xabcd1234...
-abcd1234...
-0xef567890...
-..." autocomplete="off" spellcheck="false" oninput="if(!this.value.trim()&&window.actualKeysStorage)window.actualKeysStorage['senderKeysMultiKeyToken']='';autoValidateTokenKeys();"></textarea>
-                    <button type="button" class="sk-toggle-btn" id="senderKeysMultiKeyTokenToggleBtn" onclick="skToggleKeyVisibility('senderKeysMultiKeyToken','senderKeysMultiKeyTokenToggleBtn')" title="Show/Hide Key">
-                        <span class="material-icons-round sk-eye-icon">visibility_off</span>
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Token Contract + Recipient -->
-        <div style="display: flex; flex-direction: column; gap: 15px; margin-bottom: 15px;">
             <input type="hidden" id="rpcUrlMultiKeyToken" value="">
 
-            <!-- Recipient Section -->
-            <div class="section">
-                <div class="section-title">Recipient</div>
-                <div class="input-group">
-                    <label>Recipient Address</label>
-                    <button onclick="thOpenWalletPicker('recipientAddressMultiKeyToken','address')" style="width:100%;display:flex;align-items:center;justify-content:center;gap:8px;padding:9px 14px;border-radius:9px;border:1px dashed rgba(6,182,212,0.45);background:rgba(6,182,212,0.06);color:var(--neon-cyan);font-family:var(--font-mono);font-size:11px;font-weight:700;cursor:pointer;margin-bottom:8px;transition:all .18s;letter-spacing:.5px;" onmousedown="this.style.background='rgba(6,182,212,0.14)'" onmouseup="this.style.background='rgba(6,182,212,0.06)'" ontouchstart="this.style.background='rgba(6,182,212,0.14)'" ontouchend="this.style.background='rgba(6,182,212,0.06)'"><span class="material-icons-round" style="font-size:15px;">account_balance_wallet</span>Select Wallet</button>
-                    <input type="text" id="recipientAddressMultiKeyToken" placeholder="0xabcd... or abcd... (address or private key)" autocomplete="off">
-                </div>
-                <!-- Recipient Wallet Info Box -->
-                <div class="wallet-info" id="recipientTokenInfoBoxMultiKeyToken" style="display: none; margin-top: 12px;">
-                    <div class="wallet-info-item">
-                        <span class="wallet-info-label">Address:</span>
-                        <span class="wallet-info-value" id="recipientAddressDisplayMultiKeyToken" style="color: #4ade80; font-family: monospace;">-</span>
-                    </div>
-                    <div class="wallet-info-item">
-                        <span class="wallet-info-label">Token Balance:</span>
-                        <span class="wallet-info-value" id="recipientTokenBalanceMultiKeyToken">-</span>
-                    </div>
-                </div>
-            </div>
+            <div class="bt-scroll">
 
-            <!-- Token Contract Section -->
-            <div class="section">
-                <div class="section-title">Token Contract</div>
-                <div class="input-group">
-                    <label>Token Address (ERC20)</label>
-                    <input type="text" id="tokenContractAddressMultiKeyToken" placeholder="0x...">
-                    <div class="hint">Enter token contract address</div>
-                </div>
-                <div class="input-group" style="display: none;">
-                    <button class="btn btn-primary" onclick="detectTokenDetailsMultiKeyToken()" style="width: 100%;">
-                        🔍 Detect Token Details
-                    </button>
-                </div>
-                <div class="input-group">
-                    <label>Token Symbol</label>
-                    <input type="text" id="tokenSymbolMultiKeyToken" placeholder="Auto-detecting..." value="" readonly>
-                    <div class="hint">Auto-detected from contract</div>
-                </div>
-                <!-- Hidden decimals field for internal use -->
-                <input type="hidden" id="tokenDecimalsMultiKeyToken" value="18">
-            </div>
-        </div>
-
-        <!-- Amount Section -->
-        <div class="section">
-                <div class="section-title">Amount</div>
-                
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-label">Sender Wallets</div>
-                        <div class="stat-value" id="totalSendersMultiKeyToken">0</div>
+            <!-- Token + Sender keys + Recipient -->
+            <div class="bt-card">
+                <div class="bt-row">
+                    <div class="bt-head">
+                        <label class="bt-cap" for="tokenContractAddressMultiKeyToken">Token contract</label>
+                        <input type="text" id="tokenSymbolMultiKeyToken" class="bt-symbol" placeholder="Auto" value="" readonly>
                     </div>
-                    <div class="stat-card">
-                        <div class="stat-label">Per Wallet</div>
-                        <div class="stat-value" id="perAddressDisplayMultiKeyToken">0</div>
-                    </div>
-                    <div class="stat-card" style="grid-column: 1 / -1;">
-                        <div class="stat-label">Total</div>
-                        <div class="stat-value" id="totalAmountMultiKeyToken">0</div>
+                    <input type="text" id="tokenContractAddressMultiKeyToken" placeholder="0x... token address (ERC20)" autocomplete="off" spellcheck="false">
+                    <!-- Hidden decimals field for internal use -->
+                    <input type="hidden" id="tokenDecimalsMultiKeyToken" value="18">
+                    <div class="input-group" style="display: none;">
+                        <button class="btn btn-primary" onclick="detectTokenDetailsMultiKeyToken()" style="width: 100%;">🔍 Detect Token Details</button>
                     </div>
                 </div>
 
-                <div class="input-group">
-                    <label>Amount per wallet</label>
-                    <input type="text" id="amountPerAddressMultiKeyToken" placeholder="0" value="0">
-                    <div class="hint">In token units (e.g., 0.00001, 100 USDT, 0.5 ETH token)</div>
-                    
-                    <!-- Quick preset buttons -->
-                    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-top: 8px;">
-                        <button class="btn" onclick="setMaxAmountMultiKeyToken()" style="padding: 6px; font-size: 0.78rem; font-weight: 700; background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: #fff; box-shadow: 0 2px 8px rgba(245,158,11,0.4); letter-spacing: 0.04em;">⚡ MAX</button>
-                        <button class="btn" onclick="setAmountMultiKeyToken('1')" style="padding: 6px; font-size: 0.75rem; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: #fff;">1</button>
-                        <button class="btn" onclick="setAmountMultiKeyToken('10')" style="padding: 6px; font-size: 0.75rem; background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: #fff;">10</button>
-                        <button class="btn" onclick="setAmountMultiKeyToken('100')" style="padding: 6px; font-size: 0.75rem; background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); color: #fff;">100</button>
+                <div class="bt-row">
+                    <div class="bt-head">
+                        <span class="bt-cap">Sender keys · <span id="mkSendersCountToken">0</span> wallets</span>
+                        <button type="button" class="bt-select" onclick="thOpenWalletPicker('senderKeysMultiKeyToken','multi')"><span class="material-icons-round">account_balance_wallet</span>Select</button>
+                    </div>
+                    <div class="sk-key-wrapper mk-keys" id="senderKeysMultiKeyTokenWrapper">
+                        <textarea id="senderKeysMultiKeyToken" class="sk-key-textarea sk-masked" placeholder="0xabcd1234...&#10;abcd1234...&#10;0xef567890...&#10;..." autocomplete="off" spellcheck="false" oninput="if(!this.value.trim()&&window.actualKeysStorage)window.actualKeysStorage['senderKeysMultiKeyToken']='';autoValidateTokenKeys();"></textarea>
+                        <button type="button" class="sk-toggle-btn" id="senderKeysMultiKeyTokenToggleBtn" onclick="skToggleKeyVisibility('senderKeysMultiKeyToken','senderKeysMultiKeyTokenToggleBtn')" title="Show/Hide Key">
+                            <span class="material-icons-round sk-eye-icon">visibility_off</span>
+                        </button>
+                    </div>
+                    <div class="mk-meta">
+                        <span class="mk-valid"><b id="mkValidToken">0</b> valid</span>
                     </div>
                 </div>
-            </div>
 
-        <!-- Direct Transfer Section -->
-        <div class="section">
-            <div class="section-title">Transfer Action</div>
-            
-            <!-- Retry info badge -->
-            <div style="display:flex; gap:10px; margin-bottom:12px; flex-wrap:wrap;">
-                <div style="background:#1a2a1a; border:1px solid #2e5a2e; border-radius:6px; padding:6px 10px; font-size:0.78rem; color:#43e97b; flex:1; min-width:140px; text-align:center;">
-                    🔄 <strong>3× Retry</strong> on fail
-                </div>
-                <div style="background:#1a1a2a; border:1px solid #2e2e5a; border-radius:6px; padding:6px 10px; font-size:0.78rem; color:#4a9eff; flex:1; min-width:140px; text-align:center;">
-                    ⏱️ <strong>2 s</strong> between retries
-                </div>
-                <div style="background:#2a1a1a; border:1px solid #5a2e2e; border-radius:6px; padding:6px 10px; font-size:0.78rem; color:#f59e0b; flex:1; min-width:140px; text-align:center;">
-                    ⚡ <strong>No Wait</strong> for confirm
-                </div>
-                <div style="background:#1a1a2a; border:1px solid #2e2e5a; border-radius:6px; padding:6px 10px; font-size:0.78rem; color:#a78bfa; flex:1; min-width:140px; text-align:center;">
-                    💤 Balance <strong>0 → skip</strong>
+                <div class="bt-row">
+                    <div class="bt-head">
+                        <span class="bt-cap">Recipient · one address</span>
+                        <div class="wallet-info bt-info" id="recipientTokenInfoBoxMultiKeyToken" style="display: none;">
+                            <div class="wallet-info-item bt-bal">
+                                <span class="wallet-info-label">Token</span>
+                                <span class="wallet-info-value" id="recipientTokenBalanceMultiKeyToken">-</span>
+                            </div>
+                            <div class="wallet-info-item bt-addr">
+                                <span class="wallet-info-label">Address</span>
+                                <span class="wallet-info-value" id="recipientAddressDisplayMultiKeyToken">-</span>
+                            </div>
+                        </div>
+                        <button type="button" class="bt-select" onclick="thOpenWalletPicker('recipientAddressMultiKeyToken','address')"><span class="material-icons-round">account_balance_wallet</span>Select</button>
+                    </div>
+                    <input type="text" id="recipientAddressMultiKeyToken" placeholder="0xabcd... or abcd... (address or private key)" autocomplete="off" spellcheck="false">
                 </div>
             </div>
 
-            <!-- Execute Section -->
-            <div class="execute-section" style="grid-template-columns:1fr;">
-                <button class="btn btn-success" id="executeBtnMultiKeyToken" onclick="executeDirectTransferMultiKeyToken()" disabled style="width: 100%; padding: 15px; font-size: 1.1rem;">
-                    ⚡ Start Transfer (No Wait • 0.1s/wallet)
-                </button>
+            <!-- Amount -->
+            <div class="bt-card bt-amount">
+                <div class="bt-amt-grid">
+                    <div class="bt-amt-main">
+                        <label class="bt-cap" for="amountPerAddressMultiKeyToken">Amount per wallet</label>
+                        <div class="bt-amt-input">
+                            <input type="text" id="amountPerAddressMultiKeyToken" placeholder="0" value="0" inputmode="decimal" autocomplete="off">
+                            <span class="bt-unit bt-unit-token">TOKEN</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="bt-chips">
+                    <button class="btn mk-max" onclick="setMaxAmountMultiKeyToken()">MAX</button>
+                    <button class="btn" onclick="setAmountMultiKeyToken('1')">1</button>
+                    <button class="btn" onclick="setAmountMultiKeyToken('10')">10</button>
+                    <button class="btn" onclick="setAmountMultiKeyToken('100')">100</button>
+                </div>
             </div>
-            <div class="progress-bar" id="progressBarMultiKeyToken">
-                <div class="progress-fill" id="progressFillMultiKeyToken"></div>
-            </div>
-        </div>
 
-        <!-- Log Section -->
-        <div class="log-section">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                <div class="section-title" style="margin-bottom: 0;">Logs</div>
-                <button class="btn" onclick="clearLogMultiKeyToken()" style="width: auto; padding: 6px 12px; font-size: 0.8rem; background: #2a2a2a; color: #e0e0e0;">Clear Log</button>
+            <!-- Summary -->
+            <div class="bt-summary">
+                <span><b id="totalSendersMultiKeyToken">0</b> senders × <b id="perAddressDisplayMultiKeyToken">0</b></span>
+                <span class="bt-total">Total <b id="totalAmountMultiKeyToken">0</b> <span class="bt-unit bt-unit-token">TOKEN</span></span>
             </div>
-            <div class="log-container" id="logContainerMultiKeyToken">
-                <div class="log-line log-info">[INFO] Multi-key token transfer ready. Enter sender keys and recipient address...</div>
+
+            <div class="mk-note"><span class="material-icons-round">sync</span>3× retry on fail · 2 s between retries · zero balance skipped</div>
+
             </div>
-        </div>
+
+            <!-- Action dock -->
+            <div class="bt-dock">
+                <div id="one-gas-toggle-th-mkt" hidden></div>
+                <div class="execute-section bt-actions" style="grid-template-columns: 1fr;">
+                    <button class="btn btn-success mk-start" id="executeBtnMultiKeyToken" onclick="executeDirectTransferMultiKeyToken()" disabled><span class="material-icons-round">bolt</span>Start transfer</button>
+                </div>
+                <div class="progress-bar" id="progressBarMultiKeyToken">
+                    <div class="progress-fill" id="progressFillMultiKeyToken"></div>
+                </div>
+            </div>
+
+            <!-- Log Section -->
+            <div class="log-section bt-logs collapsed" id="mkLogsToken">
+                <div class="bt-loghead" onclick="mkToggleLogs('token')" role="button" aria-label="Show or hide logs">
+                    <span class="material-icons-round bt-logchev">expand_more</span>
+                    <span class="bt-cap">Logs</span>
+                    <button type="button" class="bt-link" onclick="event.stopPropagation();clearLogMultiKeyToken()">Clear</button>
+                </div>
+                <div class="log-container" id="logContainerMultiKeyToken">
+                    <div class="log-line log-info">[INFO] Multi-key token transfer ready. Enter sender keys and recipient address...</div>
+                </div>
+            </div>
         </div>
 
         </div>

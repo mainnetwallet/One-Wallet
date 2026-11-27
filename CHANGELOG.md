@@ -6,6 +6,11 @@ Per-build release notes are published on the [Releases](../../releases) page.
 ## [Unreleased]
 
 ### Changed
+- **Multi Key Recipients UI:** now uses the same compact layout as Batch Transfer — one grouped card (Developer wallet /
+  Sender keys with "N valid" and pool balance / Recipient), amount row with a Direct | Contract send-mode switch and
+  quick chips (MAX highlighted), summary strip, contract row with gas pill and Deploy / Execute transfer, and a
+  collapsible Logs bar. Token mode has the same card layout with a one-line retry note and a Start transfer button.
+  Swipe left→right = Token, right→left = Native. Markup/styling only: element IDs and transfer logic are unchanged.
 - **Batch Transfer spacing (Token only):** a light trim of box heights and gaps (recipients box, rows, summary, logs bar)
   so Deploy / Execute transfer and the collapsed Logs bar sit above the bottom nav in Token mode. Native keeps its
   original spacing. Layout is unchanged: gas pill above the buttons, Logs below them.
