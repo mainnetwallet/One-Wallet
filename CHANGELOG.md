@@ -11,6 +11,9 @@ Per-build release notes are published on the [Releases](../../releases) page.
   softer Swap button glow. **Live router** rows are now full width, flat (neutral border; purple border and tick on
   the selected route, `BEST` tag on the top route), and Gas / Impact text wraps instead of being cut off with "...".
   Light-mode overrides updated to match.
+- **Swap router list height:** the Live router list now measures the space between its top and the bottom nav
+  (`swFitDexScroll`, re-run on resize and whenever the swap card changes), so the last router card is no longer
+  hidden under the nav bar. Replaced the old fixed `calc(100vh - 420px ...)` guess and the 72px bottom padding.
 - **Swap gas type:** the three-button Gas Type row is now one compact "Network fee" pill above the Swap button.
   Default is AUTO; tap the pill to cycle AUTO / 1559 / LEGACY (`window._ngCycle`, same `OneGasMode` as before).
 - **Send screen navigation:** swipe-down-to-close is turned off on the Send screen (it opts out with

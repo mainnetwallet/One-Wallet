@@ -25,6 +25,41 @@ function _swDexIconHtml(dexDisplayName, bgColor, apiLogoUrl) {
   return `<div style="width:28px;height:28px;border-radius:8px;background:${bgColor};display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;color:#fff;flex-shrink:0;">${dexDisplayName.slice(0,2).toUpperCase()}</div>`;
 }
 
+// ── Fit the Live Router list between the swap card and the bottom nav ──
+// The list scrolls inside its own box. Its height is measured from where it starts to where the bottom nav
+// starts, so the last router card is never hidden under the nav, whatever the card above it looks like.
+function swFitDexScroll() {
+  const wrap = document.getElementById('sw-dex-scroll-wrap');
+  if (!wrap) return;
+  const top = wrap.getBoundingClientRect().top;
+  if (!top) return; // page or list hidden
+  const nav = document.querySelector('.bottom-nav');
+  const navRect = nav ? nav.getBoundingClientRect() : null;
+  const vh = window.visualViewport ? window.visualViewport.height : window.innerHeight;
+  const bottomLimit = (navRect && navRect.height) ? navRect.top : vh;
+  const avail = Math.floor(bottomLimit - top - 8);
+  wrap.style.maxHeight = Math.max(120, avail) + 'px';
+}
+window.swFitDexScroll = swFitDexScroll;
+
+(function _swArmDexFit() {
+  function arm() {
+    const body = document.getElementById('sw-scroll-body');
+    if (!body) { setTimeout(arm, 500); return; }
+    const fit = () => requestAnimationFrame(swFitDexScroll);
+    if (window.ResizeObserver) {
+      const ro = new ResizeObserver(fit);
+      const watch = () => Array.from(body.children).forEach(ch => ro.observe(ch));
+      watch();
+      new MutationObserver(() => { watch(); fit(); }).observe(body, { childList: true });
+    }
+    window.addEventListener('resize', fit);
+    window.addEventListener('orientationchange', fit);
+    fit();
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', arm); else arm();
+})();
+
 function swRenderDexComparison() {
   const list = document.getElementById('sw-dex-list');
   if (!list) return;
@@ -124,6 +159,7 @@ function swRenderDexComparison() {
 
   // Show selected DEX badge
   _swUpdateSelectedDexBadge(SW.bestDex?.dex || SW.quotes[0].dex);
+  swFitDexScroll();
 }
 
 window.swToggleMoreRoutes = function() {}; // no-op — replaced by scroll
