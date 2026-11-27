@@ -1,0 +1,44 @@
+/* Transfer Hub home — tabbed list (Send / Manage / Tools). Theme-aware via CSS variables. */
+#th-wrapper .th-hub { width: 100%; max-width: 480px; margin: 0 auto; padding: 4px 0 24px; }
+#th-wrapper .th-hub-head { padding: 4px 4px 14px; }
+#th-wrapper .th-hub-head h1 { margin: 0; font-size: 1.35rem; font-weight: 600; color: var(--text-primary); }
+#th-wrapper .th-hub-head p { margin: 2px 0 0; font-size: 0.82rem; color: var(--text-secondary); }
+
+#th-wrapper .th-hub-tabs {
+  display: flex; gap: 4px; padding: 4px; margin-bottom: 12px;
+  background: var(--bg-glass); border: 1px solid var(--border-subtle); border-radius: 14px;
+}
+#th-wrapper .th-hub-tab {
+  flex: 1; padding: 9px 0; border: 1px solid transparent; border-radius: 10px; cursor: pointer;
+  background: transparent; color: var(--text-secondary); font: inherit; font-size: 0.85rem; font-weight: 500;
+  -webkit-tap-highlight-color: transparent; transition: background 0.15s, color 0.15s;
+}
+#th-wrapper .th-hub-tab.active {
+  background: var(--bg-surface); color: var(--text-primary); border-color: var(--border-subtle);
+}
+
+#th-wrapper .th-hub-panel {
+  display: none; background: var(--bg-surface); border: 1px solid var(--border-subtle);
+  border-radius: 16px; overflow: hidden;
+}
+#th-wrapper .th-hub-panel.active { display: block; }
+
+#th-wrapper .th-hub-row {
+  display: flex; align-items: center; gap: 12px; padding: 12px 14px; cursor: pointer;
+  border-bottom: 1px solid var(--border-subtle); -webkit-tap-highlight-color: transparent;
+  user-select: none; transition: background 0.12s;
+}
+#th-wrapper .th-hub-row:last-child { border-bottom: none; }
+#th-wrapper .th-hub-row:active { background: var(--bg-glass-hover); }
+#th-wrapper .th-hub-row:focus-visible { outline: 2px solid var(--accent-primary); outline-offset: -2px; }
+
+#th-wrapper .th-hub-icon {
+  width: 40px; height: 40px; border-radius: 12px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(var(--row-c), 0.16); color: rgb(var(--row-c));
+}
+#th-wrapper .th-hub-icon .material-icons-round { font-size: 22px; }
+#th-wrapper .th-hub-text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px; }
+#th-wrapper .th-hub-title { font-size: 0.92rem; font-weight: 500; color: var(--text-primary); }
+#th-wrapper .th-hub-desc { font-size: 0.76rem; color: var(--text-secondary); }
+#th-wrapper .th-hub-chev { font-size: 20px; color: var(--text-secondary); opacity: 0.7; }

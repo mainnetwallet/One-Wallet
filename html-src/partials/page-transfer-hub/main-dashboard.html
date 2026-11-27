@@ -1,69 +1,61 @@
         <div id="mainDashboard" style="display: none;">
             <div class="section">
-                <div style="padding: 6px 4px 4px 4px;">
-                    <div id="dashboardGrid">
-                        <div class="dashboard-card" onclick="openBatchTransfer()">
-                            <div class="dc-icon-wrap" style="--dc-g1:#667eea;--dc-g2:#764ba2;">
-                                <span class="dc-emoji">📤</span>
-                                <div class="dc-shine"></div>
-                            </div>
-                            <span class="dc-label">Batch Transfer</span>
+                <div class="th-hub">
+                    <div class="th-hub-head"><h1>Transfer Hub</h1><p>Pick a tool to get started</p></div>
+                    <div class="th-hub-tabs" role="tablist">
+                        <button type="button" class="th-hub-tab active" role="tab" aria-selected="true" data-th-tab="send">Send</button>
+                        <button type="button" class="th-hub-tab" role="tab" aria-selected="false" data-th-tab="manage">Manage</button>
+                        <button type="button" class="th-hub-tab" role="tab" aria-selected="false" data-th-tab="tools">Tools</button>
+                    </div>
+                    <div class="th-hub-panel active" role="tabpanel" data-th-panel="send">
+                        <div class="th-hub-row" role="button" tabindex="0" style="--row-c:99,102,241;" onclick="openBatchTransfer()">
+                            <span class="th-hub-icon"><span class="material-icons-round" aria-hidden="true">send</span></span>
+                            <span class="th-hub-text"><span class="th-hub-title">Batch Transfer</span><span class="th-hub-desc">One source, many recipients</span></span>
+                            <span class="material-icons-round th-hub-chev" aria-hidden="true">chevron_right</span>
                         </div>
-                        <div class="dashboard-card" onclick="openMultiKeyNative()">
-                            <div class="dc-icon-wrap" style="--dc-g1:#fa709a;--dc-g2:#f7b731;">
-                                <span class="dc-emoji">🔑</span>
-                                <div class="dc-shine"></div>
-                            </div>
-                            <span class="dc-label">Multi Key Native</span>
+                        <div class="th-hub-row" role="button" tabindex="0" style="--row-c:236,72,153;" onclick="openMultiKeyNative()">
+                            <span class="th-hub-icon"><span class="material-icons-round" aria-hidden="true">vpn_key</span></span>
+                            <span class="th-hub-text"><span class="th-hub-title">Multi Key Native</span><span class="th-hub-desc">Many keys, one target</span></span>
+                            <span class="material-icons-round th-hub-chev" aria-hidden="true">chevron_right</span>
                         </div>
-                        <div class="dashboard-card" onclick="openWalletToWallet()">
-                            <div class="dc-icon-wrap" style="--dc-g1:#f093fb;--dc-g2:#f5576c;">
-                                <span class="dc-emoji">🔄</span>
-                                <div class="dc-shine"></div>
-                            </div>
-                            <span class="dc-label">Wallet to Wallet</span>
+                        <div class="th-hub-row" role="button" tabindex="0" style="--row-c:20,184,166;" onclick="openWalletToWallet()">
+                            <span class="th-hub-icon"><span class="material-icons-round" aria-hidden="true">swap_horiz</span></span>
+                            <span class="th-hub-text"><span class="th-hub-title">Wallet to Wallet</span><span class="th-hub-desc">Direct moves between wallets</span></span>
+                            <span class="material-icons-round th-hub-chev" aria-hidden="true">chevron_right</span>
                         </div>
-                        <div class="dashboard-card" onclick="openSelfTransfer()">
-                            <div class="dc-icon-wrap" style="--dc-g1:#5ee7df;--dc-g2:#b490ca;">
-                                <span class="dc-emoji">↩️</span>
-                                <div class="dc-shine"></div>
-                            </div>
-                            <span class="dc-label">Self Transfer</span>
+                        <div class="th-hub-row" role="button" tabindex="0" style="--row-c:139,92,246;" onclick="openSelfTransfer()">
+                            <span class="th-hub-icon"><span class="material-icons-round" aria-hidden="true">undo</span></span>
+                            <span class="th-hub-text"><span class="th-hub-title">Self Transfer</span><span class="th-hub-desc">Between your own wallets</span></span>
+                            <span class="material-icons-round th-hub-chev" aria-hidden="true">chevron_right</span>
                         </div>
-                        <div class="dashboard-card" onclick="openNftTransfer()">
-                            <div class="dc-icon-wrap" style="--dc-g1:#4facfe;--dc-g2:#00c9ff;">
-                                <span class="dc-emoji">🎨</span>
-                                <div class="dc-shine"></div>
-                            </div>
-                            <span class="dc-label">NFT Transfer</span>
+                        <div class="th-hub-row" role="button" tabindex="0" style="--row-c:14,165,233;" onclick="openNftTransfer()">
+                            <span class="th-hub-icon"><span class="material-icons-round" aria-hidden="true">collections</span></span>
+                            <span class="th-hub-text"><span class="th-hub-title">NFT Transfer</span><span class="th-hub-desc">Send collectibles in bulk</span></span>
+                            <span class="material-icons-round th-hub-chev" aria-hidden="true">chevron_right</span>
                         </div>
-                        <div class="dashboard-card" onclick="openTokenApprovalManager()">
-                            <div class="dc-icon-wrap" style="--dc-g1:#43cea2;--dc-g2:#185a9d;">
-                                <span class="dc-emoji">🎯</span>
-                                <div class="dc-shine"></div>
-                            </div>
-                            <span class="dc-label">Token Approval Manager</span>
+                    </div>
+                    <div class="th-hub-panel" role="tabpanel" data-th-panel="manage">
+                        <div class="th-hub-row" role="button" tabindex="0" style="--row-c:16,185,129;" onclick="openTokenApprovalManager()">
+                            <span class="th-hub-icon"><span class="material-icons-round" aria-hidden="true">verified_user</span></span>
+                            <span class="th-hub-text"><span class="th-hub-title">Token Approval Manager</span><span class="th-hub-desc">Review and revoke approvals</span></span>
+                            <span class="material-icons-round th-hub-chev" aria-hidden="true">chevron_right</span>
                         </div>
-                        <div class="dashboard-card" onclick="openWithdraw()">
-                            <div class="dc-icon-wrap" style="--dc-g1:#ff9a9e;--dc-g2:#f6d365;">
-                                <span class="dc-emoji">💰</span>
-                                <div class="dc-shine"></div>
-                            </div>
-                            <span class="dc-label">Withdraw Manager</span>
+                        <div class="th-hub-row" role="button" tabindex="0" style="--row-c:245,158,11;" onclick="openWithdraw()">
+                            <span class="th-hub-icon"><span class="material-icons-round" aria-hidden="true">payments</span></span>
+                            <span class="th-hub-text"><span class="th-hub-title">Withdraw Manager</span><span class="th-hub-desc">Saved contracts and withdraws</span></span>
+                            <span class="material-icons-round th-hub-chev" aria-hidden="true">chevron_right</span>
                         </div>
-                        <div class="dashboard-card" onclick="openBalanceCheck()">
-                            <div class="dc-icon-wrap" style="--dc-g1:#ff6b6b;--dc-g2:#feca57;">
-                                <span class="dc-emoji">📊</span>
-                                <div class="dc-shine"></div>
-                            </div>
-                            <span class="dc-label">Balance Check</span>
+                    </div>
+                    <div class="th-hub-panel" role="tabpanel" data-th-panel="tools">
+                        <div class="th-hub-row" role="button" tabindex="0" style="--row-c:249,115,22;" onclick="openBalanceCheck()">
+                            <span class="th-hub-icon"><span class="material-icons-round" aria-hidden="true">bar_chart</span></span>
+                            <span class="th-hub-text"><span class="th-hub-title">Balance Check</span><span class="th-hub-desc">Scan many wallets at once</span></span>
+                            <span class="material-icons-round th-hub-chev" aria-hidden="true">chevron_right</span>
                         </div>
-                        <div class="dashboard-card" onclick="openPhraseToKey()">
-                            <div class="dc-icon-wrap" style="--dc-g1:#43e97b;--dc-g2:#38f9d7;">
-                                <span class="dc-emoji">🗝️</span>
-                                <div class="dc-shine"></div>
-                            </div>
-                            <span class="dc-label">Phrase to Key</span>
+                        <div class="th-hub-row" role="button" tabindex="0" style="--row-c:34,197,94;" onclick="openPhraseToKey()">
+                            <span class="th-hub-icon"><span class="material-icons-round" aria-hidden="true">lock_open</span></span>
+                            <span class="th-hub-text"><span class="th-hub-title">Phrase to Key</span><span class="th-hub-desc">Convert a phrase to private keys</span></span>
+                            <span class="material-icons-round th-hub-chev" aria-hidden="true">chevron_right</span>
                         </div>
                     </div>
                 </div>
