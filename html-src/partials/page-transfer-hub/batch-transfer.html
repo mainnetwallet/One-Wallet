@@ -9,11 +9,6 @@
                 <button id="nativeModeBtn" class="mode-toggle-btn active" onclick="switchBatchMode('native')">Native</button>
                 <button id="tokenModeBtn" class="mode-toggle-btn" onclick="switchBatchMode('token')">Token</button>
             </div>
-            <!-- Gas type: one shared setting for Deploy + Execute (tap to change) -->
-            <button type="button" class="bt-gaspill" onclick="window._ngCycle()" aria-label="Gas type, tap to change" title="Gas type - tap to change">
-                <span class="material-icons-round bt-gaspill-ico">local_gas_station</span>
-                <span class="sw-gas-pill-label bt-gaspill-label">AUTO</span>
-            </button>
         </div>
 
         <!-- Native Mode Content -->
@@ -112,6 +107,14 @@
 
             <!-- Action dock: gas type + Deploy / Execute (stays visible above the bottom nav) -->
             <div class="bt-dock">
+            <!-- Gas type (single shared setting for Deploy + Execute; tap to change) -->
+            <div class="bt-gasrow">
+                <button type="button" class="bt-gaspill" onclick="window._ngCycle()" aria-label="Gas type, tap to change" title="Gas type - tap to change">
+                    <span class="material-icons-round bt-gaspill-ico">local_gas_station</span>
+                    <span class="sw-gas-pill-label bt-gaspill-label">AUTO</span>
+                </button>
+            </div>
+
             <!-- Execute -->
             <div class="execute-section bt-actions">
                 <button class="btn btn-primary" id="deployBtn" onclick="deployAndTransfer()" disabled>Deploy</button>
@@ -252,6 +255,14 @@
 
             <!-- Action dock: gas type + Deploy / Execute (stays visible above the bottom nav) -->
             <div class="bt-dock">
+            <!-- Gas type (single shared setting for Deploy + Execute; tap to change) -->
+            <div class="bt-gasrow">
+                <button type="button" class="bt-gaspill" onclick="window._ngCycle()" aria-label="Gas type, tap to change" title="Gas type - tap to change">
+                    <span class="material-icons-round bt-gaspill-ico">local_gas_station</span>
+                    <span class="sw-gas-pill-label bt-gaspill-label">AUTO</span>
+                </button>
+            </div>
+
             <!-- Execute -->
             <div class="execute-section bt-actions">
                 <button class="btn btn-primary" id="deployBtnToken" onclick="deployContractToken()" disabled>Deploy</button>
