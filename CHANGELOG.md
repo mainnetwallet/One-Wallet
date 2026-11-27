@@ -6,6 +6,9 @@ Per-build release notes are published on the [Releases](../../releases) page.
 ## [Unreleased]
 
 ### Fixed
+- **dApp requests could hang forever when the rejection message contained a quote:** the error text sent back to the
+  dApp was escaped in the wrong order, producing a script error, so the dApp's request never finished. The message is
+  now safely encoded and the request always ends with the rejection.
 - **Security: the native network helper accepted any address and any response size (partial fix):** it now only
   talks to `https://` addresses, refuses loopback, local-network and link-local addresses, stops reading a response
   after 8 MB, and ignores calls with a malformed callback id. A per-host allow-list is not included yet because this

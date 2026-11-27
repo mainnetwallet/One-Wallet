@@ -1503,8 +1503,10 @@ public class InAppBrowserActivity extends AppCompatActivity {
         if (wv == null) wv = a.activeWebView();
         if (wv == null) return;
         final WebView target = wv;
-        String safeMsg = message == null ? "User rejected" : message.replace("\"", "\\\"").replace("\\", "\\\\");
-        target.post(() -> target.evaluateJavascript("window._oneW3Reject && window._oneW3Reject(" + reqId + ", \"" + safeMsg + "\");", null));
+        // jsStr() JSON-quotes the message (backslash, quote, newlines, U+2028/9), so any reject text
+        // reaches the dApp as a valid JS string and its promise always settles.
+        String safeMsg = jsStr(message == null ? "User rejected" : message);
+        target.post(() -> target.evaluateJavascript("window._oneW3Reject && window._oneW3Reject(" + reqId + ", " + safeMsg + ");", null));
     }
 
     public static void updateAccountState(final String accountsJson, final String chainId) {
