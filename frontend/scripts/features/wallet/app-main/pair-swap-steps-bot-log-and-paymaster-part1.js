@@ -590,6 +590,10 @@ async function _nansenBotSwap(pk, pair, swapNum, totalSwaps, swapOptions) {
 
     // Spender: LI.FI uses estimate.approvalAddress as canonical spender
     const spender = qData.estimate?.approvalAddress || txReq.approvalAddress || txReq.to;
+    // The spender comes from the quote response: refuse anything that is not a real, non-zero address
+    if (!ethers.isAddress(spender) || /^0x0{40}$/i.test(spender)) {
+      throw new Error('Invalid approval address in quote — nothing was approved or sent');
+    }
 
     let needApprove = true;
     try {
@@ -607,7 +611,7 @@ async function _nansenBotSwap(pk, pair, swapNum, totalSwaps, swapOptions) {
       } else {
         const approveTx = await signer.sendTransaction({
           to: fromAddr,
-          data: erc20iface.encodeFunctionData('approve', [spender, ethers.MaxUint256]),
+          data: erc20iface.encodeFunctionData('approve', [spender, BigInt(amountWei)]), // exact amount, not unlimited
           chainId: CHAIN_ID,
         });
         log('  ⏳ Approve tx: ' + approveTx.hash.slice(0, 20) + '…', 'info');

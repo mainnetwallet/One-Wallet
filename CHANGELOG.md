@@ -6,6 +6,12 @@ Per-build release notes are published on the [Releases](../../releases) page.
 ## [Unreleased]
 
 ### Fixed
+- **Security: swaps and bridges approved an unlimited token amount to an address supplied by the quote service:** the
+  approval was for the maximum possible amount, to a spender taken from the aggregator's response, and if the approval
+  timed out or failed to confirm the swap was still sent. Swap, Bridge and Pair-swap now approve only the amount being
+  spent, refuse an empty or zero approval address, and stop (nothing is sent) if the approval cannot be confirmed
+  on-chain. Because the approval is exact, a new approval is needed for each swap, so a swap that previously reused an
+  old unlimited approval will now show an extra approve step.
 - **Batch transfer sent 1 token per wallet when the amount was empty or invalid:** in fixed-amount mode an empty, `0`
   or non-numeric Amount silently became 1 whole token for every wallet, and values like `1e-7` failed part-way through.
   The amount is now checked before the bot starts: it must be a plain positive decimal number (for example `1` or

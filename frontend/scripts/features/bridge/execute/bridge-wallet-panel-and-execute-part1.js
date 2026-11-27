@@ -617,13 +617,17 @@
         // Using wrong approval target = router has no allowance → TX revert (main same-chain bug).
         const _approvalAddr = txReq.approvalAddress
           || ((_routeSteps[0] && (_routeSteps[0].estimate?.approvalAddress || _routeSteps[0].action?.approvalAddress)) || txReq.to);
+        // The spender comes from the quote response: refuse anything that is not a real, non-zero address
+        if (!ethers.isAddress(_approvalAddr) || _approvalAddr.toLowerCase() === zeroAddr) {
+          throw new Error('Invalid approval address in route — nothing was approved or sent');
+        }
         const allowance = await tokenC.allowance(wallet.address, _approvalAddr);
         if (allowance < fromAmt) {
           if (usePaymaster) {
             if (labelEl) labelEl.textContent = '⛽ Sponsoring approve…';
             let _approveSponsored = false;
             try {
-              const approveData = tokenC.interface.encodeFunctionData('approve', [_approvalAddr, ethers.MaxUint256]);
+              const approveData = tokenC.interface.encodeFunctionData('approve', [_approvalAddr, fromAmt]);
               await sendSwapViaUserOp(wallet, { to: br.fromToken.address, value: '0x0', data: approveData }, provider, () => {});
               _approveSponsored = true;
             } catch (_appSponsorErr) {
@@ -633,14 +637,14 @@
             }
             if (!_approveSponsored) {
               if (labelEl) labelEl.textContent = 'Approving token…';
-              const appTx = await tokenC.approve(_approvalAddr, ethers.MaxUint256);
+              const appTx = await tokenC.approve(_approvalAddr, fromAmt);
               try {
                 await Promise.race([appTx.wait(1), new Promise((_, rej) => setTimeout(() => rej(new Error('approve timeout')), 60000))]);
               } catch(_appWaitErr) { /* timeout — proceed anyway */ }
             }
           } else {
             if (labelEl) labelEl.textContent = 'Approving token…';
-            const appTx = await tokenC.approve(_approvalAddr, ethers.MaxUint256);
+            const appTx = await tokenC.approve(_approvalAddr, fromAmt);
             try {
               await Promise.race([appTx.wait(1), new Promise((_, rej) => setTimeout(() => rej(new Error('approve timeout')), 60000))]);
             } catch(_appWaitErr) {
@@ -654,6 +658,14 @@
               }
             }
           }
+          // Stop if the approval did not land on-chain. A timeout / failed wait used to be ignored
+          // and the swap was sent anyway.
+          let _allowanceOk = false;
+          for (let _ai = 0; _ai < 8 && !_allowanceOk; _ai++) {
+            try { _allowanceOk = (await tokenC.allowance(wallet.address, _approvalAddr)) >= fromAmt; } catch(_) {}
+            if (!_allowanceOk) await new Promise(r => setTimeout(r, 2500));
+          }
+          if (!_allowanceOk) throw new Error('Approve not confirmed on-chain — nothing was sent. Please try again.');
           if (labelEl) labelEl.textContent = '✅ Approved';
           await new Promise(r => setTimeout(r, 800));
         }
