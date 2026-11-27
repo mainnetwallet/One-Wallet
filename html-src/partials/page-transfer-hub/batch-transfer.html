@@ -101,6 +101,14 @@
                 </div>
             </div>
 
+            <!-- Gas type (single shared setting for Deploy + Execute; tap to change) -->
+            <div class="bt-gasrow">
+                <button type="button" class="bt-gaspill" onclick="window._ngCycle()" aria-label="Gas type, tap to change" title="Gas type - tap to change">
+                    <span class="material-icons-round bt-gaspill-ico">local_gas_station</span>
+                    <span class="sw-gas-pill-label bt-gaspill-label">AUTO</span>
+                </button>
+            </div>
+
             <!-- Execute -->
             <div class="execute-section bt-actions">
                 <button class="btn btn-primary" id="deployBtn" onclick="deployAndTransfer()" disabled>Deploy</button>
@@ -231,6 +239,14 @@
                     </div>
                     <div class="saved-contracts" id="savedContractsListToken"></div>
                 </div>
+            </div>
+
+            <!-- Gas type (single shared setting for Deploy + Execute; tap to change) -->
+            <div class="bt-gasrow">
+                <button type="button" class="bt-gaspill" onclick="window._ngCycle()" aria-label="Gas type, tap to change" title="Gas type - tap to change">
+                    <span class="material-icons-round bt-gaspill-ico">local_gas_station</span>
+                    <span class="sw-gas-pill-label bt-gaspill-label">AUTO</span>
+                </button>
             </div>
 
             <!-- Execute -->

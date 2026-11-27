@@ -6,6 +6,10 @@ Per-build release notes are published on the [Releases](../../releases) page.
 ## [Unreleased]
 
 ### Changed
+- **Batch Transfer gas type:** one small gas pill (top-right of the Deploy / Execute row) replaces the two duplicate
+  Gas Type boxes. It shows only the current mode (AUTO by default); tap it to switch AUTO → 1559 → LEGACY. The same
+  setting is used for Deploy and Execute, and the choice is now remembered across app restarts.
+- **Batch Transfer buttons:** Deploy (left) and Execute transfer (right) sit side by side again.
 - **Transfer Hub home redesigned:** the 3×3 emoji icon grid is replaced by a clean list with Send / Manage / Tools tabs,
   a short description under each tool, and theme-aware colors (works in dark and light mode). All tools open exactly as before.
 - **Batch Transfer redesigned to fit one screen:** wallet, recipients, amount, contract and the Deploy / Execute buttons

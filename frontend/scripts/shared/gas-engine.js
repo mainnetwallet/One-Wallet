@@ -359,7 +359,11 @@ window.toggleThemeMode = function() {
    GAS MODE TOGGLE — Auto / EIP-1559 / Legacy
    Gas engine: v3 — gasPrice-based EIP-1559 + instant Legacy fallback
    ───────────────────────────────────────────────────────────── */
-window.OneGasMode = 'auto'; // default
+window.OneGasMode = 'auto'; // default (restored from the saved choice below)
+try {
+  var _savedGas = localStorage.getItem('one-gas-mode');
+  if (_savedGas === 'auto' || _savedGas === 'eip1559' || _savedGas === 'legacy') window.OneGasMode = _savedGas;
+} catch (e) {}
 
 (function _injectGasToggle() {
   const TOGGLE_HTML = `
@@ -423,7 +427,11 @@ window.OneGasMode = 'auto'; // default
   }
 
   const _ngSetBase = window._ngSet;
-  window._ngSet = function(mode) { _ngSetBase(mode); _ngSyncPills(mode); };
+  window._ngSet = function(mode) {
+    _ngSetBase(mode);
+    _ngSyncPills(mode);
+    try { localStorage.setItem('one-gas-mode', mode); } catch (e) {}   // remember the choice
+  };
 
   window._ngCycle = function() {
     const order = ['auto', 'eip1559', 'legacy'];
@@ -467,10 +475,6 @@ window.OneGasMode = 'auto'; // default
     // ── Transfer Hub sections — inject above each execute button ──
     const _thTargets = [
       // [buttonId, toggleId]
-      ['deployBtn',                      'th-batch-native-deploy'],
-      ['deployBtnToken',                 'th-batch-token-deploy'],
-      ['executeBtn',                     'th-batch-native'],
-      ['executeBtnToken',                'th-batch-token'],
       ['executeDirectBtnMultiKeyNative', 'th-mkn-direct'],
       ['executeBtnMultiKeyNative',       'th-mkn-contract'],
       ['executeBtnMultiKeyToken',        'th-mkt'],
@@ -505,11 +509,17 @@ window.OneGasMode = 'auto'; // default
       }
     });
 
+  function _ngRestore() { window._ngSet(window.OneGasMode || 'auto'); }
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => { setTimeout(_tryInject, 800); setTimeout(_tryInject, 2000); });
+    document.addEventListener('DOMContentLoaded', () => {
+      setTimeout(_ngRestore, 100);
+      setTimeout(() => { _tryInject(); _ngRestore(); }, 800);
+      setTimeout(() => { _tryInject(); _ngRestore(); }, 2000);
+    });
   } else {
-    setTimeout(_tryInject, 800);
-    setTimeout(_tryInject, 2000);
+    setTimeout(_ngRestore, 100);
+    setTimeout(() => { _tryInject(); _ngRestore(); }, 800);
+    setTimeout(() => { _tryInject(); _ngRestore(); }, 2000);
   }
 })();
 
