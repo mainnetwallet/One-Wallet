@@ -63,7 +63,7 @@
   /* ── ANTI-FLICKER: Modal content panels — GPU promoted ── */
   /* These slide up via transform, so they NEED translateZ(0) pre-promotion */
   .hcp-modal, .wg-edit-box,
-  .txh-modal, #sw-settings-sheet,
+  .txh-modal,
   #sw-wallet-panel, #br-wallet-panel {
     will-change: transform;
     transform: translateY(100%) translateZ(0);
