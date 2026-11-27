@@ -1,0 +1,46 @@
+/* ══════════════════════════════════════════════════
+   AMOUNT PER TRANSFER CENTRED — Multi Key Recipients + Batch Transfer (Native and Token)
+   Same look as W2W (th-w2w-compact.css): label and value in the middle of the card, unit pinned to the right edge.
+   The side control that used to sit next to the amount (Send mode / Batch size) moves to its own compact row under it.
+   Loaded after transfer-hub-multikey-form-redesign.css; selectors carry the same specificity so source order decides.
+   Markup: html-src/partials/page-transfer-hub/multikey-native.html, batch-transfer.html (unchanged)
+   ══════════════════════════════════════════════════ */
+
+        #th-wrapper :is(#batchTransferUI, #multiKeyNativeUI) :is(#nativeModeContent, #tokenModeContent, #multiKeyNativeModeContent, #multiKeyTokenModeContent) .bt-amt-grid {
+            grid-template-columns: minmax(0, 1fr);
+            gap: 8px;
+        }
+        #th-wrapper :is(#batchTransferUI, #multiKeyNativeUI) :is(#nativeModeContent, #tokenModeContent, #multiKeyNativeModeContent, #multiKeyTokenModeContent) .bt-amt-main .bt-cap {
+            text-align: center;
+        }
+        #th-wrapper :is(#batchTransferUI, #multiKeyNativeUI) :is(#nativeModeContent, #tokenModeContent, #multiKeyNativeModeContent, #multiKeyTokenModeContent) .bt-amt-input {
+            position: relative;
+            justify-content: center;
+            border-image: linear-gradient(90deg, rgba(139,92,246,0.35), var(--accent-primary), rgba(139,92,246,0.35)) 1;
+        }
+        #th-wrapper :is(#batchTransferUI, #multiKeyNativeUI) :is(#nativeModeContent, #tokenModeContent, #multiKeyNativeModeContent, #multiKeyTokenModeContent) .bt-amt-input input {
+            flex: 1;
+            text-align: center;
+            padding: 2px 56px !important;
+        }
+        #th-wrapper :is(#batchTransferUI, #multiKeyNativeUI) :is(#nativeModeContent, #tokenModeContent, #multiKeyNativeModeContent, #multiKeyTokenModeContent) .bt-amt-input .bt-unit {
+            position: absolute;
+            right: 2px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+/* Send mode / Batch size: label on the left, control on the right, one short row */
+        #th-wrapper :is(#batchTransferUI, #multiKeyNativeUI) :is(#nativeModeContent, #tokenModeContent, #multiKeyNativeModeContent, #multiKeyTokenModeContent) :is(.mk-send, .bt-batch) {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+        }
+        #th-wrapper :is(#batchTransferUI, #multiKeyNativeUI) :is(#nativeModeContent, #tokenModeContent, #multiKeyNativeModeContent, #multiKeyTokenModeContent) :is(.mk-send, .bt-batch) .bt-cap {
+            display: block;
+            margin-bottom: 0 !important;
+        }
+        #th-wrapper :is(#batchTransferUI, #multiKeyNativeUI) :is(#nativeModeContent, #tokenModeContent, #multiKeyNativeModeContent, #multiKeyTokenModeContent) .mk-send .mk-send-seg {
+            min-width: 150px;
+        }
