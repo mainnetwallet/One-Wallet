@@ -5,6 +5,14 @@
     @android.webkit.JavascriptInterface <methods>;
 }
 
+# Keep every @JavascriptInterface method in the app, including the dApp bridge
+# (InAppBrowserActivity$OneWeb3Bridge). These methods are only called by name from page JS, so R8
+# would otherwise treat them as unused and remove or rename them in release builds.
+-keepclassmembers class com.one.wallet.** {
+    @android.webkit.JavascriptInterface <methods>;
+}
+-keepattributes JavascriptInterface
+
 # Keep MainActivity & ForegroundService
 -keep class com.one.wallet.MainActivity { *; }
 -keep class com.one.wallet.service.OneForegroundService { *; }

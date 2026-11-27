@@ -6,6 +6,10 @@ Per-build release notes are published on the [Releases](../../releases) page.
 ## [Unreleased]
 
 ### Fixed
+- **Release builds could lose the dApp connection bridge:** only the main wallet bridge was protected from code
+  shrinking, so the in-app browser's dApp bridge (connect, sign, send) could be renamed or removed in release builds.
+  All bridge methods are now kept. This was fixed from the build configuration and still needs a release-build check
+  on a device (connect, sign and send from a dApp).
 - **The site name on the dApp approval sheet could belong to a different tab:** the name came from the last page that
   started loading in any tab, so with several tabs open the sheet could show another site's name. It now shows the
   address of the tab that actually sent the request.
