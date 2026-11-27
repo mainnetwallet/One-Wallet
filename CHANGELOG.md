@@ -6,6 +6,9 @@ Per-build release notes are published on the [Releases](../../releases) page.
 ## [Unreleased]
 
 ### Fixed
+- **Security: web pages in the in-app browser could launch other apps without a tap:** any non-web link a page loaded
+  (including from a redirect or script) was handed straight to Android. Now only `mailto:`, `tel:`, `sms:` and
+  `wc:` links are passed on, and only when you tap them; all other schemes are ignored.
 - **Security: any web page in the in-app browser could switch your chain or wallet, or open non-web links:** pages
   could call the wallet and chain "selected" callbacks and make the browser remember whatever they sent, and could ask the
   browser to open a tab for any kind of link. Those callbacks are removed; the chain and wallet now change only when

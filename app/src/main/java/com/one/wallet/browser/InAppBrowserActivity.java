@@ -146,6 +146,15 @@ public class InAppBrowserActivity extends AppCompatActivity {
     public static boolean isValidAddress(String s) { return s != null && ADDRESS_RE.matcher(s).matches(); }
     public static boolean isValidChainId(String s) { return s != null && CHAIN_ID_RE.matcher(s).matches(); }
     /** True only for absolute http(s) URLs; page JS must not open other schemes (file:, intent:, javascript:). */
+    private static final java.util.Set<String> EXTERNAL_SCHEMES =
+        new java.util.HashSet<>(java.util.Arrays.asList("mailto", "tel", "sms", "smsto", "wc"));
+
+    /** Schemes a dApp page may hand to the system after a user tap. */
+    static boolean isAllowedExternalScheme(Uri u) {
+        String sch = u != null ? u.getScheme() : null;
+        return sch != null && EXTERNAL_SCHEMES.contains(sch.toLowerCase(java.util.Locale.ROOT));
+    }
+
     static boolean isHttpUrl(String url) {
         if (url == null) return false;
         String u = url.trim().toLowerCase(java.util.Locale.ROOT);
@@ -1152,11 +1161,17 @@ public class InAppBrowserActivity extends AppCompatActivity {
             public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
                 String url = request.getUrl().toString();
                 if (url.startsWith("http://") || url.startsWith("https://")) return false;
-                try {
-                    Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-                    i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    startActivity(i);
-                } catch (Exception ignored) {}
+                // Non-web links: only well-known schemes, only after a real user tap (never from a
+                // redirect or script), and only as a plain browsable VIEW intent. Everything else
+                // (intent:, file:, content:, javascript:, market:, custom app schemes) is dropped.
+                if (request.hasGesture() && !request.isRedirect() && isAllowedExternalScheme(request.getUrl())) {
+                    try {
+                        Intent i = new Intent(Intent.ACTION_VIEW, request.getUrl());
+                        i.addCategory(Intent.CATEGORY_BROWSABLE);
+                        i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(i);
+                    } catch (Exception ignored) {}
+                }
                 return true;
             }
         });
