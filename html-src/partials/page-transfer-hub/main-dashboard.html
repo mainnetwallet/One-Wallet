@@ -2,12 +2,8 @@
             <div class="section">
                 <div class="th-hub">
                     <div class="th-hub-head"><h1>Transfer Hub</h1><p>Pick a tool to get started</p></div>
-                    <div class="th-hub-tabs" role="tablist">
-                        <button type="button" class="th-hub-tab active" role="tab" aria-selected="true" data-th-tab="send">Send</button>
-                        <button type="button" class="th-hub-tab" role="tab" aria-selected="false" data-th-tab="manage">Manage</button>
-                        <button type="button" class="th-hub-tab" role="tab" aria-selected="false" data-th-tab="tools">Tools</button>
-                    </div>
-                    <div class="th-hub-panel active" role="tabpanel" data-th-panel="send">
+                    <div class="th-hub-label">Send</div>
+                    <div class="th-hub-panel" role="group" aria-label="Send" data-th-panel="send">
                         <div class="th-hub-row" role="button" tabindex="0" style="--row-c:99,102,241;" onclick="openBatchTransfer()">
                             <span class="th-hub-icon"><span class="material-icons-round" aria-hidden="true">send</span></span>
                             <span class="th-hub-text"><span class="th-hub-title">Batch Transfer</span><span class="th-hub-desc">One source, many recipients</span></span>
@@ -34,7 +30,8 @@
                             <span class="material-icons-round th-hub-chev" aria-hidden="true">chevron_right</span>
                         </div>
                     </div>
-                    <div class="th-hub-panel" role="tabpanel" data-th-panel="manage">
+                    <div class="th-hub-label">Manage</div>
+                    <div class="th-hub-panel" role="group" aria-label="Manage" data-th-panel="manage">
                         <div class="th-hub-row" role="button" tabindex="0" style="--row-c:16,185,129;" onclick="openTokenApprovalManager()">
                             <span class="th-hub-icon"><span class="material-icons-round" aria-hidden="true">verified_user</span></span>
                             <span class="th-hub-text"><span class="th-hub-title">Token Approval Manager</span><span class="th-hub-desc">Review and revoke approvals</span></span>
@@ -46,7 +43,8 @@
                             <span class="material-icons-round th-hub-chev" aria-hidden="true">chevron_right</span>
                         </div>
                     </div>
-                    <div class="th-hub-panel" role="tabpanel" data-th-panel="tools">
+                    <div class="th-hub-label">Tools</div>
+                    <div class="th-hub-panel" role="group" aria-label="Tools" data-th-panel="tools">
                         <div class="th-hub-row" role="button" tabindex="0" style="--row-c:249,115,22;" onclick="openBalanceCheck()">
                             <span class="th-hub-icon"><span class="material-icons-round" aria-hidden="true">bar_chart</span></span>
                             <span class="th-hub-text"><span class="th-hub-title">Balance Check</span><span class="th-hub-desc">Scan many wallets at once</span></span>
