@@ -6,6 +6,9 @@ Per-build release notes are published on the [Releases](../../releases) page.
 ## [Unreleased]
 
 ### Changed
+- **Batch Transfer buttons scroll again:** Deploy / Execute transfer are no longer pinned; they scroll with the form
+  like before (gas pill above them, Logs below, collapsed by default). The page keeps its bottom padding so they
+  can always be scrolled fully above the bottom nav.
 - **Batch Transfer logs position:** Logs now sit below the docked Deploy / Execute row (still collapsed by default,
   tap the row to expand) instead of inside the scrolling form; the progress bar moved into the dock.
 - **Batch Transfer layout fix:** the page is now a flex column while Batch Transfer is open - the form scrolls and the
