@@ -119,34 +119,34 @@
         #th-wrapper #multiKeyNativeUI #contractTransferSection .bt-gasrow { margin-bottom: 8px; }
         #th-wrapper #multiKeyNativeUI #contractTransferSection .bt-contract { margin-bottom: 6px; }
 
-/* ── Compact pass: tighter gaps/heights in both modes so Deploy / Execute / Start sit above the bottom nav ── */
-        #th-wrapper #multiKeyNativeUI .th-section-header { padding: 4px 0 4px !important; margin-bottom: 2px !important; }
-        #th-wrapper #multiKeyNativeUI .bt-seg-wrap { margin: 0 0 6px; }
-        #th-wrapper #multiKeyNativeUI :is(#multiKeyNativeModeContent, #multiKeyTokenModeContent) .bt-card { margin-bottom: 5px; }
-        #th-wrapper #multiKeyNativeUI :is(#multiKeyNativeModeContent, #multiKeyTokenModeContent) .bt-row { padding: 6px 11px; }
-        #th-wrapper #multiKeyNativeUI :is(#multiKeyNativeModeContent, #multiKeyTokenModeContent) .bt-head { margin-bottom: 3px; }
-        #th-wrapper #multiKeyNativeUI :is(#multiKeyNativeModeContent, #multiKeyTokenModeContent) .bt-select { height: 28px; }
+/* ── Spacing pass: slightly looser than the tight compact layout (still keeps actions near the bottom nav) ── */
+        #th-wrapper #multiKeyNativeUI .th-section-header { padding: 6px 0 5px !important; margin-bottom: 4px !important; }
+        #th-wrapper #multiKeyNativeUI .bt-seg-wrap { margin: 0 0 8px; }
+        #th-wrapper #multiKeyNativeUI :is(#multiKeyNativeModeContent, #multiKeyTokenModeContent) .bt-card { margin-bottom: 7px; }
+        #th-wrapper #multiKeyNativeUI :is(#multiKeyNativeModeContent, #multiKeyTokenModeContent) .bt-row { padding: 9px 11px; }
+        #th-wrapper #multiKeyNativeUI :is(#multiKeyNativeModeContent, #multiKeyTokenModeContent) .bt-head { margin-bottom: 5px; }
+        #th-wrapper #multiKeyNativeUI :is(#multiKeyNativeModeContent, #multiKeyTokenModeContent) .bt-select { height: 30px; }
         #th-wrapper #multiKeyNativeUI :is(#multiKeyNativeModeContent, #multiKeyTokenModeContent) .bt-row .mk-keys .sk-key-textarea {
-            height: 56px !important;
-            min-height: 56px !important;
+            height: 66px !important;
+            min-height: 66px !important;
             max-height: 140px !important;
         }
-        #th-wrapper #multiKeyNativeUI .mk-meta { margin-top: 3px; }
-        #th-wrapper #multiKeyNativeUI :is(#multiKeyNativeModeContent, #multiKeyTokenModeContent) .bt-amount { padding: 6px 11px; }
-        #th-wrapper #multiKeyNativeUI :is(#multiKeyNativeModeContent, #multiKeyTokenModeContent) .bt-amt-grid { margin-bottom: 4px; }
-        #th-wrapper #multiKeyNativeUI :is(#multiKeyNativeModeContent, #multiKeyTokenModeContent) .bt-amt-input input { min-height: 26px !important; padding: 0 !important; }
-        #th-wrapper #multiKeyNativeUI :is(#multiKeyNativeModeContent, #multiKeyTokenModeContent) .bt-summary { padding: 6px 14px; margin-bottom: 5px; }
-        #th-wrapper #multiKeyNativeUI :is(#multiKeyNativeModeContent, #multiKeyTokenModeContent) .bt-crow { padding: 2px 6px 2px 12px; }
-        #th-wrapper #multiKeyNativeUI :is(#multiKeyNativeModeContent, #multiKeyTokenModeContent) .bt-iconbtn { width: 32px; height: 32px; }
+        #th-wrapper #multiKeyNativeUI .mk-meta { margin-top: 5px; }
+        #th-wrapper #multiKeyNativeUI :is(#multiKeyNativeModeContent, #multiKeyTokenModeContent) .bt-amount { padding: 9px 11px; }
+        #th-wrapper #multiKeyNativeUI :is(#multiKeyNativeModeContent, #multiKeyTokenModeContent) .bt-amt-grid { margin-bottom: 7px; }
+        #th-wrapper #multiKeyNativeUI :is(#multiKeyNativeModeContent, #multiKeyTokenModeContent) .bt-amt-input input { min-height: 30px !important; padding: 2px 0 !important; }
+        #th-wrapper #multiKeyNativeUI :is(#multiKeyNativeModeContent, #multiKeyTokenModeContent) .bt-summary { padding: 9px 14px; margin-bottom: 7px; }
+        #th-wrapper #multiKeyNativeUI :is(#multiKeyNativeModeContent, #multiKeyTokenModeContent) .bt-crow { padding: 4px 6px 4px 12px; }
+        #th-wrapper #multiKeyNativeUI :is(#multiKeyNativeModeContent, #multiKeyTokenModeContent) .bt-iconbtn { width: 34px; height: 34px; }
         #th-wrapper #multiKeyNativeUI .bt-gasrow,
         #th-wrapper #multiKeyNativeUI #directTransferSection .bt-gasrow,
-        #th-wrapper #multiKeyNativeUI #contractTransferSection .bt-gasrow { margin-bottom: 4px; }
-        #th-wrapper #multiKeyNativeUI :is(#multiKeyNativeModeContent, #multiKeyTokenModeContent) .bt-actions { margin-bottom: 4px !important; }
-        #th-wrapper #multiKeyNativeUI :is(#multiKeyNativeModeContent, #multiKeyTokenModeContent) .bt-actions .btn { min-height: 42px !important; }
-        #th-wrapper #multiKeyNativeUI .mk-note { margin: 0 2px 5px; }
-        #th-wrapper #multiKeyNativeUI :is(#multiKeyNativeModeContent, #multiKeyTokenModeContent) .bt-dock .progress-bar { margin: 4px 0 0 !important; }
-        #th-wrapper #multiKeyNativeUI :is(#multiKeyNativeModeContent, #multiKeyTokenModeContent) .bt-logs { padding: 2px 0 0 !important; }
-        #th-wrapper #multiKeyNativeUI :is(#multiKeyNativeModeContent, #multiKeyTokenModeContent) .bt-logs .bt-loghead { height: 34px; }
+        #th-wrapper #multiKeyNativeUI #contractTransferSection .bt-gasrow { margin-bottom: 7px; }
+        #th-wrapper #multiKeyNativeUI :is(#multiKeyNativeModeContent, #multiKeyTokenModeContent) .bt-actions { margin-bottom: 7px !important; }
+        #th-wrapper #multiKeyNativeUI :is(#multiKeyNativeModeContent, #multiKeyTokenModeContent) .bt-actions .btn { min-height: 46px !important; }
+        #th-wrapper #multiKeyNativeUI .mk-note { margin: 2px 2px 8px; }
+        #th-wrapper #multiKeyNativeUI :is(#multiKeyNativeModeContent, #multiKeyTokenModeContent) .bt-dock .progress-bar { margin: 6px 0 0 !important; }
+        #th-wrapper #multiKeyNativeUI :is(#multiKeyNativeModeContent, #multiKeyTokenModeContent) .bt-logs { padding: 4px 0 0 !important; }
+        #th-wrapper #multiKeyNativeUI :is(#multiKeyNativeModeContent, #multiKeyTokenModeContent) .bt-logs .bt-loghead { height: 38px; }
 
 /* ── Single action buttons (Execute direct transfer / Start transfer): centred ── */
         #th-wrapper #multiKeyNativeUI #directTransferSection .bt-actions,
