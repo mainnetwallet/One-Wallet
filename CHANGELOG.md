@@ -6,6 +6,9 @@ Per-build release notes are published on the [Releases](../../releases) page.
 ## [Unreleased]
 
 ### Fixed
+- **Security: screens showing private keys could be captured:** screenshots, screen recording, screen casting and the
+  app-switcher (Recents) preview could capture wallet screens that display private keys and recovery phrases. The main
+  wallet window now blocks all of these. Note: this also means you can no longer take screenshots of the wallet screens.
 - **Pull-to-refresh could wipe the Bridge form during a bridge, and a cancelled pull left it stuck:** pulling down on
   the Bridge page while a bridge or swap was running cleared the selected route, amount and recipient mid-transaction.
   Pull-to-refresh is now ignored on the Bridge page while a transaction is running. Also, if a pull was interrupted
