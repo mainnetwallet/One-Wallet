@@ -6,6 +6,10 @@ Per-build release notes are published on the [Releases](../../releases) page.
 ## [Unreleased]
 
 ### Fixed
+- **Pull-to-refresh could wipe the Bridge form during a bridge, and a cancelled pull left it stuck:** pulling down on
+  the Bridge page while a bridge or swap was running cleared the selected route, amount and recipient mid-transaction.
+  Pull-to-refresh is now ignored on the Bridge page while a transaction is running. Also, if a pull was interrupted
+  (for example by a system gesture), the pull state and indicator are now reset instead of staying active.
 - **Release builds could lose the dApp connection bridge:** only the main wallet bridge was protected from code
   shrinking, so the in-app browser's dApp bridge (connect, sign, send) could be renamed or removed in release builds.
   All bridge methods are now kept. This was fixed from the build configuration and still needs a release-build check

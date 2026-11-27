@@ -826,7 +826,9 @@ __NX._initPTR = _initPTR;
         pulling = false;
         var _thForce = ownPage === 'transfer-hub' && _thHasRunning();
         var _effThresh = PTR_THRESHOLD;
-        if (pullDist >= _effThresh && !triggered) {
+        // Never refresh (which clears the route, amount and recipient) while a bridge execution is running.
+        var _brBusy = ownPage === 'bridge' && !!window.brRunning;
+        if (pullDist >= _effThresh && !triggered && !_brBusy) {
           triggered = true;
           _ptrStopMode = _thForce;
           _showRefreshing();
@@ -850,6 +852,19 @@ __NX._initPTR = _initPTR;
             indicator.style.opacity    = '0';
           }, 50);
         }
+      }, { passive: true });
+
+      // A cancelled touch (system gesture, incoming call, palm rejection) never fires touchend, which used to
+      // leave `pulling` set with a stale pullDist. Reset everything and hide the indicator.
+      scrollEl.addEventListener('touchcancel', function() {
+        pulling = false; triggered = false; pullDist = 0;
+        if (refreshing) return;
+        _setIndicator(0);
+        setTimeout(function() {
+          indicator.style.transition = 'transform 0.3s ease, opacity 0.3s ease';
+          indicator.style.transform  = 'translateY(-100%)';
+          indicator.style.opacity    = '0';
+        }, 50);
       }, { passive: true });
     }
 
