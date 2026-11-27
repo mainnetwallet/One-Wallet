@@ -119,6 +119,7 @@ Per-build release notes are published on the [Releases](../../releases) page.
   could refresh (clear) the page. Pull-to-refresh on Bridge now only starts when the routes list is scrolled to its top.
 
 ### Changed
+- **New app icon and logo:** a bold white "1" on a violet-to-cyan gradient replaces the previous glossy wallet icon. Updated the launcher icons (square and round), the browser favicon and the files in `docs/branding/`. All of them are generated from one definition by `tools/make_brand_assets.py`.
 - **BRIDGE NOW / SWAP NOW button look:** the button is now a compact pill (fits its content, centred) with a `#e3edb7`
   soft gradient, dark text and a soft tinted shadow, in both dark and light theme. The look now lives in one CSS rule
   (`#br-exec-btn` in `styles/base/bridge-cards-bottom-nav-and-fab.css`, via `--br-exec-*` variables); scripts no longer
