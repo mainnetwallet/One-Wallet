@@ -1,14 +1,15 @@
-    <!-- Wallet to Wallet Transfer Section -->
-    <div id="walletToWalletUI" style="display: none;">
+    <!-- Wallet to Wallet Transfer — compact single-screen layout shared with Multi Key Recipients (bt-* classes)
+         UI-only helpers: scripts/features/transfer/w2w-ui-sync.js · styles: styles/features/transfer/th-w2w-compact.css -->
+    <div id="walletToWalletUI" data-mode="native" style="display: none;">
 
         <!-- Header -->
-        <div class="th-section-header"><button class="th-back-btn" onclick="showMainDashboard()" title="Back to Dashboard"><span class="material-icons-round">arrow_back</span></button><h1>🔄 W2W Transfer</h1><button class="th-header-chain-btn" onclick="thOpenHeaderChainPicker('w2wNative')" title="Switch network"><span class="th-hcb-emoji" id="th-net-emoji-w2wNative-hdr">⛓️</span><span class="th-hcb-name" id="th-net-name-w2wNative-hdr">Network</span><span class="material-icons-round">expand_more</span></button></div>
+        <div class="th-section-header"><button class="th-back-btn" onclick="showMainDashboard()" title="Back to Dashboard"><span class="material-icons-round">arrow_back</span></button><h1>W2W transfer</h1><button class="th-header-chain-btn" onclick="thOpenHeaderChainPicker('w2wNative')" title="Switch network"><span class="th-hcb-emoji" id="th-net-emoji-w2wNative-hdr">⛓️</span><span class="th-hcb-name" id="th-net-name-w2wNative-hdr">Network</span><span class="material-icons-round">expand_more</span></button></div>
 
         <!-- Mode Toggle -->
-        <div style="display:flex;justify-content:center;margin-bottom:12px;">
-            <div style="background:var(--bg-raised);border:1px solid var(--border-subtle);border-radius:10px;padding:3px;display:inline-flex;gap:3px;">
-                <button id="w2wNativeModeBtn" class="mode-toggle-btn active" onclick="selectW2WMode('native')" style="padding:7px 18px;border-radius:7px;border:none;background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;font-weight:600;font-size:0.8rem;cursor:pointer;transition:all .3s;">⚡ Native</button>
-                <button id="w2wTokenModeBtn" class="mode-toggle-btn" onclick="selectW2WMode('token')" style="padding:7px 18px;border-radius:7px;border:none;background:transparent;color:#888;font-weight:600;font-size:0.8rem;cursor:pointer;transition:all .3s;">🔐 Token</button>
+        <div class="bt-seg-wrap">
+            <div class="bt-seg" data-mode="native">
+                <button id="w2wNativeModeBtn" class="mode-toggle-btn active" onclick="selectW2WMode('native')">Native</button>
+                <button id="w2wTokenModeBtn" class="mode-toggle-btn" onclick="selectW2WMode('token')">Token</button>
             </div>
         </div>
 
@@ -16,102 +17,166 @@
         <div id="w2wNativeFields" class="transfer-fields" style="display:block;">
             <input type="hidden" id="rpcUrlW2W" value="">
 
-            <!-- Box 1: Sender Keys -->
-            <div style="background:var(--bg-raised);border:1px solid var(--border-subtle);border-radius:10px;padding:10px 12px;margin-bottom:8px;">
-                <div style="font-size:0.72rem;font-weight:700;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.8px;margin-bottom:7px;">👛 Sender Keys <span id="w2wSenderCount" style="background:rgba(74,158,255,0.12);color:#4a9eff;padding:2px 8px;border-radius:6px;font-size:0.68rem;margin-left:4px;">0</span></div>
-                <button onclick="thOpenWalletPicker('w2wSenderKeys','multi')" style="width:100%;display:flex;align-items:center;justify-content:center;gap:6px;padding:7px 12px;border-radius:8px;border:1px dashed rgba(99,102,241,0.45);background:rgba(99,102,241,0.06);color:var(--neon-purple);font-family:var(--font-mono);font-size:10px;font-weight:700;cursor:pointer;margin-bottom:6px;transition:all .18s;" onmousedown="this.style.background='rgba(99,102,241,0.14)'" onmouseup="this.style.background='rgba(99,102,241,0.06)'" ontouchstart="this.style.background='rgba(99,102,241,0.14)'" ontouchend="this.style.background='rgba(99,102,241,0.06)'"><span class="material-icons-round" style="font-size:13px;">account_balance_wallet</span>Select Wallet</button>
-                <div class="sk-key-wrapper" id="w2wSenderKeysWrapper">
-                    <textarea id="w2wSenderKeys" class="sk-key-textarea sk-masked" placeholder="0xabc123...&#10;0xdef456..." style="min-height:120px;font-family:monospace;font-size:0.75rem;resize:vertical;" oninput="autoValidateW2WNativeKeys()" autocomplete="off" spellcheck="false"></textarea>
-                    <button type="button" class="sk-toggle-btn" id="w2wSenderKeysToggleBtn" onclick="skToggleKeyVisibility('w2wSenderKeys','w2wSenderKeysToggleBtn')" title="Show/Hide Keys"><span class="material-icons-round sk-eye-icon">visibility_off</span></button>
-                </div>
-            </div>
-
-            <!-- Box 2: Receiver Keys -->
-            <div style="background:var(--bg-raised);border:1px solid var(--border-subtle);border-radius:10px;padding:10px 12px;margin-bottom:8px;">
-                <div style="font-size:0.72rem;font-weight:700;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.8px;margin-bottom:7px;">📥 Receiver Keys/Addresses <span id="w2wReceiverCount" style="background:rgba(16,185,129,0.12);color:#10b981;padding:2px 8px;border-radius:6px;font-size:0.68rem;margin-left:4px;">0</span></div>
-                <button onclick="thOpenWalletPicker('w2wReceiverKeys','addresses')" style="width:100%;display:flex;align-items:center;justify-content:center;gap:6px;padding:7px 12px;border-radius:8px;border:1px dashed rgba(6,182,212,0.45);background:rgba(6,182,212,0.06);color:var(--neon-cyan);font-family:var(--font-mono);font-size:10px;font-weight:700;cursor:pointer;margin-bottom:6px;transition:all .18s;" onmousedown="this.style.background='rgba(6,182,212,0.14)'" onmouseup="this.style.background='rgba(6,182,212,0.06)'" ontouchstart="this.style.background='rgba(6,182,212,0.14)'" ontouchend="this.style.background='rgba(6,182,212,0.06)'"><span class="material-icons-round" style="font-size:13px;">account_balance_wallet</span>Select Wallet</button>
-                <textarea id="w2wReceiverKeys" placeholder="0x123... or keys" style="width:100%;min-height:120px;font-family:monospace;font-size:0.75rem;resize:vertical;background:var(--bg-surface);border:1px solid var(--border-subtle);border-radius:8px;padding:8px;color:var(--text-primary);box-sizing:border-box;" oninput="autoValidateW2WNativeReceivers()"></textarea>
-            </div>
-
-            <!-- Box 3: Amount Settings -->
-            <div style="background:var(--bg-raised);border:1px solid var(--border-subtle);border-radius:10px;padding:10px 12px;margin-bottom:8px;">
-                <div style="font-size:0.72rem;font-weight:700;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.8px;margin-bottom:7px;">💰 Amount Settings</div>
-                <!-- Mini Stats -->
-                <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px;">
-                    <div style="background:var(--bg-surface);border:1px solid var(--border-subtle);border-radius:8px;padding:6px 10px;text-align:center;">
-                        <div style="font-size:0.65rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.6px;">Senders</div>
-                        <div style="font-size:1rem;font-weight:700;color:var(--accent-primary);" id="w2wTotalSenders">0</div>
+            <!-- Sender keys + Receivers -->
+            <div class="bt-card">
+                <div class="bt-row">
+                    <div class="bt-head">
+                        <span class="bt-cap">Sender keys · <span id="w2wSenderCount">0</span> wallets</span>
+                        <button type="button" class="bt-select" onclick="thOpenWalletPicker('w2wSenderKeys','multi')"><span class="material-icons-round">account_balance_wallet</span>Select</button>
                     </div>
-                    <div style="background:var(--bg-surface);border:1px solid var(--border-subtle);border-radius:8px;padding:6px 10px;text-align:center;">
-                        <div style="font-size:0.65rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.6px;">Receivers</div>
-                        <div style="font-size:1rem;font-weight:700;color:var(--accent-green);" id="w2wTotalReceivers">0</div>
+                    <div class="w2w-fold">
+                        <div class="sk-key-wrapper w2w-keys" id="w2wSenderKeysWrapper">
+                            <textarea id="w2wSenderKeys" class="sk-key-textarea sk-masked" placeholder="0xabc123...&#10;0xdef456..." oninput="autoValidateW2WNativeKeys()" autocomplete="off" spellcheck="false"></textarea>
+                            <button type="button" class="sk-toggle-btn" id="w2wSenderKeysToggleBtn" onclick="skToggleKeyVisibility('w2wSenderKeys','w2wSenderKeysToggleBtn')" title="Show/Hide Keys"><span class="material-icons-round sk-eye-icon">visibility_off</span></button>
+                        </div>
+                        <div class="mk-meta"><span class="mk-valid"><b id="w2wTotalSenders">0</b> valid</span></div>
                     </div>
                 </div>
-                <input type="text" id="w2wCustomAmount" placeholder="Amount per transfer" value="" style="width:100%;padding:8px 10px;background:var(--bg-surface);border:1px solid var(--border-subtle);border-radius:8px;color:var(--text-primary);font-size:0.85rem;box-sizing:border-box;margin-bottom:6px;">
-                <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:5px;">
-                    <button onclick="setW2WMaxAmount()" style="padding:5px 2px;font-size:0.7rem;font-weight:700;background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff;border:none;border-radius:6px;cursor:pointer;">⚡MAX</button>
-                    <button onclick="setW2WAmount('0.00000001')" style="padding:5px 2px;font-size:0.65rem;background:linear-gradient(135deg,#f093fb,#f5576c);color:#fff;border:none;border-radius:6px;cursor:pointer;">0.00…01</button>
-                    <button onclick="setW2WAmount('0.1')" style="padding:5px 2px;font-size:0.7rem;background:linear-gradient(135deg,#4facfe,#00f2fe);color:#fff;border:none;border-radius:6px;cursor:pointer;">0.1</button>
-                    <button onclick="setW2WAmount('1')" style="padding:5px 2px;font-size:0.7rem;background:linear-gradient(135deg,#43e97b,#38f9d7);color:#fff;border:none;border-radius:6px;cursor:pointer;">1</button>
+
+                <div class="bt-row">
+                    <div class="bt-head">
+                        <span class="bt-cap">Receivers · <span id="w2wReceiverCount">0</span> addresses</span>
+                        <button type="button" class="bt-select" onclick="thOpenWalletPicker('w2wReceiverKeys','addresses')"><span class="material-icons-round">account_balance_wallet</span>Select</button>
+                    </div>
+                    <div class="w2w-fold">
+                        <textarea id="w2wReceiverKeys" class="w2w-recv" placeholder="0x123... or keys" oninput="autoValidateW2WNativeReceivers()" autocomplete="off" spellcheck="false"></textarea>
+                        <div class="mk-meta"><span class="mk-valid"><b id="w2wTotalReceivers">0</b> valid</span><span class="w2w-warn" id="w2wPairWarnNative"></span></div>
+                    </div>
                 </div>
             </div>
 
-            <!-- Execute Button -->
-            <button class="btn btn-success execute-btn" id="executeW2WBtn" onclick="executeWalletToWallet()" disabled style="width:100%;padding:13px;font-size:0.95rem;font-weight:700;margin-bottom:8px;border-radius:10px;opacity:0.45;cursor:not-allowed;">🚀 Execute Transfer</button>
-            <div class="progress-bar" id="progressBarW2W" style="display:none;margin-bottom:8px;"><div class="progress-fill" id="progressFillW2W"></div></div>
+            <!-- Amount -->
+            <div class="bt-card bt-amount">
+                <div class="bt-amt-grid">
+                    <div class="bt-amt-main">
+                        <label class="bt-cap" for="w2wCustomAmount">Amount per transfer</label>
+                        <div class="bt-amt-input">
+                            <input type="text" id="w2wCustomAmount" placeholder="0" value="" inputmode="decimal" autocomplete="off">
+                            <span class="bt-unit bt-unit-native">ETH</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="bt-chips w2w-fold">
+                    <button class="btn mk-max" onclick="setW2WMaxAmount()">MAX</button>
+                    <button class="btn" onclick="setW2WAmount('0.00000001')">0.00000001</button>
+                    <button class="btn" onclick="setW2WAmount('0.1')">0.1</button>
+                    <button class="btn" onclick="setW2WAmount('1')">1</button>
+                </div>
+            </div>
+
+            <!-- Summary -->
+            <div class="bt-summary">
+                <span><b id="w2wPairsNative">0</b> pairs × <b id="w2wPerNative">0</b></span>
+                <span class="bt-total">Total <b id="w2wTotalNative">0</b> <span class="bt-unit bt-unit-native">ETH</span></span>
+            </div>
+
+            <!-- Gas pill + Execute -->
+            <div class="bt-dock">
+                <div class="w2w-act">
+                    <div class="bt-gasrow" id="one-gas-toggle-th-w2w">
+                        <button type="button" class="bt-gaspill" onclick="window._ngCycle()" aria-label="Gas type, tap to change" title="Gas type - tap to change">
+                            <span class="material-icons-round bt-gaspill-ico">local_gas_station</span>
+                            <span class="sw-gas-pill-label bt-gaspill-label">AUTO</span>
+                        </button>
+                    </div>
+                    <div class="execute-section bt-actions">
+                        <button class="btn btn-success execute-btn" id="executeW2WBtn" onclick="executeWalletToWallet()" disabled>Execute transfer</button>
+                    </div>
+                </div>
+                <div class="progress-bar" id="progressBarW2W" style="display:none;"><div class="progress-fill" id="progressFillW2W"></div></div>
+            </div>
         </div>
 
         <!-- ══ TOKEN MODE ══ -->
         <div id="w2wTokenFields" class="transfer-fields" style="display:none;">
             <input type="hidden" id="rpcUrlW2WToken" value="">
 
-            <!-- Box 1: Sender Keys -->
-            <div style="background:var(--bg-raised);border:1px solid var(--border-subtle);border-radius:10px;padding:10px 12px;margin-bottom:8px;">
-                <div style="font-size:0.72rem;font-weight:700;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.8px;margin-bottom:7px;">👛 Sender Keys <span id="w2wSenderCountToken" style="background:rgba(74,158,255,0.12);color:#4a9eff;padding:2px 8px;border-radius:6px;font-size:0.68rem;margin-left:4px;">0</span></div>
-                <button onclick="thOpenWalletPicker('w2wSenderKeysToken','multi')" style="width:100%;display:flex;align-items:center;justify-content:center;gap:6px;padding:7px 12px;border-radius:8px;border:1px dashed rgba(99,102,241,0.45);background:rgba(99,102,241,0.06);color:var(--neon-purple);font-family:var(--font-mono);font-size:10px;font-weight:700;cursor:pointer;margin-bottom:6px;transition:all .18s;" onmousedown="this.style.background='rgba(99,102,241,0.14)'" onmouseup="this.style.background='rgba(99,102,241,0.06)'" ontouchstart="this.style.background='rgba(99,102,241,0.14)'" ontouchend="this.style.background='rgba(99,102,241,0.06)'"><span class="material-icons-round" style="font-size:13px;">account_balance_wallet</span>Select Wallet</button>
-                <div class="sk-key-wrapper" id="w2wSenderKeysTokenWrapper">
-                    <textarea id="w2wSenderKeysToken" class="sk-key-textarea sk-masked" placeholder="0xabc123...&#10;0xdef456..." style="min-height:120px;font-family:monospace;font-size:0.75rem;resize:vertical;" oninput="autoValidateW2WTokenKeys()" autocomplete="off" spellcheck="false"></textarea>
-                    <button type="button" class="sk-toggle-btn" id="w2wSenderKeysTokenToggleBtn" onclick="skToggleKeyVisibility('w2wSenderKeysToken','w2wSenderKeysTokenToggleBtn')" title="Show/Hide Keys"><span class="material-icons-round sk-eye-icon">visibility_off</span></button>
+            <!-- Token contract + Sender keys + Receivers -->
+            <div class="bt-card">
+                <div class="bt-row">
+                    <div class="bt-head">
+                        <label class="bt-cap" for="w2wTokenContract">Token contract</label>
+                    </div>
+                    <input type="text" id="w2wTokenContract" placeholder="0x... token address (ERC20)" autocomplete="off" spellcheck="false" oninput="if(typeof checkW2WExecuteReady==='function')checkW2WExecuteReady();">
+                </div>
+
+                <div class="bt-row">
+                    <div class="bt-head">
+                        <span class="bt-cap">Sender keys · <span id="w2wSenderCountToken">0</span> wallets</span>
+                        <button type="button" class="bt-select" onclick="thOpenWalletPicker('w2wSenderKeysToken','multi')"><span class="material-icons-round">account_balance_wallet</span>Select</button>
+                    </div>
+                    <div class="w2w-fold">
+                        <div class="sk-key-wrapper w2w-keys" id="w2wSenderKeysTokenWrapper">
+                            <textarea id="w2wSenderKeysToken" class="sk-key-textarea sk-masked" placeholder="0xabc123...&#10;0xdef456..." oninput="autoValidateW2WTokenKeys()" autocomplete="off" spellcheck="false"></textarea>
+                            <button type="button" class="sk-toggle-btn" id="w2wSenderKeysTokenToggleBtn" onclick="skToggleKeyVisibility('w2wSenderKeysToken','w2wSenderKeysTokenToggleBtn')" title="Show/Hide Keys"><span class="material-icons-round sk-eye-icon">visibility_off</span></button>
+                        </div>
+                        <div class="mk-meta"><span class="mk-valid"><b id="w2wTotalSendersToken">0</b> valid</span></div>
+                    </div>
+                </div>
+
+                <div class="bt-row">
+                    <div class="bt-head">
+                        <span class="bt-cap">Receivers · <span id="w2wReceiverCountToken">0</span> addresses</span>
+                        <button type="button" class="bt-select" onclick="thOpenWalletPicker('w2wReceiverKeysToken','addresses')"><span class="material-icons-round">account_balance_wallet</span>Select</button>
+                    </div>
+                    <div class="w2w-fold">
+                        <textarea id="w2wReceiverKeysToken" class="w2w-recv" placeholder="0x123... or keys" oninput="autoValidateW2WTokenReceivers()" autocomplete="off" spellcheck="false"></textarea>
+                        <div class="mk-meta"><span class="mk-valid"><b id="w2wTotalReceiversToken">0</b> valid</span><span class="w2w-warn" id="w2wPairWarnToken"></span></div>
+                    </div>
                 </div>
             </div>
 
-            <!-- Box 2: Receiver Keys -->
-            <div style="background:var(--bg-raised);border:1px solid var(--border-subtle);border-radius:10px;padding:10px 12px;margin-bottom:8px;">
-                <div style="font-size:0.72rem;font-weight:700;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.8px;margin-bottom:7px;">📥 Receiver Keys/Addresses <span id="w2wReceiverCountToken" style="background:rgba(16,185,129,0.12);color:#10b981;padding:2px 8px;border-radius:6px;font-size:0.68rem;margin-left:4px;">0</span></div>
-                <button onclick="thOpenWalletPicker('w2wReceiverKeysToken','addresses')" style="width:100%;display:flex;align-items:center;justify-content:center;gap:6px;padding:7px 12px;border-radius:8px;border:1px dashed rgba(6,182,212,0.45);background:rgba(6,182,212,0.06);color:var(--neon-cyan);font-family:var(--font-mono);font-size:10px;font-weight:700;cursor:pointer;margin-bottom:6px;transition:all .18s;" onmousedown="this.style.background='rgba(6,182,212,0.14)'" onmouseup="this.style.background='rgba(6,182,212,0.06)'" ontouchstart="this.style.background='rgba(6,182,212,0.14)'" ontouchend="this.style.background='rgba(6,182,212,0.06)'"><span class="material-icons-round" style="font-size:13px;">account_balance_wallet</span>Select Wallet</button>
-                <textarea id="w2wReceiverKeysToken" placeholder="0x123... or keys" style="width:100%;min-height:120px;font-family:monospace;font-size:0.75rem;resize:vertical;background:var(--bg-surface);border:1px solid var(--border-subtle);border-radius:8px;padding:8px;color:var(--text-primary);box-sizing:border-box;" oninput="autoValidateW2WTokenReceivers()"></textarea>
-            </div>
-
-            <!-- Box 3: Token Contract -->
-            <div style="background:var(--bg-raised);border:1px solid var(--border-subtle);border-radius:10px;padding:10px 12px;margin-bottom:8px;">
-                <div style="font-size:0.72rem;font-weight:700;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.8px;margin-bottom:7px;">🔐 Token Contract</div>
-                <input type="text" id="w2wTokenContract" placeholder="0x... (ERC20 contract address)" style="width:100%;padding:8px 10px;background:var(--bg-surface);border:1px solid var(--border-subtle);border-radius:8px;color:var(--text-primary);font-size:0.82rem;font-family:monospace;box-sizing:border-box;">
-                <div style="font-size:0.68rem;color:var(--text-muted);margin-top:4px;">ERC20 token contract address</div>
-            </div>
-
-            <!-- Box 4: Amount -->
-            <div style="background:var(--bg-raised);border:1px solid var(--border-subtle);border-radius:10px;padding:10px 12px;margin-bottom:8px;">
-                <div style="font-size:0.72rem;font-weight:700;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.8px;margin-bottom:7px;">💰 Amount per Transfer</div>
-                <input type="text" id="w2wCustomAmountToken" placeholder="Token amount" value="" style="width:100%;padding:8px 10px;background:var(--bg-surface);border:1px solid var(--border-subtle);border-radius:8px;color:var(--text-primary);font-size:0.85rem;box-sizing:border-box;margin-bottom:6px;">
-                <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:5px;">
-                    <button onclick="setW2WMaxAmountToken()" style="padding:5px 2px;font-size:0.7rem;font-weight:700;background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff;border:none;border-radius:6px;cursor:pointer;">⚡MAX</button>
-                    <button onclick="setW2WAmountToken('1')" style="padding:5px 2px;font-size:0.7rem;background:linear-gradient(135deg,#f093fb,#f5576c);color:#fff;border:none;border-radius:6px;cursor:pointer;">1</button>
-                    <button onclick="setW2WAmountToken('10')" style="padding:5px 2px;font-size:0.7rem;background:linear-gradient(135deg,#4facfe,#00f2fe);color:#fff;border:none;border-radius:6px;cursor:pointer;">10</button>
-                    <button onclick="setW2WAmountToken('100')" style="padding:5px 2px;font-size:0.7rem;background:linear-gradient(135deg,#43e97b,#38f9d7);color:#fff;border:none;border-radius:6px;cursor:pointer;">100</button>
+            <!-- Amount -->
+            <div class="bt-card bt-amount">
+                <div class="bt-amt-grid">
+                    <div class="bt-amt-main">
+                        <label class="bt-cap" for="w2wCustomAmountToken">Amount per transfer</label>
+                        <div class="bt-amt-input">
+                            <input type="text" id="w2wCustomAmountToken" placeholder="0" value="" inputmode="decimal" autocomplete="off">
+                            <span class="bt-unit bt-unit-token">TOKEN</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="bt-chips w2w-fold">
+                    <button class="btn mk-max" onclick="setW2WMaxAmountToken()">MAX</button>
+                    <button class="btn" onclick="setW2WAmountToken('1')">1</button>
+                    <button class="btn" onclick="setW2WAmountToken('10')">10</button>
+                    <button class="btn" onclick="setW2WAmountToken('100')">100</button>
                 </div>
             </div>
 
-            <!-- Execute Button -->
-            <button class="btn btn-success execute-btn" id="executeW2WTokenBtn" onclick="executeWalletToWalletToken()" disabled style="width:100%;padding:13px;font-size:0.95rem;font-weight:700;margin-bottom:8px;border-radius:10px;opacity:0.45;cursor:not-allowed;">🚀 Execute Token Transfer</button>
-            <div class="progress-bar" id="progressBarW2WToken" style="display:none;margin-bottom:8px;"><div class="progress-fill" id="progressFillW2WToken"></div></div>
+            <!-- Summary -->
+            <div class="bt-summary">
+                <span><b id="w2wPairsToken">0</b> pairs × <b id="w2wPerToken">0</b></span>
+                <span class="bt-total">Total <b id="w2wTotalToken">0</b> <span class="bt-unit bt-unit-token">TOKEN</span></span>
+            </div>
+
+            <!-- Gas pill + Execute -->
+            <div class="bt-dock">
+                <div class="w2w-act">
+                    <div class="bt-gasrow" id="one-gas-toggle-th-w2w-token">
+                        <button type="button" class="bt-gaspill" onclick="window._ngCycle()" aria-label="Gas type, tap to change" title="Gas type - tap to change">
+                            <span class="material-icons-round bt-gaspill-ico">local_gas_station</span>
+                            <span class="sw-gas-pill-label bt-gaspill-label">AUTO</span>
+                        </button>
+                    </div>
+                    <div class="execute-section bt-actions">
+                        <button class="btn btn-success execute-btn" id="executeW2WTokenBtn" onclick="executeWalletToWalletToken()" disabled>Execute transfer</button>
+                    </div>
+                </div>
+                <div class="progress-bar" id="progressBarW2WToken" style="display:none;"><div class="progress-fill" id="progressFillW2WToken"></div></div>
+            </div>
         </div>
 
-        <!-- Logs Section -->
-        <div style="background:var(--bg-raised);border:1px solid var(--border-subtle);border-radius:10px;padding:10px 12px;margin-top:4px;">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
-                <div style="font-size:0.72rem;font-weight:700;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.8px;">📝 Transfer Logs</div>
-                <button onclick="clearLogW2W()" style="padding:4px 10px;font-size:0.72rem;background:var(--bg-surface);border:1px solid var(--border-subtle);border-radius:6px;color:var(--text-secondary);cursor:pointer;">🗑️ Clear</button>
+        <!-- Logs (shared by Native + Token): collapsed by default, same strip as Multi Key Recipients -->
+        <div class="log-section bt-logs collapsed" id="w2wLogs">
+            <div class="bt-loghead" onclick="w2wToggleLogs()" role="button" aria-label="Show or hide logs">
+                <span class="material-icons-round bt-logchev">expand_more</span>
+                <span class="bt-cap">Logs</span>
+                <button type="button" class="bt-link" onclick="event.stopPropagation();clearLogW2W()">Clear</button>
             </div>
-            <div class="log-section" id="logSectionW2W" style="max-height:220px;overflow-y:auto;min-height:80px;"></div>
+            <div class="log-container" id="logSectionW2W">
+                <div class="log-line log-info">[INFO] Ready to configure wallet to wallet transfer...</div>
+            </div>
         </div>
     </div>

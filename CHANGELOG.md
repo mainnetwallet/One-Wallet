@@ -6,6 +6,13 @@ Per-build release notes are published on the [Releases](../../releases) page.
 ## [Unreleased]
 
 ### Changed
+- **W2W Transfer UI:** now uses the same compact layout as Multi Key Recipients so everything fits on one phone
+  screen without scrolling - one grouped card (Sender keys / Receivers, each with a "Select" button, a short masked key
+  box and an "N valid" line; a "Only N pairs will run" note when the two lists differ), amount row with quick chips
+  (MAX highlighted), a `pairs x amount / Total` summary, gas pill and Execute transfer on one row, and a collapsible
+  Logs bar like Multi Key Recipients. Opening Logs (or starting a transfer) folds the key boxes so the log box stays on
+  screen. Token mode has the same layout plus a Token contract row. Markup/styling only: element IDs and transfer
+  logic are unchanged.
 - **Multi Key Recipients UI:** now uses the same compact layout as Batch Transfer — one grouped card (Developer wallet /
   Sender keys with "N valid" and pool balance / Recipient), amount row with a Direct | Contract send-mode switch and
   quick chips (MAX highlighted), summary strip, contract row with gas pill and Deploy / Execute transfer, and a

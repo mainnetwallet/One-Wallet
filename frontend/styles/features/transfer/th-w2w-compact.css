@@ -1,0 +1,80 @@
+/* ══════════════════════════════════════════════════
+   WALLET TO WALLET — additions on top of the shared compact layout
+   The bt-* rules live in transfer-hub-base-form-styles.css (scoped to Batch Transfer, Multi Key Recipients and this screen).
+   Markup: html-src/partials/page-transfer-hub/wallet-to-wallet.html
+   UI-only helpers: scripts/features/transfer/w2w-ui-sync.js
+   Goal: Sender keys, Receivers, Amount, summary and Execute fit on one phone screen without scrolling.
+   ══════════════════════════════════════════════════ */
+
+/* Key boxes: short multi-line boxes (2 lines native, 1 line in Token mode) */
+        #th-wrapper #walletToWalletUI .bt-row .w2w-keys .sk-key-textarea,
+        #th-wrapper #walletToWalletUI .bt-row textarea.w2w-recv {
+            width: 100%;
+            box-sizing: border-box;
+            height: 52px !important;
+            min-height: 52px !important;
+            max-height: 120px !important;
+            padding: 6px 40px 6px 10px !important;
+            font-family: var(--font-mono);
+            font-size: 0.72rem !important;
+            line-height: 1.55 !important;
+            resize: vertical;
+        }
+        #th-wrapper #walletToWalletUI .bt-row textarea.w2w-recv { padding-right: 10px !important; }
+        #th-wrapper #walletToWalletUI .bt-row .w2w-keys .sk-toggle-btn {
+            top: 4px !important;
+            transform: none !important;
+        }
+        #th-wrapper #walletToWalletUI[data-mode="token"] .bt-row .w2w-keys .sk-key-textarea,
+        #th-wrapper #walletToWalletUI[data-mode="token"] .bt-row textarea.w2w-recv {
+            height: 34px !important;
+            min-height: 34px !important;
+        }
+        #th-wrapper #walletToWalletUI .bt-row input[type="text"] {
+            width: 100%;
+            box-sizing: border-box;
+            text-overflow: ellipsis;
+        }
+
+/* "N valid" line + pair warning */
+        #th-wrapper #walletToWalletUI .mk-meta {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            margin-top: 5px;
+            font-size: 0.72rem;
+            line-height: 1.3;
+        }
+        #th-wrapper #walletToWalletUI .mk-valid { color: #22c55e; font-weight: 600; }
+        #th-wrapper #walletToWalletUI .w2w-warn {
+            margin-left: auto;
+            color: var(--accent-amber, #f59e0b);
+            font-weight: 600;
+            white-space: nowrap;
+        }
+        #th-wrapper #walletToWalletUI .w2w-warn:empty { display: none; }
+
+/* Amount card: tighter, MAX chip highlighted like Multi Key Recipients */
+        #th-wrapper #walletToWalletUI .bt-chips .btn.mk-max {
+            color: var(--accent-amber, #f59e0b) !important;
+        }
+        #th-wrapper #walletToWalletUI .bt-summary { margin-top: 6px; }
+
+/* Gas pill + Execute on one row */
+        #th-wrapper #walletToWalletUI .w2w-act {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        #th-wrapper #walletToWalletUI .w2w-act .bt-gasrow { margin: 0; flex: none; }
+        #th-wrapper #walletToWalletUI .w2w-act .bt-actions { flex: 1; min-width: 0; margin: 0 !important; grid-template-columns: 1fr !important; }
+        #th-wrapper #walletToWalletUI .bt-dock { padding-top: 6px; }
+        #th-wrapper #walletToWalletUI .bt-dock .progress-bar { margin: 6px 0 0 !important; }
+
+/* Logs: collapsed strip by default. Opening it folds the key boxes, meta lines and chips so the log box fits on screen. */
+        #th-wrapper #walletToWalletUI .bt-logs { padding: 4px 0 0 !important; }
+        #th-wrapper #walletToWalletUI .bt-logs .bt-loghead { height: 36px; }
+        #th-wrapper #walletToWalletUI .bt-logs .log-container { height: 130px !important; }
+        #th-wrapper #walletToWalletUI.w2w-logs-open .w2w-fold { display: none !important; }
+        #th-wrapper #walletToWalletUI.w2w-logs-open .bt-row .bt-head { margin-bottom: 0; }
