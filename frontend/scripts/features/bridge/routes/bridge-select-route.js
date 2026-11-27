@@ -1,3 +1,19 @@
+  // ── Compact amount formatter + font auto-fit (Bridge page) ──
+  window.brFmtAmt = function (n) {
+    n = Number(n);
+    if (!isFinite(n) || n <= 0) return '—';
+    if (n >= 1000) return n.toLocaleString('en-US', { maximumFractionDigits: 2 });
+    if (n >= 1)    return String(parseFloat(n.toFixed(4)));
+    if (n < 0.000001) return '<0.000001';
+    return String(parseFloat(n.toPrecision(5)));
+  };
+  window.brFitAmt = function (el, text) {
+    if (!el) return;
+    var len = String(text == null ? '' : text).length;
+    if (len <= 8) el.removeAttribute('data-sz');
+    else el.setAttribute('data-sz', len <= 11 ? 'm' : 's');
+  };
+
   function brSelectRoute(idx) {
     br.selectedRoute = idx;
     const route = br.routes[idx];
@@ -36,11 +52,12 @@
     const est = route.estimate || {};
     const toDecim = br.toToken.decimals || 18;
     const toAmt = est.toAmount
-      ? parseFloat(ethers.formatUnits(est.toAmount.toString(), toDecim)).toFixed(6)
+      ? window.brFmtAmt(parseFloat(ethers.formatUnits(est.toAmount.toString(), toDecim)))
       : '—';
     const _toUsdNum = parseFloat(est.toAmountUSD || 0);
     const toUSD = (_toUsdNum > 0) ? '≈ ' + _formatCurrencyDisplay(_toUsdNum) : '≈ $—';
     $e('br-to-amount').textContent = toAmt;
+    window.brFitAmt($e('br-to-amount'), toAmt);
     $e('br-to-amount').classList.add('br-has-val');
     $e('br-to-usd').textContent = toUSD;
 

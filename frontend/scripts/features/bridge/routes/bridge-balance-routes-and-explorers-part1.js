@@ -447,6 +447,7 @@
   // ── Amount debounce ──
   window.brOnAmountChange = function () {
     clearTimeout(br.quoteDebounce);
+    if (window.brFitAmt) window.brFitAmt($e('br-from-amount'), $e('br-from-amount').value);
     const val = parseFloat($e('br-from-amount').value);
     // Reset slider when user types manually (not when triggered from slider pct)
     if (!br._fromSlider) brUpdateSliderUI(0);
@@ -585,6 +586,7 @@
     $e('br-quote-error').style.display = 'none';
     $e('br-to-amount').textContent = '—';
     $e('br-to-amount').classList.remove('br-has-val');
+    if (window.brFitAmt) window.brFitAmt($e('br-to-amount'), '—');
     $e('br-to-usd').textContent = '≈ $0.00';
     const slipRow = $e('br-slippage-row');
     if (slipRow) slipRow.style.display = 'none';
