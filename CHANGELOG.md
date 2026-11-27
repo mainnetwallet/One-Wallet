@@ -8,6 +8,10 @@ Per-build release notes are published on the [Releases](../../releases) page.
 ### Changed
 - **Transfer Hub home redesigned:** the 3×3 emoji icon grid is replaced by a clean list with Send / Manage / Tools tabs,
   a short description under each tool, and theme-aware colors (works in dark and light mode). All tools open exactly as before.
+- **Batch Transfer redesigned to fit one screen:** wallet, recipients, amount, contract and the Deploy / Execute buttons
+  are now compact cards with a flat Native / Token switch, a batch-size stepper, one-line total summary and a short log
+  box, so little or no scrolling is needed. Saved contracts open from a chevron on the contract row. Layout only: all
+  fields, buttons and transfer logic are unchanged.
 
 ### Fixed
 - **Explorer links were matched by text anywhere in the address:** a link was opened in the system browser if an

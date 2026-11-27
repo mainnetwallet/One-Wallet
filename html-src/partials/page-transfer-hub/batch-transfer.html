@@ -4,292 +4,254 @@
         <div class="th-section-header"><button class="th-back-btn" onclick="showMainDashboard()" title="Back to Dashboard"><span class="material-icons-round">arrow_back</span></button><h1>📤 Batch Transfer</h1><button class="th-header-chain-btn" onclick="thOpenHeaderChainPicker('batch')" title="Switch network"><span class="th-hcb-emoji" id="th-net-emoji-batchNative-hdr">⛓️</span><span class="th-hcb-name" id="th-net-name-batchNative-hdr">Network</span><span class="material-icons-round">expand_more</span></button></div>
 
         <!-- Transfer Mode Toggle -->
-        <div style="display: flex; justify-content: center; margin-bottom: 20px;">
-            <div style="background: #1a1a1a; border: 2px solid #2a2a2a; border-radius: 12px; padding: 4px; display: inline-flex; gap: 4px;">
-                <button id="nativeModeBtn" class="mode-toggle-btn active" onclick="switchBatchMode('native')" style="padding: 10px 24px; border-radius: 8px; border: none; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; font-weight: 600; cursor: pointer; transition: all 0.3s;">
-                    📤 Native (ETH/BNB)
-                </button>
-                <button id="tokenModeBtn" class="mode-toggle-btn" onclick="switchBatchMode('token')" style="padding: 10px 24px; border-radius: 8px; border: none; background: transparent; color: #888; font-weight: 600; cursor: pointer; transition: all 0.3s;">
-                    🪙 Token (ERC20)
-                </button>
+        <div class="bt-seg-wrap">
+            <div class="bt-seg">
+                <button id="nativeModeBtn" class="mode-toggle-btn active" onclick="switchBatchMode('native')">Native</button>
+                <button id="tokenModeBtn" class="mode-toggle-btn" onclick="switchBatchMode('token')">Token</button>
             </div>
         </div>
 
         <!-- Native Mode Content -->
         <div id="nativeModeContent" style="display: block;">
-        <div class="grid">
             <input type="hidden" id="rpcUrl" value="">
 
-            <!-- Wallet Section -->
-            <div class="section">
-                <div class="section-title">Wallet</div>
-                <div class="input-group">
-                    <label>Private Key <span style="opacity: 0.6; font-size: 0.85em;">(Double-click to clear)</span></label>
-                    <button onclick="thOpenWalletPicker('privateKey','single')" style="width:100%;display:flex;align-items:center;justify-content:center;gap:8px;padding:9px 14px;border-radius:9px;border:1px dashed rgba(99,102,241,0.45);background:rgba(99,102,241,0.06);color:var(--neon-purple);font-family:var(--font-mono);font-size:11px;font-weight:700;cursor:pointer;margin-bottom:8px;transition:all .18s;letter-spacing:.5px;" onmousedown="this.style.background='rgba(99,102,241,0.14)'" onmouseup="this.style.background='rgba(99,102,241,0.06)'" ontouchstart="this.style.background='rgba(99,102,241,0.14)'" ontouchend="this.style.background='rgba(99,102,241,0.06)'"><span class="material-icons-round" style="font-size:15px;">account_balance_wallet</span>Select Wallet</button>
+            <!-- Wallet + Recipients -->
+            <div class="bt-card">
+                <div class="bt-row">
+                    <div class="bt-head">
+                        <span class="bt-cap">From wallet · private key</span>
+                        <div class="wallet-info bt-info" id="walletInfoBox">
+                            <div class="wallet-info-item bt-bal">
+                                <span class="wallet-info-label">Balance</span>
+                                <span class="wallet-info-value" id="walletBalance">-</span>
+                            </div>
+                            <div class="wallet-info-item bt-addr">
+                                <span class="wallet-info-label">Address</span>
+                                <span class="wallet-info-value" id="walletAddress">-</span>
+                            </div>
+                        </div>
+                        <button type="button" class="bt-select" onclick="thOpenWalletPicker('privateKey','single')"><span class="material-icons-round">account_balance_wallet</span>Select</button>
+                    </div>
                     <div class="sk-key-wrapper" id="privateKeyWrapper">
-                        <textarea id="privateKey" class="sk-key-textarea sk-masked" placeholder="0x..." autocomplete="off" rows="2" spellcheck="false" ondblclick="document.getElementById('privateKey').value='';if(typeof checkBatchNativeWallet==='function')checkBatchNativeWallet();"></textarea>
+                        <textarea id="privateKey" class="sk-key-textarea sk-masked" placeholder="0x... (double-click to clear)" autocomplete="off" rows="1" spellcheck="false" ondblclick="document.getElementById('privateKey').value='';if(typeof checkBatchNativeWallet==='function')checkBatchNativeWallet();"></textarea>
                         <button type="button" class="sk-toggle-btn" id="privateKeyToggleBtn" onclick="skToggleKeyVisibility('privateKey','privateKeyToggleBtn')" title="Show/Hide Key">
                             <span class="material-icons-round sk-eye-icon" id="privateKeyEyeIcon">visibility_off</span>
                         </button>
                     </div>
-
                 </div>
-                <div class="wallet-info" id="walletInfoBox">
-                    <div class="wallet-info-item">
-                        <span class="wallet-info-label">Address</span>
-                        <span class="wallet-info-value" id="walletAddress">-</span>
+
+                <div class="bt-row">
+                    <div class="bt-head">
+                        <span class="bt-cap">Recipients · <span id="btRecipCount">0</span> addresses</span>
+                        <button type="button" class="bt-select" onclick="thOpenWalletPicker('receiverAddresses','addresses')"><span class="material-icons-round">groups</span>Select</button>
                     </div>
-                    <div class="wallet-info-item">
-                        <span class="wallet-info-label">Balance</span>
-                        <span class="wallet-info-value" id="walletBalance">-</span>
-                    </div>
+                    <textarea id="receiverAddresses" rows="3" placeholder="0x...&#10;0x...&#10;Paste addresses, keys or any text - addresses are auto-extracted"></textarea>
                 </div>
             </div>
 
-            <!-- Recipients Section -->
-            <div class="section">
-                <div class="section-title">Recipients</div>
-                <div class="input-group">
-                    <label>Addresses (one per line)</label>
-                    <button onclick="thOpenWalletPicker('receiverAddresses','addresses')" style="width:100%;display:flex;align-items:center;justify-content:center;gap:8px;padding:9px 14px;border-radius:9px;border:1px dashed rgba(6,182,212,0.45);background:rgba(6,182,212,0.06);color:var(--neon-cyan);font-family:var(--font-mono);font-size:11px;font-weight:700;cursor:pointer;margin-bottom:8px;transition:all .18s;letter-spacing:.5px;" onmousedown="this.style.background='rgba(6,182,212,0.14)'" onmouseup="this.style.background='rgba(6,182,212,0.06)'" ontouchstart="this.style.background='rgba(6,182,212,0.14)'" ontouchend="this.style.background='rgba(6,182,212,0.06)'"><span class="material-icons-round" style="font-size:15px;">account_balance_wallet</span>Select Wallet</button>
-                    <textarea id="receiverAddresses" placeholder="0x...
-0x...
-0x..."></textarea>
-                    <div class="hint">Supports addresses, private keys, or any format - auto-extracts addresses</div>
+            <!-- Amount -->
+            <div class="bt-card bt-amount">
+                <div class="bt-amt-grid">
+                    <div class="bt-amt-main">
+                        <label class="bt-cap" for="amountPerAddress">Amount per address</label>
+                        <div class="bt-amt-input">
+                            <input type="text" id="amountPerAddress" placeholder="0" value="0" inputmode="decimal" autocomplete="off">
+                            <span class="bt-unit bt-unit-native">ETH</span>
+                        </div>
+                    </div>
+                    <div class="bt-batch">
+                        <label class="bt-cap" for="batchSize">Batch size</label>
+                        <div class="bt-stepper">
+                            <button type="button" aria-label="Decrease batch size" onclick="btStep('batchSize',-1)">&minus;</button>
+                            <input type="number" id="batchSize" value="50" min="1" max="100">
+                            <button type="button" aria-label="Increase batch size" onclick="btStep('batchSize',1)">+</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="bt-chips">
+                    <button class="btn" onclick="setAmount('0.000000001')">0.000000001</button>
+                    <button class="btn" onclick="setAmount('0.00001')">0.00001</button>
+                    <button class="btn" onclick="setAmount('0.0001')">0.0001</button>
+                    <button class="btn" onclick="setAmount('0.001')">0.001</button>
                 </div>
             </div>
 
-            <!-- Amount Section -->
-            <div class="section">
-                <div class="section-title">Amount</div>
-                
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-label">Recipients</div>
-                        <div class="stat-value" id="totalAddresses">0</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-label">Per Address</div>
-                        <div class="stat-value" id="perAddressDisplay">0</div>
-                    </div>
-                    <div class="stat-card" style="grid-column: 1 / -1;">
-                        <div class="stat-label">Total</div>
-                        <div class="stat-value" id="totalAmount">0</div>
-                    </div>
-                </div>
-
-                <div class="input-group">
-                    <label>Amount per address</label>
-                    <input type="text" id="amountPerAddress" placeholder="0" value="0">
-                    <div class="hint">In native token (ETH, BNB, etc.) - Supports any decimal value</div>
-                    
-                    <!-- Quick preset buttons -->
-                    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-top: 8px;">
-                        <button class="btn" onclick="setAmount('0.000000001')" style="padding: 6px; font-size: 0.75rem; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff;">0.000000001</button>
-                        <button class="btn" onclick="setAmount('0.00001')" style="padding: 6px; font-size: 0.75rem; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: #fff;">0.00001</button>
-                        <button class="btn" onclick="setAmount('0.0001')" style="padding: 6px; font-size: 0.75rem; background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: #fff;">0.0001</button>
-                        <button class="btn" onclick="setAmount('0.001')" style="padding: 6px; font-size: 0.75rem; background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); color: #fff;">0.001</button>
-                    </div>
-                </div>
-
-                <div class="input-group">
-                    <label>Batch Size</label>
-                    <input type="number" id="batchSize" value="50" min="1" max="100">
-                </div>
-            </div>
-        </div>
-
-        <!-- Contract Management Section -->
-        <div class="section">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                <div class="section-title" style="margin-bottom: 0;">Contract Management</div>
-                <button onclick="openContractDeleteModal()" id="batchDeleteContractsBtn" style="background:linear-gradient(135deg,#ef4444,#b91c1c);color:#fff;border:none;padding:5px 12px;border-radius:7px;font-size:0.75rem;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:4px;letter-spacing:0.03em;transition:opacity 0.15s;" onmouseover="this.style.opacity='0.82'" onmouseout="this.style.opacity='1'">🗑 Delete</button>
+            <!-- Summary -->
+            <div class="bt-summary">
+                <span><b id="totalAddresses">0</b> recipients × <b id="perAddressDisplay">0</b></span>
+                <span class="bt-total">Total <b id="totalAmount">0</b> <span class="bt-unit bt-unit-native">ETH</span></span>
             </div>
 
-            <!-- Saved Contracts -->
-            <div id="savedContractsHeader" style="display: none;">
-                <div style="margin-bottom: 6px;">
-                    <label style="margin-bottom: 0; font-size: 0.82rem; color: #888;">Saved Contracts (<span id="savedContractsCount">0</span>)</label>
+            <!-- Contract -->
+            <div class="bt-card bt-contract" id="btContractCardNative">
+                <div class="bt-crow">
+                    <span class="material-icons-round bt-cicon">description</span>
+                    <span class="bt-clabel"><span id="btContractPrefix">Contract</span> <b id="btContractVal">-</b></span>
+                    <span class="bt-ver" id="btContractVer">v3.6</span>
+                    <button type="button" class="bt-iconbtn" aria-label="Show saved contracts" onclick="btToggleContracts('native')"><span class="material-icons-round bt-chev">expand_more</span></button>
+                    <button type="button" class="bt-iconbtn bt-del" id="batchDeleteContractsBtn" aria-label="Delete contracts" onclick="openContractDeleteModal()"><span class="material-icons-round">delete</span></button>
+                </div>
+                <div class="bt-cpanel">
+                    <div id="savedContractsHeader" style="display: none;">
+                        <div style="margin-bottom: 6px;">
+                            <label style="margin-bottom: 0; font-size: 0.82rem; color: #888;">Saved Contracts (<span id="savedContractsCount">0</span>)</label>
+                        </div>
+                    </div>
+                    <div class="saved-contracts" id="savedContractsList"></div>
                 </div>
             </div>
-            <div class="saved-contracts" id="savedContractsList"></div>
 
-            <!-- Execute Section -->
-            <div class="execute-section" style="margin-top: 12px;">
-                <button class="btn btn-primary" id="deployBtn" onclick="deployAndTransfer()" disabled>🔥 Deploy v3.6 (NO AMOUNT!)</button>
-                <button class="btn btn-success" id="executeBtn" onclick="executeTransfer()" disabled>Execute Transfer</button>
+            <!-- Execute -->
+            <div class="execute-section bt-actions">
+                <button class="btn btn-primary" id="deployBtn" onclick="deployAndTransfer()" disabled>Deploy</button>
+                <button class="btn btn-success" id="executeBtn" onclick="executeTransfer()" disabled>Execute transfer</button>
             </div>
             <div class="progress-bar" id="progressBar">
                 <div class="progress-fill" id="progressFill"></div>
             </div>
-        </div>
 
-        <!-- Log Section -->
-        <div class="log-section">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                <div class="section-title" style="margin-bottom: 0;">Logs</div>
-                <button class="btn" onclick="clearLog()" style="width: auto; padding: 6px 12px; font-size: 0.8rem; background: #2a2a2a; color: #e0e0e0;">Clear Log</button>
+            <!-- Log Section -->
+            <div class="log-section">
+                <div class="bt-loghead">
+                    <span class="bt-cap">Logs</span>
+                    <button type="button" class="bt-link" onclick="clearLog()">Clear</button>
+                </div>
+                <div class="log-container" id="logContainer">
+                </div>
             </div>
-            <div class="log-container" id="logContainer">
-            </div>
-        </div>
         </div>
 
         <!-- Token Mode Content -->
         <div id="tokenModeContent" style="display: none;">
-        <!-- First Row: Wallet + Token Contract (single column stacked) -->
-        <div style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 12px;">
             <input type="hidden" id="rpcUrlToken" value="">
 
-            <!-- Wallet Section -->
-            <div class="section">
-                <div class="section-title">
-                    Wallet
+            <!-- Token + Wallet + Recipients -->
+            <div class="bt-card">
+                <div class="bt-row">
+                    <div class="bt-head">
+                        <label class="bt-cap" for="tokenContractAddress">Token contract</label>
+                        <input type="text" id="tokenSymbol" class="bt-symbol" placeholder="Auto" value="" readonly>
+                    </div>
+                    <input type="text" id="tokenContractAddress" placeholder="0x... token address (ERC20)" autocomplete="off" spellcheck="false">
+                    <!-- Hidden decimals field for internal use -->
+                    <input type="hidden" id="tokenDecimals" value="18">
                 </div>
-                <div class="input-group">
-                    <label>Private Key</label>
-                    <button onclick="thOpenWalletPicker('privateKeyToken','single')" style="width:100%;display:flex;align-items:center;justify-content:center;gap:8px;padding:9px 14px;border-radius:9px;border:1px dashed rgba(99,102,241,0.45);background:rgba(99,102,241,0.06);color:var(--neon-purple);font-family:var(--font-mono);font-size:11px;font-weight:700;cursor:pointer;margin-bottom:8px;transition:all .18s;letter-spacing:.5px;" onmousedown="this.style.background='rgba(99,102,241,0.14)'" onmouseup="this.style.background='rgba(99,102,241,0.06)'" ontouchstart="this.style.background='rgba(99,102,241,0.14)'" ontouchend="this.style.background='rgba(99,102,241,0.06)'"><span class="material-icons-round" style="font-size:15px;">account_balance_wallet</span>Select Wallet</button>
+
+                <div class="bt-row">
+                    <div class="bt-head">
+                        <span class="bt-cap">From wallet · private key</span>
+                        <div class="wallet-info bt-info" id="walletInfoBoxToken">
+                            <div class="wallet-info-item bt-bal">
+                                <span class="wallet-info-label">Token</span>
+                                <span class="wallet-info-value" id="walletTokenBalanceToken">-</span>
+                            </div>
+                            <div class="wallet-info-item bt-addr">
+                                <span class="wallet-info-label">Address</span>
+                                <span class="wallet-info-value" id="walletAddressToken">-</span>
+                            </div>
+                            <div class="wallet-info-item bt-gas">
+                                <span class="wallet-info-label">Gas</span>
+                                <span class="wallet-info-value" id="walletNativeBalanceToken">-</span>
+                            </div>
+                        </div>
+                        <button type="button" class="bt-select" onclick="thOpenWalletPicker('privateKeyToken','single')"><span class="material-icons-round">account_balance_wallet</span>Select</button>
+                    </div>
                     <div class="sk-key-wrapper" id="privateKeyTokenWrapper">
-                        <textarea id="privateKeyToken" class="sk-key-textarea sk-masked" placeholder="0xabcd... or abcd... (with/without 0x)" autocomplete="off" rows="2" spellcheck="false"></textarea>
+                        <textarea id="privateKeyToken" class="sk-key-textarea sk-masked" placeholder="0x... (with or without 0x)" autocomplete="off" rows="1" spellcheck="false"></textarea>
                         <button type="button" class="sk-toggle-btn" id="privateKeyTokenToggleBtn" onclick="skToggleKeyVisibility('privateKeyToken','privateKeyTokenToggleBtn')" title="Show/Hide Key">
                             <span class="material-icons-round sk-eye-icon">visibility_off</span>
                         </button>
                     </div>
                 </div>
-                <div class="wallet-info" id="walletInfoBoxToken">
-                    <div class="wallet-info-item">
-                        <span class="wallet-info-label">Address:</span>
-                        <span class="wallet-info-value" id="walletAddressToken">-</span>
+
+                <div class="bt-row">
+                    <div class="bt-head">
+                        <span class="bt-cap">Recipients · <span id="btRecipCountToken">0</span> addresses</span>
+                        <button type="button" class="bt-select" onclick="thOpenWalletPicker('receiverAddressesToken','addresses')"><span class="material-icons-round">groups</span>Select</button>
                     </div>
-                    <div class="wallet-info-item">
-                        <span class="wallet-info-label">Native Balance:</span>
-                        <span class="wallet-info-value" id="walletNativeBalanceToken">-</span>
-                    </div>
-                    <div class="wallet-info-item">
-                        <span class="wallet-info-label">Token Balance:</span>
-                        <span class="wallet-info-value" id="walletTokenBalanceToken">-</span>
+                    <textarea id="receiverAddressesToken" rows="3" placeholder="0x...&#10;0x...&#10;Paste addresses, keys or any text - addresses are auto-extracted"></textarea>
+
+                    <!-- Token Balance Display Box (Collapsible) -->
+                    <div id="recipientBalancesToken" style="display: none; background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 8px; padding: 0; margin-top: 10px; overflow: hidden;">
+                        <div onclick="toggleTokenBalancesBox()" style="padding: 12px; cursor: pointer; background: linear-gradient(135deg, #1a2a3a 0%, #2a1a3a 100%); border-bottom: 1px solid #2a2a2a; display: flex; justify-content: space-between; align-items: center;">
+                            <div style="font-size: 0.85rem; font-weight: 600; color: #4a9eff;">📊 Token Balances</div>
+                            <div id="balanceBoxToggleIcon" style="font-size: 1.2rem; color: #4a9eff; transition: transform 0.3s;">▼</div>
+                        </div>
+                        <div id="recipientBalancesListToken" style="padding: 12px; max-height: 300px; overflow-y: auto; display: block;"></div>
                     </div>
                 </div>
             </div>
 
-            <!-- Token Contract Section -->
-            <div class="section">
-                <div class="section-title">Token Contract</div>
-                <div class="input-group">
-                    <label>Token Address (ERC20)</label>
-                    <input type="text" id="tokenContractAddress" placeholder="0x...">
-                    <div class="hint">Enter token contract address</div>
-                </div>
-                <div class="input-group">
-                    <label>Token Symbol</label>
-                    <input type="text" id="tokenSymbol" placeholder="Auto-detecting..." value="" readonly>
-                    <div class="hint">Auto-detected from contract</div>
-                </div>
-                <!-- Hidden decimals field for internal use -->
-                <input type="hidden" id="tokenDecimals" value="18">
-            </div>
-        </div>
-
-        <!-- Second Row: Recipients + Amount (2 columns) -->
-        <div class="grid">
-            <!-- Recipients Section -->
-            <div class="section">
-                <div class="section-title">Recipients</div>
-                <div class="input-group">
-                    <label>Addresses (one per line)</label>
-                    <button onclick="thOpenWalletPicker('receiverAddressesToken','addresses')" style="width:100%;display:flex;align-items:center;justify-content:center;gap:8px;padding:9px 14px;border-radius:9px;border:1px dashed rgba(6,182,212,0.45);background:rgba(6,182,212,0.06);color:var(--neon-cyan);font-family:var(--font-mono);font-size:11px;font-weight:700;cursor:pointer;margin-bottom:8px;transition:all .18s;letter-spacing:.5px;" onmousedown="this.style.background='rgba(6,182,212,0.14)'" onmouseup="this.style.background='rgba(6,182,212,0.06)'" ontouchstart="this.style.background='rgba(6,182,212,0.14)'" ontouchend="this.style.background='rgba(6,182,212,0.06)'"><span class="material-icons-round" style="font-size:15px;">account_balance_wallet</span>Select Wallet</button>
-                    <textarea id="receiverAddressesToken" placeholder="0x...
-0x...
-0x..."></textarea>
-                    <div class="hint">Supports addresses, private keys, or any format - auto-extracts addresses</div>
-                </div>
-                
-                <!-- Token Balance Display Box (Collapsible) -->
-                <div id="recipientBalancesToken" style="display: none; background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 8px; padding: 0; margin-top: 10px; overflow: hidden;">
-                    <div onclick="toggleTokenBalancesBox()" style="padding: 12px; cursor: pointer; background: linear-gradient(135deg, #1a2a3a 0%, #2a1a3a 100%); border-bottom: 1px solid #2a2a2a; display: flex; justify-content: space-between; align-items: center;">
-                        <div style="font-size: 0.85rem; font-weight: 600; color: #4a9eff;">📊 Token Balances</div>
-                        <div id="balanceBoxToggleIcon" style="font-size: 1.2rem; color: #4a9eff; transition: transform 0.3s;">▼</div>
+            <!-- Amount -->
+            <div class="bt-card bt-amount">
+                <div class="bt-amt-grid">
+                    <div class="bt-amt-main">
+                        <label class="bt-cap" for="amountPerAddressToken">Amount per address</label>
+                        <div class="bt-amt-input">
+                            <input type="text" id="amountPerAddressToken" placeholder="0" value="0" inputmode="decimal" autocomplete="off">
+                            <span class="bt-unit bt-unit-token">TOKEN</span>
+                        </div>
                     </div>
-                    <div id="recipientBalancesListToken" style="padding: 12px; max-height: 300px; overflow-y: auto; display: block;"></div>
-                </div>
-                
-            </div>
-
-            <!-- Amount Section -->
-            <div class="section">
-                <div class="section-title">Amount</div>
-                
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-label">Recipients</div>
-                        <div class="stat-value" id="totalAddressesToken">0</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-label">Per Address</div>
-                        <div class="stat-value" id="perAddressDisplayToken">0</div>
-                    </div>
-                    <div class="stat-card" style="grid-column: 1 / -1;">
-                        <div class="stat-label">Total</div>
-                        <div class="stat-value" id="totalAmountToken">0</div>
+                    <div class="bt-batch">
+                        <label class="bt-cap" for="batchSizeToken">Batch size</label>
+                        <div class="bt-stepper">
+                            <button type="button" aria-label="Decrease batch size" onclick="btStep('batchSizeToken',-1)">&minus;</button>
+                            <input type="number" id="batchSizeToken" value="50" min="1" max="100">
+                            <button type="button" aria-label="Increase batch size" onclick="btStep('batchSizeToken',1)">+</button>
+                        </div>
                     </div>
                 </div>
+                <div class="bt-chips">
+                    <button class="btn" onclick="setAmountToken('0.00001')">0.00001</button>
+                    <button class="btn" onclick="setAmountToken('1')">1</button>
+                    <button class="btn" onclick="setAmountToken('10')">10</button>
+                    <button class="btn" onclick="setAmountToken('100')">100</button>
+                </div>
+            </div>
 
-                <div class="input-group">
-                    <label>Amount per address</label>
-                    <input type="text" id="amountPerAddressToken" placeholder="0" value="0">
-                    <div class="hint">In token units (e.g., 0.00001, 100 USDT, 0.5 ETH token)</div>
-                    
-                    <!-- Quick preset buttons -->
-                    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-top: 8px;">
-                        <button class="btn" onclick="setAmountToken('0.00001')" style="padding: 6px; font-size: 0.75rem; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff;">0.00001</button>
-                        <button class="btn" onclick="setAmountToken('1')" style="padding: 6px; font-size: 0.75rem; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: #fff;">1</button>
-                        <button class="btn" onclick="setAmountToken('10')" style="padding: 6px; font-size: 0.75rem; background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: #fff;">10</button>
-                        <button class="btn" onclick="setAmountToken('100')" style="padding: 6px; font-size: 0.75rem; background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); color: #fff;">100</button>
+            <!-- Summary -->
+            <div class="bt-summary">
+                <span><b id="totalAddressesToken">0</b> recipients × <b id="perAddressDisplayToken">0</b></span>
+                <span class="bt-total">Total <b id="totalAmountToken">0</b> <span class="bt-unit bt-unit-token">TOKEN</span></span>
+            </div>
+
+            <!-- Contract -->
+            <div class="bt-card bt-contract" id="btContractCardToken">
+                <div class="bt-crow">
+                    <span class="material-icons-round bt-cicon">description</span>
+                    <span class="bt-clabel"><span id="btContractPrefixToken">Contract</span> <b id="btContractValToken">-</b></span>
+                    <button type="button" class="bt-iconbtn" aria-label="Show saved contracts" onclick="btToggleContracts('token')"><span class="material-icons-round bt-chev">expand_more</span></button>
+                    <button type="button" class="bt-iconbtn bt-del" id="batchDeleteContractsBtnToken" aria-label="Delete contracts" onclick="openContractDeleteModalToken()"><span class="material-icons-round">delete</span></button>
+                </div>
+                <div class="bt-cpanel">
+                    <div id="savedContractsHeaderToken" style="display: none;">
+                        <div style="margin-bottom: 6px;">
+                            <label style="margin-bottom: 0; font-size: 0.82rem; color: #888;">Saved Contracts (<span id="savedContractsCountToken">0</span>)</label>
+                        </div>
                     </div>
-                </div>
-
-                <div class="input-group">
-                    <label>Batch Size</label>
-                    <input type="number" id="batchSizeToken" value="50" min="1" max="100">
+                    <div class="saved-contracts" id="savedContractsListToken"></div>
                 </div>
             </div>
-        </div>
 
-        <!-- Contract Management Section -->
-        <div class="section">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                <div class="section-title" style="margin-bottom: 0;">Contract Management</div>
-                <button onclick="openContractDeleteModalToken()" id="batchDeleteContractsBtnToken" style="background:linear-gradient(135deg,#ef4444,#b91c1c);color:#fff;border:none;padding:5px 12px;border-radius:7px;font-size:0.75rem;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:4px;letter-spacing:0.03em;transition:opacity 0.15s;" onmouseover="this.style.opacity='0.82'" onmouseout="this.style.opacity='1'">🗑 Delete</button>
-            </div>
-            
-            <!-- Saved Contracts -->
-            <div id="savedContractsHeaderToken" style="display: none;">
-                <div style="margin-bottom: 6px;">
-                    <label style="margin-bottom: 0; font-size: 0.82rem; color: #888;">Saved Contracts (<span id="savedContractsCountToken">0</span>)</label>
-                </div>
-            </div>
-            <div class="saved-contracts" id="savedContractsListToken"></div>
-
-            <!-- Execute Section -->
-            <div class="execute-section" style="margin-top: 12px;">
-                <button class="btn btn-primary" id="deployBtnToken" onclick="deployContractToken()" disabled>Deploy New Contract</button>
-                <button class="btn btn-success" id="executeBtnToken" onclick="executeTransferToken()" disabled>Execute Transfer</button>
+            <!-- Execute -->
+            <div class="execute-section bt-actions">
+                <button class="btn btn-primary" id="deployBtnToken" onclick="deployContractToken()" disabled>Deploy</button>
+                <button class="btn btn-success" id="executeBtnToken" onclick="executeTransferToken()" disabled>Execute transfer</button>
             </div>
             <div class="progress-bar" id="progressBarToken">
                 <div class="progress-fill" id="progressFillToken"></div>
             </div>
-        </div>
 
-        <!-- Log Section -->
-        <div class="log-section">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                <div class="section-title" style="margin-bottom: 0;">Logs</div>
-                <button class="btn" onclick="clearLogToken()" style="width: auto; padding: 6px 12px; font-size: 0.8rem; background: #2a2a2a; color: #e0e0e0;">Clear Log</button>
+            <!-- Log Section -->
+            <div class="log-section">
+                <div class="bt-loghead">
+                    <span class="bt-cap">Logs</span>
+                    <button type="button" class="bt-link" onclick="clearLogToken()">Clear</button>
+                </div>
+                <div class="log-container" id="logContainerToken">
+
+                </div>
             </div>
-            <div class="log-container" id="logContainerToken">
-                
-            </div>
-        </div>
         </div>
 
         </div>
