@@ -6,6 +6,7 @@ Per-build release notes are published on the [Releases](../../releases) page.
 ## [Unreleased]
 
 ### Changed
+- **Token Approval logs:** opening Logs no longer folds / hides the key box and hints; the log box is scrolled into view when it opens (`th-token-approval-manager-mobile.css`, `token-approval-ui-sync.js`).
 - **Self transfer layout:** the screen now fills the space down to the bottom nav bar like W2W (cards spread out, Logs strip sits right above the nav bar), no more big empty gap (`th-self-transfer-mobile.css`).
 - **Self transfer + W2W logs:** opening Logs no longer folds / hides the key boxes, hints or amount chips - everything stays where it is and the log box is scrolled into view when it opens (fixes the Logs tap looking like it did nothing on W2W).
 - **NFT Transfer + Self Transfer:** the action button (Transfer NFTs / Collect NFTs / Execute transfer) is now centred on the screen and only a little wider than its label; the gas pill stays on the left. Styling only (`th-nft-transfer-mobile.css`, `th-self-transfer-mobile.css`).

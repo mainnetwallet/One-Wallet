@@ -3,7 +3,7 @@
 // Presentation glue for the compact Token Approval layout
 // (html-src/partials/page-transfer-hub/token-approval-manager.html).
 // It never touches wallet, signing or approval logic: it only
-//   * opens/closes the logs box (and folds the key box while logs are open),
+//   * opens/closes the logs box (nothing above it is hidden; it scrolls into view when opened),
 //   * drives the Unlimited / Custom / Revoke chips by writing to the same
 //     #approvalAmount input the approval already reads (empty = unlimited, 0 = revoke),
 //   * mirrors the chosen mode and wallet count into the summary and the
@@ -27,6 +27,10 @@
     var willOpen = typeof open === 'boolean' ? open : box.classList.contains('collapsed');
     box.classList.toggle('collapsed', !willOpen);
     if (ui) ui.classList.toggle('ap-logs-open', willOpen);
+    // Nothing above folds away, so if the opened log box ends up below the visible area, bring it into view
+    if (willOpen) setTimeout(function () {
+      try { box.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); } catch (e) { box.scrollIntoView(false); }
+    }, 60);
   };
 
   // Amount chips: Unlimited = empty, Revoke = 0, Custom = type your own amount

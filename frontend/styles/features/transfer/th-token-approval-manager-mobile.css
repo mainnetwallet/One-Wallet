@@ -99,8 +99,7 @@
         #th-wrapper #tokenApprovalManagerUI .ap-clear .material-icons-round { font-size: 20px; color: #f87171; }
         #th-wrapper #tokenApprovalManagerUI .bt-dock { padding-top: 6px; }
 
-/* Logs: collapsed strip by default. Opening it folds the key box and hints so the log box fits on screen. */
+/* Logs: collapsed strip by default. Opening it never hides or folds anything above. */
         #th-wrapper #tokenApprovalManagerUI .bt-logs { padding: 4px 0 0 !important; }
         #th-wrapper #tokenApprovalManagerUI .bt-logs .bt-loghead { height: 36px; }
         #th-wrapper #tokenApprovalManagerUI .bt-logs .log-container { height: 130px !important; max-height: none !important; }
-        #th-wrapper #tokenApprovalManagerUI.ap-logs-open :is(.ap-keys, .mk-meta) { display: none !important; }
