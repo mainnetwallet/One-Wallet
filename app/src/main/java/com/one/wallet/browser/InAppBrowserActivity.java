@@ -133,6 +133,47 @@ public class InAppBrowserActivity extends AppCompatActivity {
     private NativeWalletGroupAdapter nativeWalletGroupAdapter;
     private org.json.JSONArray nativeWalletGroupsData = new org.json.JSONArray();
 
+    // ── Strict validation + JS-literal helpers for page-controlled bridge input ──
+    // Strings that originate in a dApp page must never be spliced into JS that runs in the
+    // key-holding main WebView without (a) validation at the bridge entry and (b) JSON quoting.
+    private static final java.util.regex.Pattern ADDRESS_RE =
+        java.util.regex.Pattern.compile("^0x[0-9a-fA-F]{40}$");
+    private static final java.util.regex.Pattern CHAIN_ID_RE =
+        java.util.regex.Pattern.compile("^0x[0-9a-fA-F]{1,16}$");
+    private static final java.util.regex.Pattern METHOD_RE =
+        java.util.regex.Pattern.compile("^[A-Za-z0-9_.:-]{1,64}$");
+
+    public static boolean isValidAddress(String s) { return s != null && ADDRESS_RE.matcher(s).matches(); }
+    public static boolean isValidChainId(String s) { return s != null && CHAIN_ID_RE.matcher(s).matches(); }
+    public static boolean isValidMethod(String s)  { return s != null && METHOD_RE.matcher(s).matches(); }
+
+    /** Returns {@code s} as a complete, double-quoted JavaScript string literal (quotes included). */
+    public static String jsStr(String s) {
+        String q = JSONObject.quote(s == null ? "" : s);
+        return q.replace(String.valueOf((char) 0x2028), "\\u2028")
+                .replace(String.valueOf((char) 0x2029), "\\u2029");
+    }
+
+    /** Escapes {@code s} for use as HTML text inside a single-quoted JS string literal. */
+    private static String escForInjectedHtml(String s) {
+        if (s == null) return "";
+        StringBuilder sb = new StringBuilder(s.length() + 16);
+        for (int i = 0; i < s.length(); i++) {
+            char c = s.charAt(i);
+            switch (c) {
+                case '&':  sb.append("&amp;");  break;
+                case '<':  sb.append("&lt;");   break;
+                case '>':  sb.append("&gt;");   break;
+                case '"':  sb.append("&quot;"); break;
+                case '\'': sb.append("&#39;");  break;
+                case '\\': sb.append("\\\\"); break;
+                case '\n': case '\r': case 0x2028: case 0x2029: sb.append(' '); break;
+                default:   sb.append(c);
+            }
+        }
+        return sb.toString();
+    }
+
     public void saveSelectedChain(String id, String name, String logoURI) {
         selectedChainId      = id;
         selectedChainName    = name;
@@ -1003,21 +1044,21 @@ public class InAppBrowserActivity extends AppCompatActivity {
         wv.addJavascriptInterface(new Object() {
             @android.webkit.JavascriptInterface
             public void onChainSelected(String hexId, String name, String logoURI) {
-                if (hexId == null || hexId.isEmpty()) return;
+                if (!isValidChainId(hexId)) return;
                 saveSelectedChain(hexId, name != null ? name : hexId, logoURI);
                 runOnUiThread(() -> {
                     updateChainButton();
                     WebView dApp = activeWebView();
                     if (dApp != null) {
-                        String safeId = hexId.replace("\\","\\\\").replace("\"","\\\"");
-                        String accts  = selectedWalletAddress != null
-                            ? "[\"" + selectedWalletAddress.replace("\\","\\\\").replace("\"","\\\"") + "\"]"
+                        String safeId = jsStr(hexId);
+                        String accts  = isValidAddress(selectedWalletAddress)
+                            ? "[" + jsStr(selectedWalletAddress) + "]"
                             : "[]";
                         dApp.post(() -> {
                             dApp.evaluateJavascript(
-                                "window._oneBrowserChainId = \"" + safeId + "\";", null);
+                                "window._oneBrowserChainId = " + safeId + ";", null);
                             dApp.evaluateJavascript(
-                                "window.ethereum && window.ethereum._updateState(" + accts + ", \"" + safeId + "\");",
+                                "window.ethereum && window.ethereum._updateState(" + accts + ", " + safeId + ");",
                                 null);
                         });
                     }
@@ -1377,24 +1418,25 @@ public class InAppBrowserActivity extends AppCompatActivity {
     public class OneWeb3Bridge {
         @JavascriptInterface
         public void walletSelected(final String address) {
-            if (address == null) return;
+            if (!isValidAddress(address)) return;
             // ── Persist at Java level so it survives page navigation & app restart ──
             saveSelectedWallet(address);
             WebView mv = MainActivity.getMainWebView();
             if (mv == null) return;
-            String safeAddr = address.replace("\"", "\\\"");
+            String safeAddr = jsStr(address);
             // BUG 2 FIX: Pass current chainId so oneSetBrowserSelectedWallet correctly
             // sets _oneBrowserChainId — without it signing uses wrong chain
             String chainId = selectedChainId != null ? selectedChainId : "0x1";
-            String safeChain = chainId.replace("\"", "\\\"");
+            String safeChain = jsStr(isValidChainId(chainId) ? chainId : "0x1");
             mv.post(() -> mv.evaluateJavascript(
-                "window.oneSetBrowserSelectedWallet && window.oneSetBrowserSelectedWallet(\"" + safeAddr + "\", \"" + safeChain + "\");", null));
+                "window.oneSetBrowserSelectedWallet && window.oneSetBrowserSelectedWallet(" + safeAddr + ", " + safeChain + ");", null));
         }
 
         @JavascriptInterface
         public void handleRequest(final int reqId, final String method, final String paramsJson) {
-            android.util.Log.d("OneWeb3", "Request #" + reqId + " method=" + method);
             WebView mv = MainActivity.getMainWebView();
+            if (!isValidMethod(method)) { resolveError(reqId, "Unsupported method"); return; }
+            android.util.Log.d("OneWeb3", "Request #" + reqId + " method=" + method);
             if (mv == null) { resolveError(reqId, "One Wallet not available"); return; }
             // Record which WebView (tab) originated this request for correct response routing.
             // activeWebView() reads main-thread state, so snapshot it safely on the UI thread
@@ -1413,11 +1455,11 @@ public class InAppBrowserActivity extends AppCompatActivity {
             WebView originWv = originHolder[0];
             if (originWv != null) sReqTabMap.put(reqId, new WeakReference<>(originWv));
             String escaped = paramsJson == null ? "[]" : paramsJson.replace("\\", "\\\\").replace("`", "\\`").replace("$", "\\$");
-            String escapedMethod = method == null ? "" : method.replace("\"", "\\\"");
+            String escapedMethod = jsStr(method);
             mv.post(() -> mv.evaluateJavascript(
                 "(function(){\n  try {\n    if (typeof oneHandleWeb3Request === 'function') {\n" +
-                "      oneHandleWeb3Request(" + reqId + ", \"" + escapedMethod + "\", `" + escaped + "`);\n" +
-                "    } else { window._oneWeb3Fallback && window._oneWeb3Fallback(" + reqId + ", \"" + escapedMethod + "\", `" + escaped + "`); }\n" +
+                "      oneHandleWeb3Request(" + reqId + ", " + escapedMethod + ", `" + escaped + "`);\n" +
+                "    } else { window._oneWeb3Fallback && window._oneWeb3Fallback(" + reqId + ", " + escapedMethod + ", `" + escaped + "`); }\n" +
                 "  } catch(e) { console.error('[OneWeb3] dispatch error:', e); }\n})()", null));
         }
 
@@ -1522,10 +1564,11 @@ public class InAppBrowserActivity extends AppCompatActivity {
         if (a == null) return;
         WebView wv = a.activeWebView();
         if (wv == null) return;
-        String safeAccounts = accountsJson == null ? "[]" : accountsJson.replace("`", "\\`").replace("$", "\\$");
-        String safeChain = chainId == null ? "0x1" : chainId.replace("\"", "\\\"");
+        String safeAccounts = accountsJson == null ? "[]"
+            : accountsJson.replace("\\", "\\\\").replace("`", "\\`").replace("$", "\\$");
+        String safeChain = jsStr(isValidChainId(chainId) ? chainId : "0x1");
         wv.post(() -> wv.evaluateJavascript(
-            "window.ethereum && window.ethereum._updateState(`" + safeAccounts + "`, \"" + safeChain + "\");", null));
+            "window.ethereum && window.ethereum._updateState(`" + safeAccounts + "`, " + safeChain + ");", null));
     }
 
     public static void injectTxModal(final int reqId, final String actionLabel, final String siteHost,
@@ -1535,9 +1578,9 @@ public class InAppBrowserActivity extends AppCompatActivity {
         WebView wv = a.activeWebView();
         if (wv == null) return;
         String safeBody    = bodyHtml    == null ? "" : bodyHtml.replace("\\","\\\\").replace("`","\\`").replace("$","\\$");
-        String safeAction  = actionLabel == null ? "REQUEST" : actionLabel.replace("\"","\\\"");
-        String safeHost    = siteHost    == null ? "dApp"    : siteHost.replace("\"","\\\"");
-        String safeApprove = approveLabel== null ? "Confirm" : approveLabel.replace("\"","\\\"");
+        String safeAction  = actionLabel == null ? "REQUEST" : escForInjectedHtml(actionLabel);
+        String safeHost    = siteHost    == null ? "dApp"    : escForInjectedHtml(siteHost);
+        String safeApprove = approveLabel== null ? "Confirm" : escForInjectedHtml(approveLabel);
         StringBuilder sb = new StringBuilder();
         sb.append("(function(){");
         sb.append("var _MID='_one_tx_modal_overlay';");

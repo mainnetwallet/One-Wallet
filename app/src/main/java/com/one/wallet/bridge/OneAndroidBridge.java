@@ -324,14 +324,16 @@ public class OneAndroidBridge {
         MainActivity a = getActivity(); if (a == null) return;
         WebView mv = MainActivity.getMainWebView();
         if (mv == null) return;
-        String safeAddr = address == null ? "" : address.replace("\"", "\\\"");
+        // Empty clears the selection; anything else must be a well-formed address.
+        if (address != null && !address.isEmpty() && !InAppBrowserActivity.isValidAddress(address)) return;
+        final String safeAddr = InAppBrowserActivity.jsStr(address == null ? "" : address);
         InAppBrowserActivity browser = InAppBrowserActivity.getInstance();
         String chainId = (browser != null) ? browser.getSelectedChainId() : "0x1";
-        if (chainId == null || chainId.isEmpty()) chainId = "0x1";
-        final String safeChain = chainId.replace("\"", "\\\"");
+        if (!InAppBrowserActivity.isValidChainId(chainId)) chainId = "0x1";
+        final String safeChain = InAppBrowserActivity.jsStr(chainId);
         mv.post(() -> mv.evaluateJavascript(
             "window.oneSetBrowserSelectedWallet && " +
-            "window.oneSetBrowserSelectedWallet(\"" + safeAddr + "\", \"" + safeChain + "\");",
+            "window.oneSetBrowserSelectedWallet(" + safeAddr + ", " + safeChain + ");",
             null
         ));
     }
@@ -375,7 +377,7 @@ public class OneAndroidBridge {
 
     @JavascriptInterface
     public void web3SwitchChain(final String hexId, final String name) {
-        if (hexId == null || hexId.isEmpty()) return;
+        if (!InAppBrowserActivity.isValidChainId(hexId)) return;
         InAppBrowserActivity browser = InAppBrowserActivity.getInstance();
         if (browser == null) return;
         browser.runOnUiThread(() -> {

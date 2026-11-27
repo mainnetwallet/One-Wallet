@@ -6,6 +6,12 @@ Per-build release notes are published on the [Releases](../../releases) page.
 ## [Unreleased]
 
 ### Fixed
+- **Security: a web page in the in-app browser could run code inside the wallet:** the wallet address, chain id and
+  request method that a dApp page sends to the browser bridge were put into JavaScript run in the main wallet view with
+  only the `"` character escaped, so a `\` in the input could break out of the string. These values are now validated
+  at the bridge entry (address `0x` + 40 hex, chain id hex, method name charset) and passed as JSON-quoted literals;
+  the transaction-modal labels are HTML-escaped. Applies to wallet select, chain select, dApp requests, account state
+  and the transaction modal.
 - **Swipe down to close no longer gets stuck half-way (Send token and Select token sheets):** the Send sheet and the Bridge
   chain / token pickers had their own swipe code, and a drag could freeze mid-screen: the WebView cancels the touch when it
   starts a native pan, and nothing handled that cancel; the gesture also gave up on the first sideways wobble or when the
