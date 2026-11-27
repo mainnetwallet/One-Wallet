@@ -443,13 +443,17 @@
         #th-wrapper #batchTransferUI .bt-gasrow {
             display: flex;
             justify-content: flex-end;
-            margin: 0 0 6px;
+            align-items: center;
+            margin: 0 2px 6px;
         }
         #th-wrapper #batchTransferUI .bt-gaspill {
             display: inline-flex;
             align-items: center;
             gap: 5px;
-            padding: 4px 10px 4px 8px;
+            height: 26px;
+            min-height: 0 !important;
+            padding: 0 10px 0 7px;
+            margin: 0;
             border-radius: 999px;
             background: var(--bg-raised);
             border: 1px solid var(--border-subtle);
@@ -563,3 +567,121 @@
             border-color: var(--border-subtle) !important;
             border-radius: 8px !important;
         }
+
+/* ══════════════════════════════════════════════════════
+   Batch Transfer — polish (Native + Token)
+   The global touch rule forces min-height:44px on every button/input inside
+   #th-wrapper, which made the small controls look oversized. Reset it here.
+   ══════════════════════════════════════════════════════ */
+        #th-wrapper #batchTransferUI .bt-select,
+        #th-wrapper #batchTransferUI .bt-stepper button,
+        #th-wrapper #batchTransferUI .bt-iconbtn,
+        #th-wrapper #batchTransferUI .bt-link,
+        #th-wrapper #batchTransferUI .bt-gaspill,
+        #th-wrapper #batchTransferUI .sk-toggle-btn {
+            min-height: 0 !important;
+            min-width: 0 !important;
+        }
+        #th-wrapper #batchTransferUI .bt-select { height: 32px; }
+
+        /* ── Cards: soft depth ── */
+        #th-wrapper #batchTransferUI .bt-card {
+            background: linear-gradient(180deg, rgba(255,255,255,0.035) 0%, rgba(255,255,255,0) 100%), var(--bg-raised);
+            border-radius: 16px;
+            box-shadow: 0 1px 0 rgba(255,255,255,0.04) inset, 0 6px 18px rgba(0,0,0,0.22);
+            margin-bottom: 8px;
+        }
+        #th-wrapper #batchTransferUI .bt-row { padding: 10px 12px; }
+        #th-wrapper #batchTransferUI .bt-amount { padding: 10px 12px; }
+
+        /* ── Labels ── */
+        #th-wrapper #batchTransferUI .bt-cap {
+            font-size: 0.66rem !important;
+            font-weight: 700 !important;
+            letter-spacing: 0.04em !important;
+            text-transform: uppercase !important;
+            color: var(--text-muted) !important;
+        }
+
+        /* ── Native / Token switch ── */
+        #th-wrapper #batchTransferUI .bt-seg {
+            border-radius: 14px;
+            box-shadow: 0 1px 0 rgba(255,255,255,0.03) inset;
+        }
+        #th-wrapper #batchTransferUI .mode-toggle-btn.active {
+            background: linear-gradient(135deg, rgba(99,102,241,0.34), rgba(139,92,246,0.22)) !important;
+            border-color: rgba(129,140,248,0.45) !important;
+            color: #fff !important;
+            box-shadow: 0 2px 10px rgba(99,102,241,0.28) !important;
+        }
+
+        /* ── Select buttons ── */
+        #th-wrapper #batchTransferUI .bt-select {
+            background: rgba(99,102,241,0.12);
+            border-color: rgba(129,140,248,0.28);
+            border-radius: 10px;
+        }
+
+        /* ── Inputs ── */
+        #th-wrapper #batchTransferUI input[type="text"],
+        #th-wrapper #batchTransferUI textarea:not(.sk-key-textarea),
+        #th-wrapper #batchTransferUI .bt-row .sk-key-textarea {
+            border-radius: 11px !important;
+        }
+
+        /* ── Amount ── */
+        #th-wrapper #batchTransferUI .bt-amt-input {
+            border-bottom-width: 2px;
+            border-image: linear-gradient(90deg, var(--accent-primary), rgba(139,92,246,0.35)) 1;
+        }
+        #th-wrapper #batchTransferUI .bt-stepper {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-subtle);
+            border-radius: 11px;
+            padding: 2px;
+        }
+        #th-wrapper #batchTransferUI .bt-stepper button { background: transparent; border-radius: 9px; }
+        #th-wrapper #batchTransferUI .bt-chips .btn { border-radius: 10px !important; }
+
+        /* ── Summary strip ── */
+        #th-wrapper #batchTransferUI .bt-summary {
+            background: linear-gradient(135deg, rgba(99,102,241,0.20), rgba(139,92,246,0.10));
+            border: 1px solid rgba(129,140,248,0.22);
+            border-radius: 14px;
+            padding: 10px 14px;
+            margin-bottom: 8px;
+        }
+
+        /* ── Contract row ── */
+        #th-wrapper #batchTransferUI .bt-crow { padding: 4px 6px 4px 12px; }
+        #th-wrapper #batchTransferUI .bt-iconbtn { width: 36px; height: 36px; border-radius: 10px; }
+
+        /* ── Gas pill ── */
+        #th-wrapper #batchTransferUI .bt-gaspill {
+            background: linear-gradient(135deg, rgba(99,102,241,0.18), rgba(245,158,11,0.10));
+            border-color: rgba(129,140,248,0.30);
+            box-shadow: 0 1px 6px rgba(0,0,0,0.25);
+        }
+
+        /* ── Deploy / Execute ── */
+        #th-wrapper #batchTransferUI .bt-actions { gap: 10px !important; margin-bottom: 10px !important; }
+        #th-wrapper #batchTransferUI .bt-actions .btn {
+            min-height: 46px !important;
+            border-radius: 14px !important;
+            letter-spacing: 0.01em;
+        }
+        #th-wrapper #batchTransferUI .bt-actions .btn-primary {
+            background: transparent !important;
+            border: 1.5px solid rgba(129,140,248,0.45) !important;
+            color: #c7d2fe !important;
+        }
+        #th-wrapper #batchTransferUI .bt-actions .btn-success {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%) !important;
+            border: none !important;
+            color: #fff !important;
+            box-shadow: 0 6px 18px rgba(99,102,241,0.38) !important;
+        }
+        #th-wrapper #batchTransferUI .bt-actions .btn-success:disabled { box-shadow: none !important; }
+
+        /* ── Logs ── */
+        #th-wrapper #batchTransferUI .log-container { border-radius: 14px !important; }

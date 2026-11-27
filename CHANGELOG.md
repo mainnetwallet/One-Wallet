@@ -6,6 +6,10 @@ Per-build release notes are published on the [Releases](../../releases) page.
 ## [Unreleased]
 
 ### Changed
+- **Batch Transfer polish (Native + Token):** the gas pill and the small Select / stepper / icon buttons were being
+  stretched to 44px by the global touch rule - they are now compact again. Cards get soft depth, the Native / Token
+  switch and the Execute button use the accent gradient, Deploy is an outlined secondary button, and the total strip,
+  amount underline and stepper were tidied.
 - **Batch Transfer gas type:** one small gas pill (top-right of the Deploy / Execute row) replaces the two duplicate
   Gas Type boxes. It shows only the current mode (AUTO by default); tap it to switch AUTO → 1559 → LEGACY. The same
   setting is used for Deploy and Execute, and the choice is now remembered across app restarts.
