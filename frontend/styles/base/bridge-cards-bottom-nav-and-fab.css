@@ -14,6 +14,9 @@
   }
   #br-routes-scroll-area::-webkit-scrollbar { display: none; }
 
+  /* Routes list sits slightly inside the page padding, so the cards are narrower on both sides */
+  #br-routes-list { box-sizing: border-box; padding: 0 10px; }
+
   /* Bridge route cards */
   .br-route-card {
     background: var(--bg-raised);

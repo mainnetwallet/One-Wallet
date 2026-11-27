@@ -19,6 +19,8 @@ Per-build release notes are published on the [Releases](../../releases) page.
   soft gradient, dark text and a soft tinted shadow, in both dark and light theme. The look now lives in one CSS rule
   (`#br-exec-btn` in `styles/base/bridge-cards-bottom-nav-and-fab.css`, via `--br-exec-*` variables); scripts no longer
   write the old gradient inline when the button is reset, loading or re-enabled. The loading spinner uses the same text colour.
+- **Bridge route cards width:** the route cards are inset by 10px more on the left and right, so they are narrower than
+  the swap panel above. The card design itself is unchanged.
 - **Bridge page layout:** FROM and TO now sit in one swap panel with the flip button on the divider between them.
   Chain and token pills are side by side on the left and the amount is on the right (FROM and TO); the balance
   (left) and USD value (right) share one row under them. The % slider and MAX stay in the FROM section, and the
