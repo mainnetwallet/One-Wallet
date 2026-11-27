@@ -6,6 +6,7 @@ Per-build release notes are published on the [Releases](../../releases) page.
 ## [Unreleased]
 
 ### Changed
+- **W2W transfer layout:** the screen now fills the space down to the bottom nav bar (fields spread out, Logs strip sits right above the nav bar), the Amount per transfer value is centred in its card, and the Execute transfer button is centred and only as wide as its label (gas pill stays on the left). Markup untouched; styling only (`th-w2w-compact.css`), applies to Native and Token.
 - **Key & Address Tools UI:** now uses the same compact layout as the other transfer tools - a Phrase -> Key / Key -> Address
   switch, one card for phrases (or private keys) with Paste / Select buttons and a live count, derivation path and
   addresses-per-phrase side by side, Generate keys + Clear icon on one row, compact result rows (short address, masked key with

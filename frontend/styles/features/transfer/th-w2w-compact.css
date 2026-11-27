@@ -78,3 +78,76 @@
         #th-wrapper #walletToWalletUI .bt-logs .log-container { height: 130px !important; }
         #th-wrapper #walletToWalletUI.w2w-logs-open .w2w-fold { display: none !important; }
         #th-wrapper #walletToWalletUI.w2w-logs-open .bt-row .bt-head { margin-bottom: 0; }
+
+/* ══════════════════════════════════════════════════
+   LAYOUT POLISH — fill the screen down to the nav bar, centred amount, centred Execute button
+   ══════════════════════════════════════════════════ */
+
+/* The screen is a column as tall as the page (page height minus nav bar + safe areas + page padding):
+   header + switch on top, the active fields spread out in the middle, the Logs strip sits at the bottom just above the nav bar.
+   Visible state is detected from the inline display (same pattern the dashboard toggles use) because the show/hide helpers set it inline. */
+        #th-wrapper #walletToWalletUI {
+            box-sizing: border-box;
+            min-height: calc(100vh - var(--nav-height) - env(safe-area-inset-bottom, 0px) - env(safe-area-inset-top, 0px) - 20px);
+            min-height: calc(100dvh - var(--nav-height) - env(safe-area-inset-bottom, 0px) - env(safe-area-inset-top, 0px) - 20px);
+            padding-bottom: 4px !important;
+        }
+        #th-wrapper #walletToWalletUI:not([style*="display:none"]):not([style*="display: none"]) {
+            display: flex !important;
+            flex-direction: column;
+        }
+        #th-wrapper #walletToWalletUI > .th-section-header,
+        #th-wrapper #walletToWalletUI > .bt-seg-wrap { flex: none; }
+        #th-wrapper #walletToWalletUI #w2wNativeFields:not([style*="display:none"]):not([style*="display: none"]),
+        #th-wrapper #walletToWalletUI #w2wTokenFields:not([style*="display:none"]):not([style*="display: none"]) {
+            display: flex !important;
+            flex-direction: column;
+            flex: 1 1 auto;
+            justify-content: space-evenly;
+            height: auto !important;
+        }
+        #th-wrapper #walletToWalletUI .transfer-fields > .bt-card,
+        #th-wrapper #walletToWalletUI .transfer-fields > .bt-summary,
+        #th-wrapper #walletToWalletUI .transfer-fields > .bt-dock { flex: none; margin-top: 0; margin-bottom: 0; }
+        #th-wrapper #walletToWalletUI > .bt-logs { flex: none; margin-top: auto !important; }
+
+/* Amount per transfer: label and number in the middle of the card, unit pinned to the right edge */
+        #th-wrapper #walletToWalletUI .bt-amount { padding: 12px 12px 10px; }
+        #th-wrapper #walletToWalletUI .bt-amt-grid { grid-template-columns: minmax(0, 1fr); }
+        #th-wrapper #walletToWalletUI .bt-amt-main .bt-cap { text-align: center; }
+        #th-wrapper #walletToWalletUI .bt-amt-input {
+            position: relative;
+            justify-content: center;
+            border-image: linear-gradient(90deg, rgba(139,92,246,0.35), var(--accent-primary), rgba(139,92,246,0.35)) 1;
+        }
+        #th-wrapper #walletToWalletUI .bt-amt-input input {
+            flex: 1;
+            text-align: center;
+            padding: 2px 56px !important;
+        }
+        #th-wrapper #walletToWalletUI .bt-amt-input .bt-unit {
+            position: absolute;
+            right: 2px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+/* Gas pill on the left, Execute transfer in the middle and only as wide as its label */
+        #th-wrapper #walletToWalletUI .w2w-act {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+            align-items: center;
+            gap: 8px;
+        }
+        #th-wrapper #walletToWalletUI .w2w-act .bt-gasrow { grid-column: 1; justify-self: start; }
+        #th-wrapper #walletToWalletUI .w2w-act .bt-actions {
+            grid-column: 2;
+            flex: none;
+            width: auto;
+            grid-template-columns: auto !important;
+        }
+        #th-wrapper #walletToWalletUI .w2w-act .bt-actions .btn {
+            width: auto;
+            padding: 8px 28px !important;
+            white-space: nowrap;
+        }
