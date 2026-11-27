@@ -147,3 +147,19 @@
         #th-wrapper #multiKeyNativeUI :is(#multiKeyNativeModeContent, #multiKeyTokenModeContent) .bt-dock .progress-bar { margin: 4px 0 0 !important; }
         #th-wrapper #multiKeyNativeUI :is(#multiKeyNativeModeContent, #multiKeyTokenModeContent) .bt-logs { padding: 2px 0 0 !important; }
         #th-wrapper #multiKeyNativeUI :is(#multiKeyNativeModeContent, #multiKeyTokenModeContent) .bt-logs .bt-loghead { height: 34px; }
+
+/* ── Single action buttons (Execute direct transfer / Start transfer): centred ── */
+        #th-wrapper #multiKeyNativeUI #directTransferSection .bt-actions,
+        #th-wrapper #multiKeyNativeUI #multiKeyTokenModeContent .bt-actions {
+            display: flex !important;
+            justify-content: center;
+        }
+        #th-wrapper #multiKeyNativeUI #executeDirectBtnMultiKeyNative,
+        #th-wrapper #multiKeyNativeUI #executeBtnMultiKeyToken {
+            flex: 0 1 280px;
+            width: 280px;
+            max-width: 100%;
+            margin: 0 auto;
+            text-align: center;
+            justify-content: center;
+        }
