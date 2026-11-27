@@ -14,6 +14,8 @@ window.oneLock = (function() {
     credId       : 'one_bio_cred_id',
     default      : 'one_lock_default',
     masterSecret : 'one_lock_master_secret', // single AES key shared across all lock methods
+    failCount    : 'one_lock_fails',         // consecutive wrong PIN/pattern attempts
+    lockUntil    : 'one_lock_until',         // epoch ms until which PIN/pattern entry is blocked
   };
 
   var PIN_LEN = 6; // 6-digit PIN
@@ -108,6 +110,29 @@ window.oneLock = (function() {
   function _get(k){try{return localStorage.getItem(k);}catch(e){return null;}}
   function _set(k,v){try{localStorage.setItem(k,v);}catch(e){}}
   function _del(k){try{localStorage.removeItem(k);}catch(e){}}
+
+  // ── Wrong-attempt limit (PIN / pattern) ──
+  // After FAIL_FREE wrong attempts entry is blocked for 30 s, doubling per further miss (max 1 h).
+  // The counter is stored, so restarting the app does not reset it; a correct entry clears it.
+  var FAIL_FREE = 5;
+  function _lockoutLeft(){
+    var until = parseInt(_get(SK.lockUntil) || '0', 10) || 0;
+    var left = until - Date.now();
+    return left > 0 ? left : 0;
+  }
+  function _lockoutMsg(ms){
+    var sec = Math.ceil(ms / 1000);
+    return 'Too many attempts. Try again in ' + (sec >= 60 ? Math.ceil(sec / 60) + ' min' : sec + ' s');
+  }
+  function _registerFail(){
+    var n = (parseInt(_get(SK.failCount) || '0', 10) || 0) + 1;
+    _set(SK.failCount, String(n));
+    if (n >= FAIL_FREE) {
+      var secs = Math.min(30 * Math.pow(2, n - FAIL_FREE), 3600);
+      _set(SK.lockUntil, String(Date.now() + secs * 1000));
+    }
+  }
+  function _clearFails(){ _del(SK.failCount); _del(SK.lockUntil); }
 
   // ── Re-encrypt all wallet groups with the current _unlockSecret ──
   // Must be called AFTER OneCrypto.setSecret() whenever the lock secret changes.
@@ -282,6 +307,7 @@ window.oneLock = (function() {
           if(bg){bg.textContent='check_circle';bg.style.color='var(--accent-green)';}
           _setBioMsg('Authenticated \u2713');
           // Apply master secret — same AES key regardless of lock method
+          _clearFails();
           _applyMasterSecret();
           setTimeout(function(){_hideLockScreen();},500);
         } else {
@@ -592,6 +618,12 @@ window.oneLock = (function() {
   // ── Lock screen PIN keypad ──
   function _pinKey(k){
     if(_lockPin.length>=PIN_LEN)return;
+    var _wait=_lockoutLeft();
+    if(_wait>0){
+      var errW=document.getElementById('nlk-pin-err');
+      if(errW){errW.textContent=_lockoutMsg(_wait);setTimeout(function(){errW.textContent='';},2000);}
+      return;
+    }
     _lockPin+=k;
     _renderLockPinDots(_lockPin.length);
     if(_lockPin.length===PIN_LEN){
@@ -603,12 +635,15 @@ window.oneLock = (function() {
       hashPromise.then(function(h){
         if(h===storedHash){
           _lockPin='';
+          _clearFails();
           // Apply master secret — works regardless of which method was used to set lock
           _applyMasterSecret();
           _hideLockScreen();
         } else {
+          _registerFail();
           var err=document.getElementById('nlk-pin-err');
-          if(err)err.textContent='Incorrect PIN';
+          var _w2=_lockoutLeft();
+          if(err)err.textContent=_w2>0?_lockoutMsg(_w2):'Incorrect PIN';
           _lockPin='';_resetLockPinDots();
           setTimeout(function(){if(err)err.textContent='';},2000);
         }
@@ -680,14 +715,24 @@ window.oneLock = (function() {
     var canvas=document.getElementById('nlk-pattern-canvas');
     if(!canvas)return;
     _lockPatState=_buildPatCanvas(canvas,function(path){
+      var _wait=_lockoutLeft();
+      if(_wait>0){
+        var eW=document.getElementById('nlk-pat-err');
+        if(eW){eW.textContent=_lockoutMsg(_wait);setTimeout(function(){eW.textContent='';},2000);}
+        if(_lockPatState&&_lockPatState.reset)_lockPatState.reset();
+        return;
+      }
       _sha256(path.join('-')).then(function(h){
         if(h===_get(SK.patHash)){
+          _clearFails();
           // Apply master secret — same AES key regardless of lock method
           _applyMasterSecret();
           _hideLockScreen();
         } else {
+          _registerFail();
           var e=document.getElementById('nlk-pat-err');
-          if(e)e.textContent='Wrong pattern. Try again.';
+          var _w2=_lockoutLeft();
+          if(e)e.textContent=_w2>0?_lockoutMsg(_w2):'Wrong pattern. Try again.';
           if(_lockPatState&&_lockPatState.reset)_lockPatState.reset();
           setTimeout(function(){if(e)e.textContent='';},2000);
         }
@@ -827,6 +872,22 @@ window.oneLock = (function() {
       }
     }, 1500);
   }
+
+  // ── Re-lock after the app has been in the background ──
+  // _isUnlocked used to be set once and never reset, so the lock only appeared at a cold start.
+  // When the page comes back after RELOCK_AFTER_MS hidden, show the lock screen again.
+  var RELOCK_AFTER_MS = 30000;
+  var _hiddenAt = 0;
+  function _onVisibility(){
+    if(document.hidden){ _hiddenAt = Date.now(); return; }
+    var away = _hiddenAt ? Date.now() - _hiddenAt : 0;
+    _hiddenAt = 0;
+    if(away >= RELOCK_AFTER_MS && _isUnlocked && _isEnabled()){
+      _isUnlocked = false;
+      _checkOnOpen();
+    }
+  }
+  document.addEventListener('visibilitychange', _onVisibility);
 
   function _init(){
     _migratePinIfNeeded();

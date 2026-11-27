@@ -6,6 +6,12 @@ Per-build release notes are published on the [Releases](../../releases) page.
 ## [Unreleased]
 
 ### Fixed
+- **Security: App Lock only appeared at a cold start and had no limit on wrong PIN / pattern attempts:** once unlocked,
+  the app stayed unlocked until it was killed, and the PIN or pattern could be tried without limit. The lock screen now
+  comes back when the app returns from the background after 30 seconds or more, and after 5 wrong PIN / pattern
+  attempts entry is blocked for 30 seconds, doubling with each further miss (up to 1 hour). The count survives
+  restarting the app and is cleared by a correct PIN, pattern or biometric unlock. (Not changed here: PIN hashing
+  strength, re-asking for the PIN before removing the lock, and tying the encryption key to biometrics.)
 - **Security: the wallet encryption secret was stored in plaintext next to the encrypted keys:** the random secret that
   the wallet keys are encrypted with was kept as plain text in the app's storage, right beside the data it protects, so
   anyone able to read that storage could decrypt the keys. The secret is now stored wrapped (AES-256-GCM) by a key held
