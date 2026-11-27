@@ -1,5 +1,5 @@
 function openBrowserWalletDrawer() {
-  _brBwdExpandedGroupId = null;
+  _brBwdOpen = new Set();
   _renderBrowserWalletDrawer();
   var ov = document.getElementById('br-browser-wallet-overlay');
   if (ov) { ov.style.opacity = '1'; ov.style.pointerEvents = 'all'; }
@@ -13,7 +13,7 @@ function closeBrowserWalletDrawer() {
   var dr = document.getElementById('br-browser-wallet-drawer');
   if (dr) dr.style.transform = 'translateX(100%)';
   if (ov) { ov.style.opacity = '0'; setTimeout(function(){ ov.style.pointerEvents = 'none'; }, 300); }
-  _brBwdExpandedGroupId = null;
+  _brBwdOpen = new Set();
   haptic && haptic();
   // Reject any pending eth_requestAccounts so dApp doesn't hang forever
   if (window._onePendingBrowserReqId) {
@@ -22,7 +22,7 @@ function closeBrowserWalletDrawer() {
   }
 }
 
-var _brBwdExpandedGroupId = null;
+var _brBwdOpen = new Set();   // expanded group indices
 
 // Called by InAppBrowserActivity via evaluateJavascript to get wallet data
 // Returns JSON string: [{id, name, wallets:[{address, label}]}]
@@ -66,20 +66,12 @@ function getBrowserChainListJson() {
 
 
 function brBwdGoBack() {
-  _brBwdExpandedGroupId = null;
   _renderBrowserWalletDrawer();
   haptic && haptic();
 }
 
+// Single select: groups only expand, one wallet is connected to the dApp.
 function _renderBrowserWalletDrawer() {
-  if (_brBwdExpandedGroupId) {
-    _renderBrBwdKeyList(_brBwdExpandedGroupId);
-  } else {
-    _renderBrBwdGroupList();
-  }
-}
-
-function _renderBrBwdGroupList() {
   var list     = document.getElementById('br-bwd-list');
   var badge    = document.getElementById('br-bwd-badge');
   var title    = document.getElementById('br-bwd-title');
@@ -89,136 +81,44 @@ function _renderBrBwdGroupList() {
 
   var groups = loadWalletGroups().filter(function(g){ return g && g.keys && g.keys.length > 0; });
 
-  if (badge)   badge.textContent  = groups.length + ' GROUP' + (groups.length !== 1 ? 'S' : '');
-  if (title)   title.textContent  = 'My Wallets';
-  if (backBtn) backBtn.style.display  = 'none';
-  if (closeBtn)closeBtn.style.display = 'flex';
+  if (badge)    badge.textContent  = groups.length + ' GROUP' + (groups.length !== 1 ? 'S' : '');
+  if (title)    title.textContent  = 'My Wallets';
+  if (backBtn)  backBtn.style.display  = 'none';
+  if (closeBtn) closeBtn.style.display = 'flex';
 
-  list.innerHTML = '';
-
-  if (groups.length === 0) {
-    list.innerHTML = '<div style="text-align:center;padding:50px 20px;font-family:var(--font-mono);font-size:11px;color:var(--text-muted);line-height:2.2;"><div style="font-size:32px;margin-bottom:10px;">📁</div>NO GROUPS FOUND<br><span style="font-size:10px;opacity:0.5;">Import in Settings first</span></div>';
-    return;
-  }
-
-  var hintEl = document.createElement('div');
-  hintEl.style.cssText = 'font-family:var(--font-mono);font-size:9px;color:var(--text-muted);letter-spacing:1px;padding:0 4px 10px;text-align:center;';
-  hintEl.textContent = 'TAP GROUP = VIEW WALLETS   •   → = ADDRESSES';
-  list.appendChild(hintEl);
-
-  groups.forEach(function(g, i) {
-    var clr = WG_COLORS[i % WG_COLORS.length];
-    var card = document.createElement('div');
-    card.style.cssText = 'display:flex;align-items:center;gap:10px;margin-bottom:8px;';
-
-    var inner = document.createElement('div');
-    inner.className = 'del-drawer-item';
-    inner.style.cssText = 'flex:1;cursor:pointer;display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:10px;transition:all 0.2s ease;';
-    inner.innerHTML =
-      '<div style="width:32px;height:32px;border-radius:9px;background:' + clr.num + ';display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 0 10px ' + clr.glow + ';">' +
-        '<span style="font-family:var(--font-mono);font-size:13px;font-weight:800;color:#fff;">' + (i+1) + '</span>' +
-      '</div>' +
-      '<div style="flex:1;min-width:0;">' +
-        '<div style="font-size:12px;font-weight:700;color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + (g.name || 'Group '+(i+1)) + '</div>' +
-        '<div style="font-size:10px;color:var(--text-muted);font-family:var(--font-mono);">' + g.keys.length + ' wallet' + (g.keys.length !== 1 ? 's' : '') + '</div>' +
-      '</div>' +
-      '<span class="material-icons-round" style="font-size:18px;color:var(--text-muted);">chevron_right</span>';
-
-    inner.addEventListener('click', function() {
-      _brBwdExpandedGroupId = g.id;
-      _renderBrowserWalletDrawer();
-      haptic && haptic();
-    });
-    card.appendChild(inner);
-    list.appendChild(card);
-  });
-}
-
-function _renderBrBwdKeyList(groupId) {
-  var list     = document.getElementById('br-bwd-list');
-  var badge    = document.getElementById('br-bwd-badge');
-  var title    = document.getElementById('br-bwd-title');
-  var backBtn  = document.getElementById('br-bwd-back-btn');
-  var closeBtn = document.getElementById('br-bwd-close-btn');
-  if (!list) return;
-
-  var groups = loadWalletGroups();
-  var g = groups.find(function(x){ return x.id === groupId; });
-  if (!g) { _brBwdExpandedGroupId = null; _renderBrBwdGroupList(); return; }
-
-  if (title)   title.textContent = g.name || 'Group';
-  if (badge)   badge.textContent = g.keys.length + ' WALLET' + (g.keys.length !== 1 ? 'S' : '');
-  if (backBtn) backBtn.style.display  = 'flex';
-  if (closeBtn)closeBtn.style.display = 'none';
-
-  list.innerHTML = '';
-
-  // Show currently selected wallet banner if any
   var selectedAddr = window._oneBrowserSelectedAddress || null;
-  if (selectedAddr) {
-    var selBanner = document.createElement('div');
-    selBanner.style.cssText = 'display:flex;align-items:center;gap:8px;padding:8px 12px;margin-bottom:10px;' +
-      'background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.25);border-radius:10px;';
-    selBanner.innerHTML =
-      '<span class="material-icons-round" style="font-size:14px;color:#10b981;">check_circle</span>' +
-      '<div style="flex:1;min-width:0;">' +
-        '<div style="font-size:9px;color:#10b981;font-weight:700;letter-spacing:0.5px;">CONNECTED TO dAPP</div>' +
-        '<div style="font-size:10px;color:#6ee7b7;font-family:var(--font-mono);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' +
-          selectedAddr.slice(0,10) + '\u2026' + selectedAddr.slice(-8) +
-        '</div>' +
-      '</div>';
-    list.appendChild(selBanner);
-  }
+  var selLower = selectedAddr ? selectedAddr.toLowerCase() : '';
+  var banner = selectedAddr
+    ? '<div class="wdu-hint" style="padding:8px 10px;margin-bottom:10px;border-radius:10px;background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.25);color:#6ee7b7;">' +
+        '<span class="material-icons-round" style="font-size:16px;color:#10b981;">check_circle</span>' +
+        '<span style="min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-family:var(--font-mono);">Connected \u00b7 ' + selectedAddr.slice(0, 8) + '\u2026' + selectedAddr.slice(-6) + '</span>' +
+      '</div>'
+    : '';
 
-  var gi = groups.indexOf(g);
-  var clr = WG_COLORS[gi % WG_COLORS.length];
-
-  g.keys.forEach(function(pk, i) {
-    var addr = '';
-    try { addr = new ethers.Wallet(pk).address; } catch(e){}
-    var short = addr ? addr.slice(0,10) + '\u2026' + addr.slice(-8) : '\u2014';
-    var isSelected = selectedAddr && addr && addr.toLowerCase() === selectedAddr.toLowerCase();
-
-    var row = document.createElement('div');
-    row.style.cssText = 'display:flex;align-items:center;gap:8px;padding:10px 12px;' +
-      'background:' + (isSelected
-        ? 'linear-gradient(145deg,rgba(16,185,129,0.08),rgba(16,185,129,0.04))'
-        : 'linear-gradient(145deg,var(--bg-glass),rgba(15,15,25,0.5))') + ';' +
-      'border:1.5px solid ' + (isSelected ? 'rgba(16,185,129,0.35)' : 'var(--border-subtle)') + ';' +
-      'border-radius:14px;margin-bottom:7px;' +
-      'animation:slideIn 0.22s ease both;animation-delay:' + (i*0.03) + 's;';
-
-    var numDiv = document.createElement('div');
-    numDiv.style.cssText = 'width:28px;height:28px;border-radius:8px;background:' + clr.num + ';display:flex;align-items:center;justify-content:center;flex-shrink:0;';
-    numDiv.innerHTML = '<span style="font-family:var(--font-mono);font-size:11px;font-weight:800;color:#fff;">' + (i+1) + '</span>';
-
-    var addrDiv = document.createElement('div');
-    addrDiv.style.cssText = 'flex:1;min-width:0;';
-    addrDiv.innerHTML =
-      '<div style="font-size:11px;font-weight:600;color:var(--text-primary);font-family:var(--font-mono);' +
-        'white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + short + '</div>' +
-      (isSelected ? '<div style="font-size:9px;color:#10b981;font-weight:600;margin-top:1px;">● Connected</div>' : '');
-
-    // Select wallet icon (active indicator)
-    var selectIcon = document.createElement('div');
-    selectIcon.style.cssText = 'width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;' +
-      (isSelected ? 'background:rgba(16,185,129,0.15);' : 'background:transparent;');
-    selectIcon.innerHTML = isSelected
-      ? '<span class="material-icons-round" style="font-size:16px;color:#10b981;">check_circle</span>'
-      : '<span class="material-icons-round" style="font-size:16px;color:var(--text-muted);opacity:0.4;">radio_button_unchecked</span>';
-
-    // Whole row is clickable to select wallet
-    row.style.cursor = isSelected ? 'default' : 'pointer';
-    (function(a) {
-      row.addEventListener('click', function() {
-        if (!isSelected) { brBwdSelectWallet(a); }
-      });
-    })(addr);
-
-    row.appendChild(numDiv);
-    row.appendChild(addrDiv);
-    row.appendChild(selectIcon);
-    list.appendChild(row);
+  WDU.renderList(list, {
+    mode: 'single',
+    groups: groups,
+    topHtml: banner,
+    isOpen: function(gi) { return _brBwdOpen.has(gi); },
+    isKeySel: function(gi, ki) {
+      if (!selLower) return false;
+      return WDU.addressOf(groups[gi].keys[ki]).toLowerCase() === selLower;
+    },
+    keyInfo: function(gi, ki, pk) {
+      var g = groups[gi];
+      var addr = WDU.addressOf(pk);
+      var isSel = selLower && addr && addr.toLowerCase() === selLower;
+      return {
+        title: (g.labels && g.labels[ki]) || ('Wallet ' + (ki + 1)),
+        sub: WDU.short(addr, 8, 6) + (isSel ? ' \u00b7 connected' : '')
+      };
+    },
+    onExpand: function(gi) { WDU.toggleInSet(_brBwdOpen, gi); _renderBrowserWalletDrawer(); },
+    onKey: function(gi, ki) {
+      var addr = WDU.addressOf(groups[gi].keys[ki]);
+      if (!addr || (selLower && addr.toLowerCase() === selLower)) return;
+      brBwdSelectWallet(addr);
+    }
   });
 }
 

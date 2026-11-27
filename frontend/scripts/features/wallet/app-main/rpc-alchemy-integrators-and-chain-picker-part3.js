@@ -1,186 +1,130 @@
+// Home wallet picker (shared wallet drawer UI, single select): groups only expand, one wallet is active.
+let _hwOpenGroups = new Set();   // expanded group indices
+
+// Select (or deselect, when it is already active) a wallet as the home wallet
+function _hwToggleWallet(g, k) {
+    if (hwSelectedKey === k) {
+      // DESELECT
+      hwSelectedKey = null;
+      homeActiveKey = null;
+      validatedKeys = [];
+      _hwSaveSelection(null, null);
+      // ── Clear balance cache so stale balances don't show ──
+      window._balanceCache = {};
+      window._balanceCacheTime = {};
+      // ── Clear token list and portfolio total immediately (no wallet = no balance) ──
+      var _tlEl = document.getElementById('token-list');
+      if (_tlEl) { _tlEl.innerHTML = ''; }
+      if (typeof window._portfolioTotalUsd !== 'undefined') { window._portfolioTotalUsd = 0; }
+      if (typeof window._portfolioAllChainsTotal !== 'undefined') { window._portfolioAllChainsTotal = 0; }
+      if (typeof updatePortfolioTotal === 'function') updatePortfolioTotal();
+      // Reset chain to All Networks when no wallet is selected
+      if (typeof setActiveChain === 'function') setActiveChain(null);
+      // ── Immediately disable chain-switch-btn & home-manage-btn (setActiveChain may re-style it) ──
+      (function _instantDisable() {
+        ['home-chain-btn', 'home-manage-btn'].forEach(function(id) {
+          var el = document.getElementById(id);
+          if (!el) return;
+          el.classList.add('wg-no-wallet');
+          el.dataset.wgDisabled = '1';
+          el.style.setProperty('opacity',        '0.35',           'important');
+          el.style.setProperty('filter',         'grayscale(0.6)', 'important');
+          el.style.setProperty('pointer-events', 'none',           'important');
+          el.style.setProperty('cursor',         'not-allowed',    'important');
+        });
+      })();
+      // Remove group from selectedGroupIds
+      if (typeof selectedGroupIds !== 'undefined') {
+        const idx = selectedGroupIds.indexOf(g.id);
+        if (idx !== -1) selectedGroupIds.splice(idx, 1);
+        try { if (typeof saveSelectedGroupIds === 'function') saveSelectedGroupIds(); } catch {}
+      }
+      // Clear activeGroupId
+      if (typeof activeGroupId !== 'undefined') {
+        activeGroupId = null;
+        try { localStorage.removeItem(WG_ACTIVE_KEY); } catch {}
+      }
+      if (typeof loadTokens === 'function') loadTokens();
+    } else {
+      // SELECT
+      hwSelectedKey = k;
+      _hwSaveSelection(k, g.id);
+      // ── FIX: set homeActiveKey & validatedKeys BEFORE any dispatchEvent ──
+      // homeApplyWallet() (called synchronously by dispatchEvent) uses homeActiveKey
+      // to restore per-wallet chain via _loadChainForWallet(). If homeActiveKey still
+      // holds the previous wallet's key at that point, the wrong chain gets applied
+      // and flashes briefly before being overwritten — this is the chain-flash bug.
+      homeActiveKey = k;
+      validatedKeys = [k];
+      const wSel = document.getElementById('home-wallet-select');
+      const gSel = document.getElementById('home-group-select');
+      // Set group first, then pre-set wallet value BEFORE dispatching
+      // so homePopulateWallets() sees the correct prevKey on first run
+      if (gSel) { gSel.value = g.id; }
+      if (wSel) { wSel.value = k; }
+      if (gSel) { gSel.dispatchEvent(new Event('change')); }
+      // After group change repopulates wallet list, force correct wallet
+      if (wSel) { wSel.value = k; wSel.dispatchEvent(new Event('change')); }
+      // Sync selectedGroupIds & activeGroupId
+      if (typeof selectedGroupIds !== 'undefined' && !selectedGroupIds.includes(g.id)) {
+        selectedGroupIds.push(g.id);
+        try { if (typeof saveSelectedGroupIds === 'function') saveSelectedGroupIds(); } catch {}
+      }
+      if (typeof activeGroupId !== 'undefined') {
+        activeGroupId = g.id;
+        try { localStorage.setItem(WG_ACTIVE_KEY, g.id); } catch {}
+      }
+    }
+    hwUpdateGroupLabel();
+    hwCloseGroupPicker();
+    if (typeof haptic === 'function') haptic();
+    // Sync Manage button enabled/disabled state
+    if (typeof _updateWgManageBtn === 'function') _updateWgManageBtn();
+    // ── WALLET GUARD: deselect হলে সাথে সাথে chain-switch-btn ও home-manage-btn disable ──
+    if (typeof window.homeWalletGuardRefresh === 'function') window.homeWalletGuardRefresh();
+  
+}
+
+function _hwRenderGroupPicker() {
+  const groups = loadWalletGroups();
+  const list = document.getElementById('hw-group-list');
+  if (!list) return;
+  WDU.renderList(list, {
+    mode: 'single',
+    groups: groups,
+    isOpen: function(gi) { return _hwOpenGroups.has(gi); },
+    isKeySel: function(gi, ki) {
+      return typeof hwSelectedKey !== 'undefined' && !!hwSelectedKey && groups[gi].keys[ki] === hwSelectedKey;
+    },
+    onExpand: function(gi) {
+      if (_hwOpenGroups.has(gi)) {
+        _hwOpenGroups.delete(gi);
+      } else {
+        _hwOpenGroups.add(gi);
+        // sync hidden select
+        const gSel = document.getElementById('home-group-select');
+        if (gSel) { gSel.value = groups[gi].id; gSel.dispatchEvent(new Event('change')); }
+      }
+      _hwRenderGroupPicker();
+    },
+    onKey: function(gi, ki) {
+      const k = groups[gi].keys[ki];
+      if (!WDU.addressOf(k)) return;
+      _hwToggleWallet(groups[gi], k);
+    }
+  });
+}
 
 function hwOpenGroupPicker() {
   const groups = loadWalletGroups();
-  const list = document.getElementById('hw-group-list');
-  list.innerHTML = '';
-
-  groups.forEach(g => {
-    // ── Group header ──
-    const groupWrap = document.createElement('div');
-    groupWrap.style.cssText = 'margin-bottom:6px;';
-
-    const groupRow = document.createElement('div');
-    // Auto-expand the group that contains the currently selected wallet key
-    const isExpanded = (typeof hwSelectedKey !== 'undefined' && hwSelectedKey && g.keys.includes(hwSelectedKey))
-      || g.id === (document.getElementById('home-group-select')?.value);
-    const _gIsActive = (typeof hwSelectedKey !== 'undefined' && hwSelectedKey && g.keys.includes(hwSelectedKey));
-    groupRow.style.cssText = 'display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-radius:12px;background:' + (_gIsActive ? 'rgba(99,102,241,0.1)' : 'rgba(255,255,255,0.05)') + ';border:1px solid ' + (_gIsActive ? 'rgba(99,102,241,0.4)' : 'rgba(255,255,255,0.09)') + ';cursor:pointer;-webkit-tap-highlight-color:transparent;';
-    groupRow.innerHTML =
-      '<div style="display:flex;align-items:center;gap:10px;">' +
-        '<span style="font-size:18px;">👛</span>' +
-        '<div>' +
-          '<div style="font-size:12px;font-weight:700;color:var(--text-primary);">' + g.name + '</div>' +
-          '<div style="font-size:10px;color:var(--text-muted);font-family:var(--font-mono);margin-top:1px;">' + g.keys.length + ' wallet' + (g.keys.length !== 1 ? 's' : '') + '</div>' +
-        '</div>' +
-      '</div>' +
-      '<span class="material-icons-round hw-chevron" style="font-size:16px;color:rgba(255,255,255,0.35);transition:transform 0.2s;">' + (isExpanded ? 'expand_less' : 'expand_more') + '</span>';
-
-    // ── Wallet sub-list ──
-    const walletList = document.createElement('div');
-    walletList.style.cssText = 'overflow-y:auto;overflow-x:hidden;scrollbar-width:none;-webkit-overflow-scrolling:touch;transition:max-height 0.3s ease;max-height:' + (isExpanded ? 'calc(100dvh - var(--nav-height) - env(safe-area-inset-bottom, 0px) - 160px)' : '0') + ';';
-
-    g.keys.forEach((k, i) => {
-      try {
-        const addr = new ethers.Wallet(k).address;
-        const isSelected = k === hwSelectedKey;
-        const wRow = document.createElement('div');
-        wRow.setAttribute('data-key', k);
-        wRow.style.cssText = 'display:flex;align-items:center;justify-content:space-between;padding:10px 14px 10px 18px;border-radius:10px;margin-top:4px;background:' + (isSelected ? 'rgba(99,102,241,0.13)' : 'rgba(255,255,255,0.03)') + ';border:1px solid ' + (isSelected ? 'rgba(99,102,241,0.4)' : 'rgba(255,255,255,0.06)') + ';cursor:pointer;-webkit-tap-highlight-color:transparent;transition:all 0.15s;';
-        wRow.innerHTML =
-          '<div style="display:flex;align-items:center;gap:10px;">' +
-            '<div style="width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,var(--accent-primary),var(--accent-secondary));display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff;flex-shrink:0;">' + (i+1) + '</div>' +
-            '<span style="font-family:var(--font-mono);font-size:10px;font-weight:600;color:var(--text-primary);">' + addr.slice(0,2) + '...' + addr.slice(-4) + '</span>' +
-          '</div>' +
-          '<span class="material-icons-round" style="font-size:16px;color:' + (isSelected ? 'var(--accent-primary)' : 'rgba(255,255,255,0.15)') + ';">' + (isSelected ? 'check_circle' : 'radio_button_unchecked') + '</span>';
-
-        let _touchStartY = 0;
-        let _touchStartX = 0;
-        let _touchMoved = false;
-        wRow.addEventListener('touchstart', function(e) {
-          _touchStartY = e.touches[0].clientY;
-          _touchStartX = e.touches[0].clientX;
-          _touchMoved = false;
-        }, { passive: true });
-        wRow.addEventListener('touchmove', function(e) {
-          if (Math.abs(e.touches[0].clientY - _touchStartY) > 6 ||
-              Math.abs(e.touches[0].clientX - _touchStartX) > 6) _touchMoved = true;
-        }, { passive: true });
-        // ── shared handler for both touch and click ──
-        function _hwWalletToggle() {
-          if (hwSelectedKey === k) {
-            // DESELECT
-            hwSelectedKey = null;
-            homeActiveKey = null;
-            validatedKeys = [];
-            _hwSaveSelection(null, null);
-            // ── Clear balance cache so stale balances don't show ──
-            window._balanceCache = {};
-            window._balanceCacheTime = {};
-            // ── Clear token list and portfolio total immediately (no wallet = no balance) ──
-            var _tlEl = document.getElementById('token-list');
-            if (_tlEl) { _tlEl.innerHTML = ''; }
-            if (typeof window._portfolioTotalUsd !== 'undefined') { window._portfolioTotalUsd = 0; }
-            if (typeof window._portfolioAllChainsTotal !== 'undefined') { window._portfolioAllChainsTotal = 0; }
-            if (typeof updatePortfolioTotal === 'function') updatePortfolioTotal();
-            // Reset chain to All Networks when no wallet is selected
-            if (typeof setActiveChain === 'function') setActiveChain(null);
-            // ── Immediately disable chain-switch-btn & home-manage-btn (setActiveChain may re-style it) ──
-            (function _instantDisable() {
-              ['home-chain-btn', 'home-manage-btn'].forEach(function(id) {
-                var el = document.getElementById(id);
-                if (!el) return;
-                el.classList.add('wg-no-wallet');
-                el.dataset.wgDisabled = '1';
-                el.style.setProperty('opacity',        '0.35',           'important');
-                el.style.setProperty('filter',         'grayscale(0.6)', 'important');
-                el.style.setProperty('pointer-events', 'none',           'important');
-                el.style.setProperty('cursor',         'not-allowed',    'important');
-              });
-            })();
-            // Remove group from selectedGroupIds
-            if (typeof selectedGroupIds !== 'undefined') {
-              const idx = selectedGroupIds.indexOf(g.id);
-              if (idx !== -1) selectedGroupIds.splice(idx, 1);
-              try { if (typeof saveSelectedGroupIds === 'function') saveSelectedGroupIds(); } catch {}
-            }
-            // Clear activeGroupId
-            if (typeof activeGroupId !== 'undefined') {
-              activeGroupId = null;
-              try { localStorage.removeItem(WG_ACTIVE_KEY); } catch {}
-            }
-            if (typeof loadTokens === 'function') loadTokens();
-          } else {
-            // SELECT
-            hwSelectedKey = k;
-            _hwSaveSelection(k, g.id);
-            // ── FIX: set homeActiveKey & validatedKeys BEFORE any dispatchEvent ──
-            // homeApplyWallet() (called synchronously by dispatchEvent) uses homeActiveKey
-            // to restore per-wallet chain via _loadChainForWallet(). If homeActiveKey still
-            // holds the previous wallet's key at that point, the wrong chain gets applied
-            // and flashes briefly before being overwritten — this is the chain-flash bug.
-            homeActiveKey = k;
-            validatedKeys = [k];
-            const wSel = document.getElementById('home-wallet-select');
-            const gSel = document.getElementById('home-group-select');
-            // Set group first, then pre-set wallet value BEFORE dispatching
-            // so homePopulateWallets() sees the correct prevKey on first run
-            if (gSel) { gSel.value = g.id; }
-            if (wSel) { wSel.value = k; }
-            if (gSel) { gSel.dispatchEvent(new Event('change')); }
-            // After group change repopulates wallet list, force correct wallet
-            if (wSel) { wSel.value = k; wSel.dispatchEvent(new Event('change')); }
-            // Sync selectedGroupIds & activeGroupId
-            if (typeof selectedGroupIds !== 'undefined' && !selectedGroupIds.includes(g.id)) {
-              selectedGroupIds.push(g.id);
-              try { if (typeof saveSelectedGroupIds === 'function') saveSelectedGroupIds(); } catch {}
-            }
-            if (typeof activeGroupId !== 'undefined') {
-              activeGroupId = g.id;
-              try { localStorage.setItem(WG_ACTIVE_KEY, g.id); } catch {}
-            }
-          }
-          hwUpdateGroupLabel();
-          hwCloseGroupPicker();
-          if (typeof haptic === 'function') haptic();
-          // Sync Manage button enabled/disabled state
-          if (typeof _updateWgManageBtn === 'function') _updateWgManageBtn();
-          // ── WALLET GUARD: deselect হলে সাথে সাথে chain-switch-btn ও home-manage-btn disable ──
-          if (typeof window.homeWalletGuardRefresh === 'function') window.homeWalletGuardRefresh();
-        }
-
-        wRow.addEventListener('touchend', function(e) {
-          if (_touchMoved) return;
-          e.preventDefault(); e.stopPropagation();
-          _hwWalletToggle();
-        }, { passive: false });
-        wRow.addEventListener('click', function(e) {
-          _hwWalletToggle();
-        });
-        walletList.appendChild(wRow);
-      } catch {}
-    });
-
-    // Group row tap — expand/collapse
-    let _gTouchStartY = 0, _gTouchMoved = false;
-    groupRow.addEventListener('touchstart', function(e) {
-      _gTouchStartY = e.touches[0].clientY; _gTouchMoved = false;
-    }, { passive: true });
-    groupRow.addEventListener('touchmove', function(e) {
-      if (Math.abs(e.touches[0].clientY - _gTouchStartY) > 6) _gTouchMoved = true;
-    }, { passive: true });
-    const groupTap = function(e) {
-      if (_gTouchMoved) return;
-      e.preventDefault(); e.stopPropagation();
-      const chevron = groupRow.querySelector('.hw-chevron');
-      if (walletList.style.maxHeight === '0px' || walletList.style.maxHeight === '0') {
-        walletList.style.maxHeight = 'calc(100dvh - var(--nav-height) - env(safe-area-inset-bottom, 0px) - 160px)';
-        if (chevron) chevron.textContent = 'expand_less';
-        // sync hidden select
-        const gSel = document.getElementById('home-group-select');
-        if (gSel) { gSel.value = g.id; gSel.dispatchEvent(new Event('change')); }
-      } else {
-        walletList.style.maxHeight = '0';
-        if (chevron) chevron.textContent = 'expand_more';
-      }
-      if (typeof haptic === 'function') haptic();
-    };
-    groupRow.addEventListener('touchend', groupTap, { passive: false });
-    groupRow.addEventListener('click', groupTap);
-
-    groupWrap.appendChild(groupRow);
-    groupWrap.appendChild(walletList);
-    list.appendChild(groupWrap);
+  const homeGroupId = document.getElementById('home-group-select')?.value;
+  // Auto-expand the group that holds the active wallet (or the current home group)
+  _hwOpenGroups = new Set();
+  groups.forEach(function(g, gi) {
+    const hasActive = typeof hwSelectedKey !== 'undefined' && hwSelectedKey && g.keys.includes(hwSelectedKey);
+    if (hasActive || g.id === homeGroupId) _hwOpenGroups.add(gi);
   });
+  _hwRenderGroupPicker();
 
   const ov    = document.getElementById('hw-group-overlay');
   const modal = document.getElementById('hw-group-modal');

@@ -133,7 +133,10 @@
         groups.forEach(function(g, i) {
           if (!g.keys || !g.keys.length) return;
           var allMatch = g.keys.every(function(pk) { return existingKeys.has((pk||'').trim().toLowerCase()); });
-          if (allMatch && g.keys.length > 0) __NX._bsbPickerSelected.add(i);
+          if (allMatch && g.keys.length > 0) {
+            __NX._bsbPickerSelected.add(i);
+            g.keys.forEach(function(_, ki) { __NX._bsbPickerIndivSelected.add(i + '-' + ki); });
+          }
         });
 
         __NX._bsbRenderList();

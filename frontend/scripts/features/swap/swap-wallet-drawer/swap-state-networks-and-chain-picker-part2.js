@@ -507,112 +507,31 @@ window.swCloseWalletPanel = function() {
   }
 })();
 
+// Signing wallet panel (shared wallet drawer UI, single select): a group only expands,
+// one wallet is picked as the swap signer.
 function _swRenderWalletPanel() {
   const body   = document.getElementById('sw-wallet-panel-body');
+  if (!body) return;
   const groups = (typeof loadWalletGroups === 'function') ? loadWalletGroups().filter(g => g && g.keys && g.keys.length > 0) : [];
-  if (body) body.innerHTML = '';
+  const active = (typeof SW !== 'undefined' && SW.walletAddress) ? String(SW.walletAddress).toLowerCase() : '';
 
-  if (!groups.length) {
-    if (body) body.innerHTML = '<div style="text-align:center;padding:24px 12px;font-family:var(--font-mono);font-size:11px;color:var(--text-muted);line-height:1.8;">No wallet groups.<br>Go to Settings → Wallet Groups.</div>';
-    return;
-  }
-
-  groups.forEach(function(g, gi) {
-    const isExpanded = gi === _swExpandedGroupIdx;
-
-    const ghdr = document.createElement('div');
-    ghdr.style.cssText = isExpanded
-      ? 'display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:12px;margin-bottom:4px;cursor:pointer;border:1px solid rgba(99,102,241,0.55);background:linear-gradient(120deg,rgba(99,102,241,0.18) 0%,rgba(139,92,246,0.13) 100%);box-shadow:0 0 18px rgba(99,102,241,0.18),inset 0 1px 0 rgba(255,255,255,0.06);transition:all 0.22s;'
-      : 'display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:12px;margin-bottom:4px;cursor:pointer;border:1px solid var(--border-subtle);background:var(--bg-glass);transition:all 0.22s;';
-    ghdr.innerHTML = isExpanded
-      ? '<span class="material-icons-round" style="font-size:15px;color:#a78bfa;filter:drop-shadow(0 0 4px rgba(167,139,250,0.6));">bolt</span>' +
-        '<div style="flex:1;">' +
-          '<div style="font-size:11px;font-weight:800;letter-spacing:0.5px;background:linear-gradient(90deg,#a78bfa,#6366f1);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">' + g.name.toUpperCase() + '</div>' +
-          '<div style="font-size:8px;font-family:var(--font-mono);color:rgba(167,139,250,0.6);margin-top:1px;letter-spacing:1px;">' + g.keys.length + ' KEYS</div>' +
-        '</div>' +
-        '<span class="material-icons-round" style="font-size:15px;color:#a78bfa;transform:rotate(180deg);transition:transform 0.25s;">expand_more</span>'
-      : '<span class="material-icons-round" style="font-size:15px;color:var(--text-muted);">folder</span>' +
-        '<div style="flex:1;">' +
-          '<div style="font-size:11px;font-weight:700;color:var(--text-secondary);">' + g.name + '</div>' +
-          '<div style="font-size:8px;font-family:var(--font-mono);color:var(--text-muted);margin-top:1px;letter-spacing:1px;">' + g.keys.length + ' KEYS</div>' +
-        '</div>' +
-        '<span class="material-icons-round" style="font-size:15px;color:var(--text-muted);transform:rotate(0deg);transition:transform 0.25s;">expand_more</span>';
-
-    ghdr.addEventListener('click', function(e) {
-      e.stopPropagation();
-      _swExpandedGroupIdx = isExpanded ? -1 : gi;
+  WDU.renderList(body, {
+    mode: 'single',
+    groups: groups,
+    emptyHtml: '<div class="wdu-empty">No wallet groups<br><span style="font-size:11px;opacity:.6;">Add them in Settings \u2192 Wallet Groups</span></div>',
+    isOpen: function(gi) { return gi === _swExpandedGroupIdx; },
+    isKeySel: function(gi, ki) {
+      return !!active && WDU.addressOf(groups[gi].keys[ki]).toLowerCase() === active;
+    },
+    onExpand: function(gi) {
+      _swExpandedGroupIdx = (_swExpandedGroupIdx === gi) ? -1 : gi;
       _swRenderWalletPanel();
-    });
-    if (body) body.appendChild(ghdr);
-
-    if (!isExpanded) return;
-
-    const itemsWrap = document.createElement('div');
-    itemsWrap.style.cssText = 'padding:3px 2px 10px;display:flex;flex-direction:column;gap:5px;margin-left:20%;';
-
-    g.keys.forEach(function(pk, wi) {
-      let addr = null;
-      try { const n = pk.startsWith('0x') ? pk : '0x' + pk; addr = new ethers.Wallet(n).address; } catch(_) {}
+    },
+    onKey: function(gi, ki) {
+      const pk = groups[gi].keys[ki];
+      const addr = WDU.addressOf(pk);
       if (!addr) return;
-
-      const isActive = SW.walletAddress === addr;
-
-      // ── Outer card ──
-      const item = document.createElement('div');
-      item.style.cssText = isActive
-        ? 'position:relative;display:flex;align-items:stretch;border-radius:10px;border:1px solid rgba(99,102,241,0.5);background:linear-gradient(120deg,rgba(99,102,241,0.16) 0%,rgba(139,92,246,0.10) 100%);box-shadow:0 0 12px rgba(99,102,241,0.13),inset 0 1px 0 rgba(255,255,255,0.07);cursor:pointer;transition:all 0.18s;overflow:hidden;width:100%;box-sizing:border-box;'
-        : 'position:relative;display:flex;align-items:stretch;border-radius:10px;border:1px solid rgba(255,255,255,0.07);background:rgba(255,255,255,0.03);cursor:pointer;transition:all 0.18s;overflow:hidden;width:100%;box-sizing:border-box;';
-
-      // shimmer top line
-      const shimmer = document.createElement('div');
-      shimmer.style.cssText = 'position:absolute;top:0;left:0;right:0;height:1px;background:' + (isActive ? 'linear-gradient(90deg,transparent,rgba(167,139,250,0.5),transparent)' : 'linear-gradient(90deg,transparent,rgba(255,255,255,0.07),transparent)') + ';pointer-events:none;';
-      item.appendChild(shimmer);
-
-      // ── LEFT — number pill (fixed 28px) ──
-      const leftCol = document.createElement('div');
-      leftCol.style.cssText = 'width:28px;flex-shrink:0;display:flex;align-items:center;justify-content:center;border-right:1px solid ' + (isActive ? 'rgba(99,102,241,0.22)' : 'rgba(255,255,255,0.06)') + ';';
-
-      const walletNum = document.createElement('div');
-      walletNum.style.cssText = isActive
-        ? 'font-size:9px;font-weight:800;font-family:var(--font-mono);background:linear-gradient(135deg,#a78bfa,#6366f1);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1;'
-        : 'font-size:9px;font-weight:700;font-family:var(--font-mono);color:rgba(255,255,255,0.25);line-height:1;';
-      walletNum.textContent = String(wi + 1).padStart(2, '0');
-      leftCol.appendChild(walletNum);
-
-      // ── RIGHT — address + indicator ──
-      const rightCol = document.createElement('div');
-      rightCol.style.cssText = 'flex:1;display:flex;align-items:center;justify-content:space-between;padding:8px 10px;min-width:0;';
-
-      const info = document.createElement('div');
-      info.style.cssText = 'min-width:0;';
-      info.innerHTML = isActive
-        ? '<div style="font-family:var(--font-mono);font-size:11px;font-weight:700;letter-spacing:0.4px;background:linear-gradient(90deg,#a78bfa,#818cf8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">' + addr.slice(0,6) + '…' + addr.slice(-4) + '</div>'
-        : '<div style="font-family:var(--font-mono);font-size:11px;font-weight:500;color:rgba(241,241,248,0.65);letter-spacing:0.4px;">' + addr.slice(0,6) + '…' + addr.slice(-4) + '</div>';
-
-      const right = document.createElement('div');
-      right.style.cssText = 'flex-shrink:0;display:flex;align-items:center;margin-left:6px;';
-      right.innerHTML = isActive
-        ? '<span class="material-icons-round" style="font-size:14px;color:#a78bfa;filter:drop-shadow(0 0 4px rgba(167,139,250,0.65));">check_circle</span>'
-        : '<div style="width:12px;height:12px;border-radius:50%;border:1.5px solid rgba(255,255,255,0.13);"></div>';
-
-      rightCol.appendChild(info);
-      rightCol.appendChild(right);
-      item.appendChild(leftCol);
-      item.appendChild(rightCol);
-
-      item.addEventListener('mouseenter', function() {
-        if (!isActive) { item.style.background = 'rgba(99,102,241,0.07)'; item.style.borderColor = 'rgba(99,102,241,0.2)'; }
-      });
-      item.addEventListener('mouseleave', function() {
-        if (!isActive) { item.style.background = 'rgba(255,255,255,0.03)'; item.style.borderColor = 'rgba(255,255,255,0.07)'; }
-      });
-      item.addEventListener('click', function(e) {
-        e.stopPropagation();
-        _swSelectWalletFromPanel(pk, addr);
-      });
-      itemsWrap.appendChild(item);
-    });
-
-    if (body) body.appendChild(itemsWrap);
+      _swSelectWalletFromPanel(pk, addr);
+    }
   });
 }

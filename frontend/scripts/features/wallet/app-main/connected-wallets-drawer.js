@@ -2,6 +2,7 @@ function openConnectedWalletsDrawer() {
   const groups = loadWalletGroups();
   if (groups.length === 0) { showToast('No wallet groups imported', 'folder'); return; }
   _cwExpandedGroupId = null;
+  _cwOpen = new Set();
 
   // Pre-populate selected keys for all already-selected groups
   groups.forEach(function(g) {
@@ -58,9 +59,5 @@ function cwDrawerGoBack() {
 }
 
 function _renderCwDrawer() {
-  if (_cwExpandedGroupId) {
-    _renderCwKeyList(_cwExpandedGroupId);
-  } else {
-    _renderCwGroupList();
-  }
+  _renderCwGroupList();
 }

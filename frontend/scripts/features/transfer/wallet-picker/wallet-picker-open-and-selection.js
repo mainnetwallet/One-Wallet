@@ -68,7 +68,10 @@
       } else {
         allMatch = g.keys.every(function(pk) { return existingKeys.has((pk||'').trim().toLowerCase()); });
       }
-      if (allMatch) _thPickerSelected.add(i);
+      if (allMatch) {
+        _thPickerSelected.add(i);
+        g.keys.forEach(function(_, ki) { _thPickerIndivSelected.add(i + '-' + ki); });
+      }
     });
 
     _thRenderList();

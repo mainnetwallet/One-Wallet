@@ -67,9 +67,11 @@
   // track which group is expanded in panel
   let brExpandedGroupIdx = -1;
 
+  // Sender / recipient panel (shared wallet drawer UI, single select): a group only expands, one wallet is picked.
   async function brRenderWalletPanel() {
     const body = $e('br-wallet-panel-body');
-    if (body) body.innerHTML = '<div style="text-align:center;padding:24px 12px;font-family:var(--font-mono);font-size:11px;color:var(--text-muted);">Loading wallets…</div>';
+    if (!body) return;
+    body.innerHTML = '<div class="wdu-empty">Loading wallets…</div>';
     // Decrypt groups — keys may be AES-encrypted (ncx4:...)
     let groups = [];
     try {
@@ -78,77 +80,34 @@
     } catch(_) {
       groups = loadGroups(); // fallback to raw if decrypt fails
     }
-    if (body) body.innerHTML = '';
-    body.style.display = 'flex';
-    body.style.flexDirection = 'column';
     body.style.overflowY = 'auto';
 
-    if (!groups.length) {
-      if (body) body.innerHTML = '<div style="text-align:center;padding:24px 12px;font-family:var(--font-mono);font-size:11px;color:var(--text-muted);line-height:1.8;">No wallet groups.<br>Go to Settings → Wallet Groups.</div>';
-      return;
-    }
+    const target = br.walletPanelTarget === 'sender' ? br.senderAddr
+                 : (br.walletPanelTarget === 'recipient' ? br.recipientAddr : null);
 
-    groups.forEach((g, gi) => {
-      const isExpanded = gi === brExpandedGroupIdx;
-
-      // Group header - clickable accordion
-      const ghdr = document.createElement('div');
-      ghdr.style.cssText = 'flex-shrink:0;display:flex;align-items:center;gap:8px;padding:10px 12px;border-radius:11px;margin-bottom:4px;cursor:pointer;border:1px solid ' + (isExpanded ? 'rgba(99,102,241,0.4)' : 'var(--border-subtle)') + ';background:' + (isExpanded ? 'rgba(99,102,241,0.1)' : 'var(--bg-glass)') + ';transition:all 0.2s;';
-      ghdr.innerHTML =
-        '<span class="material-icons-round" style="font-size:16px;color:' + (isExpanded ? 'var(--accent-primary)' : 'var(--text-muted)') + ';">' + (isExpanded ? 'folder_open' : 'folder') + '</span>' +
-        '<div style="flex:1;">' +
-          '<div style="font-size:12px;font-weight:700;color:' + (isExpanded ? 'var(--text-primary)' : 'var(--text-secondary)') + ';">' + g.name + '</div>' +
-          '<div style="font-size:9px;font-family:var(--font-mono);color:var(--text-muted);margin-top:1px;">' + g.keys.length + ' KEYS</div>' +
-        '</div>' +
-        '<span class="material-icons-round" style="font-size:16px;color:var(--text-muted);transform:' + (isExpanded ? 'rotate(180deg)' : 'rotate(0deg)') + ';transition:transform 0.25s;">expand_more</span>';
-
-      ghdr.addEventListener('click', async function(e) {
-        e.stopPropagation();
-        brExpandedGroupIdx = isExpanded ? -1 : gi;
-        await brRenderWalletPanel();
-      });
-      body.appendChild(ghdr);
-
-      if (!isExpanded) return;
-
-      // Wallet items
-      const itemsWrap = document.createElement('div');
-      itemsWrap.style.cssText = 'flex:1;overflow-y:auto;overflow-x:hidden;padding:0 4px 8px;scrollbar-width:none;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;';
-
-      g.keys.forEach(function(pk, wi) {
+    WDU.renderList(body, {
+      mode: 'single',
+      groups: groups,
+      emptyHtml: '<div class="wdu-empty">No wallet groups<br><span style="font-size:11px;opacity:.6;">Add them in Settings \u2192 Wallet Groups</span></div>',
+      isOpen: function(gi) { return gi === brExpandedGroupIdx; },
+      isKeySel: function(gi, ki) {
+        const addr = deriveAddress(groups[gi].keys[ki]);
+        return !!addr && !!target && addr === target;
+      },
+      keyInfo: function(gi, ki, pk) {
+        const addr = deriveAddress(pk);
+        return { title: 'Wallet ' + (ki + 1), sub: WDU.short(addr, 6, 4) };
+      },
+      onExpand: function(gi) {
+        brExpandedGroupIdx = (brExpandedGroupIdx === gi) ? -1 : gi;
+        brRenderWalletPanel();
+      },
+      onKey: function(gi, ki) {
+        const pk = groups[gi].keys[ki];
         const addr = deriveAddress(pk);
         if (!addr) return;
-
-        const isCurSender    = br.walletPanelTarget === 'sender'    && addr === br.senderAddr;
-        const isCurRecipient = br.walletPanelTarget === 'recipient' && addr === br.recipientAddr;
-        const isActive = isCurSender || isCurRecipient;
-
-        const item = document.createElement('div');
-        item.style.cssText = 'display:flex;align-items:center;gap:8px;padding:9px 10px;border-radius:10px;border:1px solid ' + (isActive ? 'rgba(99,102,241,0.5)' : 'var(--border-subtle)') + ';background:' + (isActive ? 'rgba(99,102,241,0.12)' : 'var(--bg-glass)') + ';cursor:pointer;margin-bottom:5px;transition:all 0.15s;';
-
-        const walletNum = document.createElement('div');
-        walletNum.style.cssText = 'width:24px;height:24px;border-radius:7px;background:rgba(99,102,241,0.15);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;font-family:var(--font-mono);color:var(--neon-purple);flex-shrink:0;';
-        if (walletNum) walletNum.textContent = wi + 1;
-
-        const info = document.createElement('div');
-        info.style.cssText = 'flex:1;min-width:0;';
-        info.innerHTML =
-          '<div style="font-family:var(--font-mono);font-size:11px;font-weight:700;color:' + (isActive ? 'var(--accent-primary)' : 'var(--text-primary)') + ';">' + addr.slice(0,6) + '…' + addr.slice(-4) + '</div>' +
-          '<div style="font-size:9px;color:var(--text-muted);font-family:var(--font-mono);margin-top:1px;">' + addr.slice(0,12) + '…</div>';
-
-        const right = document.createElement('span');
-        right.className = 'material-icons-round';
-        right.style.cssText = 'font-size:16px;color:' + (isActive ? 'var(--accent-primary)' : 'var(--text-muted)') + ';flex-shrink:0;';
-        if (right) right.textContent = isActive ? 'check_circle' : 'radio_button_unchecked';
-
-        item.appendChild(walletNum);
-        item.appendChild(info);
-        item.appendChild(right);
-        item.addEventListener('click', function(e) { e.stopPropagation(); brSelectWalletFromPanel(pk, addr); });
-        itemsWrap.appendChild(item);
-      });
-
-      body.appendChild(itemsWrap);
+        brSelectWalletFromPanel(pk, addr);
+      }
     });
   }
 

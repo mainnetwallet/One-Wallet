@@ -9,6 +9,7 @@ var _swapDrawerMode = 'step1';
 function openSwapWalletDrawer() {
   _swapDrawerMode = 'profile';
   _swapWalletDrawerExpandedGroupId = null;
+  _swapDrawerOpen = new Set();
   _renderSwapWalletDrawer();
   var ov = document.getElementById('swap-wallet-drawer-overlay');
   var dr = document.getElementById('swap-wallet-drawer');
@@ -25,6 +26,7 @@ function openSwapWalletDrawer() {
 function openSwapGroupDrawer() {
   _swapDrawerMode = 'step1';
   _swapWalletDrawerExpandedGroupId = null;
+  _swapDrawerOpen = new Set();
   _renderSwapWalletDrawer();
   var ov = document.getElementById('swap-wallet-drawer-overlay');
   var dr = document.getElementById('swap-wallet-drawer');
