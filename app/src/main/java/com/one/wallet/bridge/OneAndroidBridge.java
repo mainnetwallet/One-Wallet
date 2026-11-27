@@ -11,6 +11,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
+import android.security.keystore.KeyGenParameterSpec;
+import android.security.keystore.KeyProperties;
+import android.util.Base64;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebView;
 import android.widget.Toast;
@@ -20,7 +23,13 @@ import androidx.biometric.BiometricPrompt;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import java.lang.ref.WeakReference;
+import java.nio.charset.StandardCharsets;
+import java.security.KeyStore;
 import java.util.concurrent.Executor;
+import javax.crypto.Cipher;
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.GCMParameterSpec;
 
 /**
  * JavaScript <-> Java interface exposed to the main WebView as {@code OneAndroid}
@@ -186,17 +195,15 @@ public class OneAndroidBridge {
         String lower = url.toLowerCase().trim();
         if (!lower.startsWith("https://") && !lower.startsWith("http://")) return;
         MainActivity a = getActivity(); if (a == null) return;
-        for (String domain : MainActivity.EXTERNAL_BROWSER_DOMAINS) {
-            if (lower.contains(domain)) {
-                a.runOnUiThread(() -> {
-                    try {
-                        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-                        browserIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                        a.startActivity(browserIntent);
-                    } catch (Exception ignored) {}
-                });
-                return;
-            }
+        if (MainActivity.isExternalBrowserUrl(url)) {
+            a.runOnUiThread(() -> {
+                try {
+                    Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                    browserIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    a.startActivity(browserIntent);
+                } catch (Exception ignored) {}
+            });
+            return;
         }
         a.openInAppBrowser(url, null);
     }
@@ -324,14 +331,16 @@ public class OneAndroidBridge {
         MainActivity a = getActivity(); if (a == null) return;
         WebView mv = MainActivity.getMainWebView();
         if (mv == null) return;
-        String safeAddr = address == null ? "" : address.replace("\"", "\\\"");
+        // Empty clears the selection; anything else must be a well-formed address.
+        if (address != null && !address.isEmpty() && !InAppBrowserActivity.isValidAddress(address)) return;
+        final String safeAddr = InAppBrowserActivity.jsStr(address == null ? "" : address);
         InAppBrowserActivity browser = InAppBrowserActivity.getInstance();
         String chainId = (browser != null) ? browser.getSelectedChainId() : "0x1";
-        if (chainId == null || chainId.isEmpty()) chainId = "0x1";
-        final String safeChain = chainId.replace("\"", "\\\"");
+        if (!InAppBrowserActivity.isValidChainId(chainId)) chainId = "0x1";
+        final String safeChain = InAppBrowserActivity.jsStr(chainId);
         mv.post(() -> mv.evaluateJavascript(
             "window.oneSetBrowserSelectedWallet && " +
-            "window.oneSetBrowserSelectedWallet(\"" + safeAddr + "\", \"" + safeChain + "\");",
+            "window.oneSetBrowserSelectedWallet(" + safeAddr + ", " + safeChain + ");",
             null
         ));
     }
@@ -375,7 +384,7 @@ public class OneAndroidBridge {
 
     @JavascriptInterface
     public void web3SwitchChain(final String hexId, final String name) {
-        if (hexId == null || hexId.isEmpty()) return;
+        if (!InAppBrowserActivity.isValidChainId(hexId)) return;
         InAppBrowserActivity browser = InAppBrowserActivity.getInstance();
         if (browser == null) return;
         browser.runOnUiThread(() -> {
@@ -445,13 +454,18 @@ public class OneAndroidBridge {
 
     @JavascriptInterface
     public void httpGet(final String url, final String headersJson, final String callbackId) {
-        if (url == null || callbackId == null) return;
+        if (url == null || !isSafeCallbackId(callbackId)) return;
         httpExecutor.execute(() -> {
             String resultJson;
             java.net.HttpURLConnection conn = null;
             try {
-                java.net.URL u = new java.net.URL(url);
+                java.net.URL u = checkedBridgeUrl(url);
+                int status;
+                // Redirects are followed by hand so every hop is re-validated (https, no private
+                // target) and never leaves the original host; the default auto-follow skipped both.
+                for (int hop = 0; ; hop++) {
                 conn = (java.net.HttpURLConnection) u.openConnection();
+                conn.setInstanceFollowRedirects(false);
                 conn.setRequestMethod("GET");
                 conn.setConnectTimeout(8000);
                 conn.setReadTimeout(8000);
@@ -476,7 +490,12 @@ public class OneAndroidBridge {
                         // Malformed headers JSON — proceed with default headers only.
                     }
                 }
-                int status = conn.getResponseCode();
+                status = conn.getResponseCode();
+                java.net.URL next = hop < MAX_BRIDGE_REDIRECTS ? nextRedirect(conn, u, status) : null;
+                if (next == null) break;
+                conn.disconnect();
+                u = next;
+                }
                 java.io.InputStream is = (status >= 200 && status < 300)
                         ? conn.getInputStream() : conn.getErrorStream();
                 String body = readHttpStream(is);
@@ -503,13 +522,14 @@ public class OneAndroidBridge {
 
     @JavascriptInterface
     public void httpPost(final String url, final String headersJson, final String bodyStr, final String callbackId) {
-        if (url == null || callbackId == null) return;
+        if (url == null || !isSafeCallbackId(callbackId)) return;
         httpExecutor.execute(() -> {
             String resultJson;
             java.net.HttpURLConnection conn = null;
             try {
-                java.net.URL u = new java.net.URL(url);
+                java.net.URL u = checkedBridgeUrl(url);
                 conn = (java.net.HttpURLConnection) u.openConnection();
+                conn.setInstanceFollowRedirects(false); // a redirect would skip the private-address check
                 conn.setRequestMethod("POST");
                 conn.setConnectTimeout(15000);
                 conn.setReadTimeout(15000);
@@ -560,12 +580,73 @@ public class OneAndroidBridge {
         });
     }
 
+    // Limits for the native HTTP bridge (BUG-015, partial): https only, no loopback / private /
+    // link-local targets, bounded response size, and a callback id that cannot break out of the
+    // JS string it is placed in. Redirects are re-validated hop by hop and limited to the same host.
+    // A per-host allow-list is NOT applied here: this bridge serves
+    // exchange and aggregator calls to many user-chosen hosts, so it needs device testing first.
+    private static final int MAX_HTTP_BODY_BYTES = 8 * 1024 * 1024;
+    private static final java.util.regex.Pattern CALLBACK_ID_RE =
+            java.util.regex.Pattern.compile("[A-Za-z0-9_-]{1,64}");
+
+    private static boolean isSafeCallbackId(String id) {
+        return id != null && CALLBACK_ID_RE.matcher(id).matches();
+    }
+
+    private static java.net.URL checkedBridgeUrl(String url) throws java.io.IOException {
+        java.net.URL u = new java.net.URL(url);
+        if (!"https".equalsIgnoreCase(u.getProtocol())) throw new java.io.IOException("only https is allowed");
+        String host = u.getHost();
+        if (host == null || host.isEmpty() || u.getUserInfo() != null) throw new java.io.IOException("invalid host");
+        for (java.net.InetAddress a : java.net.InetAddress.getAllByName(host)) {
+            if (isBlockedAddress(a)) throw new java.io.IOException("blocked address");
+        }
+        return u;
+    }
+
+    /** Loopback, wildcard, link-local, private (incl. IPv6 unique-local fc00::/7 and CGNAT 100.64/10), multicast. */
+    private static boolean isBlockedAddress(java.net.InetAddress a) {
+        if (a.isAnyLocalAddress() || a.isLoopbackAddress() || a.isLinkLocalAddress()
+                || a.isSiteLocalAddress() || a.isMulticastAddress()) return true;
+        byte[] b = a.getAddress();
+        if (b.length == 4) {
+            int b0 = b[0] & 0xff, b1 = b[1] & 0xff;
+            return b0 == 0 || (b0 == 100 && b1 >= 64 && b1 <= 127);
+        }
+        return b.length == 16 && (b[0] & 0xfe) == 0xfc;
+    }
+
+    private static final int MAX_BRIDGE_REDIRECTS = 3;
+
+    /**
+     * For a 3xx response returns the validated redirect target, or null when the response is not a
+     * redirect. Throws if the target is not https / is a private address / is on another host (custom
+     * request headers such as API keys must not be replayed to a different host).
+     */
+    private static java.net.URL nextRedirect(java.net.HttpURLConnection conn, java.net.URL cur, int status)
+            throws java.io.IOException {
+        if (status != 301 && status != 302 && status != 303 && status != 307 && status != 308) return null;
+        String loc = conn.getHeaderField("Location");
+        if (loc == null || loc.isEmpty()) return null;
+        java.net.URL next = checkedBridgeUrl(new java.net.URL(cur, loc).toString());
+        if (!next.getHost().equalsIgnoreCase(cur.getHost())) {
+            throw new java.io.IOException("redirect to another host blocked");
+        }
+        return next;
+    }
+
     private static String readHttpStream(java.io.InputStream is) throws java.io.IOException {
         if (is == null) return "";
         java.io.ByteArrayOutputStream out = new java.io.ByteArrayOutputStream();
         byte[] buf = new byte[8192];
         int n;
-        while ((n = is.read(buf)) != -1) out.write(buf, 0, n);
+        while ((n = is.read(buf)) != -1) {
+            out.write(buf, 0, n);
+            if (out.size() > MAX_HTTP_BODY_BYTES) {
+                is.close();
+                throw new java.io.IOException("response too large");
+            }
+        }
         is.close();
         return out.toString("UTF-8");
     }
@@ -587,5 +668,65 @@ public class OneAndroidBridge {
                     + callbackId + "', '" + escaped + "');";
             a.webView.evaluateJavascript(js, null);
         });
+    }
+
+    // ── Android Keystore wrapping for the wallet master secret (BUG-002) ──
+    // The JS lock code keeps one random "master secret" that the wallet keys are encrypted with.
+    // It used to sit in localStorage in plaintext, next to the ciphertext. It is now stored wrapped
+    // (AES-256-GCM) with a non-exportable key that lives in the Android Keystore, so reading the
+    // app's storage files alone does not reveal it.
+    private static final String KS_ALIAS = "one_master_wrap_v1";
+    private static final String KS_PREFIX = "ks1:";
+
+    private static SecretKey getOrCreateWrapKey() throws Exception {
+        KeyStore ks = KeyStore.getInstance("AndroidKeyStore");
+        ks.load(null);
+        if (ks.containsAlias(KS_ALIAS)) {
+            KeyStore.Entry entry = ks.getEntry(KS_ALIAS, null);
+            if (entry instanceof KeyStore.SecretKeyEntry) {
+                return ((KeyStore.SecretKeyEntry) entry).getSecretKey();
+            }
+        }
+        KeyGenerator kg = KeyGenerator.getInstance(KeyProperties.KEY_ALGORITHM_AES, "AndroidKeyStore");
+        kg.init(new KeyGenParameterSpec.Builder(KS_ALIAS,
+                KeyProperties.PURPOSE_ENCRYPT | KeyProperties.PURPOSE_DECRYPT)
+                .setBlockModes(KeyProperties.BLOCK_MODE_GCM)
+                .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_NONE)
+                .setKeySize(256)
+                .build());
+        return kg.generateKey();
+    }
+
+    /** Wraps {@code plain}; returns "ks1:&lt;iv&gt;.&lt;ciphertext&gt;" or "" when the Keystore is unusable. */
+    @JavascriptInterface
+    public String keystoreWrap(String plain) {
+        if (plain == null || plain.isEmpty()) return "";
+        try {
+            Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
+            cipher.init(Cipher.ENCRYPT_MODE, getOrCreateWrapKey());
+            byte[] iv = cipher.getIV();
+            byte[] ct = cipher.doFinal(plain.getBytes(StandardCharsets.UTF_8));
+            return KS_PREFIX + Base64.encodeToString(iv, Base64.NO_WRAP)
+                    + "." + Base64.encodeToString(ct, Base64.NO_WRAP);
+        } catch (Exception e) {
+            return "";
+        }
+    }
+
+    /** Reverses {@link #keystoreWrap}; returns "" if the value is not a valid wrapped secret. */
+    @JavascriptInterface
+    public String keystoreUnwrap(String wrapped) {
+        if (wrapped == null || !wrapped.startsWith(KS_PREFIX)) return "";
+        try {
+            String[] parts = wrapped.substring(KS_PREFIX.length()).split("\\.");
+            if (parts.length != 2) return "";
+            byte[] iv = Base64.decode(parts[0], Base64.NO_WRAP);
+            byte[] ct = Base64.decode(parts[1], Base64.NO_WRAP);
+            Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
+            cipher.init(Cipher.DECRYPT_MODE, getOrCreateWrapKey(), new GCMParameterSpec(128, iv));
+            return new String(cipher.doFinal(ct), StandardCharsets.UTF_8);
+        } catch (Exception e) {
+            return "";
+        }
     }
 }

@@ -80,10 +80,6 @@
         <domain includeSubdomains="true">socketscan.io</domain>
         <domain includeSubdomains="true">uniswap.org</domain>
 
-        <!-- CORS Proxies -->
-        <domain includeSubdomains="true">api.allorigins.win</domain>
-        <domain includeSubdomains="true">api.codetabs.com</domain>
-
         <!-- TrustWallet / Token Logos -->
         <domain includeSubdomains="true">raw.githubusercontent.com</domain>
         <domain includeSubdomains="true">github.com</domain>

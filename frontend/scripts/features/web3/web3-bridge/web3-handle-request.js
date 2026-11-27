@@ -1096,17 +1096,17 @@ window.oneHandleWeb3Request = async function(reqId, method, paramsJson) {
         var _modalToRow, _modalAmountRow, _modalTypeRow = '';
         if (_erc20Info) {
           // ERC20: show decoded recipient, amount, token symbol, contract
-          _modalToRow = '<div class="w3m-tx-row"><span class="w3m-tx-label">To</span><span class="w3m-tx-value">' + _erc20Info.recipientShort + '</span></div>';
-          _modalAmountRow = '<div class="w3m-tx-row"><span class="w3m-tx-label">Amount</span><span class="w3m-tx-value" style="color:#10b981;font-weight:700;">' + _erc20Info.amount + ' ' + _erc20Info.symbol + '</span></div>';
-          _modalTypeRow = '<div class="w3m-tx-row"><span class="w3m-tx-label">Type</span><span class="w3m-tx-value" style="color:#a78bfa;">' + _erc20Info.type + '</span></div>' +
-            '<div class="w3m-tx-row"><span class="w3m-tx-label">Contract</span><span class="w3m-tx-value">' + (_erc20Info.contract ? _erc20Info.contract.slice(0,8)+'...'+_erc20Info.contract.slice(-6) : '?') + '</span></div>';
+          _modalToRow = '<div class="w3m-tx-row"><span class="w3m-tx-label">To</span><span class="w3m-tx-value">' + _escHtml(_erc20Info.recipientShort) + '</span></div>';
+          _modalAmountRow = '<div class="w3m-tx-row"><span class="w3m-tx-label">Amount</span><span class="w3m-tx-value" style="color:#10b981;font-weight:700;">' + _escHtml(_erc20Info.amount + ' ' + _erc20Info.symbol) + '</span></div>';
+          _modalTypeRow = '<div class="w3m-tx-row"><span class="w3m-tx-label">Type</span><span class="w3m-tx-value" style="color:#a78bfa;">' + _escHtml(_erc20Info.type) + '</span></div>' +
+            '<div class="w3m-tx-row"><span class="w3m-tx-label">Contract</span><span class="w3m-tx-value">' + _escHtml(_erc20Info.contract ? _erc20Info.contract.slice(0,8)+'...'+_erc20Info.contract.slice(-6) : '?') + '</span></div>';
         } else {
           // Native ETH / generic contract tx
-          _modalToRow = '<div class="w3m-tx-row"><span class="w3m-tx-label">To</span><span class="w3m-tx-value">' + toShort + '</span></div>';
+          _modalToRow = '<div class="w3m-tx-row"><span class="w3m-tx-label">To</span><span class="w3m-tx-value">' + _escHtml(toShort) + '</span></div>';
           // Only show Value row if ETH value is non-zero, OR if there is no calldata (pure ETH send)
           var _rawVal = txParams.value ? BigInt(txParams.value) : 0n;
           if (_rawVal > 0n || !hasData) {
-            _modalAmountRow = '<div class="w3m-tx-row"><span class="w3m-tx-label">Value</span><span class="w3m-tx-value">' + valDisplay + ' ' + sym + '</span></div>';
+            _modalAmountRow = '<div class="w3m-tx-row"><span class="w3m-tx-label">Value</span><span class="w3m-tx-value">' + _escHtml(valDisplay + ' ' + sym) + '</span></div>';
           } else {
             _modalAmountRow = ''; // 0 ETH + has calldata → hide redundant zero value row
           }
@@ -1117,8 +1117,8 @@ window.oneHandleWeb3Request = async function(reqId, method, paramsJson) {
               : txParams.data.slice(0,10) + '... (unknown)';
             var _contractShort = txParams.to ? txParams.to.slice(0,8) + '...' + txParams.to.slice(-6) : '?';
             _modalTypeRow =
-              '<div class="w3m-tx-row"><span class="w3m-tx-label">Action</span><span class="w3m-tx-value" style="color:#a78bfa;">' + _actionLabel + '</span></div>' +
-              '<div class="w3m-tx-row"><span class="w3m-tx-label">Contract</span><span class="w3m-tx-value">' + _contractShort + '</span></div>';
+              '<div class="w3m-tx-row"><span class="w3m-tx-label">Action</span><span class="w3m-tx-value" style="color:#a78bfa;">' + _escHtml(_actionLabel) + '</span></div>' +
+              '<div class="w3m-tx-row"><span class="w3m-tx-label">Contract</span><span class="w3m-tx-value">' + _escHtml(_contractShort) + '</span></div>';
           } else {
             _modalTypeRow = '';
           }
@@ -1126,17 +1126,17 @@ window.oneHandleWeb3Request = async function(reqId, method, paramsJson) {
 
         var _chainLogoUri  = _resolveChainLogoUri(chainId);
         var _chainEmoji4   = _resolveChainEmoji(chainId);
-        var _chainBadgeImg = '<img src="' + _chainLogoUri + '" width="14" height="14" ' +
+        var _chainBadgeImg = '<img src="' + _escHtml(_chainLogoUri) + '" width="14" height="14" ' +
           'style="border-radius:50%;object-fit:cover;flex-shrink:0;vertical-align:middle;" ' +
           'onerror="this.outerHTML=\'<span style=&quot;font-size:11px;line-height:1;&quot;>' + _chainEmoji4 + '</span>\'">';
 
         var bodyHtml4 = _W3M_BODY_STYLES +
-          '<div class="w3m-network-badge">' + _chainBadgeImg + ' ' + chainName.toUpperCase() + '</div>' +
+          '<div class="w3m-network-badge">' + _chainBadgeImg + ' ' + _escHtml(chainName.toUpperCase()) + '</div>' +
           '<div class="w3m-section-title">TRANSACTION DETAILS</div>' +
           '<div class="w3m-address-box">' +
           '<div class="w3m-tx-row"><span class="w3m-tx-label">From</span><span class="w3m-tx-value" style="display:flex;flex-direction:column;align-items:flex-end;gap:2px;">' +
-            '<span style="color:#a78bfa;font-weight:700;">' + (_getWalletLabelForAddress(fromAddr4) || '') + '</span>' +
-            '<span>' + (fromAddr4 ? fromAddr4.slice(0,8)+'...'+fromAddr4.slice(-6) : '?') + '</span>' +
+            '<span style="color:#a78bfa;font-weight:700;">' + _escHtml(_getWalletLabelForAddress(fromAddr4) || '') + '</span>' +
+            '<span>' + _escHtml(fromAddr4 ? fromAddr4.slice(0,8)+'...'+fromAddr4.slice(-6) : '?') + '</span>' +
           '</span></div>' +
           _modalToRow +
           _modalAmountRow +

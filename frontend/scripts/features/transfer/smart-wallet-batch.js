@@ -549,6 +549,19 @@
     return ethers.keccak256(abi.encode(['bytes32','address','uint256'], [opHash, entryPoint, BigInt(chainId)]));
   }
 
+  // Fixed-amount mode: strict decimal string -> base units. There is no default: an empty, zero or
+  // invalid field used to turn into 1 whole token per wallet (BUG-009).
+  function supParseFixedAmount(decimals) {
+    var str = String((supGid('sup-amount') || {}).value || '').trim();
+    if (!/^(\d+(\.\d+)?|\.\d+)$/.test(str)) return { err: 'Valid amount দিন (যেমন 1 বা 0.5) — empty/invalid হলে transfer হবে না' };
+    if (str.charAt(0) === '.') str = '0' + str; // ".5" -> "0.5"
+    var v;
+    try { v = ethers.parseUnits(str, decimals); }
+    catch (e) { return { err: 'Amount-এ সর্বোচ্চ ' + decimals + ' দশমিক ঘর দেওয়া যাবে' }; }
+    if (v <= 0n) return { err: 'Amount 0-র বেশি হতে হবে' };
+    return { value: v };
+  }
+
   // ── Core Batch ──
   async function supRunBatch() {
     var ethRpcList = supGid('sup-ethRpc').value.split('\n').map(function(s) { return s.trim(); }).filter(Boolean);
@@ -567,6 +580,12 @@
     var tokenAddr   = supGid('sup-tokenAddr').value.trim();
     var decimals    = parseInt(supGid('sup-tokenDecimals').value) || 18;
     var mode        = supGid('sup-mode').value;
+    var fixedAmt    = null;
+    if (mode !== 'full') {
+      var _fa = supParseFixedAmount(decimals);
+      if (_fa.err) { supLog('❌ ' + _fa.err, 'err'); return; }
+      fixedAmt = _fa.value;
+    }
 
     // Gas
     var BUNDLER_MIN = 7660000n;
@@ -613,7 +632,7 @@
         if (mode === 'full') {
           transferAmt = bal;
         } else {
-          transferAmt = ethers.parseUnits(String(parseFloat(supGid('sup-amount').value) || 1), decimals);
+          transferAmt = fixedAmt;
         }
 
         if (bal === 0n) {
@@ -778,6 +797,10 @@
     recipient = recipient.trim(); tokenAddr = tokenAddr.trim();
     if (!ethers.isAddress(recipient)) { supLog('❌ Valid recipient address দিন','err'); window.supSwitchTab('log'); return; }
     if (!ethers.isAddress(tokenAddr))  { supLog('❌ Valid ERC20 token address দিন','err'); window.supSwitchTab('log'); return; }
+    if (supGid('sup-mode').value !== 'full') {
+      var _amtCheck = supParseFixedAmount(parseInt(supGid('sup-tokenDecimals').value) || 18);
+      if (_amtCheck.err) { supLog('❌ ' + _amtCheck.err, 'err'); window.supSwitchTab('log'); return; }
+    }
 
     supWallets = [];
     var lines = (supGid('sup-pkArea') || {}).value || '';

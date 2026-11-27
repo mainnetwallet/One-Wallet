@@ -11,6 +11,14 @@
       .replace(/'/g, '&#39;');
   };
 
+  // Image URL allow-list for <img src>: http(s) or data:image/* only, '' otherwise.
+  // Always pass the result through oneSanitize() before putting it in an attribute.
+  window.oneSafeImgUrl = function(u) {
+    if (u == null) return '';
+    var s = String(u).trim();
+    return /^(https?:\/\/|data:image\/(png|jpe?g|gif|webp|avif|svg\+xml)[;,])/i.test(s) ? s : '';
+  };
+
   // Fetch with timeout wrapper — default 15s
   window.oneFetch = function(url, options, timeoutMs) {
     timeoutMs = timeoutMs || 15000;

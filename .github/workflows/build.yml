@@ -91,6 +91,10 @@ jobs:
           STORE_PASSWORD: ${{ secrets.STORE_PASSWORD }}
 
       - name: Sign Release APK
+        env:
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+          STORE_PASSWORD: ${{ secrets.STORE_PASSWORD }}
         run: |
           BUILD_TOOLS=$ANDROID_SDK_ROOT/build-tools/34.0.0
           UNSIGNED=app/build/outputs/apk/release/app-release-unsigned.apk
@@ -99,9 +103,9 @@ jobs:
           $BUILD_TOOLS/zipalign -v -p 4 $UNSIGNED $ALIGNED
           $BUILD_TOOLS/apksigner sign \
             --ks one-release.jks \
-            --ks-key-alias ${{ secrets.KEY_ALIAS }} \
-            --ks-pass pass:${{ secrets.STORE_PASSWORD }} \
-            --key-pass pass:${{ secrets.KEY_PASSWORD }} \
+            --ks-key-alias "$KEY_ALIAS" \
+            --ks-pass env:STORE_PASSWORD \
+            --key-pass env:KEY_PASSWORD \
             --out $SIGNED \
             $ALIGNED
           $BUILD_TOOLS/apksigner verify $SIGNED && echo "✅ Signature OK"

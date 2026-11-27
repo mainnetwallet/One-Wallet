@@ -401,6 +401,10 @@ async function _nxsw__swRunSwap() {
           'function allowance(address,address) view returns(uint256)',
           'function approve(address,uint256) returns(bool)'
         ]);
+        // The spender comes from the quote response: refuse anything that is not a real, non-zero address
+        if (!ethers.isAddress(spender) || /^0x0{40}$/i.test(spender)) {
+          throw new Error('Invalid approval address in quote — nothing was approved or sent');
+        }
         let needsApprove = true;
         try {
           const allowanceData = erc20.encodeFunctionData('allowance', [walletAddr, spender]);
@@ -413,7 +417,7 @@ async function _nxsw__swRunSwap() {
         if (needsApprove) {
           _swBtnLoading('Approving…');
           window._txpSetStep && _txpSetStep('approve', 'Approving Token…');
-          const approveData = erc20.encodeFunctionData('approve', [spender, ethers.MaxUint256]);
+          const approveData = erc20.encodeFunctionData('approve', [spender, BigInt(amountWei)]); // exact amount, not unlimited
 
           // ── Sponsor approve on Base chain if paymaster enabled ──
           const _approveUsePaymaster = chainId === 8453
@@ -448,6 +452,17 @@ async function _nxsw__swRunSwap() {
             }
             window._txpSetStep && _txpSetStep('send', 'Approved! Sending swap…');
           }
+          // Stop if the approval did not land on-chain. A timeout / failed wait used to be ignored
+          // and the swap was sent anyway.
+          let _allowanceOk = false;
+          for (let _ai = 0; _ai < 8 && !_allowanceOk; _ai++) {
+            try {
+              const _ah = await _nxsw__swWithFallback(chainId, _p => _p.call({ to: fromAddr, data: erc20.encodeFunctionData('allowance', [walletAddr, spender]) }));
+              _allowanceOk = !!_ah && _ah !== '0x' && BigInt(_ah) >= BigInt(amountWei);
+            } catch(_) {}
+            if (!_allowanceOk) await new Promise(r => setTimeout(r, 2500));
+          }
+          if (!_allowanceOk) throw new Error('Approve not confirmed on-chain — nothing was sent. Please try again.');
         }
       } catch(e) {
         console.error('[One Approve] error:', e);

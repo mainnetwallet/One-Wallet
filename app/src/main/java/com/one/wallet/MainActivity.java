@@ -100,11 +100,36 @@ public class MainActivity extends AppCompatActivity {
         "explorer.rango.exchange"
     };
 
+    /**
+     * True when the URL's host is one of EXTERNAL_BROWSER_DOMAINS or a subdomain of one. Matches the parsed
+     * host only, so a URL that merely contains an explorer name in its path or query (for example
+     * https://example.com/?u=etherscan.io) is not treated as an explorer link.
+     */
+    public static boolean isExternalBrowserUrl(String url) {
+        if (url == null) return false;
+        String host;
+        try { host = Uri.parse(url.trim()).getHost(); } catch (Exception e) { return false; }
+        if (host == null) return false;
+        host = host.toLowerCase(java.util.Locale.ROOT);
+        for (String domain : EXTERNAL_BROWSER_DOMAINS) {
+            if (host.equals(domain) || host.endsWith("." + domain)) return true;
+        }
+        return false;
+    }
+
     @SuppressLint({"SetJavaScriptEnabled", "JavascriptInterface"})
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        android.webkit.WebView.setWebContentsDebuggingEnabled(true);
+        // Remote WebView debugging exposes localStorage and the JS bridges to anyone with ADB/USB access,
+        // so only allow it for debuggable (debug) builds, never in release.
+        android.webkit.WebView.setWebContentsDebuggingEnabled(
+            (getApplicationInfo().flags & android.content.pm.ApplicationInfo.FLAG_DEBUGGABLE) != 0);
+
+        // Wallet screens show private keys and recovery phrases in many places, so block screenshots,
+        // screen recording / casting and the Recents thumbnail for this window.
+        getWindow().setFlags(android.view.WindowManager.LayoutParams.FLAG_SECURE,
+                android.view.WindowManager.LayoutParams.FLAG_SECURE);
 
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_main);
@@ -292,16 +317,13 @@ public class MainActivity extends AppCompatActivity {
                 if (url.startsWith("file://")) return false;
                 if (url.startsWith("one://")) return true;
                 if (url.startsWith("http://") || url.startsWith("https://")) {
-                    String urlLower = url.toLowerCase();
-                    for (String domain : EXTERNAL_BROWSER_DOMAINS) {
-                        if (urlLower.contains(domain)) {
-                            try {
-                                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-                                browserIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                                startActivity(browserIntent);
-                            } catch (Exception ignored) {}
-                            return true;
-                        }
+                    if (isExternalBrowserUrl(url)) {
+                        try {
+                            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                            browserIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                            startActivity(browserIntent);
+                        } catch (Exception ignored) {}
+                        return true;
                     }
                     openInAppBrowser(url, null);
                     return true;
@@ -570,7 +592,9 @@ public class MainActivity extends AppCompatActivity {
     public void _sendNotification(String title, String body, String explorerUrl, boolean silent) {
         NotificationManager nm = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         if (nm == null) return;
-        if (notifIdCounter.get() > 50) return;
+        // Ids cycle 1..50 (the oldest slot is reused) instead of silently dropping every notification
+        // after the 50th until the counter happens to be reset.
+        final int notifId = notifIdCounter.getAndUpdate(v -> v >= 50 ? 1 : v + 1);
         if (title != null && title.length() > 100) title = title.substring(0, 100);
         if (body != null && body.length() > 300) body = body.substring(0, 300);
 
@@ -582,7 +606,7 @@ public class MainActivity extends AppCompatActivity {
         if (explorerUrl != null && explorerUrl.toLowerCase().trim().startsWith("https://")) {
             Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(explorerUrl));
             browserIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            pendingIntent = PendingIntent.getActivity(this, notifIdCounter.get(), browserIntent, flags);
+            pendingIntent = PendingIntent.getActivity(this, notifId, browserIntent, flags);
         }
 
         String channelId = silent ? SILENT_CHANNEL_ID : CHANNEL_ID;
@@ -601,6 +625,6 @@ public class MainActivity extends AppCompatActivity {
             builder.setVibrate(new long[]{0L});
             builder.setDefaults(0);
         }
-        nm.notify(notifIdCounter.getAndIncrement(), builder.build());
+        nm.notify(notifId, builder.build());
     }
 }

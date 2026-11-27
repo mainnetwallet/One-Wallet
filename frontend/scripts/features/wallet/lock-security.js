@@ -14,6 +14,8 @@ window.oneLock = (function() {
     credId       : 'one_bio_cred_id',
     default      : 'one_lock_default',
     masterSecret : 'one_lock_master_secret', // single AES key shared across all lock methods
+    failCount    : 'one_lock_fails',         // consecutive wrong PIN/pattern attempts
+    lockUntil    : 'one_lock_until',         // epoch ms until which PIN/pattern entry is blocked
   };
 
   var PIN_LEN = 6; // 6-digit PIN
@@ -42,15 +44,50 @@ window.oneLock = (function() {
   // ── Master secret: one shared AES key for all lock methods ──
   // PIN, Pattern, and Biometric all use the same master secret to en/decrypt wallets.
   // This means switching unlock methods never loses wallet data.
+  //
+  // The secret is stored wrapped by a non-exportable Android Keystore key ("ks1:<iv>.<ct>"), not in
+  // plaintext next to the data it protects (BUG-002). Where the Keystore bridge is unavailable
+  // (e.g. opened in a desktop browser) it falls back to the old plaintext value.
+  var _msCache = null;
+  function _ksReady() {
+    return !!(window.OneAndroid && typeof window.OneAndroid.keystoreWrap === 'function' &&
+              typeof window.OneAndroid.keystoreUnwrap === 'function');
+  }
+  // Wrap with the Keystore and verify the round trip; returns the wrapped string or '' on failure.
+  function _ksWrap(secret) {
+    if (!_ksReady()) return '';
+    try {
+      var w = window.OneAndroid.keystoreWrap(secret) || '';
+      if (w && window.OneAndroid.keystoreUnwrap(w) === secret) return w;
+    } catch (e) {}
+    return '';
+  }
   function _getMasterSecret() {
-    return _get(SK.masterSecret);
+    if (_msCache) return _msCache;
+    var v = _get(SK.masterSecret);
+    if (!v) return null;
+    if (v.indexOf('ks1:') === 0) {
+      var plain = '';
+      if (_ksReady()) { try { plain = window.OneAndroid.keystoreUnwrap(v) || ''; } catch (e) {} }
+      // Wrapped but unreadable: return null and never regenerate it — a new secret would orphan the wallets.
+      if (!plain) return null;
+      _msCache = plain;
+      return plain;
+    }
+    // Plaintext secret from an older version: migrate it into the Keystore
+    var wrapped = _ksWrap(v);
+    if (wrapped) _set(SK.masterSecret, wrapped);
+    _msCache = v;
+    return v;
   }
   function _ensureMasterSecret() {
     var existing = _getMasterSecret();
     if (existing) return existing;
+    if (_get(SK.masterSecret)) return null; // stored but unreadable (see above) — do not overwrite
     // Generate fresh master secret on first lock setup
     var secret = 'one:master:' + _genSalt() + ':' + _genSalt();
-    _set(SK.masterSecret, secret);
+    _set(SK.masterSecret, _ksWrap(secret) || secret);
+    _msCache = secret;
     return secret;
   }
   // Apply master secret to OneCrypto so wallet decrypt works
@@ -60,9 +97,42 @@ window.oneLock = (function() {
       OneCrypto.setSecret(secret);
     }
   }
+  // No lock enabled: make sure a master secret exists and is applied, so wallet keys are always
+  // encrypted at rest and never stored as plaintext (BUG-004). A secret left by an earlier lock is
+  // reused — removing the lock does not re-encrypt the wallets, and clearing it made them
+  // undecryptable after a restart (BUG-011). With a lock enabled this does nothing: the secret is
+  // applied after the user unlocks.
+  function _applySecretIfNoLock() {
+    if (_isEnabled()) return;
+    _ensureMasterSecret();
+    _applyMasterSecret();
+  }
   function _get(k){try{return localStorage.getItem(k);}catch(e){return null;}}
   function _set(k,v){try{localStorage.setItem(k,v);}catch(e){}}
   function _del(k){try{localStorage.removeItem(k);}catch(e){}}
+
+  // ── Wrong-attempt limit (PIN / pattern) ──
+  // After FAIL_FREE wrong attempts entry is blocked for 30 s, doubling per further miss (max 1 h).
+  // The counter is stored, so restarting the app does not reset it; a correct entry clears it.
+  var FAIL_FREE = 5;
+  function _lockoutLeft(){
+    var until = parseInt(_get(SK.lockUntil) || '0', 10) || 0;
+    var left = until - Date.now();
+    return left > 0 ? left : 0;
+  }
+  function _lockoutMsg(ms){
+    var sec = Math.ceil(ms / 1000);
+    return 'Too many attempts. Try again in ' + (sec >= 60 ? Math.ceil(sec / 60) + ' min' : sec + ' s');
+  }
+  function _registerFail(){
+    var n = (parseInt(_get(SK.failCount) || '0', 10) || 0) + 1;
+    _set(SK.failCount, String(n));
+    if (n >= FAIL_FREE) {
+      var secs = Math.min(30 * Math.pow(2, n - FAIL_FREE), 3600);
+      _set(SK.lockUntil, String(Date.now() + secs * 1000));
+    }
+  }
+  function _clearFails(){ _del(SK.failCount); _del(SK.lockUntil); }
 
   // ── Re-encrypt all wallet groups with the current _unlockSecret ──
   // Must be called AFTER OneCrypto.setSecret() whenever the lock secret changes.
@@ -201,8 +271,8 @@ window.oneLock = (function() {
   function _checkOnOpen(){
     if(_isUnlocked)return;
     if(!_isEnabled()){
-      // No lock — use device fingerprint as secret (OneCrypto default)
-      if(typeof OneCrypto!=='undefined') OneCrypto.clearSecret();
+      // No lock — keep/create the master secret (see _applySecretIfNoLock)
+      _applySecretIfNoLock();
       return;
     }
     _lockPin='';_resetLockPinDots();
@@ -237,6 +307,7 @@ window.oneLock = (function() {
           if(bg){bg.textContent='check_circle';bg.style.color='var(--accent-green)';}
           _setBioMsg('Authenticated \u2713');
           // Apply master secret — same AES key regardless of lock method
+          _clearFails();
           _applyMasterSecret();
           setTimeout(function(){_hideLockScreen();},500);
         } else {
@@ -547,6 +618,12 @@ window.oneLock = (function() {
   // ── Lock screen PIN keypad ──
   function _pinKey(k){
     if(_lockPin.length>=PIN_LEN)return;
+    var _wait=_lockoutLeft();
+    if(_wait>0){
+      var errW=document.getElementById('nlk-pin-err');
+      if(errW){errW.textContent=_lockoutMsg(_wait);setTimeout(function(){errW.textContent='';},2000);}
+      return;
+    }
     _lockPin+=k;
     _renderLockPinDots(_lockPin.length);
     if(_lockPin.length===PIN_LEN){
@@ -558,12 +635,15 @@ window.oneLock = (function() {
       hashPromise.then(function(h){
         if(h===storedHash){
           _lockPin='';
+          _clearFails();
           // Apply master secret — works regardless of which method was used to set lock
           _applyMasterSecret();
           _hideLockScreen();
         } else {
+          _registerFail();
           var err=document.getElementById('nlk-pin-err');
-          if(err)err.textContent='Incorrect PIN';
+          var _w2=_lockoutLeft();
+          if(err)err.textContent=_w2>0?_lockoutMsg(_w2):'Incorrect PIN';
           _lockPin='';_resetLockPinDots();
           setTimeout(function(){if(err)err.textContent='';},2000);
         }
@@ -635,14 +715,24 @@ window.oneLock = (function() {
     var canvas=document.getElementById('nlk-pattern-canvas');
     if(!canvas)return;
     _lockPatState=_buildPatCanvas(canvas,function(path){
+      var _wait=_lockoutLeft();
+      if(_wait>0){
+        var eW=document.getElementById('nlk-pat-err');
+        if(eW){eW.textContent=_lockoutMsg(_wait);setTimeout(function(){eW.textContent='';},2000);}
+        if(_lockPatState&&_lockPatState.reset)_lockPatState.reset();
+        return;
+      }
       _sha256(path.join('-')).then(function(h){
         if(h===_get(SK.patHash)){
+          _clearFails();
           // Apply master secret — same AES key regardless of lock method
           _applyMasterSecret();
           _hideLockScreen();
         } else {
+          _registerFail();
           var e=document.getElementById('nlk-pat-err');
-          if(e)e.textContent='Wrong pattern. Try again.';
+          var _w2=_lockoutLeft();
+          if(e)e.textContent=_w2>0?_lockoutMsg(_w2):'Wrong pattern. Try again.';
           if(_lockPatState&&_lockPatState.reset)_lockPatState.reset();
           setTimeout(function(){if(e)e.textContent='';},2000);
         }
@@ -783,11 +873,28 @@ window.oneLock = (function() {
     }, 1500);
   }
 
+  // ── Re-lock after the app has been in the background ──
+  // _isUnlocked used to be set once and never reset, so the lock only appeared at a cold start.
+  // When the page comes back after RELOCK_AFTER_MS hidden, show the lock screen again.
+  var RELOCK_AFTER_MS = 30000;
+  var _hiddenAt = 0;
+  function _onVisibility(){
+    if(document.hidden){ _hiddenAt = Date.now(); return; }
+    var away = _hiddenAt ? Date.now() - _hiddenAt : 0;
+    _hiddenAt = 0;
+    if(away >= RELOCK_AFTER_MS && _isUnlocked && _isEnabled()){
+      _isUnlocked = false;
+      _checkOnOpen();
+    }
+  }
+  document.addEventListener('visibilitychange', _onVisibility);
+
   function _init(){
     _migratePinIfNeeded();
     _syncToggleUI(_isEnabled());
     _updateSetupUI();
     // If no lock is set, populate plaintext cache immediately on boot
+    _applySecretIfNoLock();
     if(!_isEnabled() && typeof loadWalletGroupsAsync==='function'){
       loadWalletGroupsAsync().then(function(){
         if(typeof _hwRestoreSelection==='function') _hwRestoreSelection();
@@ -798,7 +905,7 @@ window.oneLock = (function() {
 
 
   return{
-    _checkOnOpen:_checkOnOpen,_triggerBio:_triggerBio,_pinKey:_pinKey,_pinBackspace:_pinBackspace,
+    _checkOnOpen:_checkOnOpen,_applySecretIfNoLock:_applySecretIfNoLock,_triggerBio:_triggerBio,_pinKey:_pinKey,_pinBackspace:_pinBackspace,
     _showPanel:_showPanel,_initLockPatternCanvas:_initLockPatternCanvas,
     openSetup:openSetup,closeSetup:closeSetup,_setupChoose:_setupChoose,
     _setupPinKey:_setupPinKey,_setupPinBackspace:_setupPinBackspace,

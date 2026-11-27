@@ -30,9 +30,9 @@
                 let html = '<div class="chain-section-header">Mainnets (' + getAllTHChains().length + ')</div>';
                 
                 getAllTHChains().forEach(chain => {
-                    html += `<div class="chain-item" onclick="selectChainNft('${chain.name}', '${chain.rpc}', '${chain.symbol}')">
-                        <div><span class="chain-name">${chain.name}</span></div>
-                        <div class="chain-symbol">${chain.symbol}</div>
+                    html += `<div class="chain-item" data-chain-name="${oneSanitize(chain.name)}" data-chain-rpc="${oneSanitize(chain.rpc)}" data-chain-symbol="${oneSanitize(chain.symbol)}" onclick="selectChainNft(this.dataset.chainName, this.dataset.chainRpc, this.dataset.chainSymbol)">
+                        <div><span class="chain-name">${oneSanitize(chain.name)}</span></div>
+                        <div class="chain-symbol">${oneSanitize(chain.symbol)}</div>
                     </div>`;
                 });
                 
@@ -42,9 +42,9 @@
                 
                 if (testnetChains && testnetChains.length > 0) {
                 testnetChains.forEach(chain => {
-                    html += `<div class="chain-item" onclick="selectChainNft('${chain.name}', '${chain.rpc}', '${chain.symbol}')">
-                        <div><span class="chain-name">${chain.name}</span></div>
-                        <div class="chain-symbol">${chain.symbol}</div>
+                    html += `<div class="chain-item" data-chain-name="${oneSanitize(chain.name)}" data-chain-rpc="${oneSanitize(chain.rpc)}" data-chain-symbol="${oneSanitize(chain.symbol)}" onclick="selectChainNft(this.dataset.chainName, this.dataset.chainRpc, this.dataset.chainSymbol)">
+                        <div><span class="chain-name">${oneSanitize(chain.name)}</span></div>
+                        <div class="chain-symbol">${oneSanitize(chain.symbol)}</div>
                     </div>`;
                 });
                 }
@@ -65,8 +65,8 @@
                 display.onclick = toggleChainListNft;
                 display.innerHTML = `
                     <div>
-                        <span class="chain-name">${selectedChain.name}</span>
-                        <span class="chain-symbol">${selectedChain.symbol}</span>
+                        <span class="chain-name">${oneSanitize(selectedChain.name)}</span>
+                        <span class="chain-symbol">${oneSanitize(selectedChain.symbol)}</span>
                     </div>
                     <span class="expand-hint">▼ Click to change</span>
                 `;
@@ -144,9 +144,9 @@
                 let html = '<div class="chain-section-header">Mainnets (' + getAllTHChains().length + ')</div>';
                 
                 getAllTHChains().forEach(chain => {
-                    html += `<div class="chain-item" onclick="selectChainNftCollect('${chain.name}', '${chain.rpc}', '${chain.symbol}')">
-                        <div><span class="chain-name">${chain.name}</span></div>
-                        <div class="chain-symbol">${chain.symbol}</div>
+                    html += `<div class="chain-item" data-chain-name="${oneSanitize(chain.name)}" data-chain-rpc="${oneSanitize(chain.rpc)}" data-chain-symbol="${oneSanitize(chain.symbol)}" onclick="selectChainNftCollect(this.dataset.chainName, this.dataset.chainRpc, this.dataset.chainSymbol)">
+                        <div><span class="chain-name">${oneSanitize(chain.name)}</span></div>
+                        <div class="chain-symbol">${oneSanitize(chain.symbol)}</div>
                     </div>`;
                 });
                 
@@ -156,9 +156,9 @@
                 
                 if (testnetChains && testnetChains.length > 0) {
                 testnetChains.forEach(chain => {
-                    html += `<div class="chain-item" onclick="selectChainNftCollect('${chain.name}', '${chain.rpc}', '${chain.symbol}')">
-                        <div><span class="chain-name">${chain.name}</span></div>
-                        <div class="chain-symbol">${chain.symbol}</div>
+                    html += `<div class="chain-item" data-chain-name="${oneSanitize(chain.name)}" data-chain-rpc="${oneSanitize(chain.rpc)}" data-chain-symbol="${oneSanitize(chain.symbol)}" onclick="selectChainNftCollect(this.dataset.chainName, this.dataset.chainRpc, this.dataset.chainSymbol)">
+                        <div><span class="chain-name">${oneSanitize(chain.name)}</span></div>
+                        <div class="chain-symbol">${oneSanitize(chain.symbol)}</div>
                     </div>`;
                 });
                 }
@@ -179,8 +179,8 @@
                 display.onclick = toggleChainListNftCollect;
                 display.innerHTML = `
                     <div>
-                        <span class="chain-name">${selectedChain.name}</span>
-                        <span class="chain-symbol">${selectedChain.symbol}</span>
+                        <span class="chain-name">${oneSanitize(selectedChain.name)}</span>
+                        <span class="chain-symbol">${oneSanitize(selectedChain.symbol)}</span>
                     </div>
                     <span class="expand-hint">▼ Click to change</span>
                 `;

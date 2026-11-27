@@ -6,6 +6,106 @@ Per-build release notes are published on the [Releases](../../releases) page.
 ## [Unreleased]
 
 ### Fixed
+- **Explorer links were matched by text anywhere in the address:** a link was opened in the system browser if an
+  explorer name appeared anywhere in it, even in a query like `?u=etherscan.io`. Only links whose host is an explorer
+  (or a subdomain of one) are now treated as explorer links. Also removed an unused public CORS-proxy entry from the
+  network configuration and a meaningless `autoVerify` flag from the `one://wallet` link.
+- **Notifications stopped appearing after 50, and the "running" notification could come back after the app was killed:**
+  after 50 notifications in one session every further transaction notification was silently dropped. Notification
+  slots are now reused (oldest first) so they keep appearing. The background-service notification is no longer
+  restarted by Android after the app is killed. The service still starts at app launch as before; making it start
+  only while work is running is not included because background bots do not all report when they start and stop.
+- **Security: screens showing private keys could be captured:** screenshots, screen recording, screen casting and the
+  app-switcher (Recents) preview could capture wallet screens that display private keys and recovery phrases. The main
+  wallet window now blocks all of these. Note: this also means you can no longer take screenshots of the wallet screens.
+- **Pull-to-refresh could wipe the Bridge form during a bridge, and a cancelled pull left it stuck:** pulling down on
+  the Bridge page while a bridge or swap was running cleared the selected route, amount and recipient mid-transaction.
+  Pull-to-refresh is now ignored on the Bridge page while a transaction is running. Also, if a pull was interrupted
+  (for example by a system gesture), the pull state and indicator are now reset instead of staying active.
+- **Release builds could lose the dApp connection bridge:** only the main wallet bridge was protected from code
+  shrinking, so the in-app browser's dApp bridge (connect, sign, send) could be renamed or removed in release builds.
+  All bridge methods are now kept. This was fixed from the build configuration and still needs a release-build check
+  on a device (connect, sign and send from a dApp).
+- **The site name on the dApp approval sheet could belong to a different tab:** the name came from the last page that
+  started loading in any tab, so with several tabs open the sheet could show another site's name. It now shows the
+  address of the tab that actually sent the request.
+- **dApp requests could hang forever when the rejection message contained a quote:** the error text sent back to the
+  dApp was escaped in the wrong order, producing a script error, so the dApp's request never finished. The message is
+  now safely encoded and the request always ends with the rejection.
+- **Security: the native network helper accepted any address and any response size (partial fix):** it now only
+  talks to `https://` addresses, refuses loopback, local-network and link-local addresses, stops reading a response
+  after 8 MB, and ignores calls with a malformed callback id. A per-host allow-list is not included yet because this
+  helper is used for exchange and aggregator requests to many different hosts and needs a device test first.
+- **Security: web pages in the in-app browser could launch other apps without a tap:** any non-web link a page loaded
+  (including from a redirect or script) was handed straight to Android. Now only `mailto:`, `tel:`, `sms:` and
+  `wc:` links are passed on, and only when you tap them; all other schemes are ignored.
+- **Security: any web page in the in-app browser could switch your chain or wallet, or open non-web links:** pages
+  could call the wallet and chain "selected" callbacks and make the browser remember whatever they sent, and could ask the
+  browser to open a tab for any kind of link. Those callbacks are removed; the chain and wallet now change only when
+  you pick them in the native chain picker or wallet drawer. Pages can now only open `http://` and `https://` links in
+  a new tab.
+- **Security: exchange API keys and secrets were stored as plain text:** the API key, secret and passphrase for each
+  connected exchange were saved as plain JSON in the app's storage, although the code comment said they were encrypted.
+  They are now stored wrapped by a non-exportable Android Keystore key, the same way as the wallet secret. Keys saved
+  by earlier versions are converted the next time they are read. If the Keystore is unavailable the previous behaviour is
+  used. Use API keys with only the permissions you need (for example, no withdrawal permission if you do not use
+  withdrawals in the app).
+- **Security: swaps and bridges approved an unlimited token amount to an address supplied by the quote service:** the
+  approval was for the maximum possible amount, to a spender taken from the aggregator's response, and if the approval
+  timed out or failed to confirm the swap was still sent. Swap, Bridge and Pair-swap now approve only the amount being
+  spent, refuse an empty or zero approval address, and stop (nothing is sent) if the approval cannot be confirmed
+  on-chain. Because the approval is exact, a new approval is needed for each swap, so a swap that previously reused an
+  old unlimited approval will now show an extra approve step.
+- **Batch transfer sent 1 token per wallet when the amount was empty or invalid:** in fixed-amount mode an empty, `0`
+  or non-numeric Amount silently became 1 whole token for every wallet, and values like `1e-7` failed part-way through.
+  The amount is now checked before the bot starts: it must be a plain positive decimal number (for example `1` or
+  `0.5`) with no more decimal places than the token has, otherwise nothing is sent and an error is shown in the log.
+  Full-balance mode is unchanged.
+- **Security: App Lock only appeared at a cold start and had no limit on wrong PIN / pattern attempts:** once unlocked,
+  the app stayed unlocked until it was killed, and the PIN or pattern could be tried without limit. The lock screen now
+  comes back when the app returns from the background after 30 seconds or more, and after 5 wrong PIN / pattern
+  attempts entry is blocked for 30 seconds, doubling with each further miss (up to 1 hour). The count survives
+  restarting the app and is cleared by a correct PIN, pattern or biometric unlock. (Not changed here: PIN hashing
+  strength, re-asking for the PIN before removing the lock, and tying the encryption key to biometrics.)
+- **Security: the wallet encryption secret was stored in plaintext next to the encrypted keys:** the random secret that
+  the wallet keys are encrypted with was kept as plain text in the app's storage, right beside the data it protects, so
+  anyone able to read that storage could decrypt the keys. The secret is now stored wrapped (AES-256-GCM) by a key held
+  in the Android Keystore that cannot be exported from the device. Existing installs are migrated automatically on the
+  next launch; if the Keystore is unavailable the app keeps working with the previous behaviour. If the wrapped secret
+  can ever not be read, the app never creates a new one over it, so stored wallets are not orphaned. Note: this protects
+  against reading the storage files, not against code running inside the app itself.
+- **Security: wallet private keys were stored as plaintext on the device in several cases:** every save first wrote
+  all keys as plain JSON to a backup entry, and the encrypt step silently returned the plaintext whenever no secret
+  was available (for example with no app lock set), so keys could stay unencrypted on disk. Keys are now only ever
+  written encrypted: no plaintext backup is written, a failed encryption stops the save and shows an error instead of
+  storing plaintext, and with no app lock the app creates its own secret on first launch. Wallets and backups saved as
+  plaintext by earlier versions are encrypted (and the old backup entry removed) the next time the app opens.
+- **Removing App Lock could make wallets unreadable, and a later save could erase them:** removing the lock left the
+  wallet keys encrypted with the lock's master secret, but on the next launch that secret was no longer applied, so the
+  keys could not be decrypted. The app then cached the wallets with no keys, and the next save wrote that empty list over
+  the stored keys. The master secret is now kept in use while no lock is enabled, and a wallet list that could not be
+  decrypted is never cached or saved (changes are blocked with a message instead of overwriting the stored keys).
+- **Security: WebView remote debugging was on in release builds:** `setWebContentsDebuggingEnabled(true)` ran
+  unconditionally, so anyone with USB / ADB access to an unlocked phone could attach Chrome DevTools to the wallet view
+  and read its storage. It is now enabled only when the app is debuggable (debug builds).
+- **Security: NFT names, token symbols and chain names could run code in the wallet:** values that come from the chain
+  or from remote metadata (NFT name / image / token id / collection name, ERC-20 `symbol()`, chain name / symbol, saved
+  swap-pair labels) were put into `innerHTML` unescaped, so a spam NFT or token could run script in the view that holds
+  the keys. They are now HTML-escaped at the NFT grids, the NFT chain pickers (which also no longer build `onclick`
+  strings from chain data), the swap-pair preview and lists, and the dApp transaction summary; NFT image URLs must be
+  `http(s)` or `data:image/*`. This covers the places named in the audit, not every `innerHTML` in the app.
+- **Security: a dApp page could approve its own transactions and signatures:** the Confirm / Reject sheet for dApp
+  requests was drawn inside the dApp page, and the approve call it used (`OneWeb3Bridge.modalApprove`) was callable by
+  the page itself, so a malicious site could send a request and approve it without any tap. The confirmation is now a
+  native sheet that the page cannot see or press: Approve / Reject are native buttons, the request id they act on is
+  fixed when the sheet opens, and `modalApprove` / `modalReject` are no longer exposed to pages. The request summary is
+  shown in a script-less view. Back, tapping outside the sheet, or navigating the tab rejects or closes it as before.
+- **Security: a web page in the in-app browser could run code inside the wallet:** the wallet address, chain id and
+  request method that a dApp page sends to the browser bridge were put into JavaScript run in the main wallet view with
+  only the `"` character escaped, so a `\` in the input could break out of the string. These values are now validated
+  at the bridge entry (address `0x` + 40 hex, chain id hex, method name charset) and passed as JSON-quoted literals;
+  the transaction-modal labels are HTML-escaped. Applies to wallet select, chain select, dApp requests, account state
+  and the transaction modal.
 - **Swipe down to close no longer gets stuck half-way (Send token and Select token sheets):** the Send sheet and the Bridge
   chain / token pickers had their own swipe code, and a drag could freeze mid-screen: the WebView cancels the touch when it
   starts a native pan, and nothing handled that cancel; the gesture also gave up on the first sideways wobble or when the

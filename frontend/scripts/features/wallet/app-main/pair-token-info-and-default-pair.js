@@ -111,8 +111,9 @@ function updatePairPreview() {
   if (!fromAddr || !toAddr) { if (box) box.style.display = 'none'; return; }
 
   if (box) box.style.display = 'block';
-  const fSym = fromSym || fromAddr.slice(0,6) + '…';
-  const tSym = toSym || toAddr.slice(0,6) + '…';
+  // Symbols can come from an on-chain symbol() call or user input: escape before innerHTML.
+  const fSym = oneSanitize(fromSym || fromAddr.slice(0,6) + '…');
+  const tSym = oneSanitize(toSym || toAddr.slice(0,6) + '…');
   const fColor = pairFromSelected ? pairFromSelected.color : '#6366f1';
   const tColor = pairToSelected ? pairToSelected.color : '#22d3ee';
 
@@ -120,7 +121,7 @@ function updatePairPreview() {
     <div style="background:${fColor}22;border:1px solid ${fColor}44;border-radius:8px;padding:5px 12px;font-size:12px;font-weight:800;color:${fColor};">${fSym}</div>
     <span class="material-icons-round" style="font-size:16px;color:var(--text-muted)">swap_horiz</span>
     <div style="background:${tColor}22;border:1px solid ${tColor}44;border-radius:8px;padding:5px 12px;font-size:12px;font-weight:800;color:${tColor};">${tSym}</div>
-    <div style="font-size:10px;color:var(--text-muted);font-family:var(--font-mono);margin-left:4px;">${fromAddr.slice(0,8)}…↔${toAddr.slice(0,8)}…</div>
+    <div style="font-size:10px;color:var(--text-muted);font-family:var(--font-mono);margin-left:4px;">${oneSanitize(fromAddr.slice(0,8))}…↔${oneSanitize(toAddr.slice(0,8))}…</div>
   `;
 }
 

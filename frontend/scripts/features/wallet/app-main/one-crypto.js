@@ -1,8 +1,8 @@
 
 // ══════════════════════════════════════════════════════
 // ONE SECURE STORAGE — AES-GCM PIN-based Encryption
-// Private keys are encrypted with the user's PIN/Pattern.
-// No lock set → device-fingerprint key (fallback).
+// Private keys are encrypted with the secret set via setSecret() (the app lock's master secret).
+// With no secret set, encrypt() fails — it never falls back to returning plaintext.
 // Keys live in memory only after unlock.
 // ══════════════════════════════════════════════════════
 // OneCrypto v4 — AES-256-GCM + PBKDF2
@@ -43,14 +43,14 @@ const OneCrypto = (function() {
   async function encrypt(plain) {
     if (!plain || typeof plain !== 'string') return plain;
     if (plain.startsWith('ncx4:')) return plain; // already encrypted
-    try {
-      var enc = new TextEncoder();
-      var iv  = crypto.getRandomValues(new Uint8Array(12));
-      var key = await _getKey();
-      var ct  = await crypto.subtle.encrypt({ name: 'AES-GCM', iv: iv }, key, enc.encode(plain));
-      var b64 = function(u8) { return btoa(String.fromCharCode.apply(null, new Uint8Array(u8))); };
-      return 'ncx4:' + b64(iv) + '.' + b64(ct);
-    } catch(e) { return plain; }
+    // Throws (PIN_REQUIRED / WebCrypto error) when it cannot encrypt, so callers never
+    // persist plaintext by accident (BUG-004). Callers must handle the rejection.
+    var enc = new TextEncoder();
+    var iv  = crypto.getRandomValues(new Uint8Array(12));
+    var key = await _getKey();
+    var ct  = await crypto.subtle.encrypt({ name: 'AES-GCM', iv: iv }, key, enc.encode(plain));
+    var b64 = function(u8) { return btoa(String.fromCharCode.apply(null, new Uint8Array(u8))); };
+    return 'ncx4:' + b64(iv) + '.' + b64(ct);
   }
 
   // ── AES-GCM decrypt "ncx4:..." → plain ──
@@ -109,6 +109,8 @@ const OneCrypto = (function() {
     _keyCache = null;
   }
 
+  function hasSecret() { return !!_unlockSecret; }
+
   // ── Plaintext cache (used by sync loadWalletGroups) ──
   function setPlaintextCache(groups) {
     _plaintextCache = groups ? JSON.parse(JSON.stringify(groups)) : null;
@@ -166,6 +168,7 @@ const OneCrypto = (function() {
   return {
     setSecret:           setSecret,
     clearSecret:         clearSecret,
+    hasSecret:           hasSecret,
     setPlaintextCache:   setPlaintextCache,
     getPlaintextCache:   getPlaintextCache,
     clearPlaintextCache: clearPlaintextCache,
