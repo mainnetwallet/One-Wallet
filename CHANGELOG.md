@@ -5,6 +5,15 @@ Per-build release notes are published on the [Releases](../../releases) page.
 
 ## [Unreleased]
 
+### Fixed
+- **Swipe down to close no longer gets stuck half-way (Send token and Select token sheets):** the Send sheet and the Bridge
+  chain / token pickers had their own swipe code, and a drag could freeze mid-screen: the WebView cancels the touch when it
+  starts a native pan, and nothing handled that cancel; the gesture also gave up on the first sideways wobble or when the
+  first few pixels were not straight down. All of them now use one shared helper (`scripts/shared/ui/sheet-swipe-close.js`)
+  where every way a gesture can end (lift, cancel, app blur, new touch) resolves the sheet fully open or fully closed.
+  Direction is locked after ~8px, a pull from the top of the token list drags the sheet, a scrolled list just scrolls, and
+  swiping the dim area above the sheet closes it too. Bridge pickers keep their `!important` CSS states.
+
 ### Changed
 - **Bridge and Send token pickers now match the Swap one:** same compact **Select token** sheet (handle, header, 38px
   search with **Paste**, "All tokens on <chain>" label, 38px logos, selected row tinted with a tick, "No tokens found").

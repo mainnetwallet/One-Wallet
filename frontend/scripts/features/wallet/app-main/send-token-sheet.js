@@ -213,50 +213,13 @@ async function _fetchSendSheetMissing() {
   if (session === _sendSheetSession && changed && sheet && sheet.classList.contains('open')) _renderSendSheet();
 }
 
-// Swipe down on the sheet (handle, header, or the list while it is scrolled to the top) closes it
+// Swipe down on the sheet (handle, header, tabs, or the list while it is at its top) or on the dim area closes it.
+// Gesture logic is shared: scripts/shared/ui/sheet-swipe-close.js
 function _attachSendSheetSwipe(sheet) {
   if (!sheet || sheet._swipeAttached) return;
   sheet._swipeAttached = true;
-  const THRESHOLD = 80;
-  let sy = 0, sx = 0, dragging = false, locked = false;
-  const list = document.getElementById('send-sheet-list');
-  const chains = document.getElementById('send-sheet-chains');
-  const reset = () => { sheet.style.transition = ''; sheet.style.transform = ''; };
-
-  sheet.addEventListener('touchstart', function (e) {
-    if (e.touches.length !== 1) return;
-    sy = e.touches[0].clientY; sx = e.touches[0].clientX;
-    dragging = true;
-    locked = !!(list && list.contains(e.target) && list.scrollTop > 2) || !!(chains && chains.contains(e.target));
-  }, { passive: true });
-
-  sheet.addEventListener('touchmove', function (e) {
-    if (!dragging || locked || e.touches.length !== 1) return;
-    const dx = Math.abs(e.touches[0].clientX - sx);
-    const dy = e.touches[0].clientY - sy;
-    if (dx > Math.abs(dy) + 6) { locked = true; reset(); return; }
-    if (list && list.contains(e.target) && list.scrollTop > 2) { locked = true; reset(); return; }
-    if (dy > 0) {
-      sheet.style.transition = 'none';
-      sheet.style.transform = 'translateY(' + dy + 'px)';
-    }
-  }, { passive: true });
-
-  sheet.addEventListener('touchend', function (e) {
-    if (!dragging) return;
-    dragging = false;
-    if (locked) { locked = false; reset(); return; }
-    const dy = (e.changedTouches[0] ? e.changedTouches[0].clientY : sy) - sy;
-    sheet.style.transition = '';
-    if (dy >= THRESHOLD) {
-      closeSendTokenSheet();
-      setTimeout(reset, 320);
-    } else {
-      sheet.style.transform = '';
-    }
-  }, { passive: true });
-
-  sheet.addEventListener('touchcancel', function () { dragging = false; locked = false; reset(); }, { passive: true });
+  attachSheetSwipeClose(sheet, { closeFn: closeSendTokenSheet, scroller: 'send-sheet-list' });
+  attachBackdropSwipeClose(document.getElementById('send-sheet-backdrop'), closeSendTokenSheet);
 }
 
 function sendSheetFilter(v) {
@@ -284,7 +247,7 @@ function openSendTokenSheet() {
   const back = document.getElementById('send-sheet-backdrop');
   if (!sheet) return;
   _attachSendSheetSwipe(sheet);
-  sheet.style.transform = '';
+  if (sheet._sheetSwipe) sheet._sheetSwipe.reset(); else { sheet.style.transform = ''; sheet.style.transition = ''; }
   sheet.classList.add('open');
   if (back) back.classList.add('open');
   _renderSendSheet();

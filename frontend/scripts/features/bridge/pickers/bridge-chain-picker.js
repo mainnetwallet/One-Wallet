@@ -123,90 +123,22 @@
   window.brCloseChainPicker = function () { $e('br-chain-overlay').classList.remove('open'); };
 
   // ── Drag-to-close for Bridge Chain & Token pickers ──
+  // Gesture logic is shared: scripts/shared/ui/sheet-swipe-close.js
+  // (the stylesheet sets transform/transition with !important on these sheets, so the helper does too)
   (function() {
-    function addDragClose(modalInnerId, overlayId, closeFn) {
-      var el = document.getElementById(modalInnerId);
-      if (!el) return;
-      var startX = 0, startY = 0, curY = 0;
-      var dragging = false, decided = false, isScrolling = false;
-      var THRESHOLD = 80; // px drag down to trigger close
-      var DECIDE_PX = 8;  // px before we decide drag vs scroll
-
-      function _getList() { return el.querySelector('[id$="-list"]'); }
-
-      function onTouchStart(e) {
-        var list = _getList();
-        // If list is scrolled down, only normal scroll — no drag-to-close
-        if (list && list.scrollTop > 0) { dragging = false; decided = true; isScrolling = true; return; }
-        startX = e.touches[0].clientX;
-        startY = e.touches[0].clientY;
-        curY = startY;
-        dragging = false;
-        decided = false;
-        isScrolling = false;
-      }
-      function onTouchMove(e) {
-        if (decided && !dragging) return; // scrolling mode — let browser handle
-
-        var dy = e.touches[0].clientY - startY;
-        var dx = Math.abs(e.touches[0].clientX - startX);
-
-        // Decide intent on first significant movement
-        if (!decided && (Math.abs(dy) > DECIDE_PX || dx > DECIDE_PX)) {
-          decided = true;
-          var list = _getList();
-          var atTop = !list || list.scrollTop <= 0;
-          // Drag-to-close only if: moving downward AND list is at top AND more vertical than horizontal
-          if (dy > 0 && atTop && Math.abs(dy) > dx) {
-            dragging = true;
-            isScrolling = false;
-            el.style.setProperty('transform', 'translateY(0)', 'important');
-            el.style.setProperty('transition', 'none', 'important');
-          } else {
-            dragging = false;
-            isScrolling = true;
-            return; // let native scroll work
-          }
-        }
-
-        if (!dragging) return;
-        curY = e.touches[0].clientY;
-        var dragY = curY - startY;
-        if (dragY < 0) dragY = 0;
-        el.style.setProperty('transform', 'translateY(' + dragY + 'px)', 'important');
-        e.preventDefault();
-      }
-      function onTouchEnd(e) {
-        if (!dragging) { dragging = false; decided = false; isScrolling = false; return; }
-        dragging = false; decided = false; isScrolling = false;
-        var dy = curY - startY;
-        if (dy > THRESHOLD) {
-          // Slide down fully then close
-          el.style.setProperty('transition', 'transform 0.3s cubic-bezier(0.4,0,0.6,1)', 'important');
-          el.style.setProperty('transform', 'translateY(100%)', 'important');
-          setTimeout(function() {
-            closeFn();
-            el.style.removeProperty('transform');
-            el.style.removeProperty('transition');
-          }, 300);
-        } else {
-          // Snap back up
-          el.style.setProperty('transition', 'transform 0.35s cubic-bezier(0.34,1.3,0.64,1)', 'important');
-          el.style.setProperty('transform', 'translateY(0)', 'important');
-          setTimeout(function() {
-            el.style.removeProperty('transform');
-            el.style.removeProperty('transition');
-          }, 350);
-        }
-      }
-      el.addEventListener('touchstart', onTouchStart, { passive: true });
-      el.addEventListener('touchmove',  onTouchMove,  { passive: false });
-      el.addEventListener('touchend',   onTouchEnd,   { passive: true });
-    }
-
+    var BR_EASE_SNAP = 'transform 0.3s cubic-bezier(0.25,1,0.5,1)';
     function initDragClose() {
-      addDragClose('br-chain-modal-inner', 'br-chain-overlay', function() { if (typeof brCloseChainPicker === 'function') brCloseChainPicker(); });
-      addDragClose('br-token-modal-inner', 'br-token-overlay', function() { if (typeof brCloseTokenPicker === 'function') brCloseTokenPicker(); });
+      if (typeof attachSheetSwipeClose !== 'function') return;
+      [
+        ['br-chain-modal-inner', 'br-chain-overlay', 'brCloseChainPicker', 'br-chain-list'],
+        ['br-token-modal-inner', 'br-token-overlay', 'brCloseTokenPicker', 'br-token-list']
+      ].forEach(function (c) {
+        var sheet = document.getElementById(c[0]);
+        if (!sheet) return;
+        var closeFn = function () { if (typeof window[c[2]] === 'function') window[c[2]](); };
+        attachSheetSwipeClose(sheet, { closeFn: closeFn, scroller: c[3], important: true, snapEase: BR_EASE_SNAP });
+        attachBackdropSwipeClose(document.getElementById(c[1]), closeFn);
+      });
     }
 
     if (document.readyState === 'loading') {
