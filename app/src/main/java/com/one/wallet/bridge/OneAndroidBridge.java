@@ -456,12 +456,12 @@ public class OneAndroidBridge {
 
     @JavascriptInterface
     public void httpGet(final String url, final String headersJson, final String callbackId) {
-        if (url == null || callbackId == null) return;
+        if (url == null || !isSafeCallbackId(callbackId)) return;
         httpExecutor.execute(() -> {
             String resultJson;
             java.net.HttpURLConnection conn = null;
             try {
-                java.net.URL u = new java.net.URL(url);
+                java.net.URL u = checkedBridgeUrl(url);
                 conn = (java.net.HttpURLConnection) u.openConnection();
                 conn.setRequestMethod("GET");
                 conn.setConnectTimeout(8000);
@@ -514,12 +514,12 @@ public class OneAndroidBridge {
 
     @JavascriptInterface
     public void httpPost(final String url, final String headersJson, final String bodyStr, final String callbackId) {
-        if (url == null || callbackId == null) return;
+        if (url == null || !isSafeCallbackId(callbackId)) return;
         httpExecutor.execute(() -> {
             String resultJson;
             java.net.HttpURLConnection conn = null;
             try {
-                java.net.URL u = new java.net.URL(url);
+                java.net.URL u = checkedBridgeUrl(url);
                 conn = (java.net.HttpURLConnection) u.openConnection();
                 conn.setRequestMethod("POST");
                 conn.setConnectTimeout(15000);
@@ -571,12 +571,44 @@ public class OneAndroidBridge {
         });
     }
 
+    // Limits for the native HTTP bridge (BUG-015, partial): https only, no loopback / private /
+    // link-local targets, bounded response size, and a callback id that cannot break out of the
+    // JS string it is placed in. A per-host allow-list is NOT applied here: this bridge serves
+    // exchange and aggregator calls to many user-chosen hosts, so it needs device testing first.
+    private static final int MAX_HTTP_BODY_BYTES = 8 * 1024 * 1024;
+    private static final java.util.regex.Pattern CALLBACK_ID_RE =
+            java.util.regex.Pattern.compile("[A-Za-z0-9_-]{1,64}");
+
+    private static boolean isSafeCallbackId(String id) {
+        return id != null && CALLBACK_ID_RE.matcher(id).matches();
+    }
+
+    private static java.net.URL checkedBridgeUrl(String url) throws java.io.IOException {
+        java.net.URL u = new java.net.URL(url);
+        if (!"https".equalsIgnoreCase(u.getProtocol())) throw new java.io.IOException("only https is allowed");
+        String host = u.getHost();
+        if (host == null || host.isEmpty() || u.getUserInfo() != null) throw new java.io.IOException("invalid host");
+        for (java.net.InetAddress a : java.net.InetAddress.getAllByName(host)) {
+            if (a.isAnyLocalAddress() || a.isLoopbackAddress() || a.isLinkLocalAddress()
+                    || a.isSiteLocalAddress() || a.isMulticastAddress()) {
+                throw new java.io.IOException("blocked address");
+            }
+        }
+        return u;
+    }
+
     private static String readHttpStream(java.io.InputStream is) throws java.io.IOException {
         if (is == null) return "";
         java.io.ByteArrayOutputStream out = new java.io.ByteArrayOutputStream();
         byte[] buf = new byte[8192];
         int n;
-        while ((n = is.read(buf)) != -1) out.write(buf, 0, n);
+        while ((n = is.read(buf)) != -1) {
+            out.write(buf, 0, n);
+            if (out.size() > MAX_HTTP_BODY_BYTES) {
+                is.close();
+                throw new java.io.IOException("response too large");
+            }
+        }
         is.close();
         return out.toString("UTF-8");
     }

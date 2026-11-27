@@ -6,6 +6,10 @@ Per-build release notes are published on the [Releases](../../releases) page.
 ## [Unreleased]
 
 ### Fixed
+- **Security: the native network helper accepted any address and any response size (partial fix):** it now only
+  talks to `https://` addresses, refuses loopback, local-network and link-local addresses, stops reading a response
+  after 8 MB, and ignores calls with a malformed callback id. A per-host allow-list is not included yet because this
+  helper is used for exchange and aggregator requests to many different hosts and needs a device test first.
 - **Security: web pages in the in-app browser could launch other apps without a tap:** any non-web link a page loaded
   (including from a redirect or script) was handed straight to Android. Now only `mailto:`, `tel:`, `sms:` and
   `wc:` links are passed on, and only when you tap them; all other schemes are ignored.
