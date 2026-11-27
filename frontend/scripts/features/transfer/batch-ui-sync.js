@@ -53,6 +53,8 @@
     if (!seg || !tok) return;
     var mode = tok.classList.contains('active') ? 'token' : 'native';
     if (seg.getAttribute('data-mode') !== mode) seg.setAttribute('data-mode', mode);
+    var root = $('batchTransferUI');   // lets the stylesheet scope tweaks to one mode
+    if (root && root.getAttribute('data-mode') !== mode) root.setAttribute('data-mode', mode);
   }
 
   function nativeSymbol() {

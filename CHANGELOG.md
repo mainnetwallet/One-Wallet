@@ -6,9 +6,9 @@ Per-build release notes are published on the [Releases](../../releases) page.
 ## [Unreleased]
 
 ### Changed
-- **Batch Transfer spacing:** a light trim of box heights and gaps (recipients box, rows, summary, logs bar) so Deploy /
-  Execute transfer and the collapsed Logs bar sit above the bottom nav in Token mode. Layout is unchanged: gas pill
-  above the buttons, Logs below them.
+- **Batch Transfer spacing (Token only):** a light trim of box heights and gaps (recipients box, rows, summary, logs bar)
+  so Deploy / Execute transfer and the collapsed Logs bar sit above the bottom nav in Token mode. Native keeps its
+  original spacing. Layout is unchanged: gas pill above the buttons, Logs below them.
 - **Batch Transfer buttons scroll again:** Deploy / Execute transfer are no longer pinned; they scroll with the form
   like before (gas pill above them, Logs below, collapsed by default). The page keeps its bottom padding so they
   can always be scrolled fully above the bottom nav.
