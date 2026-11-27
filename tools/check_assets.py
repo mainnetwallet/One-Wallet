@@ -27,7 +27,8 @@ ASSETS = os.path.normpath(ASSETS)
 
 def main() -> int:
     html = build_html.build()
-    refs = re.findall(r'(?:src|href)="((?:scripts|styles|vendor)/[^"]+)"', html)
+    refs = [a or b for a, b in re.findall(
+        r'(?:src|href)\s*=\s*(?:"((?:scripts|styles|vendor)/[^"]+)"|\'((?:scripts|styles|vendor)/[^\']+)\')', html)]
     problems = []
 
     for r in refs:
