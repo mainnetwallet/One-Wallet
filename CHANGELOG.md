@@ -6,6 +6,11 @@ Per-build release notes are published on the [Releases](../../releases) page.
 ## [Unreleased]
 
 ### Fixed
+- **Security: any web page in the in-app browser could switch your chain or wallet, or open non-web links:** pages
+  could call the wallet and chain "selected" callbacks and make the browser remember whatever they sent, and could ask the
+  browser to open a tab for any kind of link. Those callbacks are removed; the chain and wallet now change only when
+  you pick them in the native chain picker or wallet drawer. Pages can now only open `http://` and `https://` links in
+  a new tab.
 - **Security: exchange API keys and secrets were stored as plain text:** the API key, secret and passphrase for each
   connected exchange were saved as plain JSON in the app's storage, although the code comment said they were encrypted.
   They are now stored wrapped by a non-exportable Android Keystore key, the same way as the wallet secret. Keys saved

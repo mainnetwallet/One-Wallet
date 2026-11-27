@@ -145,6 +145,12 @@ public class InAppBrowserActivity extends AppCompatActivity {
 
     public static boolean isValidAddress(String s) { return s != null && ADDRESS_RE.matcher(s).matches(); }
     public static boolean isValidChainId(String s) { return s != null && CHAIN_ID_RE.matcher(s).matches(); }
+    /** True only for absolute http(s) URLs; page JS must not open other schemes (file:, intent:, javascript:). */
+    static boolean isHttpUrl(String url) {
+        if (url == null) return false;
+        String u = url.trim().toLowerCase(java.util.Locale.ROOT);
+        return u.startsWith("https://") || u.startsWith("http://");
+    }
     public static boolean isValidMethod(String s)  { return s != null && METHOD_RE.matcher(s).matches(); }
 
     /** Returns {@code s} as a complete, double-quoted JavaScript string literal (quotes included). */
@@ -1021,30 +1027,8 @@ public class InAppBrowserActivity extends AppCompatActivity {
         wv.setHapticFeedbackEnabled(false);
 
         wv.addJavascriptInterface(new OneWeb3Bridge(), "OneWeb3Bridge");
-        wv.addJavascriptInterface(new Object() {
-            @android.webkit.JavascriptInterface
-            public void onChainSelected(String hexId, String name, String logoURI) {
-                if (!isValidChainId(hexId)) return;
-                saveSelectedChain(hexId, name != null ? name : hexId, logoURI);
-                runOnUiThread(() -> {
-                    updateChainButton();
-                    WebView dApp = activeWebView();
-                    if (dApp != null) {
-                        String safeId = jsStr(hexId);
-                        String accts  = isValidAddress(selectedWalletAddress)
-                            ? "[" + jsStr(selectedWalletAddress) + "]"
-                            : "[]";
-                        dApp.post(() -> {
-                            dApp.evaluateJavascript(
-                                "window._oneBrowserChainId = " + safeId + ";", null);
-                            dApp.evaluateJavascript(
-                                "window.ethereum && window.ethereum._updateState(" + accts + ", " + safeId + ");",
-                                null);
-                        });
-                    }
-                });
-            }
-        }, "_OneChainBridge");
+        // NOTE: no page-visible chain/wallet setters. The chain and wallet are changed only by the
+        // native pickers (see the chain picker and wallet drawer), never by dApp page JS.
 
         wv.setWebViewClient(new WebViewClient() {
             @Override
@@ -1397,22 +1381,6 @@ public class InAppBrowserActivity extends AppCompatActivity {
     // ══════════════════════════════════════════════════════════════
     public class OneWeb3Bridge {
         @JavascriptInterface
-        public void walletSelected(final String address) {
-            if (!isValidAddress(address)) return;
-            // ── Persist at Java level so it survives page navigation & app restart ──
-            saveSelectedWallet(address);
-            WebView mv = MainActivity.getMainWebView();
-            if (mv == null) return;
-            String safeAddr = jsStr(address);
-            // BUG 2 FIX: Pass current chainId so oneSetBrowserSelectedWallet correctly
-            // sets _oneBrowserChainId — without it signing uses wrong chain
-            String chainId = selectedChainId != null ? selectedChainId : "0x1";
-            String safeChain = jsStr(isValidChainId(chainId) ? chainId : "0x1");
-            mv.post(() -> mv.evaluateJavascript(
-                "window.oneSetBrowserSelectedWallet && window.oneSetBrowserSelectedWallet(" + safeAddr + ", " + safeChain + ");", null));
-        }
-
-        @JavascriptInterface
         public void handleRequest(final int reqId, final String method, final String paramsJson) {
             WebView mv = MainActivity.getMainWebView();
             if (!isValidMethod(method)) { resolveError(reqId, "Unsupported method"); return; }
@@ -1469,7 +1437,7 @@ public class InAppBrowserActivity extends AppCompatActivity {
          */
         @JavascriptInterface
         public void openInAppBrowser(final String url, final String ignored) {
-            if (url == null || url.isEmpty()) return;
+            if (!isHttpUrl(url)) return;
             InAppBrowserActivity a = sInstance != null ? sInstance.get() : null;
             if (a == null) return;
             a.runOnUiThread(() -> a.openNewTabPublic(url));
