@@ -1,7 +1,7 @@
 /* Select token bottom sheet (Swap, Bridge, Send) — shared sw-tp-* classes */
 .sw-tp-sheet {
   width: 100%;
-  height: 80%;
+  height: 68%;
   box-sizing: border-box;
   background: var(--bg-deep);
   border-radius: 20px 20px 0 0;
@@ -36,6 +36,7 @@
 .sw-tp-title {
   font-size: 16px;
   font-weight: 700;
+  font-family: var(--font-ui);
   color: var(--text-primary);
 }
 .sw-tp-close {

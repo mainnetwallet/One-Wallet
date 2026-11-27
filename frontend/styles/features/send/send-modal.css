@@ -313,7 +313,7 @@
   /* Row / header / search look comes from the shared sw-tp-* classes (styles/features/swap/swap-token-picker.css) */
   .send-sheet {
     position: absolute; left: 0; right: 0; bottom: 0; z-index: 720;
-    height: 80%; padding: 0 14px;
+    height: 68%; padding: 0 14px;
     background: var(--bg-deep); border-top: 1px solid var(--border-subtle);
     border-radius: 20px 20px 0 0;
     display: flex; flex-direction: column;
