@@ -6,6 +6,12 @@ Per-build release notes are published on the [Releases](../../releases) page.
 ## [Unreleased]
 
 ### Fixed
+- **Security: wallet private keys were stored as plaintext on the device in several cases:** every save first wrote
+  all keys as plain JSON to a backup entry, and the encrypt step silently returned the plaintext whenever no secret
+  was available (for example with no app lock set), so keys could stay unencrypted on disk. Keys are now only ever
+  written encrypted: no plaintext backup is written, a failed encryption stops the save and shows an error instead of
+  storing plaintext, and with no app lock the app creates its own secret on first launch. Wallets and backups saved as
+  plaintext by earlier versions are encrypted (and the old backup entry removed) the next time the app opens.
 - **Removing App Lock could make wallets unreadable, and a later save could erase them:** removing the lock left the
   wallet keys encrypted with the lock's master secret, but on the next launch that secret was no longer applied, so the
   keys could not be decrypted. The app then cached the wallets with no keys, and the next save wrote that empty list over

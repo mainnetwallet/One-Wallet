@@ -60,12 +60,15 @@ window.oneLock = (function() {
       OneCrypto.setSecret(secret);
     }
   }
-  // No lock is enabled, but wallets saved while a lock was on are still encrypted with the
-  // master secret (removing the lock does not re-encrypt them). Keep using that secret so they
-  // stay readable after a restart; clearing it made them undecryptable (BUG-011).
+  // No lock enabled: make sure a master secret exists and is applied, so wallet keys are always
+  // encrypted at rest and never stored as plaintext (BUG-004). A secret left by an earlier lock is
+  // reused — removing the lock does not re-encrypt the wallets, and clearing it made them
+  // undecryptable after a restart (BUG-011). With a lock enabled this does nothing: the secret is
+  // applied after the user unlocks.
   function _applySecretIfNoLock() {
-    if (_isEnabled()) return; // with a lock on, the secret is applied after the user unlocks
-    if (_getMasterSecret()) _applyMasterSecret();
+    if (_isEnabled()) return;
+    _ensureMasterSecret();
+    _applyMasterSecret();
   }
   function _get(k){try{return localStorage.getItem(k);}catch(e){return null;}}
   function _set(k,v){try{localStorage.setItem(k,v);}catch(e){}}
@@ -208,10 +211,8 @@ window.oneLock = (function() {
   function _checkOnOpen(){
     if(_isUnlocked)return;
     if(!_isEnabled()){
-      // No lock. If an earlier lock left wallets encrypted with the master secret, keep using it
-      // (clearing it made them undecryptable — BUG-011); otherwise there is no secret to apply.
-      if(_getMasterSecret()) _applyMasterSecret();
-      else if(typeof OneCrypto!=='undefined') OneCrypto.clearSecret();
+      // No lock — keep/create the master secret (see _applySecretIfNoLock)
+      _applySecretIfNoLock();
       return;
     }
     _lockPin='';_resetLockPinDots();

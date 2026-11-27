@@ -245,38 +245,63 @@ async function loadWalletGroupsAsync() {
       return [];
     }
     _wgLoadFailed = false;
+    // Leftover plaintext backup written by older versions. It was written before every encrypt and
+    // removed only after the encrypted copy was stored, so it is at least as new as the stored copy.
+    // Fold it into the encrypted storage; saveWalletGroups removes the backup once that succeeds.
+    try {
+      const _left = localStorage.getItem(WG_STORAGE_KEY + '_plain_backup');
+      if (_left) {
+        const _lg = JSON.parse(_left);
+        if (Array.isArray(_lg) && _lg.length > 0) {
+          OneCrypto.setPlaintextCache(_lg);
+          saveWalletGroups(_lg);
+          return _lg;
+        }
+        localStorage.removeItem(WG_STORAGE_KEY + '_plain_backup'); // empty/invalid — nothing to keep
+      }
+    } catch(_) {}
     OneCrypto.setPlaintextCache(groups);
+    // Keys saved as plaintext before a secret existed: encrypt them now (BUG-004)
+    const _hasPlainStored = parsed.some(g => g && Array.isArray(g.keys) &&
+      g.keys.some(k => typeof k === 'string' && k && !k.startsWith('ncx4:')));
+    if (_hasPlainStored) saveWalletGroups(groups);
     return groups;
   } catch { return []; }
 }
 
 // ── saveWalletGroups: update plaintext cache + AES-encrypt to localStorage ──
+// Keys are only ever written encrypted. No plaintext copy is stored (BUG-004): if the keys cannot
+// be encrypted, nothing is written to storage and the user is told.
 function saveWalletGroups(groups) {
   // Stored keys could not be decrypted: writing now would overwrite them with an empty/partial list.
   if (_wgLoadFailed) {
     if (typeof showToast === 'function') showToast('Wallets are locked — restart the app and unlock before changing wallets', 'error');
     return;
   }
+  // No lock enabled → make sure the master secret exists. Lock enabled but not unlocked → no secret.
+  if (window.oneLock && typeof window.oneLock._applySecretIfNoLock === 'function') {
+    window.oneLock._applySecretIfNoLock();
+  }
+  if (typeof OneCrypto.hasSecret === 'function' && !OneCrypto.hasSecret()) {
+    if (typeof showToast === 'function') showToast('Unlock the app before changing wallets — keys not saved', 'error');
+    return;
+  }
   // Update in-memory plaintext cache immediately (sync, used by loadWalletGroups)
   OneCrypto.setPlaintextCache(groups);
   // AES-encrypt async then persist
-  // Fix: also do an immediate plain-JSON save as backup so keys are never lost
-  // if the async encrypt hasn't finished before app closes
-  try {
-    const _backupKey = WG_STORAGE_KEY + '_plain_backup';
-    localStorage.setItem(_backupKey, JSON.stringify(groups));
-  } catch(_bErr) {}
   OneCrypto.encryptGroups(groups).then(function(encoded) {
     try {
       localStorage.setItem(WG_STORAGE_KEY, JSON.stringify(encoded));
-      // Clear plain backup once encrypted version is safely stored
+      // Remove any plaintext backup left by older versions
       try { localStorage.removeItem(WG_STORAGE_KEY + '_plain_backup'); } catch(_) {}
     } catch (e) {
       if (e && (e.name === 'QuotaExceededError' || e.name === 'NS_ERROR_DOM_QUOTA_REACHED' || (e.code && e.code === 22))) {
         if (typeof showToast === 'function') showToast('Storage full — keys not saved!', 'error');
       }
     }
-  }).catch(function() {});
+  }).catch(function() {
+    // Encryption failed: storage is left as it was (never plaintext)
+    if (typeof showToast === 'function') showToast('Could not encrypt wallet keys — not saved', 'error');
+  });
   if (typeof window.homeWalletGuardRefresh === 'function') window.homeWalletGuardRefresh();
 }
-
