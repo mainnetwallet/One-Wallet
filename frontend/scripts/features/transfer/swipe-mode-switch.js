@@ -1,8 +1,9 @@
 
 // ══════════════════════════════════════════════════════
 // TRANSFER HUB — SWIPE TO SWITCH MODE
-// Left→Right : native mode
-// Right→Left : token mode
+// Batch Transfer: Native→Token = swipe left→right, Token→Native = swipe right→left
+//   (the Native/Token thumb follows the finger while dragging)
+// Other sections: Left→Right : first mode, Right→Left : next mode
 // Axis-lock: horizontal swipe only (vertical scroll preserved)
 // ══════════════════════════════════════════════════════
 (function() {
@@ -14,6 +15,8 @@
     {
       id: 'batchTransferUI',
       modes: ['native', 'token'],
+      reverse: true,   // left→right = token, right→left = native (no wrap-around)
+      threshold: 64,
       switcher: function(m) { if (typeof switchBatchMode === 'function') switchBatchMode(m); },
       getCurrent: function() {
         var btn = document.getElementById('nativeModeBtn');
@@ -96,6 +99,32 @@
     var startX = 0, startY = 0;
     var axis = null;       // 'h' | 'v' | null
     var _hintBtn = null;
+    var threshold = section.threshold || SWIPE_THRESHOLD;
+
+    // reverse sections: the mode a swipe of this sign would switch to (or null at the ends)
+    function targetFor(dx) {
+      var modes = section.modes, idx = modes.indexOf(section.getCurrent());
+      var next = dx > 0 ? idx + 1 : idx - 1;
+      return (next >= 0 && next < modes.length) ? modes[next] : null;
+    }
+
+    // Batch thumb follows the finger (0 = Native side, 1 = Token side)
+    function dragThumb(dx) {
+      var seg = el.querySelector('.bt-seg');
+      if (!seg) return;
+      var modes = section.modes, idx = modes.indexOf(section.getCurrent());
+      var p = Math.min(1, Math.abs(dx) / (threshold * 1.4));
+      var allowed = targetFor(dx) !== null;
+      var pos = idx + (allowed ? (dx > 0 ? p : -p) : 0);
+      seg.classList.add('bt-dragging');
+      seg.style.setProperty('--bt-p', String(Math.max(0, Math.min(1, pos))));
+    }
+    function endDragThumb() {
+      var seg = el.querySelector('.bt-seg');
+      if (!seg) return;
+      seg.classList.remove('bt-dragging');
+      seg.style.removeProperty('--bt-p');
+    }
 
     function clearHint() {
       if (_hintBtn) {
@@ -138,11 +167,13 @@
         axis = adx >= ady ? 'h' : 'v';
       }
 
-      if (axis === 'v') { clearHint(); return; }
+      if (axis === 'v') { clearHint(); if (section.reverse) endDragThumb(); return; }
       if (axis !== 'h') return;
 
       // Horizontal — prevent page scroll while swiping
       e.preventDefault();
+
+      if (section.reverse) { dragThumb(dx); return; }
 
       // Visual hint on mode button
       var progress = Math.min(1, Math.max(0, (adx - 40) / (SWIPE_THRESHOLD - 40)));
@@ -159,11 +190,21 @@
 
       axis = null;
       clearHint();
+      if (section.reverse) endDragThumb();
 
       // Only fire when axis was confirmed horizontal
       if (savedAxis !== 'h') return;
-      if (Math.abs(dx) < SWIPE_THRESHOLD) return;
+      if (Math.abs(dx) < threshold) return;
       if (Math.abs(dy) > SWIPE_MAX_VERTICAL) return;
+
+      if (section.reverse) {
+        var target = targetFor(dx);
+        if (!target) return;
+        // Content follows the finger: swiping →  brings the new mode in from the left
+        window._btSlideDir = dx > 0 ? 'left' : 'right';
+        section.switcher(target);
+        return;
+      }
 
       var modes   = section.modes;
       var current = section.getCurrent();
@@ -176,6 +217,12 @@
         // Left→Right swipe → previous mode (native)
         section.switcher(modes[(idx - 1 + modes.length) % modes.length]);
       }
+    }, { passive: true });
+
+    el.addEventListener('touchcancel', function() {
+      axis = null;
+      clearHint();
+      if (section.reverse) endDragThumb();
     }, { passive: true });
   }
 

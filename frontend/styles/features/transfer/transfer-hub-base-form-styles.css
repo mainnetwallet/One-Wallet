@@ -859,3 +859,27 @@
         #th-wrapper #batchTransferUI #tokenModeContent .bt-actions .btn { min-height: 44px !important; }
         #th-wrapper #batchTransferUI #tokenModeContent .bt-logs { padding: 2px 0 0 !important; }
         #th-wrapper #batchTransferUI #tokenModeContent .bt-logs .bt-loghead { height: 34px; }
+
+/* ══════════════════════════════════════════════════════
+   Batch Transfer — smooth Native / Token switch
+   ══════════════════════════════════════════════════════ */
+        /* sliding content must never create sideways page scroll (clip keeps sticky/scroll behavior intact) */
+        #th-wrapper #batchTransferUI { overflow-x: clip; }
+        /* thumb: a softer, slightly springy glide */
+        #th-wrapper #batchTransferUI .bt-seg::before {
+            transition: transform 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+            will-change: transform;
+        }
+        /* while a finger drags, the thumb tracks it 1:1 (set from swipe-mode-switch.js) */
+        #th-wrapper #batchTransferUI .bt-seg.bt-dragging::before {
+            transition: none;
+            transform: translateX(calc(var(--bt-p, 0) * 100%));
+        }
+        #th-wrapper #batchTransferUI .bt-seg .mode-toggle-btn {
+            transition: color 0.25s ease;
+            -webkit-tap-highlight-color: transparent;
+        }
+        #th-wrapper #batchTransferUI .bt-seg .mode-toggle-btn:hover { transform: none; }
+        @media (prefers-reduced-motion: reduce) {
+            #th-wrapper #batchTransferUI .bt-seg::before { transition: none; }
+        }

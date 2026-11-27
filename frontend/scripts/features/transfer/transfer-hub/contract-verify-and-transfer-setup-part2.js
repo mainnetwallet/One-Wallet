@@ -398,6 +398,7 @@
             const tokenModeContent = document.getElementById('tokenModeContent');
             const nativeModeBtn = document.getElementById('nativeModeBtn');
             const tokenModeBtn = document.getElementById('tokenModeBtn');
+            const _btWasToken = tokenModeBtn.classList.contains('active');
 
             // Shared header sync — single chain for both modes
             function _syncHdr() {
@@ -443,6 +444,29 @@
                 }
                 _syncHdr();
                                 _thLogInitialRpc('rpcUrlToken', logMessageToken);
+            }
+
+            // Move the Native/Token thumb right away (no waiting for the UI sync poll)
+            var _btSeg = document.querySelector('#batchTransferUI .bt-seg');
+            if (_btSeg) _btSeg.setAttribute('data-mode', mode);
+            var _btRoot = document.getElementById('batchTransferUI');
+            if (_btRoot) _btRoot.setAttribute('data-mode', mode);
+
+            // Slide the incoming mode in (swipe: follows the finger; tap: follows the thumb)
+            var _btSwipeDir = window._btSlideDir; window._btSlideDir = null;
+            if ((mode === 'token') !== _btWasToken) {
+                var _btIn = mode === 'native' ? nativeModeContent : tokenModeContent;
+                var _btFrom = _btSwipeDir || (mode === 'token' ? 'right' : 'left'); // side it enters from
+                var _btReduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+                if (!_btReduce && _btIn && _btIn.children) {
+                    var _btX = _btFrom === 'right' ? 28 : -28;
+                    Array.prototype.forEach.call(_btIn.children, function (c) {
+                        if (c.animate) c.animate(
+                            [{ opacity: 0, transform: 'translateX(' + _btX + 'px)' }, { opacity: 1, transform: 'translateX(0)' }],
+                            { duration: 260, easing: 'cubic-bezier(0.22, 1, 0.36, 1)' }
+                        );
+                    });
+                }
             }
         }
 
