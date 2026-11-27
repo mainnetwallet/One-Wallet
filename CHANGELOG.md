@@ -8,7 +8,7 @@ Per-build release notes are published on the [Releases](../../releases) page.
 ### Changed
 - **Swap screen polish:** same layout and features, cleaner look. Larger header chips, bigger FROM / TO labels,
   borderless large amount text (24px in, 22px out), taller percent slider (1 / 25 / 50 / 75 / 100%) and MAX button,
-  softer Swap button glow. **Live router** rows are now full width, flat (neutral border; purple border and tick on
+  softer Swap button glow. **Live router** rows are now flat and inset 6% from both sides (neutral border; purple border and tick on
   the selected route, `BEST` tag on the top route), and Gas / Impact text wraps instead of being cut off with "...".
   Light-mode overrides updated to match.
 - **Swap router list height:** the Live router list now measures the space between its top and the bottom nav
