@@ -42,10 +42,7 @@
     const hasRoute  = routesReady && br.selectedRoute !== null;
     const canExecute = hasWallet && hasAmount && hasRoute;
 
-    // Fixed purple gradient — does not change with chain
-    btn.style.background = 'linear-gradient(135deg,#6366f1,#8b5cf6,#a78bfa)';
-    btn.style.borderColor = 'rgba(167,139,250,0.6)';
-    btn.style.boxShadow = '0 0 18px rgba(99,102,241,0.45),0 0 40px rgba(139,92,246,0.2),0 4px 16px rgba(0,0,0,0.45)';
+    // Button colours come from CSS (#br-exec-btn in bridge-cards-bottom-nav-and-fab.css)
     btn.onmouseenter = null;
     btn.onmouseleave = null;
     btn.ontouchstart = null;

@@ -320,7 +320,7 @@
           if (_execBtn) {
             _execBtn.disabled      = false;
             _execBtn.style.opacity = '1';
-            _execBtn.style.background = 'linear-gradient(135deg,#6366f1,#8b5cf6,#a78bfa)';
+            _execBtn.style.background = '';
             _execBtn.style.cursor  = '';
             _execBtn.style.filter  = '';
             _execBtn.style.pointerEvents = '';

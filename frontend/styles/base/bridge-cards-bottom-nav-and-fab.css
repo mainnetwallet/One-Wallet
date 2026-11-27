@@ -187,3 +187,24 @@
   .fab:hover { transform: scale(1.08); }
 
   
+
+  /* ── BRIDGE NOW / SWAP NOW button look (single source) ──
+     Dark theme: light button with dark text. Light theme: dark button with white text.
+     !important because older scripts used to write inline background/shadow on this button. */
+  #br-exec-btn {
+    --br-exec-bg: #f1f1f8;
+    --br-exec-border: #ffffff;
+    --br-exec-fg: #0a0a12;
+    --br-exec-track: rgba(10,10,18,0.25);
+    background: var(--br-exec-bg) !important;
+    border-color: var(--br-exec-border) !important;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.45) !important;
+    color: var(--br-exec-fg);
+  }
+  body.light-mode #br-exec-btn {
+    --br-exec-bg: #1e1b4b;
+    --br-exec-border: #1e1b4b;
+    --br-exec-fg: #ffffff;
+    --br-exec-track: rgba(255,255,255,0.3);
+    box-shadow: 0 4px 14px rgba(30,27,75,0.25) !important;
+  }

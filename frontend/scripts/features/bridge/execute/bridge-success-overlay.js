@@ -472,7 +472,7 @@
           if (_execBtn) {
             _execBtn.disabled        = false;
             _execBtn.style.opacity   = '1';
-            _execBtn.style.background = 'linear-gradient(135deg,#6366f1,#8b5cf6,#a78bfa)';
+            _execBtn.style.background = '';
             _execBtn.style.cursor    = '';
             _execBtn.style.filter    = '';
             _execBtn.style.pointerEvents = '';
@@ -524,7 +524,7 @@
           if (_execBtn2) {
             _execBtn2.disabled         = false;
             _execBtn2.style.opacity    = '1';
-            _execBtn2.style.background = 'linear-gradient(135deg,#6366f1,#8b5cf6,#a78bfa)';
+            _execBtn2.style.background = '';
             _execBtn2.style.cursor     = '';
             _execBtn2.style.filter     = '';
             _execBtn2.style.pointerEvents = '';
