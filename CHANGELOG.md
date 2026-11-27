@@ -6,6 +6,10 @@ Per-build release notes are published on the [Releases](../../releases) page.
 ## [Unreleased]
 
 ### Changed
+- **Batch Transfer layout fix:** the page is now a flex column while Batch Transfer is open - the form scrolls and the
+  gas pill + Deploy / Execute transfer dock stays fixed just above the bottom nav (Native and Token). The previous
+  sticky dock never stuck because `.container` is its own overflow box. Logs are collapsed by default and the whole
+  Logs row is the tap target (Clear no longer toggles it).
 - **Batch Transfer, round 3:** the Native / Token switch is now a small centered pill with a sliding thumb (no longer
   full width). Gas type + Deploy / Execute transfer are docked just above the bottom nav so they no longer disappear
   behind it while you scroll. Logs is collapsible (tap the header) and expanded by default with a taller box.

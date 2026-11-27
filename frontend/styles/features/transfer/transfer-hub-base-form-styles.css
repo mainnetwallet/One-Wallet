@@ -789,3 +789,85 @@
         #th-wrapper #batchTransferUI .bt-logs.collapsed .log-container { display: none !important; }
         #th-wrapper #batchTransferUI .bt-logs .log-container { height: 150px !important; }
 
+/* ══════════════════════════════════════════════════════
+   Batch Transfer — fixed layout: form scrolls, Deploy/Execute dock stays above the bottom nav
+   (#th-wrapper .container is overflow-x:hidden = its own scroll box, which breaks position:sticky,
+   so the page is turned into a flex column while Batch Transfer is on screen.)
+   ══════════════════════════════════════════════════════ */
+        #page-transfer-hub:has(#batchTransferUI:not([style*="display: none"])) {
+            overflow: hidden !important;
+            display: flex;
+            flex-direction: column;
+        }
+        #page-transfer-hub:has(#batchTransferUI:not([style*="display: none"])) #th-wrapper {
+            flex: 1 1 auto;
+            min-height: 0;
+            display: flex;
+            flex-direction: column;
+        }
+        #page-transfer-hub:has(#batchTransferUI:not([style*="display: none"])) #th-wrapper > .container {
+            flex: 1 1 auto;
+            min-height: 0 !important;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        #th-wrapper #batchTransferUI:not([style*="display: none"]) {
+            flex: 1 1 auto;
+            min-height: 0;
+            display: flex !important;
+            flex-direction: column;
+            padding-bottom: 0 !important;
+        }
+        #th-wrapper #batchTransferUI > .th-section-header,
+        #th-wrapper #batchTransferUI > .bt-seg-wrap { flex: none; }
+        #th-wrapper #batchTransferUI #nativeModeContent:not([style*="display: none"]),
+        #th-wrapper #batchTransferUI #tokenModeContent:not([style*="display: none"]) {
+            display: flex !important;
+            flex-direction: column;
+            flex: 1 1 auto;
+            min-height: 0;
+        }
+        #th-wrapper #batchTransferUI .bt-scroll {
+            flex: 1 1 auto;
+            min-height: 0;
+            overflow-x: hidden;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            overscroll-behavior: contain;
+            padding-bottom: 10px;
+        }
+        #th-wrapper #batchTransferUI .bt-dock {
+            position: static;
+            flex: none;
+            margin: 0;
+            padding: 8px 0 8px;
+            background: var(--bg-deep);
+            border-top: 1px solid var(--border-subtle);
+            box-shadow: 0 -10px 16px -10px rgba(0,0,0,0.55);
+        }
+
+/* ── Logs: whole header row toggles (collapsed by default) ── */
+        #th-wrapper #batchTransferUI .bt-logs .bt-loghead {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            height: 42px;
+            margin: 0 0 6px;
+            padding: 0 6px 0 8px;
+            border-radius: 12px;
+            background: var(--bg-raised);
+            border: 1px solid var(--border-subtle);
+            cursor: pointer;
+            -webkit-tap-highlight-color: transparent;
+        }
+        #th-wrapper #batchTransferUI .bt-logs .bt-loghead:active { background: var(--bg-surface); }
+        #th-wrapper #batchTransferUI .bt-logs .bt-loghead .bt-cap { flex: 1; pointer-events: none; }
+        #th-wrapper #batchTransferUI .bt-logs .bt-link {
+            min-height: 0 !important;
+            min-width: 0 !important;
+            height: 30px;
+            padding: 0 10px;
+            border-radius: 8px;
+        }
+
