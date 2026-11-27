@@ -1,0 +1,159 @@
+/* ══════════════════════════════════════════════════
+   KEY & ADDRESS TOOLS — additions on top of the shared compact layout
+   The bt-* rules live in transfer-hub-base-form-styles.css (scoped to the transfer tools incl. #phraseToKeyUI).
+   Markup: html-src/partials/page-transfer-hub/phrase-to-key.html (result rows: scripts/features/transfer/transfer-hub/phrase-to-keys-and-copy-helpers.js
+   and key-to-address-conversion.js) · UI-only helpers: scripts/features/transfer/key-address-tools-ui-sync.js
+   Goal: phrases / keys, options and the action fit on one phone screen; results and logs sit below as compact strips.
+   ══════════════════════════════════════════════════ */
+
+/* Title stays on one line */
+        #th-wrapper #phraseToKeyUI .th-section-header h1 {
+            font-size: 1rem !important;
+            white-space: nowrap;
+        }
+
+/* Phrase box: short multi-line mono box */
+        #th-wrapper #phraseToKeyUI .kt-input {
+            width: 100%;
+            box-sizing: border-box;
+            height: 78px;
+            min-height: 64px;
+            max-height: 200px;
+            padding: 6px 10px;
+            font-family: var(--font-mono);
+            font-size: 0.72rem;
+            line-height: 1.55;
+            resize: vertical;
+        }
+        #th-wrapper #phraseToKeyUI .mk-meta {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 5px;
+            font-size: 0.72rem;
+            line-height: 1.3;
+        }
+        #th-wrapper #phraseToKeyUI .st-hint {
+            color: var(--text-muted);
+            font-size: 0.68rem;
+            font-weight: 400;
+        }
+        #th-wrapper #phraseToKeyUI .bt-row input[type="text"],
+        #th-wrapper #phraseToKeyUI .bt-row input[type="number"] {
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+/* Live counters sit inside the card caption: drop the old pill look (JS still sets inline colours) */
+        #th-wrapper #phraseToKeyUI :is(#phraseCountBadge, #keyCountBadge, #addressCount) {
+            background: transparent !important;
+            padding: 0 !important;
+            margin: 0 !important;
+            border-radius: 0 !important;
+            color: inherit !important;
+            font-size: inherit !important;
+            font-weight: inherit !important;
+        }
+
+/* Derivation path + addresses each side by side */
+        #th-wrapper #phraseToKeyUI .kt-opts {
+            display: grid;
+            grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
+            gap: 8px;
+        }
+        #th-wrapper #phraseToKeyUI .kt-opt { min-width: 0; }
+        #th-wrapper #phraseToKeyUI .kt-opt .bt-cap { display: block; margin-bottom: 4px; }
+
+/* Header tool buttons */
+        #th-wrapper #phraseToKeyUI .kt-tools { display: inline-flex; gap: 6px; }
+        #th-wrapper #phraseToKeyUI .kt-del .material-icons-round { color: #f87171; }
+
+/* Generate + Clear on one row */
+        #th-wrapper #phraseToKeyUI .st-act { display: flex; align-items: center; gap: 8px; }
+        #th-wrapper #phraseToKeyUI .st-act .bt-actions {
+            flex: 1;
+            min-width: 0;
+            margin: 0 !important;
+            grid-template-columns: minmax(0, 1fr) 42px !important;
+        }
+        #th-wrapper #phraseToKeyUI .ap-clear {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 !important;
+            width: 42px;
+        }
+        #th-wrapper #phraseToKeyUI .ap-clear .material-icons-round { font-size: 20px; color: #f87171; }
+        #th-wrapper #phraseToKeyUI .bt-dock { padding-top: 6px; margin-bottom: 10px; }
+
+/* Results cards + compact rows */
+        #th-wrapper #phraseToKeyUI .kt-results { padding: 10px 12px 4px !important; }
+        #th-wrapper #phraseToKeyUI .kt-results .bt-head { margin-bottom: 4px; }
+        #th-wrapper #phraseToKeyUI #generatedKeysContainer,
+        #th-wrapper #phraseToKeyUI #addressResults {
+            max-height: 360px;
+            overflow-y: auto;
+        }
+        #th-wrapper #phraseToKeyUI .kt-none { text-align: center; padding: 18px 8px; }
+        #th-wrapper #phraseToKeyUI .kt-none-t { font-size: 0.76rem; font-weight: 600; color: var(--text-secondary); }
+        #th-wrapper #phraseToKeyUI .kt-none-s { font-size: 0.66rem; color: var(--text-muted); margin-top: 2px; }
+        #th-wrapper #phraseToKeyUI .kt-phead {
+            padding: 8px 2px 2px;
+            font-size: 0.66rem;
+            color: var(--text-muted);
+            letter-spacing: 0.3px;
+        }
+        #th-wrapper #phraseToKeyUI .kt-rrow {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            min-width: 0;
+            padding: 9px 2px;
+            border-top: 1px solid var(--border-subtle);
+        }
+        #th-wrapper #phraseToKeyUI .kt-phead + .kt-rrow,
+        #th-wrapper #phraseToKeyUI .kt-rrow:first-child { border-top: 0; }
+        #th-wrapper #phraseToKeyUI .kt-idx { flex: none; min-width: 22px; font-size: 0.62rem; color: var(--text-muted); }
+        #th-wrapper #phraseToKeyUI .kt-main { flex: 1; min-width: 0; }
+        #th-wrapper #phraseToKeyUI .kt-addr {
+            font-family: var(--font-mono);
+            font-size: 0.72rem;
+            color: #7db8ff;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        #th-wrapper #phraseToKeyUI .kt-key {
+            margin-top: 2px;
+            font-family: var(--font-mono);
+            font-size: 0.64rem;
+            color: var(--text-muted);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        #th-wrapper #phraseToKeyUI .kt-key.shown {
+            white-space: normal;
+            word-break: break-all;
+            color: #fbbf24;
+        }
+        #th-wrapper #phraseToKeyUI .kt-ib {
+            flex: none;
+            width: 28px;
+            height: 28px;
+            padding: 0;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            border: 1px solid var(--border-subtle);
+            background: transparent;
+            color: var(--text-secondary);
+            cursor: pointer;
+        }
+        #th-wrapper #phraseToKeyUI .kt-ib .material-icons-round { font-size: 15px; }
+
+/* Logs: collapsed strip by default */
+        #th-wrapper #phraseToKeyUI .bt-logs { padding: 4px 0 0 !important; }
+        #th-wrapper #phraseToKeyUI .bt-logs .bt-loghead { height: 36px; }
+        #th-wrapper #phraseToKeyUI .bt-logs .log-container { height: 130px !important; max-height: none !important; }

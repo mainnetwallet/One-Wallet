@@ -56,23 +56,10 @@
                     }
 
 
-                    // Add phrase header
+                    // Phrase header (compact caption line)
                     const phraseHeader = document.createElement('div');
-                    phraseHeader.style.cssText = `
-                        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                        border-radius: 12px;
-                        padding: 15px;
-                        margin-bottom: 15px;
-                        margin-top: ${phraseIndex > 0 ? '20px' : '0'};
-                    `;
-                    phraseHeader.innerHTML = `
-                        <div style="font-weight: 700; color: #ffffff; font-size: 1.1rem; margin-bottom: 5px;">
-                            🔑 Phrase #${phraseIndex + 1}
-                        </div>
-                        <div style="font-size: 0.85rem; color: #e0e0e0; opacity: 0.9;">
-                            ${words.length} words • ${numAddresses} wallet(s)
-                        </div>
-                    `;
+                    phraseHeader.className = 'kt-phead';
+                    phraseHeader.textContent = `Phrase #${phraseIndex + 1} · ${words.length} words · ${numAddresses} wallet${numAddresses !== 1 ? 's' : ''}`;
                     container.appendChild(phraseHeader);
 
                     // Generate keys for this phrase
@@ -90,37 +77,25 @@
                             totalWallets++;
                             successCount++;
 
-                            // Create card for each key
+                            // Compact row for each wallet: short address, masked key, reveal + copy icons
+                            const _short = address.slice(0, 8) + '...' + address.slice(-6);
+                            const _mask = privateKey.slice(0, 4) + '••••••••' + privateKey.slice(-4);
                             const keyCard = document.createElement('div');
-                            keyCard.style.cssText = `
-                                background: #1a1a1a;
-                                border: 1px solid #2a2a2a;
-                                border-radius: 12px;
-                                padding: 15px;
-                                margin-bottom: 12px;
-                            `;
-
+                            keyCard.className = 'kt-rrow';
+                            keyCard.setAttribute('data-scope', 'p2k');
+                            keyCard.setAttribute('data-addr', address);
+                            keyCard.setAttribute('data-key', privateKey);
+                            keyCard.setAttribute('data-key-mask', _mask);
                             keyCard.innerHTML = `
-                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                                    <div style="font-weight: 600; color: #4a9eff;">Phrase #${phraseIndex + 1} • Wallet #${i + 1}</div>
-                                    <div style="font-size: 0.8rem; color: #888;">Path: ${modifiedPath}</div>
+                                <span class="kt-idx" title="${modifiedPath}">#${i + 1}</span>
+                                <div class="kt-main">
+                                    <div class="kt-addr" title="${address}">${_short}</div>
+                                    <div class="kt-key">${_mask}</div>
                                 </div>
-                                <div style="margin-bottom: 10px;">
-                                    <div style="font-size: 0.85rem; color: #888; margin-bottom: 5px;">Address:</div>
-                                    <div style="background: #0a0a0a; padding: 10px; border-radius: 6px; font-family: monospace; font-size: 0.85rem; word-break: break-all; display: flex; justify-content: space-between; align-items: center;">
-                                        <span>${address}</span>
-                                        <button onclick="copyToClipboardLog('${address}', 'Address')" style="background: #2a2a2a; border: none; color: #4a9eff; padding: 5px 10px; border-radius: 4px; cursor: pointer; margin-left: 10px; font-size: 0.8rem;">📋</button>
-                                    </div>
-                                </div>
-                                <div>
-                                    <div style="font-size: 0.85rem; color: #888; margin-bottom: 5px;">Private Key:</div>
-                                    <div style="background: #0a0a0a; padding: 10px; border-radius: 6px; font-family: monospace; font-size: 0.85rem; word-break: break-all; display: flex; justify-content: space-between; align-items: center;">
-                                        <span>${privateKey}</span>
-                                        <button onclick="copyToClipboardLog('${privateKey}', 'Private Key')" style="background: #2a2a2a; border: none; color: #4a9eff; padding: 5px 10px; border-radius: 4px; cursor: pointer; margin-left: 10px; font-size: 0.8rem;">📋</button>
-                                    </div>
-                                </div>
+                                <button type="button" class="kt-ib" onclick="ktToggleKey(this)" title="Show / hide private key" aria-label="Show or hide private key"><span class="material-icons-round">visibility_off</span></button>
+                                <button type="button" class="kt-ib" onclick="ktCopy(this,'addr')" title="Copy address" aria-label="Copy address"><span class="material-icons-round">place</span></button>
+                                <button type="button" class="kt-ib" onclick="ktCopy(this,'key')" title="Copy private key" aria-label="Copy private key"><span class="material-icons-round">vpn_key</span></button>
                             `;
-
                             container.appendChild(keyCard);
                             
 

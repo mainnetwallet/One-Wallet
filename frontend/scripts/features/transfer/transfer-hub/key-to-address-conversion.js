@@ -59,25 +59,17 @@
             countSpan.textContent = convertedAddresses.length;
             
             if (convertedAddresses.length === 0) {
-                resultsDiv.innerHTML = '<div style="text-align: center; color: #808080; padding: 60px 20px;"><div style="font-size: 3rem;">🔐</div><div style="font-size: 1.1rem; font-weight: 600;">No addresses yet</div></div>';
+                resultsDiv.innerHTML = '<div class="kt-none"><div class="kt-none-t">No addresses yet</div><div class="kt-none-s">Paste private keys above to convert</div></div>';
                 return;
             }
             
             let html = '';
             convertedAddresses.forEach((item) => {
-                html += `<div style="background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 10px; padding: 15px; margin-bottom: 12px;">
-                    <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-                        <div style="color: #4a9eff; font-weight: 700;">Wallet #${item.index}</div>
-                        <button onclick="copyAddress('${item.address}')" style="background: #2a2a2a; border: 1px solid #3a3a3a; color: #4a9eff; padding: 4px 12px; border-radius: 6px; cursor: pointer;">📋 Copy</button>
-                    </div>
-                    <div style="background: #0a0a0a; border: 1px solid #2a2a2a; border-radius: 8px; padding: 12px; margin-bottom: 8px;">
-                        <div style="font-size: 0.7rem; color: #888; margin-bottom: 4px;">ADDRESS</div>
-                        <div style="font-family: monospace; font-size: 0.85rem; color: #4ade80; word-break: break-all;">${item.address}</div>
-                    </div>
-                    <div style="background: #0a0a0a; border: 1px solid #2a2a2a; border-radius: 8px; padding: 12px;">
-                        <div style="font-size: 0.7rem; color: #888; margin-bottom: 4px;">PRIVATE KEY</div>
-                        <div style="font-family: monospace; font-size: 0.75rem; color: #ffa500; word-break: break-all;">${item.privateKey.substring(0, 20)}...${item.privateKey.substring(item.privateKey.length - 20)}</div>
-                    </div>
+                const _short = item.address.slice(0, 8) + '...' + item.address.slice(-6);
+                html += `<div class="kt-rrow" data-scope="k2a" data-addr="${item.address}">
+                    <span class="kt-idx">#${item.index}</span>
+                    <div class="kt-main"><div class="kt-addr" title="${item.address}">${_short}</div></div>
+                    <button type="button" class="kt-ib" onclick="ktCopy(this,'addr')" title="Copy address" aria-label="Copy address"><span class="material-icons-round">content_copy</span></button>
                 </div>`;
             });
             

@@ -6,6 +6,11 @@ Per-build release notes are published on the [Releases](../../releases) page.
 ## [Unreleased]
 
 ### Changed
+- **Key & Address Tools UI:** now uses the same compact layout as the other transfer tools - a Phrase -> Key / Key -> Address
+  switch, one card for phrases (or private keys) with Paste / Select buttons and a live count, derivation path and
+  addresses-per-phrase side by side, Generate keys + Clear icon on one row, compact result rows (short address, masked key with
+  show/hide, copy address / copy key icons) with Copy keys / Copy addresses in the results header, and collapsible Logs strips
+  (Phrase -> Key now has a log too). Markup/styling only; element IDs, phrase/key/address logic and copy-all unchanged.
 - **Balance Check UI:** now uses the same compact layout as the other transfer tools - a Native / Token switch (Native = token
   address empty, as before), one Wallets card with a "Select" button and a live count of addresses and keys found, a
   `wallets checked / Total` summary, Check balances + Clear icon on one row, compact result rows (short address, balance,

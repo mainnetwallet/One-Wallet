@@ -276,7 +276,7 @@ __NX._initPTR = _initPTR;
                 if (_ptk_addrCnt) _ptk_addrCnt.textContent = '0';
                 // Reset address results
                 var _ptk_addrRes = document.getElementById('addressResults');
-                if (_ptk_addrRes) _ptk_addrRes.innerHTML = '<div style="text-align:center;color:#808080;padding:60px 20px;"><div style="font-size:3rem;">🔐</div><div style="font-size:1.1rem;font-weight:600;">No addresses yet</div><div style="font-size:0.85rem;margin-top:8px;">Paste private keys above to convert</div></div>';
+                if (_ptk_addrRes) _ptk_addrRes.innerHTML = '<div class="kt-none"><div class="kt-none-t">No addresses yet</div><div class="kt-none-s">Paste private keys above to convert</div></div>';
                 // Log reset
                 var _ptk_log = document.getElementById('logContainerKeyToAddress');
                 if (_ptk_log) _ptk_log.innerHTML = '<div class="log-line log-info">[INFO] Refreshed. Paste private keys to convert to addresses.</div>';

@@ -248,34 +248,16 @@
             const keyToAddressModeBtn = document.getElementById('keyToAddressModeBtn');
             const phraseModeContent = document.getElementById('phraseModeContent');
             const keyToAddressModeContent = document.getElementById('keyToAddressModeContent');
-            
-            if (mode === 'phrase') {
-                if (phraseModeContent) phraseModeContent.style.display = 'block';
-                if (keyToAddressModeContent) keyToAddressModeContent.style.display = 'none';
-                
-                if (phraseModeBtn) {
-                    phraseModeBtn.classList.add('active');
-                    phraseModeBtn.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
-                    phraseModeBtn.style.color = 'white';
-                }
-                if (keyToAddressModeBtn) {
-                    keyToAddressModeBtn.classList.remove('active');
-                    keyToAddressModeBtn.style.background = 'transparent';
-                    keyToAddressModeBtn.style.color = '#888';
-                }
-            } else if (mode === 'keyToAddress') {
-                if (phraseModeContent) phraseModeContent.style.display = 'none';
-                if (keyToAddressModeContent) keyToAddressModeContent.style.display = 'block';
-                
-                if (keyToAddressModeBtn) {
-                    keyToAddressModeBtn.classList.add('active');
-                    keyToAddressModeBtn.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
-                    keyToAddressModeBtn.style.color = 'white';
-                }
-                if (phraseModeBtn) {
-                    phraseModeBtn.classList.remove('active');
-                    phraseModeBtn.style.background = 'transparent';
-                    phraseModeBtn.style.color = '#888';
-                }
-            }
+            const ui = document.getElementById('phraseToKeyUI');
+            if (mode !== 'phrase' && mode !== 'keyToAddress') return;
+            const isPhrase = mode === 'phrase';
+
+            if (phraseModeContent) phraseModeContent.style.display = isPhrase ? 'block' : 'none';
+            if (keyToAddressModeContent) keyToAddressModeContent.style.display = isPhrase ? 'none' : 'block';
+            // Look comes from the shared .bt-seg styles (no inline colours); swipe-mode-switch reads the 'active' class
+            if (phraseModeBtn) phraseModeBtn.classList.toggle('active', isPhrase);
+            if (keyToAddressModeBtn) keyToAddressModeBtn.classList.toggle('active', !isPhrase);
+            if (ui) ui.setAttribute('data-mode', isPhrase ? 'phrase' : 'keyToAddress');
+            const seg = ui && ui.querySelector('.bt-seg');
+            if (seg) seg.setAttribute('data-mode', isPhrase ? 'phrase' : 'keyToAddress');
         }
