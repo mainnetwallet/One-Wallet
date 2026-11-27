@@ -104,7 +104,10 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        android.webkit.WebView.setWebContentsDebuggingEnabled(true);
+        // Remote WebView debugging exposes localStorage and the JS bridges to anyone with ADB/USB access,
+        // so only allow it for debuggable (debug) builds, never in release.
+        android.webkit.WebView.setWebContentsDebuggingEnabled(
+            (getApplicationInfo().flags & android.content.pm.ApplicationInfo.FLAG_DEBUGGABLE) != 0);
 
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_main);

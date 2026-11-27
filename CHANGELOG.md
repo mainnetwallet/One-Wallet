@@ -6,6 +6,9 @@ Per-build release notes are published on the [Releases](../../releases) page.
 ## [Unreleased]
 
 ### Fixed
+- **Security: WebView remote debugging was on in release builds:** `setWebContentsDebuggingEnabled(true)` ran
+  unconditionally, so anyone with USB / ADB access to an unlocked phone could attach Chrome DevTools to the wallet view
+  and read its storage. It is now enabled only when the app is debuggable (debug builds).
 - **Security: NFT names, token symbols and chain names could run code in the wallet:** values that come from the chain
   or from remote metadata (NFT name / image / token id / collection name, ERC-20 `symbol()`, chain name / symbol, saved
   swap-pair labels) were put into `innerHTML` unescaped, so a spam NFT or token could run script in the view that holds
