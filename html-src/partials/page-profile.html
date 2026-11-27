@@ -126,153 +126,123 @@
       </div>
 
       <div style="flex-shrink:0;">
-      <div class="profile-hero" style="position:relative;">
+      <div class="prof-card">
+        <!-- Active wallet row (tap = address list) -->
+        <div class="prof-card-top" id="profile-addr-wrap" onclick="openAddrListModal()">
+          <div class="prof-avatar"><span class="material-icons-round">account_balance_wallet</span></div>
+          <div class="prof-card-id">
+            <div class="prof-card-label">ACTIVE WALLET</div>
+            <div class="prof-card-addr" id="profile-addr-text">Add keys in Swap tab</div>
+          </div>
+          <span class="material-icons-round prof-card-list">format_list_numbered</span>
+        </div>
 
-        <!-- Chain pill + Connected Wallets — top right -->
-        <div style="position:absolute;top:14px;right:0;display:inline-flex;align-items:center;gap:6px;">
-          <div onclick="openTxHistory(); haptic && haptic();"
-            style="display:inline-flex;align-items:center;gap:6px;height:30px;box-sizing:border-box;
-              background:rgba(245,158,11,0.10);
-              border:1px solid rgba(245,158,11,0.38);
-              border-radius:40px; padding:0 11px 0 7px;
-              cursor:pointer; transition:transform 0.15s ease;
-              box-shadow:0 0 10px rgba(245,158,11,0.08);"
-            onmousedown="this.style.transform='scale(0.93)'" onmouseup="this.style.transform=''"
-            ontouchstart="this.style.transform='scale(0.93)'" ontouchend="this.style.transform=''">
-            <span class="material-icons-round" style="font-size:16px;line-height:1;color:var(--accent-amber);flex-shrink:0;">history</span>
-            <span style="font-size:10px;font-weight:700;color:var(--accent-amber);font-family:var(--font-mono);letter-spacing:0.8px;white-space:nowrap;">HISTORY</span>
+        <!-- Chips: History / Chain / Wallets -->
+        <div class="prof-chips">
+          <div class="prof-chip prof-chip--amber" onclick="openTxHistory(); haptic && haptic();">
+            <span class="material-icons-round">history</span>
+            <span class="prof-chip-text">HISTORY</span>
           </div>
-          <div id="prof-chain-single" onclick="openProfChainPicker(); haptic && haptic();"
-            style="display:inline-flex;align-items:center;gap:6px;height:30px;box-sizing:border-box;
-              background:rgba(99,102,241,0.10);
-              border:1px solid rgba(99,102,241,0.38);
-              border-radius:40px; padding:0 11px 0 7px;
-              cursor:pointer; transition:transform 0.15s ease;
-              box-shadow:0 0 10px rgba(99,102,241,0.12);"
-            onmousedown="this.style.transform='scale(0.93)'" onmouseup="this.style.transform=''"
-            ontouchstart="this.style.transform='scale(0.93)'" ontouchend="this.style.transform=''">
-            <div id="prof-chain-single-emoji" style="font-size:16px;line-height:1;flex-shrink:0;">🔵</div>
-            <div id="prof-chain-single-name" style="font-size:10px;font-weight:700;color:var(--neon-purple);font-family:var(--font-mono);letter-spacing:0.8px;white-space:nowrap;">BASE</div>
-            <span class="material-icons-round" style="font-size:12px;color:var(--text-muted);flex-shrink:0;">unfold_more</span>
+          <div class="prof-chip" id="prof-chain-single" onclick="openProfChainPicker(); haptic && haptic();">
+            <div id="prof-chain-single-emoji" class="prof-chip-emoji">🔵</div>
+            <div id="prof-chain-single-name" class="prof-chip-text">BASE</div>
+            <span class="material-icons-round prof-chip-more">unfold_more</span>
           </div>
-          <div onclick="openConnectedWalletsDrawer(); haptic && haptic();"
-            style="display:inline-flex;align-items:center;gap:6px;height:30px;box-sizing:border-box;
-              background:rgba(99,102,241,0.10);
-              border:1px solid rgba(99,102,241,0.38);
-              border-radius:40px; padding:0 11px 0 7px;
-              cursor:pointer; transition:transform 0.15s ease;
-              box-shadow:0 0 10px rgba(99,102,241,0.12);"
-            onmousedown="this.style.transform='scale(0.93)'" onmouseup="this.style.transform=''"
-            ontouchstart="this.style.transform='scale(0.93)'" ontouchend="this.style.transform=''">
-            <span class="material-icons-round" style="font-size:16px;line-height:1;color:var(--accent-primary);flex-shrink:0;">account_balance_wallet</span>
-            <span id="prof-hero-wallet-count" style="font-size:10px;font-weight:700;color:var(--neon-purple);font-family:var(--font-mono);letter-spacing:0.8px;white-space:nowrap;">WALLETS</span>
+          <div class="prof-chip" onclick="openConnectedWalletsDrawer(); haptic && haptic();">
+            <span class="material-icons-round">account_balance_wallet</span>
+            <span id="prof-hero-wallet-count" class="prof-chip-text">WALLETS</span>
           </div>
         </div>
+
+        <!-- Stats: Wallets / Delegated / Not delegated -->
+        <div id="profile-stats-wrap" class="prof-stats" style="transition:opacity 0.3s ease;">
+          <div class="prof-stat" onclick="rippleEffect(this,event)">
+            <div class="prof-stat-value" id="profile-stat-wallets">—</div>
+            <div class="prof-stat-label">WALLETS</div>
+          </div>
+          <div class="prof-stat prof-stat--mid" id="delegated-stat-card" onclick="profileDelegatedCardClick(this,event)">
+            <div class="prof-stat-value" id="profile-stat-keys" style="color:var(--accent-green);">—</div>
+            <div class="prof-stat-label">DELEGATED</div>
+            <span id="delegated-refresh-spinner" style="display:none;position:absolute;top:2px;right:8px;font-size:11px;color:var(--accent-green);font-family:var(--font-mono);opacity:0.8;">⟳</span>
+          </div>
+          <div class="prof-stat" onclick="rippleEffect(this,event)">
+            <div class="prof-stat-value" id="profile-stat-notdelegated" style="color:var(--accent-red);">—</div>
+            <div class="prof-stat-label">NOT DELEGATED</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Hint: shown when no wallet selected -->
+      <div id="profile-stats-hint" class="prof-hint" onclick="openConnectedWalletsDrawer()">
+        <span class="material-icons-round" style="font-size:15px;color:var(--accent-primary);">account_balance_wallet</span>
+        <span class="prof-hint-text">SELECT WALLET FROM CONNECTED WALLETS</span>
+        <span class="material-icons-round" style="font-size:14px;color:var(--text-muted);">chevron_right</span>
       </div>
 
       <!-- legacy hidden -->
       <div class="prof-chain-grid" id="prof-chain-grid" style="display:none;"></div>
       <div class="prof-chain-scroll" id="prof-chain-scroll" style="display:none;"></div>
 
-      <div class="profile-addr" onclick="openAddrListModal()" id="profile-addr-wrap" style="margin: 0 20px 16px;">
-        <span id="profile-addr-text">Add keys in Swap tab</span>
-        <span class="material-icons-round">format_list_numbered</span>
-      </div>
-
-      <!-- Stats -->
-      <div id="profile-stats-wrap" style="transition:opacity 0.3s ease;">
-        <div class="profile-stats">
-        <div class="stat-card" onclick="rippleEffect(this,event)" style="box-shadow:0 4px 24px rgba(0,0,0,0.25),0 0 0 1px rgba(99,102,241,0.12),inset 0 1px 0 rgba(255,255,255,0.06);">
-          <div style="font-size:14px;margin-bottom:6px;opacity:0.6;">👛</div>
-          <div class="stat-value" id="profile-stat-wallets" style="background:linear-gradient(135deg,var(--accent-primary),var(--neon-purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;text-shadow:none;">—</div>
-          <div class="stat-label">WALLETS</div>
-        </div>
-        <div class="stat-card" id="delegated-stat-card" onclick="profileDelegatedCardClick(this,event)" style="cursor:pointer;position:relative;box-shadow:0 4px 24px rgba(0,0,0,0.25),0 0 0 1px rgba(16,185,129,0.15),inset 0 1px 0 rgba(255,255,255,0.06);">
-          <div style="font-size:14px;margin-bottom:6px;opacity:0.6;">🛡️</div>
-          <div class="stat-value" id="profile-stat-keys" style="color:var(--accent-green);text-shadow:0 0 16px rgba(16,185,129,0.4);">—</div>
-          <div class="stat-label">DELEGATED</div>
-          <span id="delegated-refresh-spinner" style="display:none;position:absolute;top:6px;right:8px;font-size:11px;color:var(--accent-green);font-family:var(--font-mono);letter-spacing:0.5px;opacity:0.8;">⟳</span>
-        </div>
-        <div class="stat-card" onclick="rippleEffect(this,event)" style="box-shadow:0 4px 24px rgba(0,0,0,0.25),0 0 0 1px rgba(239,68,68,0.12),inset 0 1px 0 rgba(255,255,255,0.06);">
-          <div style="font-size:14px;margin-bottom:6px;opacity:0.6;">⚠️</div>
-          <div class="stat-value" id="profile-stat-notdelegated" style="color:var(--accent-red);text-shadow:0 0 16px rgba(239,68,68,0.35);">—</div>
-          <div class="stat-label">NOT DELEGATED</div>
-        </div>
-        </div>
-      <!-- Hint: shown when no wallet selected -->
-      <div id="profile-stats-hint" onclick="openConnectedWalletsDrawer()" style="display:flex;align-items:center;justify-content:center;gap:8px;margin:0 20px 12px;padding:10px 14px;background:rgba(99,102,241,0.06);border:1px dashed rgba(99,102,241,0.28);border-radius:12px;cursor:pointer;transition:all 0.2s;" onmousedown="this.style.opacity='.7'" onmouseup="this.style.opacity='1'" ontouchstart="this.style.opacity='.7'" ontouchend="this.style.opacity='1'">
-        <span class="material-icons-round" style="font-size:15px;color:var(--accent-primary);">account_balance_wallet</span>
-        <span style="font-size:10px;font-weight:700;font-family:var(--font-mono);color:var(--text-muted);letter-spacing:1px;">SELECT WALLET FROM CONNECTED WALLETS</span>
-        <span class="material-icons-round" style="font-size:14px;color:var(--text-muted);">chevron_right</span>
-      </div>
-      </div>
-
-      <div class="glow-line"></div>
+      <span id="txh-menu-sub" style="display:none;">0 transactions</span>
 
       <span id="txh-menu-sub" style="display:none;">0 transactions</span>
 
       </div><!-- /flex-shrink:0 header -->
       <!-- ══ TOOLS ══ -->
-      <div class="menu-group-label" style="flex-shrink:0;padding:10px 20px 4px;">TOOLS</div>
+      <div class="prof-section-label">TOOLS</div>
       <div id="prof-tools-scroll" style="overflow-y:auto;-webkit-overflow-scrolling:touch;flex:1;min-height:0;scrollbar-width:none;">
-      <div class="menu-group">
-        <div class="menu-item" onclick="switchPage('nansen');rippleEffect(this,event)">
-          <div class="menu-icon" style="background:linear-gradient(135deg,rgba(99,102,241,0.2),rgba(139,92,246,0.15));box-shadow:0 0 10px rgba(99,102,241,0.2);">
+      <div class="prof-tools">
+        <div class="prof-tool" onclick="switchPage('nansen');rippleEffect(this,event)">
+          <div class="prof-tool-icon" style="background:rgba(99,102,241,0.16);">
             <span class="material-icons-round" style="color:var(--accent-primary)">swap_horiz</span>
           </div>
-          <div class="menu-text">
-            <div class="menu-title">Nansen &amp; Jumper Swap</div>
-            <div class="menu-sub">Multi-wallet · Tap to open</div>
+          <div class="prof-tool-text">
+            <div class="prof-tool-title">Nansen &amp; Jumper Swap</div>
+            <div class="prof-tool-sub">Multi-wallet</div>
           </div>
           <div id="swap-menu-indicator" class="menu-arrow"><span class="material-icons-round">chevron_right</span></div>
         </div>
-        <div class="menu-item" onclick="switchPage('delegation');rippleEffect(this,event)">
-          <div class="menu-icon" style="background:rgba(16,185,129,0.15);">
+        <div class="prof-tool" onclick="switchPage('delegation');rippleEffect(this,event)">
+          <div class="prof-tool-icon" style="background:rgba(16,185,129,0.15);">
             <span class="material-icons-round" style="color:var(--accent-green)">security</span>
           </div>
-          <div class="menu-text">
-            <div class="menu-title">EIP-7702 Delegation</div>
-            <div class="menu-sub" id="del-menu-sub">Batch delegate • <span id="del-menu-chain">Base</span></div>
+          <div class="prof-tool-text">
+            <div class="prof-tool-title">EIP-7702 Delegation</div>
+            <div class="prof-tool-sub" id="del-menu-sub">Batch delegate • <span id="del-menu-chain">Base</span></div>
           </div>
           <div class="menu-arrow"><span class="material-icons-round">chevron_right</span></div>
         </div>
-        <div class="menu-item" onclick="switchPage('sup-transfer');rippleEffect(this,event)">
-          <div class="menu-icon" style="background:linear-gradient(135deg,rgba(244,63,94,0.2),rgba(167,139,250,0.15));box-shadow:0 0 10px rgba(244,63,94,0.2);">
+        <div class="prof-tool" onclick="switchPage('sup-transfer');rippleEffect(this,event)">
+          <div class="prof-tool-icon" style="background:rgba(244,63,94,0.15);">
             <span class="material-icons-round" style="color:var(--neon-pink)">send</span>
           </div>
-          <div class="menu-text">
-            <div class="menu-title">Sup Transfer</div>
-            <div class="menu-sub">SUP token · Multi-wallet</div>
+          <div class="prof-tool-text">
+            <div class="prof-tool-title">Sup Transfer</div>
+            <div class="prof-tool-sub">SUP token · Multi-wallet</div>
           </div>
           <div id="sup-menu-indicator" class="menu-arrow"><span class="material-icons-round">chevron_right</span></div>
         </div>
-        <div class="menu-item" onclick="switchPage('base-swap-bot');rippleEffect(this,event)">
-          <div class="menu-icon" style="background:linear-gradient(135deg,rgba(6,182,212,0.2),rgba(99,102,241,0.15));box-shadow:0 0 10px rgba(6,182,212,0.2);">
+        <div class="prof-tool" onclick="switchPage('base-swap-bot');rippleEffect(this,event)">
+          <div class="prof-tool-icon" style="background:rgba(6,182,212,0.16);">
             <span class="material-icons-round" style="color:var(--accent-tertiary)">currency_exchange</span>
           </div>
-          <div class="menu-text">
-            <div class="menu-title">Base Swap Bot</div>
-            <div class="menu-sub">7 DEX · Fee Tier · Base network</div>
+          <div class="prof-tool-text">
+            <div class="prof-tool-title">Base Swap Bot</div>
+            <div class="prof-tool-sub">7 DEX · Fee Tier · Base network</div>
           </div>
           <div id="bsb-menu-indicator" class="menu-arrow"><span class="material-icons-round">chevron_right</span></div>
         </div>
-        <div class="menu-item" onclick="switchPage('transfer-hub');rippleEffect(this,event)">
-          <div class="menu-icon" style="background:linear-gradient(135deg,rgba(245,158,11,0.2),rgba(99,102,241,0.15));box-shadow:0 0 10px rgba(245,158,11,0.2);">
+        <div class="prof-tool" onclick="switchPage('transfer-hub');rippleEffect(this,event)">
+          <div class="prof-tool-icon" style="background:rgba(245,158,11,0.16);">
             <span class="material-icons-round" style="color:var(--accent-amber)">hub</span>
           </div>
-          <div class="menu-text">
-            <div class="menu-title">Transfer Hub</div>
-            <div class="menu-sub">Multi-chain · Transfer tools</div>
+          <div class="prof-tool-text">
+            <div class="prof-tool-title">Transfer Hub</div>
+            <div class="prof-tool-sub">Multi-chain · Transfer tools</div>
           </div>
           <div class="menu-arrow"><span class="material-icons-round">chevron_right</span></div>
         </div>
       </div>
-
-
-
-
-
-
 
       </div><!-- /prof-tools-scroll -->
     </div>

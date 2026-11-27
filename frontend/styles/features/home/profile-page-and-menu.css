@@ -156,3 +156,86 @@
     padding: 2px 8px; border-radius: 6px;
   }
 
+
+  /* ══════════════ PROFILE REDESIGN (wallet card · chips · stats · tools list) ══════════════ */
+  .prof-card {
+    margin: 12px 14px 0; padding: 14px;
+    background: var(--bg-surface); border: 1px solid var(--border-subtle);
+    border-radius: 18px;
+  }
+  .prof-card-top { display: flex; align-items: center; gap: 12px; cursor: pointer; }
+  .prof-avatar {
+    width: 44px; height: 44px; border-radius: 50%; flex-shrink: 0;
+    background: rgba(99,102,241,0.16); border: 1px solid rgba(99,102,241,0.45);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .prof-avatar .material-icons-round { font-size: 22px; color: var(--neon-purple); }
+  .prof-card-id { flex: 1; min-width: 0; }
+  .prof-card-label { font-size: 9px; letter-spacing: 1.5px; color: var(--text-muted); font-family: var(--font-mono); }
+  .prof-card-addr {
+    margin-top: 2px; font-family: var(--font-mono); font-size: 13px; color: var(--text-primary, #f1f1f8);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .prof-card-list { font-size: 18px; color: var(--text-muted); }
+
+  .prof-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+  .prof-chip {
+    display: inline-flex; align-items: center; gap: 6px;
+    height: 30px; box-sizing: border-box; padding: 0 11px 0 8px;
+    border-radius: 40px; cursor: pointer;
+    background: rgba(99,102,241,0.10); border: 1px solid rgba(99,102,241,0.38);
+    transition: transform 0.15s ease; user-select: none; -webkit-user-select: none;
+  }
+  .prof-chip:active { transform: scale(0.94); }
+  .prof-chip .material-icons-round { font-size: 16px; color: var(--accent-primary); flex-shrink: 0; }
+  .prof-chip-text {
+    font-size: 10px; font-weight: 700; color: var(--neon-purple);
+    font-family: var(--font-mono); letter-spacing: 0.8px; white-space: nowrap;
+  }
+  .prof-chip-emoji { font-size: 15px; line-height: 1; flex-shrink: 0; }
+  .prof-chip .prof-chip-more { font-size: 12px; color: var(--text-muted); }
+  .prof-chip--amber { background: rgba(245,158,11,0.10); border-color: rgba(245,158,11,0.38); }
+  .prof-chip--amber .material-icons-round,
+  .prof-chip--amber .prof-chip-text { color: var(--accent-amber); }
+
+  .prof-stats {
+    display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));
+    margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--border-subtle);
+  }
+  .prof-stat { position: relative; overflow: hidden; text-align: center; cursor: pointer; padding: 2px 4px; }
+  .prof-stat--mid { border-left: 1px solid var(--border-subtle); border-right: 1px solid var(--border-subtle); }
+  .prof-stat-value { font-size: 20px; font-weight: 700; line-height: 1.1; color: var(--text-primary, #f1f1f8); }
+  .prof-stat-label { margin-top: 4px; font-size: 8px; letter-spacing: 1.5px; color: var(--text-muted); font-family: var(--font-mono); }
+
+  .prof-hint {
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    margin: 10px 14px 0; padding: 10px 14px; cursor: pointer;
+    background: rgba(99,102,241,0.06); border: 1px dashed rgba(99,102,241,0.28); border-radius: 12px;
+  }
+  .prof-hint-text { font-size: 10px; font-weight: 700; font-family: var(--font-mono); color: var(--text-muted); letter-spacing: 1px; }
+
+  .prof-section-label {
+    flex-shrink: 0; padding: 16px 20px 8px;
+    font-size: 10px; font-weight: 700; letter-spacing: 2px;
+    color: var(--text-muted); font-family: var(--font-mono);
+  }
+  .prof-tools {
+    margin: 0 14px 12px; overflow: hidden;
+    background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: 16px;
+  }
+  .prof-tool {
+    position: relative; display: flex; align-items: center; gap: 12px;
+    padding: 12px 14px; cursor: pointer; transition: background 0.15s ease;
+  }
+  .prof-tool + .prof-tool { border-top: 1px solid var(--border-subtle); }
+  .prof-tool:active { background: var(--bg-glass-hover); }
+  .prof-tool-icon {
+    width: 36px; height: 36px; border-radius: 10px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .prof-tool-icon .material-icons-round { font-size: 18px; }
+  .prof-tool-text { flex: 1; min-width: 0; }
+  .prof-tool-title { font-size: 13px; font-weight: 600; }
+  .prof-tool-sub { margin-top: 1px; font-size: 10px; color: var(--text-muted); font-family: var(--font-mono); }
+  .prof-tool .menu-arrow { display: flex; align-items: center; }
+  .prof-tool .menu-arrow .material-icons-round { font-size: 18px; color: var(--text-muted); }
