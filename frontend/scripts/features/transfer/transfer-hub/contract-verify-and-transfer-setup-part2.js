@@ -406,10 +406,16 @@
                 var hdrEmEl = document.getElementById('th-net-emoji-batchNative-hdr');
                 var hdrNmEl = document.getElementById('th-net-name-batchNative-hdr');
                 if (!cfg) { if (hdrNmEl) hdrNmEl.textContent = 'Network'; if (hdrEmEl) hdrEmEl.textContent = '⛓️'; return; }
-                if (hdrNmEl) hdrNmEl.textContent = cfg.name || 'Network';
+                var fullChain = (typeof getAllTHChains === 'function') ? getAllTHChains().find(function(c){ return c.chainId === cfg.chainId; }) : null;
+                var em = (typeof chainEmoji === 'function' && fullChain) ? chainEmoji(fullChain) : '⛓️';
+                // Same chain already shown -> leave the chain button untouched (rewriting it re-loaded the logo = flicker on every switch)
+                var _nm = cfg.name || 'Network';
+                var _wrap = hdrEmEl ? hdrEmEl.querySelector('.clogo-wrap') : null;
+                var _wantLogo = fullChain && fullChain.logoURI;
+                if (hdrNmEl && hdrEmEl && hdrNmEl.textContent === _nm &&
+                    (_wantLogo ? (_wrap && _wrap.dataset.logo === _wantLogo) : (!_wrap && hdrEmEl.textContent === em))) return;
+                if (hdrNmEl) hdrNmEl.textContent = _nm;
                 if (hdrEmEl) {
-                    var fullChain = (typeof getAllTHChains === 'function') ? getAllTHChains().find(function(c){ return c.chainId === cfg.chainId; }) : null;
-                    var em = (typeof chainEmoji === 'function' && fullChain) ? chainEmoji(fullChain) : '⛓️';
                     if (fullChain && fullChain.logoURI && typeof _chainLogoHtml === 'function') { hdrEmEl.innerHTML = _chainLogoHtml(fullChain.logoURI, em, 18); if (typeof _fixChainLogos === 'function') _fixChainLogos(hdrEmEl); }
                     else { hdrEmEl.textContent = em; }
                 }
