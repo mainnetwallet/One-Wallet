@@ -6,6 +6,11 @@ Per-build release notes are published on the [Releases](../../releases) page.
 ## [Unreleased]
 
 ### Changed
+- **Balance Check UI:** now uses the same compact layout as the other transfer tools - a Native / Token switch (Native = token
+  address empty, as before), one Wallets card with a "Select" button and a live count of addresses and keys found, a
+  `wallets checked / Total` summary, Check balances + Clear icon on one row, compact result rows (short address, balance,
+  copy icon) with CSV / JSON export in the results header, and a collapsible Logs strip. Markup/styling only; element IDs and
+  balance-check logic unchanged.
 - **Withdraw Manager UI:** now uses the same compact layout as W2W, Self Transfer, NFT Transfer and Token Approval - a selected-contract
   card (type tag, tappable address, Native and Token balances), one Developer wallet + Recipient card with "Select" buttons and
   a slim ownership strip, a `Native / Token` summary, gas pill + one Withdraw button on a row, compact contract rows with

@@ -300,7 +300,7 @@ __NX._initPTR = _initPTR;
 
               // Results list reset
               var _bcResults = document.getElementById('balanceResultsList');
-              if (_bcResults) _bcResults.innerHTML = '<div style="text-align:center;color:#808080;padding:20px 10px;"><div style="font-size:2rem;margin-bottom:6px;">💰</div><div style="font-size:0.85rem;">No results yet</div><div style="font-size:0.75rem;margin-top:5px;color:#606060;">Enter addresses or keys and click \"Check Balances\"</div></div>';
+              if (_bcResults) _bcResults.innerHTML = '<div class="bc-none"><div class="bc-none-t">No results yet</div><div class="bc-none-s">Add wallets and tap Check balances</div></div>';
 
               // Check Balances button
               var _bcBtn = document.getElementById('checkBalancesBtn');

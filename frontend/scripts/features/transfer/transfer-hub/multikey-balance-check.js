@@ -331,9 +331,9 @@
             
             if (balanceCheckResults.length === 0) {
                 listDiv.innerHTML = `
-                    <div style="text-align: center; color: #808080; padding: 40px 20px;">
-                        <div style="font-size: 3rem; margin-bottom: 10px;">💰</div>
-                        <div>No results yet</div>
+                    <div class="bc-none">
+                        <div class="bc-none-t">No results yet</div>
+                        <div class="bc-none-s">Add wallets and tap Check balances</div>
                     </div>
                 `;
                 return;
@@ -341,19 +341,17 @@
             
             let html = '';
             
+            // Compact rows (styles: th-balance-check-mobile.css). Result data and export are unchanged.
             balanceCheckResults.forEach(result => {
+                const _addr = String(result.address);
+                const _short = _addr.length > 16 ? _addr.slice(0, 8) + '...' + _addr.slice(-6) : _addr;
+                const _zero = !(parseFloat(result.balance) > 0);
                 html += `
-                    <div style="background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 8px; padding: 12px; margin-bottom: 8px;">
-                        <div style="display: flex; justify-content: space-between; align-items: center;">
-                            <div style="flex: 1;">
-                                <div style="font-size: 0.75rem; color: #888; margin-bottom: 4px;">#${result.index}</div>
-                                <div style="font-family: monospace; font-size: 0.85rem; color: #e0e0e0; word-break: break-all;">${result.address}</div>
-                            </div>
-                            <div style="text-align: right; margin-left: 15px;">
-                                <div style="font-size: 1.2rem; font-weight: 700; color: #4ead80;">${formatBalanceSmart(result.balance)}</div>
-                                <div style="font-size: 0.75rem; color: #888;">${result.symbol}</div>
-                            </div>
-                        </div>
+                    <div class="bc-rrow${_zero ? ' bc-zero' : ''}">
+                        <span class="bc-idx">#${result.index}</span>
+                        <div class="bc-addr" title="${_addr}">${_short}</div>
+                        <div class="bc-val">${formatBalanceSmart(result.balance)} <small>${result.symbol}</small></div>
+                        <button type="button" class="bc-copy" onclick="bcCopy('${_addr}', this)" title="Copy address" aria-label="Copy address"><span class="material-icons-round">content_copy</span></button>
                     </div>
                 `;
             });

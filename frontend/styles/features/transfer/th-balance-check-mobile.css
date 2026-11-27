@@ -1,67 +1,133 @@
-        /* ===== BALANCE CHECK UI — MOBILE PHONE OPTIMIZED ===== */
-        #th-wrapper #balanceCheckUI .section {
-            padding: 10px !important;
-            margin-bottom: 6px !important;
+/* ══════════════════════════════════════════════════
+   BALANCE CHECK — additions on top of the shared compact layout
+   The bt-* rules live in transfer-hub-base-form-styles.css (scoped to Batch Transfer, Multi Key Recipients, W2W, Self Transfer, NFT Transfer, Token Approval, Withdraw Manager and this screen).
+   Markup: html-src/partials/page-transfer-hub/balance-check.html (result rows: scripts/features/transfer/transfer-hub/multikey-balance-check.js)
+   UI-only helpers: scripts/features/transfer/balance-check-ui-sync.js
+   Goal: wallets, summary and Check fit on one phone screen; results and logs sit below as compact strips.
+   ══════════════════════════════════════════════════ */
+
+/* Title stays on one line next to the network button */
+        #th-wrapper #balanceCheckUI .th-section-header h1 {
+            font-size: 1rem !important;
+            white-space: nowrap;
         }
 
-        #th-wrapper #balanceCheckUI .section-title {
-            font-size: 0.88rem !important;
-            padding: 7px 10px !important;
-            margin: -10px -10px 8px -10px !important;
+/* Inputs fill the card; token row only exists in Token mode */
+        #th-wrapper #balanceCheckUI .bt-row input[type="text"] {
+            width: 100%;
+            box-sizing: border-box;
+            text-overflow: ellipsis;
+        }
+        #th-wrapper #balanceCheckUI[data-mode="native"] #bcTokenRow { display: none; }
+
+/* Wallets box: short multi-line box */
+        #th-wrapper #balanceCheckUI .bc-input {
+            width: 100%;
+            box-sizing: border-box;
+            height: 84px;
+            min-height: 64px;
+            max-height: 200px;
+            padding: 6px 10px;
+            font-family: var(--font-mono);
+            font-size: 0.72rem;
+            line-height: 1.55;
+            resize: vertical;
+        }
+        #th-wrapper #balanceCheckUI .mk-meta {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 5px;
+            font-size: 0.72rem;
+            line-height: 1.3;
+        }
+        #th-wrapper #balanceCheckUI .st-hint {
+            color: var(--text-muted);
+            font-size: 0.68rem;
+            font-weight: 400;
+        }
+        #th-wrapper #balanceCheckUI #bcFoundCount {
+            background: transparent !important;
+            padding: 0 !important;
+            color: inherit !important;
+            font-size: inherit !important;
+            font-weight: inherit !important;
         }
 
-        #th-wrapper #balanceCheckUI .input-group {
-            margin-bottom: 7px !important;
-        }
+/* Summary */
+        #th-wrapper #balanceCheckUI .bt-summary { margin-top: 2px; }
+        #th-wrapper #balanceCheckUI .bt-summary b { overflow-wrap: anywhere; }
 
-        #th-wrapper #balanceCheckUI input[type="text"] {
-            padding: 8px 10px !important;
-            font-size: 0.82rem !important;
-            min-height: 38px !important;
+/* Check + Clear on one row */
+        #th-wrapper #balanceCheckUI .st-act { display: flex; align-items: center; gap: 8px; }
+        #th-wrapper #balanceCheckUI .st-act .bt-actions {
+            flex: 1;
+            min-width: 0;
+            margin: 0 !important;
+            grid-template-columns: minmax(0, 1fr) 42px !important;
         }
-
-        #th-wrapper #balanceCheckUI textarea {
-            min-height: 100px !important;
-            max-height: 140px !important;
-            font-size: 0.82rem !important;
+        #th-wrapper #balanceCheckUI .ap-clear {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 !important;
+            width: 42px;
         }
+        #th-wrapper #balanceCheckUI .ap-clear .material-icons-round { font-size: 20px; color: #f87171; }
+        #th-wrapper #balanceCheckUI .bt-dock { padding-top: 6px; margin-bottom: 10px; }
 
-        #th-wrapper #balanceCheckUI .btn {
-            padding: 10px 8px !important;
-            font-size: 0.82rem !important;
-            min-height: 40px !important;
+/* Results card: export pills in the header, compact rows */
+        #th-wrapper #balanceCheckUI .bc-results { padding: 10px 12px 4px !important; }
+        #th-wrapper #balanceCheckUI .bc-results .bt-head { margin-bottom: 4px; }
+        #th-wrapper #balanceCheckUI .bc-tools { display: inline-flex; gap: 6px; }
+        #th-wrapper #balanceCheckUI .bc-export { min-width: 46px; justify-content: center; }
+        #th-wrapper #balanceCheckUI #balanceResultsList {
+            max-height: 360px;
+            overflow-y: auto;
         }
-
-        #th-wrapper #balanceCheckUI .hint {
-            font-size: 0.7rem !important;
-            margin-top: 3px !important;
+        #th-wrapper #balanceCheckUI .bc-none { text-align: center; padding: 18px 8px; }
+        #th-wrapper #balanceCheckUI .bc-none-t { font-size: 0.76rem; font-weight: 600; color: var(--text-secondary); }
+        #th-wrapper #balanceCheckUI .bc-none-s { font-size: 0.66rem; color: var(--text-muted); margin-top: 2px; }
+        #th-wrapper #balanceCheckUI .bc-rrow {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            min-width: 0;
+            padding: 9px 2px;
+            border-top: 1px solid var(--border-subtle);
         }
-
-        #th-wrapper #balanceCheckUI .stat-card {
-            padding: 8px 10px !important;
+        #th-wrapper #balanceCheckUI .bc-rrow:first-child { border-top: 0; }
+        #th-wrapper #balanceCheckUI .bc-idx { flex: none; min-width: 22px; font-size: 0.62rem; color: var(--text-muted); }
+        #th-wrapper #balanceCheckUI .bc-addr {
+            flex: 1;
+            min-width: 0;
+            font-family: var(--font-mono);
+            font-size: 0.72rem;
+            color: #7db8ff;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
-
-        #th-wrapper #balanceCheckUI .stat-value {
-            font-size: 15px !important;
+        #th-wrapper #balanceCheckUI .bc-val { flex: none; text-align: right; font-size: 0.78rem; font-weight: 700; color: #34d399; white-space: nowrap; max-width: 42%; overflow: hidden; text-overflow: ellipsis; }
+        #th-wrapper #balanceCheckUI .bc-val small { font-size: 0.6rem; font-weight: 600; color: var(--text-muted); }
+        #th-wrapper #balanceCheckUI .bc-zero .bc-val { color: var(--text-muted); }
+        #th-wrapper #balanceCheckUI .bc-copy {
+            flex: none;
+            width: 28px;
+            height: 28px;
+            padding: 0;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            border: 1px solid var(--border-subtle);
+            background: transparent;
+            color: var(--text-secondary);
+            cursor: pointer;
         }
+        #th-wrapper #balanceCheckUI .bc-copy .material-icons-round { font-size: 15px; }
 
-        #th-wrapper #balanceCheckUI .stat-label {
-            font-size: 0.68rem !important;
-        }
-
-        #th-wrapper #balanceCheckUI .stats-grid {
-            gap: 6px !important;
-        }
-
-        #th-wrapper #balanceCheckUI .log-container {
-            max-height: 200px !important;
-            font-size: 0.75rem !important;
-        }
-
-        /* Force single column on any remaining grids */
-        #th-wrapper #balanceCheckUI [style*="grid-template-columns: 1fr 1fr"]:not([style*="gap: 8px"]) {
-            grid-template-columns: 1fr !important;
-            gap: 7px !important;
-        }
-        /* ===== END BALANCE CHECK UI ===== */
-
+/* Logs: collapsed strip by default */
+        #th-wrapper #balanceCheckUI .bt-logs { padding: 4px 0 0 !important; }
+        #th-wrapper #balanceCheckUI .bt-logs .bt-loghead { height: 36px; }
+        #th-wrapper #balanceCheckUI .bt-logs .log-container { height: 130px !important; max-height: none !important; }
