@@ -6,6 +6,11 @@ Per-build release notes are published on the [Releases](../../releases) page.
 ## [Unreleased]
 
 ### Fixed
+- **Notifications stopped appearing after 50, and the "running" notification could come back after the app was killed:**
+  after 50 notifications in one session every further transaction notification was silently dropped. Notification
+  slots are now reused (oldest first) so they keep appearing. The background-service notification is no longer
+  restarted by Android after the app is killed. The service still starts at app launch as before; making it start
+  only while work is running is not included because background bots do not all report when they start and stop.
 - **Security: screens showing private keys could be captured:** screenshots, screen recording, screen casting and the
   app-switcher (Recents) preview could capture wallet screens that display private keys and recovery phrases. The main
   wallet window now blocks all of these. Note: this also means you can no longer take screenshots of the wallet screens.

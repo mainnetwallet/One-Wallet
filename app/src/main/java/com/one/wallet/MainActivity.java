@@ -578,7 +578,9 @@ public class MainActivity extends AppCompatActivity {
     public void _sendNotification(String title, String body, String explorerUrl, boolean silent) {
         NotificationManager nm = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         if (nm == null) return;
-        if (notifIdCounter.get() > 50) return;
+        // Ids cycle 1..50 (the oldest slot is reused) instead of silently dropping every notification
+        // after the 50th until the counter happens to be reset.
+        final int notifId = notifIdCounter.getAndUpdate(v -> v >= 50 ? 1 : v + 1);
         if (title != null && title.length() > 100) title = title.substring(0, 100);
         if (body != null && body.length() > 300) body = body.substring(0, 300);
 
@@ -590,7 +592,7 @@ public class MainActivity extends AppCompatActivity {
         if (explorerUrl != null && explorerUrl.toLowerCase().trim().startsWith("https://")) {
             Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(explorerUrl));
             browserIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            pendingIntent = PendingIntent.getActivity(this, notifIdCounter.get(), browserIntent, flags);
+            pendingIntent = PendingIntent.getActivity(this, notifId, browserIntent, flags);
         }
 
         String channelId = silent ? SILENT_CHANNEL_ID : CHANNEL_ID;
@@ -609,6 +611,6 @@ public class MainActivity extends AppCompatActivity {
             builder.setVibrate(new long[]{0L});
             builder.setDefaults(0);
         }
-        nm.notify(notifIdCounter.getAndIncrement(), builder.build());
+        nm.notify(notifId, builder.build());
     }
 }

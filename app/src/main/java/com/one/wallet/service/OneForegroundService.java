@@ -28,7 +28,9 @@ public class OneForegroundService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        return START_STICKY;
+        // This service only holds the "running" notification; it has no work of its own to resume.
+        // START_STICKY made Android re-create it (and its notification) after the app was killed.
+        return START_NOT_STICKY;
     }
 
     @Override
