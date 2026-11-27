@@ -15,11 +15,10 @@ Per-build release notes are published on the [Releases](../../releases) page.
   swiping the dim area above the sheet closes it too. Bridge pickers keep their `!important` CSS states.
 
 ### Changed
-- **BRIDGE NOW / SWAP NOW button colour:** the purple gradient with glow is replaced by a light button (`#f1f1f8`) with
-  dark text and a plain drop shadow in the dark theme, and a dark indigo button with white text in light mode. The look now
-  lives in one CSS rule (`#br-exec-btn` in `styles/base/bridge-cards-bottom-nav-and-fab.css`, via `--br-exec-*` variables);
-  scripts no longer write the old gradient inline when the button is reset, loading or re-enabled. The loading spinner uses
-  the same text colour so it stays visible on the light button.
+- **BRIDGE NOW / SWAP NOW button colour:** the purple gradient with glow is replaced by a slate (`#334155`) soft gradient
+  with white text and a plain drop shadow, in both dark and light theme. The look now lives in one CSS rule (`#br-exec-btn`
+  in `styles/base/bridge-cards-bottom-nav-and-fab.css`, via `--br-exec-*` variables); scripts no longer write the old
+  gradient inline when the button is reset, loading or re-enabled. The loading spinner uses the same text colour.
 - **Bridge page layout:** FROM and TO now sit in one swap panel with the flip button on the divider between them.
   Chain and token pills are side by side on the left and the amount is on the right (FROM and TO); the balance
   (left) and USD value (right) share one row under them. The % slider and MAX stay in the FROM section, and the
