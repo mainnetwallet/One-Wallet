@@ -402,6 +402,36 @@ window.OneGasMode = 'auto'; // default
     });
   };
 
+  // Compact swap-screen pill: default AUTO, tap to cycle AUTO -> 1559 -> LEGACY
+  const SWAP_PILL_HTML = `
+    <span style="font-family:var(--font-mono);font-size:10px;color:var(--text-muted);letter-spacing:0.5px;">Network fee</span>
+    <button type="button" onclick="window._ngCycle()" class="sw-gas-pill" aria-label="Gas type, tap to change" title="Tap to change gas type"
+      style="display:flex;align-items:center;gap:6px;padding:5px 11px 5px 9px;border-radius:999px;background:var(--bg-raised);border:1px solid var(--border-subtle);cursor:pointer;font-family:var(--font-mono);font-size:10px;color:var(--text-secondary);-webkit-tap-highlight-color:transparent;">
+      <span class="material-icons-round" style="font-size:14px;color:var(--accent-amber);pointer-events:none;">local_gas_station</span>
+      <span style="pointer-events:none;">Gas</span>
+      <span class="sw-gas-pill-label" style="font-weight:700;letter-spacing:0.5px;color:var(--neon-purple);pointer-events:none;">AUTO</span>
+      <span class="material-icons-round" style="font-size:13px;color:var(--text-muted);pointer-events:none;">swap_horiz</span>
+    </button>`;
+
+  function _ngSyncPills(mode) {
+    const names  = { auto:'AUTO', eip1559:'1559', legacy:'LEGACY' };
+    const colors = { auto:'var(--neon-purple)', eip1559:'var(--neon-cyan)', legacy:'var(--accent-amber)' };
+    document.querySelectorAll('.sw-gas-pill-label').forEach(el => {
+      el.textContent = names[mode] || 'AUTO';
+      el.style.color = colors[mode] || colors.auto;
+    });
+  }
+
+  const _ngSetBase = window._ngSet;
+  window._ngSet = function(mode) { _ngSetBase(mode); _ngSyncPills(mode); };
+
+  window._ngCycle = function() {
+    const order = ['auto', 'eip1559', 'legacy'];
+    const next = order[(order.indexOf(window.OneGasMode || 'auto') + 1) % order.length];
+    window._ngSet(next);
+    try { if (typeof haptic === 'function') haptic(); } catch (e) {}
+  };
+
   // Inject after DOM ready — place into send-review-card and bridge status area
   function _tryInject() {
     // Send section — inject near send-btn
@@ -415,15 +445,15 @@ window.OneGasMode = 'auto'; // default
       sendBtn.parentNode.insertBefore(wrap, sendBtn);
     }
 
-    // Swap section — inject above sw-action-btn
+    // Swap section — compact gas pill above sw-action-btn
     const swapBtn = document.getElementById('sw-action-btn');
     if (swapBtn && !document.getElementById('one-gas-toggle-swap')) {
       const wrap3 = document.createElement('div');
       wrap3.id = 'one-gas-toggle-swap';
-      wrap3.innerHTML = TOGGLE_HTML;
-      wrap3.querySelector('.one-gas-toggle-widget').id = 'one-gas-toggle-swap-inner';
-      wrap3.style.cssText = 'padding:0 0 8px 0;display:flex;justify-content:flex-end;';
+      wrap3.innerHTML = SWAP_PILL_HTML;
+      wrap3.style.cssText = 'padding:2px 2px 10px;display:flex;align-items:center;justify-content:space-between;';
       swapBtn.parentNode.insertBefore(wrap3, swapBtn);
+      _ngSyncPills(window.OneGasMode || 'auto');
     }
 
     // Bridge section — inject inside settings sheet GAS MODE div

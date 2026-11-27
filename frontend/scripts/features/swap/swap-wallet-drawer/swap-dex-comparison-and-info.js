@@ -45,8 +45,8 @@ function swRenderDexComparison() {
     const isSelected = SW._manualRouteKey ? (_qRouteKey === _selRouteKey) : (i === 0 && !SW._manualDexName);
     const isBest = q.dex === SW.quotes[0].dex && (q.apiSource || '') === (SW.quotes[0].apiSource || '');
     const checkIcon = isSelected
-      ? `<span class="material-icons-round" style="font-size:16px;color:var(--accent-green);flex-shrink:0;filter:drop-shadow(0 0 4px rgba(16,185,129,0.6));">check_circle</span>`
-      : `<span style="width:16px;display:inline-block;flex-shrink:0;"></span>`;
+      ? `<span class="material-icons-round" style="font-size:20px;color:var(--accent-green);flex-shrink:0;">check_circle</span>`
+      : `<span style="width:20px;display:inline-block;flex-shrink:0;"></span>`;
     const badge = '';
     // ── API source tag ──
     const _API_TAG_MAP = {
@@ -69,7 +69,7 @@ function swRenderDexComparison() {
     const _srcKey = (q.apiSource || '').toLowerCase().replace(/[^a-z0-9]/g, '');
     const _apiTag = _API_TAG_MAP[_srcKey];
     const apiTagHtml = _apiTag
-      ? `<span style="font-size:7px;font-weight:700;letter-spacing:0.4px;padding:1px 5px;border-radius:4px;background:${_apiTag.bg};border:1px solid ${_apiTag.border};color:${_apiTag.color};flex-shrink:0;">${_apiTag.label}</span>`
+      ? `<span style="font-size:9px;font-weight:700;letter-spacing:0.4px;padding:1px 6px;border-radius:5px;background:${_apiTag.bg};border:1px solid ${_apiTag.border};color:${_apiTag.color};flex-shrink:0;">${_apiTag.label}</span>`
       : '';
     const _v1 = q.output;
     const _toDecDisplay = SW.toToken ? Math.min(SW.toToken.decimals || 18, 8) : 8;
@@ -90,17 +90,17 @@ function swRenderDexComparison() {
         ${_swDexIconHtml(q.dex, q.color, q.routerLogoURI || null)}
         <div style="flex:1;min-width:0;">
           <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
-            <span style="font-size:12px;font-weight:700;white-space:nowrap;flex-shrink:0;">${q.dex}</span>
+            <span style="font-size:13px;font-weight:700;white-space:nowrap;flex-shrink:0;">${q.dex}</span>
             ${apiTagHtml}
             ${badge}
-            ${isBest && !isSelected ? '<span style="font-size:8px;font-weight:700;color:var(--accent-green);background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.25);padding:1px 6px;border-radius:5px;letter-spacing:0.5px;flex-shrink:0;">BEST</span>' : ''}
+            ${isBest && !isSelected ? '<span style="font-size:9px;font-weight:700;color:var(--accent-primary);background:rgba(99,102,241,0.12);border:1px solid rgba(99,102,241,0.3);padding:1px 7px;border-radius:5px;letter-spacing:0.5px;flex-shrink:0;">BEST</span>' : ''}
           </div>
-          <div style="font-family:var(--font-mono);font-size:9px;color:var(--text-secondary);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"><span class="sw-gas-fee-chip" data-dex="${q.dex}" onclick="event.stopPropagation();swRefreshGasFee(this)" style="cursor:pointer;border-radius:4px;padding:1px 3px;transition:background 0.15s;" onmouseenter="this.style.background='rgba(99,102,241,0.15)'" onmouseleave="this.style.background=''">⛽ ${q.gasFee}</span> · <span style="color:${q.impact > 0 ? 'var(--accent-green)' : q.impact < -1 ? 'var(--accent-red)' : q.impact < -0.3 ? 'var(--accent-amber)' : 'var(--text-secondary)'}">Impact: ${q.impact > 0 ? '+' : ''}${Math.abs(q.impact) < 0.01 ? (q.impact >= 0 ? '<+0.01' : '<-0.01') : q.impact.toFixed(2)}%</span></div>
+          <div style="font-family:var(--font-mono);font-size:10px;color:var(--text-secondary);margin-top:3px;white-space:normal;line-height:1.5;"><span class="sw-gas-fee-chip" data-dex="${q.dex}" onclick="event.stopPropagation();swRefreshGasFee(this)" style="cursor:pointer;border-radius:4px;padding:1px 3px;transition:background 0.15s;" onmouseenter="this.style.background='rgba(99,102,241,0.15)'" onmouseleave="this.style.background=''">⛽ ${q.gasFee}</span> · <span style="color:${q.impact > 0 ? 'var(--accent-green)' : q.impact < -1 ? 'var(--accent-red)' : q.impact < -0.3 ? 'var(--accent-amber)' : 'var(--text-secondary)'}">Impact ${q.impact > 0 ? '+' : ''}${Math.abs(q.impact) < 0.01 ? (q.impact >= 0 ? '<+0.01' : '<-0.01') : q.impact.toFixed(2)}%</span></div>
         </div>
         <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;">
           <div style="text-align:right;">
-            <div style="font-family:var(--font-mono);font-size:11px;font-weight:700;color:var(--accent-green);">${fmtOut}</div>
-            <div style="font-family:var(--font-mono);font-size:9px;color:var(--text-secondary);">${pct}%</div>
+            <div style="font-family:var(--font-mono);font-size:12px;font-weight:700;color:var(--text-primary);">${fmtOut}</div>
+            <div style="font-family:var(--font-mono);font-size:10px;color:var(--text-secondary);">${pct}%</div>
           </div>
           ${checkIcon}
         </div>
@@ -215,11 +215,11 @@ function _swRedrawDexRows(selectedIdx) {
     const isSelected = i === selectedIdx;
     const isBest = i === 0;
     const checkIcon = isSelected
-      ? `<span class="material-icons-round" style="font-size:16px;color:var(--accent-green);flex-shrink:0;filter:drop-shadow(0 0 4px rgba(16,185,129,0.6));">check_circle</span>`
-      : `<span style="width:16px;display:inline-block;flex-shrink:0;"></span>`;
+      ? `<span class="material-icons-round" style="font-size:20px;color:var(--accent-green);flex-shrink:0;">check_circle</span>`
+      : `<span style="width:20px;display:inline-block;flex-shrink:0;"></span>`;
     const selectedBadge = isSelected
       ? ``
-      : (isBest ? `<span style="font-size:8px;font-weight:700;color:var(--accent-green);background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.25);padding:1px 6px;border-radius:5px;letter-spacing:0.5px;">BEST</span>` : '');
+      : (isBest ? `<span style="font-size:9px;font-weight:700;color:var(--accent-primary);background:rgba(99,102,241,0.12);border:1px solid rgba(99,102,241,0.3);padding:1px 7px;border-radius:5px;letter-spacing:0.5px;">BEST</span>` : '');
     const _API_TAG_MAP2 = {
       'lifi': { label: 'LiFi', bg: 'rgba(139,92,246,0.15)', border: 'rgba(139,92,246,0.35)', color: '#a78bfa' },
       'rango': { label: 'Rango', bg: 'rgba(255,140,0,0.12)', border: 'rgba(255,140,0,0.35)', color: '#fb923c' },
@@ -240,7 +240,7 @@ function _swRedrawDexRows(selectedIdx) {
     const _srcKey2 = (q.apiSource || '').toLowerCase().replace(/[^a-z0-9]/g, '');
     const _apiTag2 = _API_TAG_MAP2[_srcKey2];
     const apiTagHtml2 = _apiTag2
-      ? `<span style="font-size:7px;font-weight:700;letter-spacing:0.4px;padding:1px 5px;border-radius:4px;background:${_apiTag2.bg};border:1px solid ${_apiTag2.border};color:${_apiTag2.color};flex-shrink:0;">${_apiTag2.label}</span>`
+      ? `<span style="font-size:9px;font-weight:700;letter-spacing:0.4px;padding:1px 6px;border-radius:5px;background:${_apiTag2.bg};border:1px solid ${_apiTag2.border};color:${_apiTag2.color};flex-shrink:0;">${_apiTag2.label}</span>`
       : '';
     const _v2 = q.output;
     const fmtOut = _v2 >= 1000 ? _v2.toLocaleString('en-US',{minimumFractionDigits:1,maximumFractionDigits:1})
@@ -255,16 +255,16 @@ function _swRedrawDexRows(selectedIdx) {
         ${_swDexIconHtml(q.dex, q.color, q.routerLogoURI || null)}
         <div style="flex:1;min-width:0;">
           <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
-            <span style="font-size:12px;font-weight:700;white-space:nowrap;flex-shrink:0;">${q.dex}</span>
+            <span style="font-size:13px;font-weight:700;white-space:nowrap;flex-shrink:0;">${q.dex}</span>
             ${apiTagHtml2}
             ${selectedBadge}
           </div>
-          <div style="font-family:var(--font-mono);font-size:9px;color:var(--text-secondary);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"><span class="sw-gas-fee-chip" data-dex="${q.dex}" onclick="event.stopPropagation();swRefreshGasFee(this)" style="cursor:pointer;border-radius:4px;padding:1px 3px;transition:background 0.15s;" onmouseenter="this.style.background='rgba(99,102,241,0.15)'" onmouseleave="this.style.background=''">⛽ ${q.gasFee}</span> · <span style="color:${q.impact > 0 ? 'var(--accent-green)' : q.impact < -1 ? 'var(--accent-red)' : q.impact < -0.3 ? 'var(--accent-amber)' : 'var(--text-secondary)'}">Impact: ${q.impact > 0 ? '+' : ''}${Math.abs(q.impact) < 0.01 ? (q.impact >= 0 ? '<+0.01' : '<-0.01') : q.impact.toFixed(2)}%</span></div>
+          <div style="font-family:var(--font-mono);font-size:10px;color:var(--text-secondary);margin-top:3px;white-space:normal;line-height:1.5;"><span class="sw-gas-fee-chip" data-dex="${q.dex}" onclick="event.stopPropagation();swRefreshGasFee(this)" style="cursor:pointer;border-radius:4px;padding:1px 3px;transition:background 0.15s;" onmouseenter="this.style.background='rgba(99,102,241,0.15)'" onmouseleave="this.style.background=''">⛽ ${q.gasFee}</span> · <span style="color:${q.impact > 0 ? 'var(--accent-green)' : q.impact < -1 ? 'var(--accent-red)' : q.impact < -0.3 ? 'var(--accent-amber)' : 'var(--text-secondary)'}">Impact ${q.impact > 0 ? '+' : ''}${Math.abs(q.impact) < 0.01 ? (q.impact >= 0 ? '<+0.01' : '<-0.01') : q.impact.toFixed(2)}%</span></div>
         </div>
         <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;">
           <div style="text-align:right;">
-            <div style="font-family:var(--font-mono);font-size:11px;font-weight:700;color:var(--accent-green);">${fmtOut}</div>
-            <div style="font-family:var(--font-mono);font-size:9px;color:var(--text-secondary);">${pct}%</div>
+            <div style="font-family:var(--font-mono);font-size:12px;font-weight:700;color:var(--text-primary);">${fmtOut}</div>
+            <div style="font-family:var(--font-mono);font-size:10px;color:var(--text-secondary);">${pct}%</div>
           </div>
           ${checkIcon}
         </div>
