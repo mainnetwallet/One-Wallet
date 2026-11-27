@@ -6,6 +6,11 @@ Per-build release notes are published on the [Releases](../../releases) page.
 ## [Unreleased]
 
 ### Fixed
+- **Batch transfer sent 1 token per wallet when the amount was empty or invalid:** in fixed-amount mode an empty, `0`
+  or non-numeric Amount silently became 1 whole token for every wallet, and values like `1e-7` failed part-way through.
+  The amount is now checked before the bot starts: it must be a plain positive decimal number (for example `1` or
+  `0.5`) with no more decimal places than the token has, otherwise nothing is sent and an error is shown in the log.
+  Full-balance mode is unchanged.
 - **Security: App Lock only appeared at a cold start and had no limit on wrong PIN / pattern attempts:** once unlocked,
   the app stayed unlocked until it was killed, and the PIN or pattern could be tried without limit. The lock screen now
   comes back when the app returns from the background after 30 seconds or more, and after 5 wrong PIN / pattern
