@@ -159,11 +159,10 @@
         #th-wrapper #nftTransferUI .bt-summary { margin-top: 2px; }
         #th-wrapper #nftTransferUI .nft-progress { margin: 4px 0 !important; }
 
-/* Logs: collapsed strip by default. Opening it folds the long inputs so the log box fits on screen. */
+/* Logs: collapsed strip by default. Opening it never hides or folds anything above. */
         #th-wrapper #nftTransferUI .bt-logs { padding: 4px 0 0 !important; }
         #th-wrapper #nftTransferUI .bt-logs .bt-loghead { height: 36px; }
         #th-wrapper #nftTransferUI .bt-logs .log-container { height: 130px !important; max-height: none !important; }
-        #th-wrapper #nftTransferUI.nft-logs-open :is(.nft-pick, .mk-meta, .nft-ids) { display: none !important; }
 
 /* Gas pill on the left, action button in the middle of the screen and only a little wider than its label */
         #th-wrapper #nftTransferUI .st-act {

@@ -3,7 +3,7 @@
 // Presentation glue for the compact NFT Transfer layout
 // (html-src/partials/page-transfer-hub/nft-transfer.html).
 // It never writes to wallet, signing or transfer state: it only
-//   * opens/closes the logs box (and folds the NFT grid while logs are open),
+//   * opens/closes the logs box (nothing above it is hidden; it scrolls into view when opened),
 //   * mirrors the 1 -> Many / Many -> 1 choice onto the segmented switch
 //     (thumb position + active button; selectNftTransferMode still does the real mode change).
 // ══════════════════════════════════════════════════════
@@ -19,6 +19,10 @@
     var willOpen = typeof open === 'boolean' ? open : box.classList.contains('collapsed');
     box.classList.toggle('collapsed', !willOpen);
     if (ui) ui.classList.toggle('nft-logs-open', willOpen);
+    // Nothing above folds away, so if the opened log box ends up below the visible area, bring it into view
+    if (willOpen) setTimeout(function () {
+      try { box.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); } catch (e) { box.scrollIntoView(false); }
+    }, 60);
   };
 
   // Keep the segmented switch in step with the visible section
