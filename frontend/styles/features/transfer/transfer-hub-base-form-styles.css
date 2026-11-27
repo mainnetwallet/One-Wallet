@@ -839,3 +839,24 @@
         #th-wrapper #batchTransferUI .bt-logs .log-container { height: 120px !important; }
         #th-wrapper #batchTransferUI .bt-dock .progress-bar { margin: 8px 0 0 !important; }
 
+/* ── Light trim only: a few px off big boxes / gaps so Deploy / Execute (and the collapsed Logs bar)
+      sit above the bottom nav in Token mode. Layout and look are unchanged. ── */
+        #th-wrapper #batchTransferUI .th-section-header { margin-bottom: 4px !important; }
+        #th-wrapper #batchTransferUI .bt-seg-wrap { margin-bottom: 6px; }
+        #th-wrapper #batchTransferUI .bt-card { margin-bottom: 6px; }
+        #th-wrapper #batchTransferUI .bt-row { padding: 8px 12px; }
+        #th-wrapper #batchTransferUI .bt-head { margin-bottom: 4px; }
+        #th-wrapper #batchTransferUI .bt-amount { padding: 8px 12px; }
+        #th-wrapper #batchTransferUI .bt-amt-grid { margin-bottom: 5px; }
+        #th-wrapper #batchTransferUI textarea:not(.sk-key-textarea) {
+            min-height: 54px !important;
+            height: 54px;
+        }
+        #th-wrapper #batchTransferUI .bt-summary { padding: 8px 14px; margin-bottom: 6px; }
+        #th-wrapper #batchTransferUI .bt-crow { padding: 3px 6px 3px 12px; }
+        #th-wrapper #batchTransferUI .bt-dock .bt-gasrow { margin-bottom: 4px; }
+        #th-wrapper #batchTransferUI .bt-actions { margin-bottom: 6px !important; }
+        #th-wrapper #batchTransferUI .bt-actions .btn { min-height: 44px !important; }
+        #th-wrapper #batchTransferUI .bt-logs { padding: 2px 0 0 !important; }
+        #th-wrapper #batchTransferUI .bt-logs .bt-loghead { height: 34px; }
+
