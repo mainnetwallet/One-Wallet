@@ -460,7 +460,12 @@ public class OneAndroidBridge {
             java.net.HttpURLConnection conn = null;
             try {
                 java.net.URL u = checkedBridgeUrl(url);
+                int status;
+                // Redirects are followed by hand so every hop is re-validated (https, no private
+                // target) and never leaves the original host; the default auto-follow skipped both.
+                for (int hop = 0; ; hop++) {
                 conn = (java.net.HttpURLConnection) u.openConnection();
+                conn.setInstanceFollowRedirects(false);
                 conn.setRequestMethod("GET");
                 conn.setConnectTimeout(8000);
                 conn.setReadTimeout(8000);
@@ -485,7 +490,12 @@ public class OneAndroidBridge {
                         // Malformed headers JSON — proceed with default headers only.
                     }
                 }
-                int status = conn.getResponseCode();
+                status = conn.getResponseCode();
+                java.net.URL next = hop < MAX_BRIDGE_REDIRECTS ? nextRedirect(conn, u, status) : null;
+                if (next == null) break;
+                conn.disconnect();
+                u = next;
+                }
                 java.io.InputStream is = (status >= 200 && status < 300)
                         ? conn.getInputStream() : conn.getErrorStream();
                 String body = readHttpStream(is);
@@ -519,6 +529,7 @@ public class OneAndroidBridge {
             try {
                 java.net.URL u = checkedBridgeUrl(url);
                 conn = (java.net.HttpURLConnection) u.openConnection();
+                conn.setInstanceFollowRedirects(false); // a redirect would skip the private-address check
                 conn.setRequestMethod("POST");
                 conn.setConnectTimeout(15000);
                 conn.setReadTimeout(15000);
@@ -571,7 +582,8 @@ public class OneAndroidBridge {
 
     // Limits for the native HTTP bridge (BUG-015, partial): https only, no loopback / private /
     // link-local targets, bounded response size, and a callback id that cannot break out of the
-    // JS string it is placed in. A per-host allow-list is NOT applied here: this bridge serves
+    // JS string it is placed in. Redirects are re-validated hop by hop and limited to the same host.
+    // A per-host allow-list is NOT applied here: this bridge serves
     // exchange and aggregator calls to many user-chosen hosts, so it needs device testing first.
     private static final int MAX_HTTP_BODY_BYTES = 8 * 1024 * 1024;
     private static final java.util.regex.Pattern CALLBACK_ID_RE =
@@ -587,12 +599,40 @@ public class OneAndroidBridge {
         String host = u.getHost();
         if (host == null || host.isEmpty() || u.getUserInfo() != null) throw new java.io.IOException("invalid host");
         for (java.net.InetAddress a : java.net.InetAddress.getAllByName(host)) {
-            if (a.isAnyLocalAddress() || a.isLoopbackAddress() || a.isLinkLocalAddress()
-                    || a.isSiteLocalAddress() || a.isMulticastAddress()) {
-                throw new java.io.IOException("blocked address");
-            }
+            if (isBlockedAddress(a)) throw new java.io.IOException("blocked address");
         }
         return u;
+    }
+
+    /** Loopback, wildcard, link-local, private (incl. IPv6 unique-local fc00::/7 and CGNAT 100.64/10), multicast. */
+    private static boolean isBlockedAddress(java.net.InetAddress a) {
+        if (a.isAnyLocalAddress() || a.isLoopbackAddress() || a.isLinkLocalAddress()
+                || a.isSiteLocalAddress() || a.isMulticastAddress()) return true;
+        byte[] b = a.getAddress();
+        if (b.length == 4) {
+            int b0 = b[0] & 0xff, b1 = b[1] & 0xff;
+            return b0 == 0 || (b0 == 100 && b1 >= 64 && b1 <= 127);
+        }
+        return b.length == 16 && (b[0] & 0xfe) == 0xfc;
+    }
+
+    private static final int MAX_BRIDGE_REDIRECTS = 3;
+
+    /**
+     * For a 3xx response returns the validated redirect target, or null when the response is not a
+     * redirect. Throws if the target is not https / is a private address / is on another host (custom
+     * request headers such as API keys must not be replayed to a different host).
+     */
+    private static java.net.URL nextRedirect(java.net.HttpURLConnection conn, java.net.URL cur, int status)
+            throws java.io.IOException {
+        if (status != 301 && status != 302 && status != 303 && status != 307 && status != 308) return null;
+        String loc = conn.getHeaderField("Location");
+        if (loc == null || loc.isEmpty()) return null;
+        java.net.URL next = checkedBridgeUrl(new java.net.URL(cur, loc).toString());
+        if (!next.getHost().equalsIgnoreCase(cur.getHost())) {
+            throw new java.io.IOException("redirect to another host blocked");
+        }
+        return next;
     }
 
     private static String readHttpStream(java.io.InputStream is) throws java.io.IOException {
