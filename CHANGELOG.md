@@ -6,6 +6,8 @@ Per-build release notes are published on the [Releases](../../releases) page.
 ## [Unreleased]
 
 ### Changed
+- **Batch Transfer logs position:** Logs now sit below the docked Deploy / Execute row (still collapsed by default,
+  tap the row to expand) instead of inside the scrolling form; the progress bar moved into the dock.
 - **Batch Transfer layout fix:** the page is now a flex column while Batch Transfer is open - the form scrolls and the
   gas pill + Deploy / Execute transfer dock stays fixed just above the bottom nav (Native and Token). The previous
   sticky dock never stuck because `.container` is its own overflow box. Logs are collapsed by default and the whole

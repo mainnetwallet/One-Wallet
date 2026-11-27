@@ -103,20 +103,6 @@
                 </div>
             </div>
 
-            <div class="progress-bar" id="progressBar">
-                <div class="progress-fill" id="progressFill"></div>
-            </div>
-
-            <!-- Log Section -->
-            <div class="log-section bt-logs collapsed" id="btLogsNative">
-                <div class="bt-loghead" onclick="btToggleLogs('native')" role="button" aria-label="Show or hide logs">
-                    <span class="material-icons-round bt-logchev">expand_more</span>
-                    <span class="bt-cap">Logs</span>
-                    <button type="button" class="bt-link" onclick="event.stopPropagation();clearLog()">Clear</button>
-                </div>
-                <div class="log-container" id="logContainer">
-                </div>
-            </div>
             </div>
 
             <!-- Action dock: gas type + Deploy / Execute (stays visible above the bottom nav) -->
@@ -134,6 +120,20 @@
                 <button class="btn btn-primary" id="deployBtn" onclick="deployAndTransfer()" disabled>Deploy</button>
                 <button class="btn btn-success" id="executeBtn" onclick="executeTransfer()" disabled>Execute transfer</button>
             </div>
+            <div class="progress-bar" id="progressBar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            </div>
+
+            <!-- Log Section -->
+            <div class="log-section bt-logs collapsed" id="btLogsNative">
+                <div class="bt-loghead" onclick="btToggleLogs('native')" role="button" aria-label="Show or hide logs">
+                    <span class="material-icons-round bt-logchev">expand_more</span>
+                    <span class="bt-cap">Logs</span>
+                    <button type="button" class="bt-link" onclick="event.stopPropagation();clearLog()">Clear</button>
+                </div>
+                <div class="log-container" id="logContainer">
+                </div>
             </div>
         </div>
 
@@ -251,21 +251,6 @@
                 </div>
             </div>
 
-            <div class="progress-bar" id="progressBarToken">
-                <div class="progress-fill" id="progressFillToken"></div>
-            </div>
-
-            <!-- Log Section -->
-            <div class="log-section bt-logs collapsed" id="btLogsToken">
-                <div class="bt-loghead" onclick="btToggleLogs('token')" role="button" aria-label="Show or hide logs">
-                    <span class="material-icons-round bt-logchev">expand_more</span>
-                    <span class="bt-cap">Logs</span>
-                    <button type="button" class="bt-link" onclick="event.stopPropagation();clearLogToken()">Clear</button>
-                </div>
-                <div class="log-container" id="logContainerToken">
-
-                </div>
-            </div>
             </div>
 
             <!-- Action dock: gas type + Deploy / Execute (stays visible above the bottom nav) -->
@@ -283,6 +268,21 @@
                 <button class="btn btn-primary" id="deployBtnToken" onclick="deployContractToken()" disabled>Deploy</button>
                 <button class="btn btn-success" id="executeBtnToken" onclick="executeTransferToken()" disabled>Execute transfer</button>
             </div>
+            <div class="progress-bar" id="progressBarToken">
+                <div class="progress-fill" id="progressFillToken"></div>
+            </div>
+            </div>
+
+            <!-- Log Section -->
+            <div class="log-section bt-logs collapsed" id="btLogsToken">
+                <div class="bt-loghead" onclick="btToggleLogs('token')" role="button" aria-label="Show or hide logs">
+                    <span class="material-icons-round bt-logchev">expand_more</span>
+                    <span class="bt-cap">Logs</span>
+                    <button type="button" class="bt-link" onclick="event.stopPropagation();clearLogToken()">Clear</button>
+                </div>
+                <div class="log-container" id="logContainerToken">
+
+                </div>
             </div>
         </div>
 

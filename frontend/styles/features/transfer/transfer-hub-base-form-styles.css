@@ -871,3 +871,14 @@
             border-radius: 8px;
         }
 
+/* ── Logs sit below the docked Deploy / Execute row ── */
+        #th-wrapper #batchTransferUI .bt-logs {
+            flex: none;
+            margin: 0 !important;
+            padding: 6px 0 2px !important;
+        }
+        #th-wrapper #batchTransferUI .bt-logs .bt-loghead { margin-bottom: 0; height: 38px; }
+        #th-wrapper #batchTransferUI .bt-logs:not(.collapsed) .bt-loghead { margin-bottom: 6px; }
+        #th-wrapper #batchTransferUI .bt-logs .log-container { height: 120px !important; }
+        #th-wrapper #batchTransferUI .bt-dock .progress-bar { margin: 8px 0 0 !important; }
+
