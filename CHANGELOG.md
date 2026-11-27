@@ -6,6 +6,7 @@ Per-build release notes are published on the [Releases](../../releases) page.
 ## [Unreleased]
 
 ### Changed
+- **NFT Transfer + Self Transfer:** the action button (Transfer NFTs / Collect NFTs / Execute transfer) is now centred on the screen and only a little wider than its label; the gas pill stays on the left. Styling only (`th-nft-transfer-mobile.css`, `th-self-transfer-mobile.css`).
 - **Multi Key Recipients + Batch Transfer:** the Amount per wallet / address label and value are now centred in the amount column (unit pinned to its right edge); the card layout, Send mode and Batch size stay where they were. Styling only (`th-amount-centered.css`), applies to Native and Token.
 - **W2W transfer layout:** the screen now fills the space down to the bottom nav bar (fields spread out, Logs strip sits right above the nav bar), the Amount per transfer value is centred in its card, and the Execute transfer button is centred and only as wide as its label (gas pill stays on the left). Markup untouched; styling only (`th-w2w-compact.css`), applies to Native and Token.
 - **Key & Address Tools UI:** now uses the same compact layout as the other transfer tools - a Phrase -> Key / Key -> Address

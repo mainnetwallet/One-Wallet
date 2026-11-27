@@ -74,3 +74,23 @@
         #th-wrapper #selfTransferUI .bt-logs .log-container { height: 130px !important; }
         #th-wrapper #selfTransferUI.st-logs-open .st-fold { display: none !important; }
         #th-wrapper #selfTransferUI.st-logs-open .bt-row .bt-head { margin-bottom: 0; }
+
+/* Gas pill on the left, action button in the middle of the screen and only a little wider than its label */
+        #th-wrapper #selfTransferUI .st-act {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+            align-items: center;
+            gap: 8px;
+        }
+        #th-wrapper #selfTransferUI .st-act .bt-gasrow { grid-column: 1; justify-self: start; }
+        #th-wrapper #selfTransferUI .st-act .bt-actions {
+            grid-column: 2;
+            flex: none;
+            width: auto;
+            grid-template-columns: auto !important;
+        }
+        #th-wrapper #selfTransferUI .st-act .bt-actions .btn {
+            width: auto;
+            padding: 8px 32px !important;
+            white-space: nowrap;
+        }

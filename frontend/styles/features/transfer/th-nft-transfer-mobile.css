@@ -164,3 +164,23 @@
         #th-wrapper #nftTransferUI .bt-logs .bt-loghead { height: 36px; }
         #th-wrapper #nftTransferUI .bt-logs .log-container { height: 130px !important; max-height: none !important; }
         #th-wrapper #nftTransferUI.nft-logs-open :is(.nft-pick, .mk-meta, .nft-ids) { display: none !important; }
+
+/* Gas pill on the left, action button in the middle of the screen and only a little wider than its label */
+        #th-wrapper #nftTransferUI .st-act {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+            align-items: center;
+            gap: 8px;
+        }
+        #th-wrapper #nftTransferUI .st-act .bt-gasrow { grid-column: 1; justify-self: start; }
+        #th-wrapper #nftTransferUI .st-act .bt-actions {
+            grid-column: 2;
+            flex: none;
+            width: auto;
+            grid-template-columns: auto !important;
+        }
+        #th-wrapper #nftTransferUI .st-act .bt-actions .btn {
+            width: auto;
+            padding: 8px 32px !important;
+            white-space: nowrap;
+        }
