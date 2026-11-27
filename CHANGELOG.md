@@ -6,6 +6,9 @@ Per-build release notes are published on the [Releases](../../releases) page.
 ## [Unreleased]
 
 ### Changed
+- **Batch Transfer, round 3:** the Native / Token switch is now a small centered pill with a sliding thumb (no longer
+  full width). Gas type + Deploy / Execute transfer are docked just above the bottom nav so they no longer disappear
+  behind it while you scroll. Logs is collapsible (tap the header) and expanded by default with a taller box.
 - **Batch Transfer polish (Native + Token):** the gas pill and the small Select / stepper / icon buttons were being
   stretched to 44px by the global touch rule - they are now compact again. Cards get soft depth, the Native / Token
   switch and the Execute button use the accent gradient, Deploy is an outlined secondary button, and the total strip,

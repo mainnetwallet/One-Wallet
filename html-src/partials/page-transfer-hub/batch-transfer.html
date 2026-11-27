@@ -15,6 +15,8 @@
         <div id="nativeModeContent" style="display: block;">
             <input type="hidden" id="rpcUrl" value="">
 
+            <div class="bt-form">
+
             <!-- Wallet + Recipients -->
             <div class="bt-card">
                 <div class="bt-row">
@@ -101,6 +103,8 @@
                 </div>
             </div>
 
+            <!-- Action dock: gas type + Deploy / Execute (stays visible above the bottom nav) -->
+            <div class="bt-dock">
             <!-- Gas type (single shared setting for Deploy + Execute; tap to change) -->
             <div class="bt-gasrow">
                 <button type="button" class="bt-gaspill" onclick="window._ngCycle()" aria-label="Gas type, tap to change" title="Gas type - tap to change">
@@ -114,14 +118,16 @@
                 <button class="btn btn-primary" id="deployBtn" onclick="deployAndTransfer()" disabled>Deploy</button>
                 <button class="btn btn-success" id="executeBtn" onclick="executeTransfer()" disabled>Execute transfer</button>
             </div>
+            </div>
+            </div>
             <div class="progress-bar" id="progressBar">
                 <div class="progress-fill" id="progressFill"></div>
             </div>
 
             <!-- Log Section -->
-            <div class="log-section">
+            <div class="log-section bt-logs" id="btLogsNative">
                 <div class="bt-loghead">
-                    <span class="bt-cap">Logs</span>
+                    <button type="button" class="bt-logtoggle" onclick="btToggleLogs('native')" aria-label="Show or hide logs"><span class="material-icons-round bt-logchev">expand_more</span><span class="bt-cap">Logs</span></button>
                     <button type="button" class="bt-link" onclick="clearLog()">Clear</button>
                 </div>
                 <div class="log-container" id="logContainer">
@@ -132,6 +138,8 @@
         <!-- Token Mode Content -->
         <div id="tokenModeContent" style="display: none;">
             <input type="hidden" id="rpcUrlToken" value="">
+
+            <div class="bt-form">
 
             <!-- Token + Wallet + Recipients -->
             <div class="bt-card">
@@ -241,6 +249,8 @@
                 </div>
             </div>
 
+            <!-- Action dock: gas type + Deploy / Execute (stays visible above the bottom nav) -->
+            <div class="bt-dock">
             <!-- Gas type (single shared setting for Deploy + Execute; tap to change) -->
             <div class="bt-gasrow">
                 <button type="button" class="bt-gaspill" onclick="window._ngCycle()" aria-label="Gas type, tap to change" title="Gas type - tap to change">
@@ -254,14 +264,16 @@
                 <button class="btn btn-primary" id="deployBtnToken" onclick="deployContractToken()" disabled>Deploy</button>
                 <button class="btn btn-success" id="executeBtnToken" onclick="executeTransferToken()" disabled>Execute transfer</button>
             </div>
+            </div>
+            </div>
             <div class="progress-bar" id="progressBarToken">
                 <div class="progress-fill" id="progressFillToken"></div>
             </div>
 
             <!-- Log Section -->
-            <div class="log-section">
+            <div class="log-section bt-logs" id="btLogsToken">
                 <div class="bt-loghead">
-                    <span class="bt-cap">Logs</span>
+                    <button type="button" class="bt-logtoggle" onclick="btToggleLogs('token')" aria-label="Show or hide logs"><span class="material-icons-round bt-logchev">expand_more</span><span class="bt-cap">Logs</span></button>
                     <button type="button" class="bt-link" onclick="clearLogToken()">Clear</button>
                 </div>
                 <div class="log-container" id="logContainerToken">

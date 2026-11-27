@@ -685,3 +685,107 @@
 
         /* ── Logs ── */
         #th-wrapper #batchTransferUI .log-container { border-radius: 14px !important; }
+
+/* ══════════════════════════════════════════════════════
+   Batch Transfer — compact centered mode switch, docked actions, collapsible logs
+   ══════════════════════════════════════════════════════ */
+
+/* ── Native / Token: small centered pill with a sliding thumb ── */
+        #th-wrapper #batchTransferUI .bt-seg-wrap {
+            display: flex;
+            justify-content: center;
+            margin: 2px 0 10px;
+        }
+        #th-wrapper #batchTransferUI .bt-seg {
+            position: relative;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            width: 188px;
+            gap: 0;
+            padding: 3px;
+            border-radius: 999px;
+            background: var(--bg-surface);
+            border: 1px solid var(--border-subtle);
+            box-shadow: 0 1px 0 rgba(255,255,255,0.03) inset, 0 4px 14px rgba(0,0,0,0.25);
+        }
+        #th-wrapper #batchTransferUI .bt-seg::before {
+            content: "";
+            position: absolute;
+            top: 3px;
+            bottom: 3px;
+            left: 3px;
+            width: calc(50% - 3px);
+            border-radius: 999px;
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            box-shadow: 0 3px 12px rgba(99,102,241,0.45);
+            transition: transform 0.22s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+        #th-wrapper #batchTransferUI .bt-seg[data-mode="token"]::before {
+            transform: translateX(100%);
+        }
+        #th-wrapper #batchTransferUI .bt-seg .mode-toggle-btn {
+            position: relative;
+            z-index: 1;
+            height: 30px;
+            min-height: 0 !important;
+            padding: 0 6px !important;
+            margin: 0 !important;
+            border: none !important;
+            border-radius: 999px !important;
+            background: transparent !important;
+            box-shadow: none !important;
+            color: var(--text-muted) !important;
+            font-size: 0.76rem !important;
+            font-weight: 700 !important;
+            letter-spacing: 0.02em;
+            transition: color 0.2s;
+        }
+        #th-wrapper #batchTransferUI .bt-seg .mode-toggle-btn.active {
+            background: transparent !important;
+            border: none !important;
+            box-shadow: none !important;
+            color: #fff !important;
+        }
+
+/* ── Form wrapper: lets the dock stick while the cards scroll ── */
+        #th-wrapper #batchTransferUI .bt-form { position: relative; }
+
+/* ── Dock: gas pill + Deploy / Execute stay above the bottom nav ── */
+        #th-wrapper #batchTransferUI .bt-dock {
+            position: sticky;
+            bottom: 0;
+            z-index: 6;
+            padding: 8px 0 6px;
+            margin: 0 -2px;
+            background: linear-gradient(to top, var(--bg-deep) 72%, rgba(10,10,18,0));
+        }
+        #th-wrapper #batchTransferUI .bt-dock .bt-actions { margin-bottom: 0 !important; }
+        #th-wrapper #batchTransferUI .bt-dock .bt-gasrow { margin-bottom: 8px; }
+        #th-wrapper #batchTransferUI .bt-form + .progress-bar { margin-top: 4px !important; }
+
+/* ── Logs: collapsible, expanded by default ── */
+        #th-wrapper #batchTransferUI .bt-logs { margin-top: 6px !important; }
+        #th-wrapper #batchTransferUI .bt-logtoggle {
+            display: inline-flex;
+            align-items: center;
+            gap: 2px;
+            height: 28px;
+            min-height: 0 !important;
+            min-width: 0 !important;
+            padding: 0 6px 0 0;
+            border: none;
+            background: none;
+            cursor: pointer;
+            -webkit-tap-highlight-color: transparent;
+        }
+        #th-wrapper #batchTransferUI .bt-logtoggle .bt-cap { flex: none; }
+        #th-wrapper #batchTransferUI .bt-logchev {
+            font-size: 20px;
+            color: var(--text-muted);
+            transition: transform 0.2s;
+            pointer-events: none;
+        }
+        #th-wrapper #batchTransferUI .bt-logs.collapsed .bt-logchev { transform: rotate(-90deg); }
+        #th-wrapper #batchTransferUI .bt-logs.collapsed .log-container { display: none !important; }
+        #th-wrapper #batchTransferUI .bt-logs .log-container { height: 150px !important; }
+

@@ -40,6 +40,21 @@
     if (card) card.classList.toggle('open');
   };
 
+  // Logs header: collapse / expand the log box (expanded by default)
+  window.btToggleLogs = function (mode) {
+    var box = $(mode === 'token' ? 'btLogsToken' : 'btLogsNative');
+    if (box) box.classList.toggle('collapsed');
+  };
+
+  // Native / Token switch: slide the thumb to the active mode
+  function syncSeg() {
+    var seg = document.querySelector('#batchTransferUI .bt-seg');
+    var tok = $('tokenModeBtn');
+    if (!seg || !tok) return;
+    var mode = tok.classList.contains('active') ? 'token' : 'native';
+    if (seg.getAttribute('data-mode') !== mode) seg.setAttribute('data-mode', mode);
+  }
+
   function nativeSymbol() {
     try {
       if (typeof currentChainConfig !== 'undefined' && currentChainConfig && currentChainConfig.symbol) {
@@ -102,6 +117,7 @@
     var ui = $('batchTransferUI');
     if (!ui || ui.getClientRects().length === 0) return; // not on screen
 
+    syncSeg();
     var ns = nativeSymbol(), ts = tokenSymbol(), i;
     var nUnits = ui.querySelectorAll('.bt-unit-native');
     for (i = 0; i < nUnits.length; i++) setText(nUnits[i], ns);
