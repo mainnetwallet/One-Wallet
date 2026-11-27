@@ -177,7 +177,7 @@
                 logSelfTransfer('error', `❌ Error: ${error.message}`);
             } finally {
                 btn.disabled = false;
-                btn.innerHTML = '🚀 Execute Self Transfers';
+                btn.innerHTML = 'Execute transfer';
                 if (typeof window.OneBGGuard !== 'undefined') window.OneBGGuard.txEnd(); // BG: release wake lock
             }
         }

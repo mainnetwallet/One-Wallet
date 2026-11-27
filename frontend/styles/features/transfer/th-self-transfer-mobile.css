@@ -1,64 +1,76 @@
-        /* ===== SELF TRANSFER UI — MOBILE PHONE OPTIMIZED ===== */
-        #th-wrapper #selfTransferUI .section {
-            padding: 10px !important;
-            margin-bottom: 6px !important;
-        }
+/* ══════════════════════════════════════════════════
+   SELF TRANSFER — additions on top of the shared compact layout
+   The bt-* rules live in transfer-hub-base-form-styles.css (scoped to Batch Transfer, Multi Key Recipients, W2W and this screen).
+   Markup: html-src/partials/page-transfer-hub/self-transfer.html
+   UI-only helpers: scripts/features/transfer/self-transfer-ui-sync.js
+   Goal: Wallets, Amount, summary and Execute fit on one phone screen without scrolling.
+   ══════════════════════════════════════════════════ */
 
-        #th-wrapper #selfTransferUI .section-title {
-            font-size: 0.88rem !important;
-            padding: 7px 10px !important;
-            margin: -10px -10px 8px -10px !important;
-        }
-
-        #th-wrapper #selfTransferUI .input-group {
-            margin-bottom: 7px !important;
-        }
-
-        #th-wrapper #selfTransferUI input[type="text"],
-        #th-wrapper #selfTransferUI input[type="number"] {
-            padding: 8px 10px !important;
-            font-size: 0.85rem !important;
-            min-height: 38px !important;
-        }
-
-        #th-wrapper #selfTransferUI .sk-key-textarea {
-            min-height: 140px !important;
+/* Key box: short masked multi-line box (1 line in Token mode) */
+        #th-wrapper #selfTransferUI .bt-row .st-keys .sk-key-textarea {
+            width: 100%;
+            box-sizing: border-box;
+            height: 64px !important;
+            min-height: 64px !important;
             max-height: 140px !important;
-            font-size: 0.8rem !important;
+            padding: 6px 40px 6px 10px !important;
+            font-family: var(--font-mono);
+            font-size: 0.72rem !important;
+            line-height: 1.55 !important;
+            resize: vertical;
+        }
+        #th-wrapper #selfTransferUI .bt-row .st-keys .sk-toggle-btn {
+            top: 4px !important;
+            transform: none !important;
+        }
+        #th-wrapper #selfTransferUI[data-mode="token"] .bt-row .st-keys .sk-key-textarea {
+            height: 52px !important;
+            min-height: 52px !important;
+        }
+        #th-wrapper #selfTransferUI .bt-row input[type="text"] {
+            width: 100%;
+            box-sizing: border-box;
+            text-overflow: ellipsis;
         }
 
-        #th-wrapper #selfTransferUI .btn {
-            padding: 10px 8px !important;
-            font-size: 0.82rem !important;
-            min-height: 40px !important;
+/* Count badge JS writes inside the caption ("3 wallets"): keep it plain */
+        #th-wrapper #selfTransferUI #selfTransferKeyCount {
+            background: transparent !important;
+            padding: 0 !important;
+            color: inherit !important;
+            font-size: inherit !important;
+            font-weight: inherit !important;
         }
-
-        #th-wrapper #selfTransferUI .hint {
-            font-size: 0.7rem !important;
-            margin-top: 2px !important;
-            line-height: 1.3 !important;
+        #th-wrapper #selfTransferUI .mk-meta {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            margin-top: 5px;
+            font-size: 0.72rem;
+            line-height: 1.3;
         }
+        #th-wrapper #selfTransferUI .st-hint { color: var(--text-muted); }
 
-        #th-wrapper #selfTransferUI .log-section {
-            height: 250px !important;
-            max-height: 250px !important;
-            min-height: 250px !important;
-            font-size: 0.75rem !important;
+/* Amount card: amount on the left, TXs-per-wallet stepper on the right */
+        #th-wrapper #selfTransferUI .st-txs .bt-cap { display: block; margin-bottom: 3px !important; }
+        #th-wrapper #selfTransferUI .st-txs .bt-stepper { justify-content: flex-end; }
+        #th-wrapper #selfTransferUI[data-mode="token"] .st-chips-native { display: none !important; }
+        #th-wrapper #selfTransferUI .bt-summary { margin-top: 6px; }
+
+/* Gas pill + Execute on one row */
+        #th-wrapper #selfTransferUI .st-act {
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
+        #th-wrapper #selfTransferUI .st-act .bt-gasrow { margin: 0; flex: none; }
+        #th-wrapper #selfTransferUI .st-act .bt-actions { flex: 1; min-width: 0; margin: 0 !important; grid-template-columns: 1fr !important; }
+        #th-wrapper #selfTransferUI .bt-dock { padding-top: 6px; }
 
-        /* Force all grids in selfTransferUI to single column */
-        #th-wrapper #selfTransferUI [style*="grid-template-columns: 1fr 1fr"],
-        #th-wrapper #selfTransferUI [style*="grid-template-columns: 2fr 1fr"],
-        #th-wrapper #selfTransferUI [style*="grid-template-columns: repeat(2"] {
-            grid-template-columns: 1fr !important;
-            gap: 7px !important;
-        }
-
-        /* Mode toggle full width */
-        #th-wrapper #selfTransferUI .mode-toggle-btn {
-            flex: 1 !important;
-            padding: 8px 6px !important;
-            font-size: 0.8rem !important;
-        }
-        /* ===== END SELF TRANSFER UI ===== */
-
+/* Logs: collapsed strip by default. Opening it folds the key box, hint and chips so the log box fits on screen. */
+        #th-wrapper #selfTransferUI .bt-logs { padding: 4px 0 0 !important; }
+        #th-wrapper #selfTransferUI .bt-logs .bt-loghead { height: 36px; }
+        #th-wrapper #selfTransferUI .bt-logs .log-container { height: 130px !important; }
+        #th-wrapper #selfTransferUI.st-logs-open .st-fold { display: none !important; }
+        #th-wrapper #selfTransferUI.st-logs-open .bt-row .bt-head { margin-bottom: 0; }

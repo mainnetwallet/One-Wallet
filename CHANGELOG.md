@@ -6,6 +6,11 @@ Per-build release notes are published on the [Releases](../../releases) page.
 ## [Unreleased]
 
 ### Changed
+- **Self Transfer UI:** now uses the same compact layout as Multi Key Recipients and W2W so everything fits on one phone
+  screen - Native / Token switch, one Wallets card ("Select" button, short masked key box; Token mode adds the token
+  contract on top), an amount field with a TXs-per-wallet stepper and quick amount chips, a `wallets x TXs / Est. total`
+  summary, gas pill and Execute transfer on one row, and a collapsible Logs strip that folds the key box when open.
+  Markup/styling only; element IDs and transfer logic unchanged.
 - **W2W Transfer UI:** now uses the same compact layout as Multi Key Recipients so everything fits on one phone
   screen without scrolling - one grouped card (Sender keys / Receivers, each with a "Select" button, a short masked key
   box and an "N valid" line; a "Only N pairs will run" note when the two lists differ), amount row with quick chips
