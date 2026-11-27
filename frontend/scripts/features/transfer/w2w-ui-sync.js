@@ -3,7 +3,7 @@
 // Presentation glue for the compact Wallet to Wallet layout
 // (html-src/partials/page-transfer-hub/wallet-to-wallet.html).
 // It never writes to wallet, signing or transfer state: it only
-//   * opens/closes the logs box (nothing above it is hidden; it scrolls into view when opened),
+//   * opens/closes the logs box (it only expands downwards: nothing above it changes and nothing scrolls by itself),
 //   * slides the Native/Token thumb,
 //   * mirrors the native coin symbol into the unit labels,
 //   * shows sender / receiver counts, the pair count and the summary line.
@@ -40,10 +40,6 @@
     var willOpen = typeof open === 'boolean' ? open : box.classList.contains('collapsed');
     box.classList.toggle('collapsed', !willOpen);
     if (ui) ui.classList.toggle('w2w-logs-open', willOpen);
-    // Nothing above folds away any more, so if the opened log box ends up below the visible area, bring it into view
-    if (willOpen) setTimeout(function () {
-      try { box.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); } catch (e) { box.scrollIntoView(false); }
-    }, 60);
   };
 
   function nativeSymbol() {

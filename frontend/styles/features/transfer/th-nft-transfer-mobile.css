@@ -159,7 +159,7 @@
         #th-wrapper #nftTransferUI .bt-summary { margin-top: 2px; }
         #th-wrapper #nftTransferUI .nft-progress { margin: 4px 0 !important; }
 
-/* Logs: collapsed strip by default. Opening it never hides or folds anything above. */
+/* Logs: collapsed strip by default. Opening it only expands downwards, nothing above it changes. */
         #th-wrapper #nftTransferUI .bt-logs { padding: 4px 0 0 !important; }
         #th-wrapper #nftTransferUI .bt-logs .bt-loghead { height: 36px; }
         #th-wrapper #nftTransferUI .bt-logs .log-container { height: 130px !important; max-height: none !important; }

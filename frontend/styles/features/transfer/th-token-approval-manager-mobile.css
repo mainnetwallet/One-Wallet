@@ -99,7 +99,7 @@
         #th-wrapper #tokenApprovalManagerUI .ap-clear .material-icons-round { font-size: 20px; color: #f87171; }
         #th-wrapper #tokenApprovalManagerUI .bt-dock { padding-top: 6px; }
 
-/* Logs: collapsed strip by default. Opening it never hides or folds anything above. */
+/* Logs: collapsed strip by default. Opening it only expands downwards, nothing above it changes. */
         #th-wrapper #tokenApprovalManagerUI .bt-logs { padding: 4px 0 0 !important; }
         #th-wrapper #tokenApprovalManagerUI .bt-logs .bt-loghead { height: 36px; }
         #th-wrapper #tokenApprovalManagerUI .bt-logs .log-container { height: 130px !important; max-height: none !important; }

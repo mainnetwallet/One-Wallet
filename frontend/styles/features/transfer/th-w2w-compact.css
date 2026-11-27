@@ -72,7 +72,7 @@
         #th-wrapper #walletToWalletUI .bt-dock { padding-top: 6px; }
         #th-wrapper #walletToWalletUI .bt-dock .progress-bar { margin: 6px 0 0 !important; }
 
-/* Logs: collapsed strip by default. Opening it never hides or folds anything above: the free space between the cards just gets used up. */
+/* Logs: collapsed strip by default. Opening it only expands downwards, nothing above it changes. */
         #th-wrapper #walletToWalletUI .bt-logs { padding: 4px 0 0 !important; }
         #th-wrapper #walletToWalletUI .bt-logs .bt-loghead { height: 36px; }
         #th-wrapper #walletToWalletUI .bt-logs .log-container { height: 130px !important; }
@@ -148,4 +148,11 @@
             width: auto;
             padding: 8px 28px !important;
             white-space: nowrap;
+        }
+
+/* Logs open = only expand downwards: the screen grows by exactly the log box (130px box + 6px header gap), so the free space that spreads the cards
+   stays the same and nothing above moves. The page is simply a bit longer; scrolling to the log box is up to the user. */
+        #th-wrapper #walletToWalletUI.w2w-logs-open {
+            min-height: calc(100vh - var(--nav-height) - env(safe-area-inset-bottom, 0px) - env(safe-area-inset-top, 0px) - 20px + 136px);
+            min-height: calc(100dvh - var(--nav-height) - env(safe-area-inset-bottom, 0px) - env(safe-area-inset-top, 0px) - 20px + 136px);
         }
