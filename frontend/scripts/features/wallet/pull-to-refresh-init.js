@@ -768,11 +768,24 @@ __NX._initPTR = _initPTR;
         return scrollEl.scrollTop <= 0;
       }
 
+      // Bridge page: #page-bridge itself never scrolls (overflow:hidden), the routes list scrolls inside
+      // #br-routes-scroll-area. Pulling is only allowed while that list is at its top, otherwise scrolling
+      // the list back up would count as a pull and refresh (clear) the page.
+      function _innerScrollTop(target) {
+        if (ownPage !== 'bridge') return 0;
+        var sa = document.getElementById('br-routes-scroll-area');
+        return (sa && target && sa.contains(target)) ? sa.scrollTop : 0;
+      }
+
       var startScrollTop = 0;
+      var startInnerTop = 0;
+      var touchTarget = null;
       scrollEl.addEventListener('touchstart', function(e) {
         if (!_canPull()) return;
         startY = e.touches[0].clientY;
         startScrollTop = scrollEl.scrollTop;
+        touchTarget = e.target;
+        startInnerTop = _innerScrollTop(touchTarget);
         pulling = false; triggered = false; pullDist = 0;
       }, { passive: true });
 
@@ -786,12 +799,14 @@ __NX._initPTR = _initPTR;
           if (dy <= 10) return; // not a downward pull gesture
           var _atTop = isOverflowHidden || startScrollTop === 0;
           if (!_atTop) return; // was scrolled down when touch started — ignore
+          if (startInnerTop > 0 || _innerScrollTop(touchTarget) > 0) return; // inner list is scrolled — it is a scroll, not a pull
           pulling = true;
         }
 
         if (dy <= 0) { pulling = false; _setIndicator(0); return; }
         // Cancel if page scrolled during pull
         if (!isOverflowHidden && scrollEl.scrollTop > startScrollTop) { pulling = false; _setIndicator(0); return; }
+        if (_innerScrollTop(touchTarget) > 0) { pulling = false; _setIndicator(0); return; } // inner list scrolled during the gesture
         pullDist = dy;
         // When TH is running use same threshold as normal PTR (260px)
         var _effThresh = PTR_THRESHOLD;

@@ -14,6 +14,10 @@ Per-build release notes are published on the [Releases](../../releases) page.
   Direction is locked after ~8px, a pull from the top of the token list drags the sheet, a scrolled list just scrolls, and
   swiping the dim area above the sheet closes it too. Bridge pickers keep their `!important` CSS states.
 
+- **Bridge: scrolling the routes list triggered pull-to-refresh:** the bridge page never scrolls itself, so pull-to-refresh
+  always saw "at the top" while the routes list scrolled inside it. Dragging the list back up then counted as a pull and
+  could refresh (clear) the page. Pull-to-refresh on Bridge now only starts when the routes list is scrolled to its top.
+
 ### Changed
 - **BRIDGE NOW / SWAP NOW button look:** the button is now a compact pill (fits its content, centred) with a `#e3edb7`
   soft gradient, dark text and a soft tinted shadow, in both dark and light theme. The look now lives in one CSS rule
