@@ -232,6 +232,20 @@ function _smoothSet(el, newText) {
 
   _smoothSetPending.set(el, { text: newText, rafId: rafId });
 }
+// ── _applyCardOrder — re-order token cards ONLY if the order really changed ──
+// appendChild() on an already-attached card detaches + re-inserts it. Doing that for every
+// card on every sort made the whole list flash (logos reload, rows repaint) on each price /
+// balance update. If the order is already correct, touch nothing.
+function _applyCardOrder(listEl, ordered) {
+  if (!listEl || !ordered) return;
+  var current = Array.prototype.filter.call(listEl.children, function(c) {
+    return c.classList && c.classList.contains('token-card');
+  });
+  var same = current.length === ordered.length;
+  for (var i = 0; same && i < ordered.length; i++) { if (current[i] !== ordered[i]) same = false; }
+  if (same) return;
+  ordered.forEach(function(c) { listEl.appendChild(c); });
+}
 // ── _directSet — instant text update, no animation (cache restores, initial render) ──
 function _directSet(el, newText) {
   if (!el || el.textContent === newText) return;
@@ -434,7 +448,7 @@ async function silentPriceRefresh() {
       }
       return parseInt(a.dataset.stableIdx, 10) - parseInt(b.dataset.stableIdx, 10);
     });
-    cards.forEach(c => listEl.appendChild(c));
+    _applyCardOrder(listEl, cards);
   })();
 
   // ── Save balance cache + token snapshot with fresh data (single save after all complete) ──

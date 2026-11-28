@@ -103,6 +103,8 @@ window.addEventListener('load', () => {
     try {
       var _wk = _oneGetSelectedKey();
       if (_wk) return; // wallet exists → skip
+      // Selection is stored but still being decrypted → wallet exists, don't flash the empty state
+      try { if (localStorage.getItem('one_hw_selected_key_v1')) return; } catch(e) {}
       var _tl = document.getElementById('token-list');
       if (!_tl) return;
       // Remove skeletons

@@ -205,6 +205,8 @@ function homeApplyWallet() {
         if (_gpPill2) { _gpPill2.textContent = '$0.00'; _gpPill2.style.opacity = '0.5'; }
       }
     } catch(e) {}
+  } else if (typeof hwSelectedKey !== 'undefined' && hwSelectedKey) {
+    // A wallet IS selected — the dropdown is just mid-repopulate. Don't flash "No Wallet Selected".
   } else {
     // No wallet selected — clear token list, balance, and show empty state
     var _tlEl = document.getElementById('token-list');

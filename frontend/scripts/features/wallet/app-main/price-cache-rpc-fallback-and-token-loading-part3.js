@@ -27,6 +27,9 @@ async function _loadTokensImpl() {
 
   // Preserve portfolio total — only reset if no cards AND no pre-cached total
   const _preExistingCards = list ? list.querySelectorAll('.token-card') : [];
+  // Remember which wallet these cards belong to so a later snapshot-restore for the SAME wallet
+  // can be skipped instead of wiping + rebuilding every card (that was the open-time flicker).
+  try { if (list) list.dataset.nxWallet = String(_currentWalletKey || homeActiveKey || '').slice(-8); } catch (e) {}
   if (_preExistingCards.length === 0) {
     // Only zero out if no pre-cached total was set (from Step 0b)
     if (!(_portfolioTotalUsd > 0)) {
@@ -152,7 +155,7 @@ async function _loadTokensImpl() {
     const allHaveSavedOrder = cards.every(c => c.dataset.savedOrder !== undefined);
     if (allHaveSavedOrder) {
       cards.sort((a, b) => parseInt(a.dataset.savedOrder, 10) - parseInt(b.dataset.savedOrder, 10));
-      cards.forEach(c => listEl.appendChild(c));
+      _applyCardOrder(listEl, cards);
       return;
     }
 
@@ -187,7 +190,7 @@ async function _loadTokensImpl() {
     withoutBalance.sort((a, b) => parseInt(a.dataset.stableIdx, 10) - parseInt(b.dataset.stableIdx, 10));
 
     // Re-append: balance cards first, then no-balance cards
-    [...withBalance, ...withoutBalance].forEach(c => listEl.appendChild(c));
+    _applyCardOrder(listEl, [...withBalance, ...withoutBalance]);
   }
 
   // ── Wallet cache key for balance lookup (wallet-specific, last 8 chars of key) ──

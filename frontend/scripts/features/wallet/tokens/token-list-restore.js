@@ -5,12 +5,19 @@ __NX._restoreTokenList = _restoreTokenList;
   function _restoreTokenList(list) {
     var tokenListEl = document.getElementById('token-list');
     if (!tokenListEl || !list || !list.length) return false;
+    // ── Anti-flicker: app open calls this several times (homePopulateWallets, homeOnWalletChange,
+    // switchPage hook ...). If this wallet's cards are already on screen they are at least as fresh
+    // as the snapshot, so don't wipe + rebuild them (that re-created every card and logo each time).
+    var _wkId = '';
+    try { _wkId = String((typeof homeActiveKey !== 'undefined' && homeActiveKey) || (typeof _oneGetSelectedKey === 'function' && _oneGetSelectedKey()) || '').slice(-8); } catch (e) {}
+    if (_wkId && tokenListEl.dataset.nxWallet === _wkId && tokenListEl.querySelector('.token-card')) return true;
     // Remove skeletons
     ['skel1','skel2','skel3'].forEach(function(id) {
       var el = document.getElementById(id);
       if (el) el.remove();
     });
     tokenListEl.innerHTML = '';
+    if (_wkId) tokenListEl.dataset.nxWallet = _wkId;
     var portfolioFromCache = 0;
     list.forEach(function(item) {
       var tokenId = item.tokenId || '';
