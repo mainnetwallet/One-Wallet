@@ -63,6 +63,12 @@
 .wc-pick.sel { background: rgba(99,102,241,.16); }
 .wc-pick .material-icons-round { color: var(--neon-purple); font-size: 20px; }
 
+/* Connected apps: one card per app, with its own network row */
+.wc-srow { display: flex; align-items: center; gap: 12px; }
+.wc-net { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,.06); }
+.wc-net.wc-tap { cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.wc-net-r { display: inline-flex; align-items: center; gap: 4px; min-width: 0; }
+
 .wc-chips { display: flex; flex-wrap: wrap; gap: 7px; }
 .wc-chip { display: inline-flex; align-items: center; gap: 6px; padding: 5px 11px 5px 5px; border-radius: 999px; font-size: 13px; background: rgba(255,255,255,.07); }
 .wc-chip-ico { width: 22px; height: 22px; border-radius: 50%; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,.1); font-size: 12px; }

@@ -22,9 +22,19 @@ Refused on purpose: `javascript:`, `file:`, `intent:`, `data:` and URLs with a `
   sign / transaction request, Connected apps (Settings > Network), Project ID setup.
 - **Project ID**: WalletConnect needs a free Project ID from <https://cloud.reown.com>. The first pairing asks for it once and stores it in
   `localStorage` (`one_wc_project_id`). To ship a default, set it in `wcGetProjectId()`.
-- Supported requests: `personal_sign`, `eth_signTypedData(_v3/_v4)`, `eth_sendTransaction`. `wallet_switchEthereumChain` is acknowledged (the session already
-  lists every allowed chain). `eth_sign`, `eth_signTransaction` and `wallet_addEthereumChain` are refused. Every sign/send shows a sheet; unlimited ERC-20
+- Supported requests: `personal_sign`, `eth_signTypedData(_v3/_v4)`, `eth_sendTransaction`, `wallet_switchEthereumChain`, `wallet_addEthereumChain`.
+  `eth_sign` and `eth_signTransaction` are refused. Every sign/send shows a sheet; unlimited ERC-20
   approvals and `setApprovalForAll` get a red warning. Requests for a chain that is not added in One Wallet are refused.
+- **Transaction history**: every `eth_sendTransaction` the user confirms is saved in `one_tx_history` (Profile > Transaction History, filter "Send") as soon
+  as it is broadcast, with the app name in the row details and in the search. A background wait for the receipt flips it to FAILED if it reverts
+  (`wc-engine.js`: `wcBuildTxHistoryEntry`, `_wcRecordTx`).
+- **`wallet_addEthereumChain`** (EIP-3085): the params are checked first (`wcParseAddChain`: hex `chainId`, name, 18-decimal native currency, at least one
+  `https` RPC; `http`/`wss` URLs and URLs with user:password are dropped, max 5 RPCs). A network that is already in One Wallet is just shared with the
+  session (its RPC is never replaced). A new one opens an **Add network** sheet showing name, chain ID, currency, RPC and explorer; only after "Add network" it is
+  saved with the other custom networks (same record as Add custom network) and added to the session (`updateSession`). Reject answers 4001, bad params -32602.
+- **Network per app** (`one_wc_session_chain` = `{ topic: chainId }`): Settings > Connected apps shows each app's network; tapping it lists the networks that
+  session was given and a pick sends the app a `chainChanged` event. `wallet_switchEthereumChain` from the app does the same when the chain is in the
+  session, otherwise it is answered 4902 (so the app can call `wallet_addEthereumChain`). The pick is dropped when the session ends.
 - Sessions are stored by WalletKit (localStorage). `one_wc_has_sessions` makes the app reopen the relay after start so requests arrive; requests only
   arrive while the app is open (no push yet).
 
@@ -45,7 +55,8 @@ cp walletconnect.min.js ../frontend/vendor/
 
 ### Tests
 
-`node tools/wc-selftest.js` (no network): proposal analysis, `buildApprovedNamespaces`, project-id validation.
+`node tools/wc-selftest.js` (no network): proposal analysis, `buildApprovedNamespaces`, project-id validation, chain id / add-chain parsing,
+per-session network, and the request flow (switch, add, send -> History, revert -> failed) against a stub WalletKit.
 `python3 tools/check_assets.py` and `python3 tools/build_html.py --check` as usual.
 
 ### Troubleshooting pairing

@@ -39,7 +39,7 @@ function _wcAllWallets() {
         var addr = new ethers.Wallet(pk).address;
         out.push({
           address: addr, key: pk, group: g.name || ('Group ' + (gi + 1)),
-          label: (g.labels && g.labels[ki]) ? g.labels[ki] : ('Wallet ' + (ki + 1)), groupId: g.id
+          label: (g.labels && g.labels[ki]) ? g.labels[ki] : ('Wallet ' + (ki + 1)), groupId: g.id, idx: ki + 1
         });
       } catch (e) {}
     });
@@ -62,6 +62,104 @@ function _wcHomeAddress() {
 function _wcSupportedChainIds() {
   try { return getAllChains().map(function (c) { return c.chainId; }); } catch (e) { return [1]; }
 }
+function _wcFindChain(chainId) {
+  try { return getAllChains().filter(function (c) { return c.chainId === chainId; })[0] || null; } catch (e) { return null; }
+}
+
+// ── Pure helpers (unit-tested in tools/wc-selftest.js) ──
+var WC_CHAIN_KEY = 'one_wc_session_chain';   // { <session topic>: chainId } the network picked for each connected app
+var WC_FN_NAMES = { '0xa9059cbb': 'transfer', '0x095ea7b3': 'approve', '0x23b872dd': 'transferFrom', '0x42842e0e': 'safeTransferFrom', '0xa22cb465': 'setApprovalForAll' };
+
+// A chain id as a dApp sends it ('0x89', 137 or '137') -> 137. NaN unless it is a positive safe integer.
+function wcParseChainId(v) {
+  var n = NaN;
+  if (typeof v === 'number') n = v;
+  else if (typeof v === 'string') {
+    v = v.trim();
+    if (/^0x[0-9a-f]+$/i.test(v)) n = parseInt(v, 16); else if (/^[0-9]+$/.test(v)) n = parseInt(v, 10);
+  }
+  return (isFinite(n) && n > 0 && Math.floor(n) === n && n <= Number.MAX_SAFE_INTEGER) ? n : NaN;
+}
+
+// Only https links without user:password are kept (the text is returned as the dApp sent it)
+function _wcHttps(u) {
+  try {
+    var s = String(u).trim(), x = new URL(s);
+    return (x.protocol === 'https:' && !x.username && !x.password && x.hostname && s.length <= 300) ? s : '';
+  } catch (e) { return ''; }
+}
+
+// wallet_addEthereumChain (EIP-3085) params[0] -> { ok, chain } or { ok:false, error }.
+// Needs a hex chainId, a name, an 18-decimal native currency and at least one https RPC.
+function wcParseAddChain(p) {
+  p = p || {};
+  var chainId = (typeof p.chainId === 'string' && /^0x/i.test(p.chainId)) ? wcParseChainId(p.chainId) : NaN;
+  if (isNaN(chainId)) return { ok: false, error: 'Invalid chainId (must be a 0x hex string)' };
+  var name = String(p.chainName || '').replace(/[\u0000-\u001f]/g, '').trim();
+  if (!name || name.length > 60) return { ok: false, error: 'Invalid chainName' };
+  var nc = p.nativeCurrency || {};
+  var symbol = String(nc.symbol || '').trim();
+  if (!/^[A-Za-z0-9$._-]{1,16}$/.test(symbol)) return { ok: false, error: 'Invalid nativeCurrency symbol' };
+  if (nc.decimals !== 18) return { ok: false, error: 'Only networks with an 18-decimal native currency are supported' };
+  var rpcs = [];
+  (Array.isArray(p.rpcUrls) ? p.rpcUrls : []).forEach(function (u) {
+    var s = _wcHttps(u);
+    if (s && rpcs.indexOf(s) < 0 && rpcs.length < 5) rpcs.push(s);
+  });
+  if (!rpcs.length) return { ok: false, error: 'rpcUrls needs at least one https URL' };
+  var explorer = '';
+  (Array.isArray(p.blockExplorerUrls) ? p.blockExplorerUrls : []).some(function (u) {
+    var s = _wcHttps(u); if (s) { explorer = s.replace(/\/+$/, ''); return true; } return false;
+  });
+  return { ok: true, chain: { chainId: chainId, name: name, symbol: symbol, decimals: 18, rpcs: rpcs, explorer: explorer } };
+}
+
+// Chains of a connected session (numbers) that One Wallet still has; supportedIds = null skips that filter
+function wcSessionChains(session, supportedIds) {
+  var ns = (session && session.namespaces && session.namespaces.eip155) || {};
+  var refs = ns.chains || (ns.accounts || []).map(function (a) { return String(a).split(':').slice(0, 2).join(':'); });
+  var out = [];
+  refs.forEach(function (c) {
+    var id = parseInt(String(c).split(':')[1], 10);
+    if (id && out.indexOf(id) < 0 && (!supportedIds || supportedIds.indexOf(id) >= 0)) out.push(id);
+  });
+  return out;
+}
+// The network a session is on: the one picked earlier when it is still in the session, else its first chain
+function wcPickActiveChain(session, stored, supportedIds) {
+  var chains = wcSessionChains(session, supportedIds);
+  return chains.indexOf(stored) >= 0 ? stored : (chains[0] || null);
+}
+function _wcChainMap() { try { return JSON.parse(localStorage.getItem(WC_CHAIN_KEY) || '{}') || {}; } catch (e) { return {}; } }
+function _wcSaveChain(topic, chainId) {
+  var m = _wcChainMap(); m[topic] = chainId;
+  try { localStorage.setItem(WC_CHAIN_KEY, JSON.stringify(m)); } catch (e) {}
+}
+function _wcDropChain(topic) {
+  var m = _wcChainMap(); if (!(topic in m)) return;
+  delete m[topic];
+  try { localStorage.setItem(WC_CHAIN_KEY, JSON.stringify(m)); } catch (e) {}
+}
+function wcGetSessionChain(session) { return wcPickActiveChain(session, _wcChainMap()[session && session.topic], _wcSupportedChainIds()); }
+
+// History row for an eth_sendTransaction a dApp asked for. Same shape as a Send entry, so History lists it under "Sent".
+// o: { ctx, hash, to, data, value ('0.01' / '0'), symbol, wallet ({ idx, groupId }) }
+function wcBuildTxHistoryEntry(o) {
+  var ctx = o.ctx || {}, peer = ctx.peer || {}, w = o.wallet || {};
+  var data = String(o.data || '0x'), sel = data.length >= 10 ? data.slice(0, 10).toLowerCase() : '';
+  var hasVal = parseFloat(o.value) > 0;
+  var left = hasVal ? (o.value + ' ' + o.symbol) : (data === '0x' ? '0 ' + o.symbol : (WC_FN_NAMES[sel] ? WC_FN_NAMES[sel] + '()' : 'Contract call'));
+  var host = ''; try { host = new URL(peer.url).hostname.replace(/^www\./, ''); } catch (e) {}
+  var e = {
+    type: 'send', hash: o.hash, chainId: ctx.chainId, fromChainId: ctx.chainId,
+    pair: left + ' → ' + (o.to ? String(o.to).slice(0, 8) + '…' : 'New contract'),
+    wallet: ctx.from, isDry: false, dapp: peer.name || host || 'WalletConnect', source: 'walletconnect'
+  };
+  if (hasVal) { e.fromAmt = o.value; e.fromToken = o.symbol; }
+  if (w.idx) e.walletIndex = w.idx;
+  if (w.groupId) e.groupId = w.groupId;
+  return e;
+}
 
 // ── Init (lazy; the 800 KB bundle is already in the page, init only opens the relay connection) ──
 function wcInit() {
@@ -81,7 +179,7 @@ function wcInit() {
     });
     kit.on('session_proposal', _wcOnProposal);
     kit.on('session_request', _wcOnRequest);
-    kit.on('session_delete', function () { _wcSyncFlag(); if (typeof wcSessionsChanged === 'function') wcSessionsChanged(); });
+    kit.on('session_delete', function (ev) { _wcDropChain(ev && ev.topic); _wcSyncFlag(); if (typeof wcSessionsChanged === 'function') wcSessionsChanged(); });
     _wcKit = kit;
     _wcSyncFlag();
     return kit;
@@ -205,8 +303,55 @@ async function wcDisconnect(topic) {
     var kit = await wcInit();
     await kit.disconnectSession({ topic: topic, reason: OneWC.getSdkError('USER_DISCONNECTED') });
   } catch (e) {}
+  _wcDropChain(topic);
   _wcSyncFlag();
   if (typeof wcSessionsChanged === 'function') wcSessionsChanged();
+}
+
+// ── Per-session network ──
+// Each connected app has its own network (Connected apps > pick one). The dApp is told with a chainChanged event.
+function _wcEmitChainChanged(kit, topic, chainId) {
+  // best effort: the app may not have asked for chainChanged, and that must never be an error for the user
+  try {
+    kit.emitSessionEvent({ topic: topic, event: { name: 'chainChanged', data: chainId }, chainId: 'eip155:' + chainId }).catch(function () {});
+  } catch (e) {}
+}
+async function wcSwitchSessionChain(topic, chainId) {
+  var kit = await wcInit();
+  var s = kit.getActiveSessions()[topic];
+  if (!s) throw new Error('This app is no longer connected');
+  if (wcSessionChains(s, _wcSupportedChainIds()).indexOf(chainId) < 0) throw new Error('This app was not given that network');
+  _wcSaveChain(topic, chainId);
+  _wcEmitChainChanged(kit, topic, chainId);
+  return chainId;
+}
+
+// Give a connected app a network it did not have (used after wallet_addEthereumChain). false = could not update.
+async function wcExtendSession(topic, chainId) {
+  try {
+    var kit = await wcInit();
+    var s = kit.getActiveSessions()[topic];
+    if (!s) return false;
+    var ns = s.namespaces.eip155, ref = 'eip155:' + chainId;
+    if ((ns.chains || []).indexOf(ref) >= 0) return true;
+    var addr = wcSessionAddress(s);
+    await kit.updateSession({ topic: topic, namespaces: { eip155: {
+      chains: (ns.chains || []).concat(ref), methods: ns.methods, events: ns.events, accounts: (ns.accounts || []).concat(ref + ':' + addr)
+    } } });
+    return true;
+  } catch (e) { return false; }
+}
+
+// The user approved wallet_addEthereumChain: save the network like Add custom network does, then answer the app
+async function wcApplyAddChain(ctx, c) {
+  if (!_wcFindChain(c.chainId)) {
+    var obj = { id: 'custom-' + c.chainId, chainId: c.chainId, emoji: '🔗', name: c.name, nativeSym: c.symbol,
+                rpc: c.rpcs[0], rpcs: c.rpcs.slice(), explorer: c.explorer || '', builtIn: false, color: '#6366f1', logoURI: null };
+    var list = loadCustomChains(); list.push(obj); saveCustomChains(list);
+    if (typeof window.brSyncChainToPicker === 'function') { try { window.brSyncChainToPicker(obj); } catch (e) {} }
+  }
+  await wcExtendSession(ctx.topic, c.chainId);
+  await _wcRespond(ctx.topic, ctx.id, null);
 }
 function wcSessionAddress(session) {
   try {
@@ -239,11 +384,28 @@ function _wcOnRequest(ev) {
     _wcRespondError(topic, id, 4902, 'Chain ' + chainId + ' is not added in One Wallet'); _wcToast('Network ' + chainId + ' is not added in One Wallet', 'error'); return;
   }
   switch (method) {
-    case 'wallet_switchEthereumChain':
-      // the session already lists every chain we allowed; switching inside it is just an acknowledgement
-      _wcRespond(topic, id, null); return;
-    case 'wallet_addEthereumChain':
-      _wcRespondError(topic, id, 4200, 'Add the network in One Wallet first'); return;
+    case 'wallet_switchEthereumChain': {
+      // EIP-3326: only networks this session was given; anything else is 4902 so the app can try wallet_addEthereumChain
+      var raw = (params[0] || {}).chainId, want = wcParseChainId(raw);
+      if (isNaN(want) || wcSessionChains(session, _wcSupportedChainIds()).indexOf(want) < 0) {
+        _wcRespondError(topic, id, 4902, 'Chain ' + String(raw).slice(0, 20) + ' is not available in this session'); return;
+      }
+      _wcSaveChain(topic, want);
+      _wcRespond(topic, id, null).then(function () { _wcEmitChainChanged(_wcKit, topic, want); });
+      if (typeof wcSessionsChanged === 'function') wcSessionsChanged();
+      return;
+    }
+    case 'wallet_addEthereumChain': {
+      // EIP-3085: a new network needs the user's OK (its RPC sees the wallet's activity); one that is already added is just shared
+      var parsed = wcParseAddChain(params[0]);
+      if (!parsed.ok) { _wcRespondError(topic, id, -32602, parsed.error); return; }
+      if (_wcFindChain(parsed.chain.chainId)) {
+        wcExtendSession(topic, parsed.chain.chainId).then(function () { _wcRespond(topic, id, null); });
+        return;
+      }
+      if (typeof wcShowAddChainSheet === 'function') { wcShowAddChainSheet(ctx, parsed.chain); return; }
+      _wcRespondError(topic, id, 4001, 'User rejected'); return;
+    }
     case 'eth_sign': case 'eth_signTransaction':
       _wcRespondError(topic, id, 4200, method + ' is not supported'); return;
     case 'personal_sign': case 'eth_signTypedData': case 'eth_signTypedData_v3': case 'eth_signTypedData_v4': case 'eth_sendTransaction':
@@ -283,9 +445,36 @@ async function wcExecuteRequest(ctx) {
     if (t.maxPriorityFeePerGas) tx.maxPriorityFeePerGas = BigInt(t.maxPriorityFeePerGas);
     if (t.gasPrice && !t.maxFeePerGas) tx.gasPrice = BigInt(t.gasPrice);
     var sent = await w.sendTransaction(tx);
+    _wcRecordTx(ctx, t, sent.hash, provider);
     return sent.hash;
   }
   throw new Error('Unsupported method');
+}
+
+// Put a sent transaction in History (Profile > Transaction History). Never lets a History problem stop the answer to the app.
+function _wcRecordTx(ctx, t, hash, provider) {
+  try {
+    if (typeof saveTxToHistory !== 'function') return;
+    var wl = _wcAllWallets().filter(function (x) { return x.address.toLowerCase() === String(ctx.from).toLowerCase(); })[0] || {};
+    var sym = (typeof _getChainSymbol === 'function') ? _getChainSymbol(ctx.chainId) : 'ETH';
+    var val = '0';
+    try { val = (typeof _fmtValue === 'function') ? _fmtValue(t.value, ctx.chainId) : (t.value ? ethers.formatEther(BigInt(t.value)) : '0'); } catch (e) {}
+    var saved = saveTxToHistory(wcBuildTxHistoryEntry({ ctx: ctx, hash: hash, to: t.to, data: t.data || t.input || '0x', value: val, symbol: sym, wallet: wl }));
+    // an entry is saved as soon as the tx is broadcast; if it later reverts it must not stay "confirmed"
+    if (saved && saved.id && provider && typeof provider.waitForTransaction === 'function') {
+      provider.waitForTransaction(hash, 1, 180000).then(function (r) { if (r && r.status === 0) _wcMarkTxFailed(saved.id); }).catch(function () {});
+    }
+  } catch (e) {}
+}
+function _wcMarkTxFailed(id) {
+  try {
+    var all = loadTxHistory(), tx = all.filter(function (x) { return x.id === id; })[0];
+    if (!tx) return;
+    tx.failed = true; tx.failReason = 'Transaction reverted on-chain';
+    saveTxHistory(all);
+    if (typeof renderTxHistory === 'function') renderTxHistory();
+    if (typeof updateTxMenuBadge === 'function') updateTxMenuBadge();
+  } catch (e) {}
 }
 
 window.addEventListener('load', function () { setTimeout(wcBootIfSessions, 2500); });

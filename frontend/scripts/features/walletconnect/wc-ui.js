@@ -1,6 +1,6 @@
 // ── WalletConnect sheets ──────────────────────────────────────
 // One bottom-sheet container (#wc-overlay > #wc-sheet) renders every WalletConnect screen:
-// connecting spinner, connect-confirm, sign / transaction request, connected apps, project-id setup.
+// connecting spinner, connect-confirm, sign / transaction request, add network, connected apps, project-id setup.
 // Engine calls (wc-engine.js): wcApproveProposal, wcRejectProposal, wcExecuteRequest, wcDisconnect ...
 var WCUI = { screen: null, state: null, queue: [], busy: false };
 
@@ -70,6 +70,7 @@ function wcUiBack() {
   if (WCUI.busy) return;
   if (WCUI.screen === 'connect') return WCUI.reject();
   if (WCUI.screen === 'request') return WCUI.rejectRequest();
+  if (WCUI.screen === 'addchain') return WCUI.rejectAddChain();
   wcCloseSheet();
 }
 
@@ -175,7 +176,6 @@ WCUI.approve = async function () {
 };
 
 // ── 3. Sign / transaction request ──
-var _WC_SEL = { '0xa9059cbb': 'transfer', '0x095ea7b3': 'approve', '0x23b872dd': 'transferFrom', '0x42842e0e': 'safeTransferFrom', '0xa22cb465': 'setApprovalForAll' };
 function _wcDecodeMsg(m) {
   try {
     if (typeof m === 'string' && /^0x([0-9a-fA-F]{2})*$/.test(m)) return new TextDecoder('utf-8', { fatal: false }).decode(ethers.getBytes(m));
@@ -222,7 +222,7 @@ function _wcRenderRequest() {
     var val = (typeof _fmtValue === 'function') ? _fmtValue(t.value, ctx.chainId) : (t.value || '0');
     var data = String(t.data || t.input || '0x');
     var sel = data.length >= 10 ? data.slice(0, 10).toLowerCase() : '';
-    var fn = _WC_SEL[sel];
+    var fn = WC_FN_NAMES[sel];
     rows += '<div class="wc-row"><span>To</span><b class="mono">' + _wcEsc(_wcShort(t.to || 'New contract')) + '</b></div>';
     if (val !== '0' || data === '0x') rows += '<div class="wc-row"><span>Value</span><b class="hi">' + _wcEsc(val + ' ' + sym) + '</b></div>';
     if (data !== '0x') rows += '<div class="wc-row"><span>Action</span><b>' + _wcEsc(fn ? fn + '()' : 'Contract call (' + (sel || 'data') + ')') + '</b></div>';
@@ -273,34 +273,104 @@ WCUI.approveRequest = async function () {
   }
 };
 
-// ── 4. Connected apps ──
-function wcOpenSessions() {
-  var render = function () {
-    var list = wcListSessions();
-    var items = list.map(function (s) {
-      var p = (s.peer && s.peer.metadata) || {}, addr = wcSessionAddress(s);
-      var n = (s.namespaces && s.namespaces.eip155 && s.namespaces.eip155.chains || []).length;
-      return '<div class="wc-card">' + _wcDappIcon(p, 'sm') + '<div class="wc-grow"><div class="wc-v">' + _wcEsc(p.name || 'App') + '</div>' +
-        '<div class="wc-mono">' + _wcEsc(_wcHost(p.url)) + ' · ' + _wcEsc(_wcShort(addr)) + '</div></div>' +
-        '<button class="wc-mini" onclick="WCUI.disconnect(\'' + _wcEsc(s.topic) + '\')">Disconnect</button></div>';
-    }).join('');
-    _wcRender('<div class="wc-h left" style="margin:2px 0 12px">Connected apps</div>' +
-      (items || '<div class="wc-empty"><span class="material-icons-round">link_off</span><div>No connected apps</div><div class="wc-sub">Scan a WalletConnect QR code from any app or website to connect.</div></div>') +
-      '<div class="wc-actions"><button class="wc-btn ghost" onclick="wcCloseSheet()">Close</button>' +
-      '<button class="wc-btn primary" onclick="wcCloseSheet();setTimeout(homeScanBtnClick,250)">Scan QR</button></div>');
-  };
+// ── 4. wallet_addEthereumChain: confirm a network an app wants to add ──
+function wcShowAddChainSheet(ctx, chain) {
   _wcEnqueueOrRun(function () {
-    _wcOpen('sessions', '', null);
-    if (!wcGetProjectId()) { render(); return; }
-    render();
-    wcInit().then(render).catch(function () {});
+    if (WCUI.screen === 'connecting') { WCUI.screen = null; }
+    _wcOpen('addchain', '', { ctx: ctx, chain: chain });
+    _wcRenderAddChain();
   });
 }
-WCUI.disconnect = async function (topic) { await wcDisconnect(topic); if (WCUI.screen === 'sessions') wcOpenSessionsRefresh(); };
-function wcOpenSessionsRefresh() { if (WCUI.screen === 'sessions') { wcCloseSheet(); setTimeout(wcOpenSessions, 300); } }
-function wcSessionsChanged() { wcOpenSessionsRefresh(); }
+function _wcRenderAddChain() {
+  var st = WCUI.state; if (!st) return;
+  var ctx = st.ctx, c = st.chain, peer = ctx.peer || {};
+  var vb = _wcVerifyBadge(ctx.verified, peer);
+  var rows =
+    '<div class="wc-row"><span>Name</span><b>' + _wcEsc(c.name) + '</b></div>' +
+    '<div class="wc-row"><span>Chain ID</span><b class="mono">' + _wcEsc(c.chainId) + '</b></div>' +
+    '<div class="wc-row"><span>Currency</span><b>' + _wcEsc(c.symbol) + '</b></div>' +
+    '<div class="wc-row"><span>RPC</span><b class="mono">' + _wcEsc(c.rpcs[0]) + '</b></div>' +
+    (c.rpcs.length > 1 ? '<div class="wc-row"><span>More RPCs</span><b>' + (c.rpcs.length - 1) + '</b></div>' : '') +
+    (c.explorer ? '<div class="wc-row"><span>Explorer</span><b class="mono">' + _wcEsc(c.explorer) + '</b></div>' : '');
+  var danger = vb.level === 'bad';
+  _wcRender(
+    '<div class="wc-head sm">' + _wcDappIcon(peer, 'sm') + '<div class="wc-grow"><div class="wc-h left">Add network</div>' +
+    '<div class="wc-sub left">' + _wcEsc(peer.name || 'App') + ' · ' + _wcEsc(_wcHost(peer.url)) + '</div></div>' + vb.html + '</div>' +
+    (vb.warn ? '<div class="wc-warn bad"><span class="material-icons-round">warning_amber</span><div>' + _wcEsc(vb.warn) + '</div></div>' : '') +
+    '<div class="wc-card col">' + rows + '</div>' +
+    '<div class="wc-warn' + (danger ? ' bad' : '') + '"><span class="material-icons-round">info</span><div>Only add networks you trust. The RPC server can see your wallet address and activity, and can show wrong balances.</div></div>' +
+    '<div id="wc-err" class="wc-err" style="display:none"></div>' +
+    '<div class="wc-actions"><button class="wc-btn ghost" onclick="WCUI.rejectAddChain()">Reject</button>' +
+    '<button id="wc-go" class="wc-btn ' + (danger ? 'danger' : 'primary') + '" onclick="WCUI.approveAddChain()">Add network</button></div>');
+}
+WCUI.rejectAddChain = function () {
+  var st = WCUI.state; if (!st || WCUI.busy) return;
+  var ctx = st.ctx; wcCloseSheet();
+  _wcRespondError(ctx.topic, ctx.id, 4001, 'User rejected');
+};
+WCUI.approveAddChain = async function () {
+  var st = WCUI.state; if (!st || WCUI.busy) return;
+  var ctx = st.ctx, c = st.chain; WCUI.busy = true;
+  var b = document.getElementById('wc-go'); if (b) { b.disabled = true; b.innerHTML = '<span class="wc-spin sm"></span>'; }
+  try {
+    await wcApplyAddChain(ctx, c);
+    WCUI.busy = false; wcCloseSheet();
+    _wcToast('Network added: ' + c.name, 'add_circle');
+  } catch (e) {
+    WCUI.busy = false;
+    var er = document.getElementById('wc-err'); if (er) { er.style.display = 'flex'; er.textContent = String((e && e.message) || e).slice(0, 160); }
+    if (b) { b.disabled = false; b.textContent = 'Add network'; }
+  }
+};
 
-// ── 5. Project ID setup ──
+// ── 5. Connected apps (each app has its own network) ──
+function wcOpenSessions() {
+  _wcEnqueueOrRun(function () {
+    _wcOpen('sessions', '', { pick: null });
+    _wcRenderSessions();
+    if (wcGetProjectId()) wcInit().then(function () { if (WCUI.screen === 'sessions') _wcRenderSessions(); }).catch(function () {});
+  });
+}
+function _wcRenderSessions() {
+  if (WCUI.screen !== 'sessions') return;
+  var st = WCUI.state || (WCUI.state = { pick: null });
+  var sup = _wcSupportedChainIds();
+  var items = wcListSessions().map(function (s) {
+    var p = (s.peer && s.peer.metadata) || {}, addr = wcSessionAddress(s);
+    var chains = wcSessionChains(s, sup), active = wcGetSessionChain(s), topic = _wcEsc(s.topic);
+    var multi = chains.length > 1, open = multi && st.pick === s.topic;
+    var net = active ? '<div class="wc-net' + (multi ? ' wc-tap' : '') + '"' + (multi ? ' onclick="WCUI.toggleChains(\'' + topic + '\')"' : '') + '>' +
+      '<span class="wc-k">Network</span><span class="wc-net-r">' + _wcChainChip('eip155:' + active) +
+      (multi ? '<span class="material-icons-round wc-chev">' + (open ? 'expand_less' : 'expand_more') + '</span>' : '') + '</span></div>' : '';
+    var picker = open ? '<div class="wc-picker">' + chains.map(function (id) {
+      var nm = (typeof _getChainName === 'function') ? _getChainName(id) : ('Chain ' + id);
+      return '<div class="wc-pick' + (id === active ? ' sel' : '') + '" onclick="WCUI.chooseChain(\'' + topic + '\',' + id + ')">' +
+        '<div class="wc-grow"><div class="wc-v">' + _wcEsc(nm) + '</div></div>' + (id === active ? '<span class="material-icons-round">check</span>' : '') + '</div>';
+    }).join('') + '</div>' : '';
+    return '<div class="wc-card col"><div class="wc-srow">' + _wcDappIcon(p, 'sm') + '<div class="wc-grow"><div class="wc-v">' + _wcEsc(p.name || 'App') + '</div>' +
+      '<div class="wc-mono">' + _wcEsc(_wcHost(p.url)) + ' · ' + _wcEsc(_wcShort(addr)) + '</div></div>' +
+      '<button class="wc-mini" onclick="WCUI.disconnect(\'' + topic + '\')">Disconnect</button></div>' + net + picker + '</div>';
+  }).join('');
+  _wcRender('<div class="wc-h left" style="margin:2px 0 12px">Connected apps</div>' +
+    (items || '<div class="wc-empty"><span class="material-icons-round">link_off</span><div>No connected apps</div><div class="wc-sub">Scan a WalletConnect QR code from any app or website to connect.</div></div>') +
+    '<div class="wc-actions"><button class="wc-btn ghost" onclick="wcCloseSheet()">Close</button>' +
+    '<button class="wc-btn primary" onclick="wcCloseSheet();setTimeout(homeScanBtnClick,250)">Scan QR</button></div>');
+}
+WCUI.toggleChains = function (topic) {
+  var st = WCUI.state; if (!st || WCUI.screen !== 'sessions') return;
+  st.pick = (st.pick === topic ? null : topic); _wcRenderSessions();
+};
+WCUI.chooseChain = async function (topic, chainId) {
+  try {
+    await wcSwitchSessionChain(topic, chainId);
+    var st = WCUI.state; if (st && WCUI.screen === 'sessions') { st.pick = null; _wcRenderSessions(); }
+    _wcToast('Network: ' + ((typeof _getChainName === 'function') ? _getChainName(chainId) : chainId), 'swap_horiz');
+  } catch (e) { _wcToast(String((e && e.message) || e).slice(0, 80), 'error'); }
+};
+WCUI.disconnect = async function (topic) { await wcDisconnect(topic); _wcRenderSessions(); };
+function wcSessionsChanged() { _wcRenderSessions(); }
+
+// ── 6. Project ID setup ──
 function wcOpenProjectIdSheet(pendingUri) {
   _wcEnqueueOrRun(function () {
     _wcOpen('pid', '', { uri: pendingUri || null });
