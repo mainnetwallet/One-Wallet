@@ -88,6 +88,9 @@
 <link rel="stylesheet" href="styles/features/transfer/th-hub-home-redesign.css">
 <link rel="stylesheet" href="styles/features/transfer/th-withdraw-manager-theme.css">
   <script src="scripts/core/clipboard-paste.js"></script>
+  <!-- Swipe-to-close (one gesture for every drawer and sheet). Loaded first so every script below can use it -->
+  <script src="scripts/shared/ui/sheet-swipe-close.js"></script>
+  <script src="scripts/shared/ui/swipe-close-registry.js"></script>
 </head>
 <body>
 
@@ -309,7 +312,6 @@
 <script src="scripts/features/wallet/app-main/token-chain-picker-modal.js"></script>
 <script src="scripts/features/wallet/app-main/add-token-on-chain.js"></script>
 <script src="scripts/shared/ui/wallet-drawer-ui.js"></script>
-<script src="scripts/shared/ui/sheet-swipe-close.js"></script>
 <script src="scripts/features/wallet/app-main/send-state-and-chain-config.js"></script>
 <script src="scripts/features/wallet/app-main/token-chain-picker-and-send-selected-box-part2.js"></script>
 <script src="scripts/features/wallet/app-main/send-selected-box-and-key-list.js"></script>
@@ -452,7 +454,7 @@
   <!-- ╔══════ TH UNIVERSAL WALLET PICKER — JavaScript ══════╗ -->
   <script src="scripts/features/transfer/wallet-picker/wallet-picker-state-and-render.js"></script>
   <script src="scripts/features/transfer/wallet-picker/wallet-picker-open-and-selection.js"></script>
-  <script src="scripts/features/transfer/wallet-picker/wallet-picker-sync-and-swipe.js"></script>
+  <script src="scripts/features/transfer/wallet-picker/wallet-picker-sync.js"></script>
   <!-- ╚══════ /TH UNIVERSAL WALLET PICKER — JavaScript ══════╝ -->
 
   <!-- ╔══════ TH CHAIN PICKER — JavaScript ══════╗ -->

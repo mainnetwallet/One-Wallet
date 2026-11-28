@@ -74,39 +74,3 @@
       target.dispatchEvent(new Event('change', { bubbles: true }));
     } catch(_e) {}
   }
-
-  // ── Right-swipe to close ──
-  (function() {
-    var attached = false;
-    var _origOpen = window.thOpenWalletPicker;
-    window.thOpenWalletPicker = function() {
-      _origOpen.apply(this, arguments);
-      if (attached) return;
-      attached = true;
-      var drawer = document.getElementById('th-wallet-picker-drawer');
-      if (!drawer) return;
-      var startX = 0, startY = 0, tracking = false, swiping = false;
-      drawer.addEventListener('touchstart', function(e) {
-        startX = e.touches[0].clientX; startY = e.touches[0].clientY;
-        tracking = true; swiping = false;
-      }, { passive: true });
-      drawer.addEventListener('touchmove', function(e) {
-        if (!tracking) return;
-        var dx = e.touches[0].clientX - startX;
-        var dy = Math.abs(e.touches[0].clientY - startY);
-        if (!swiping && Math.abs(dx) > 8) {
-          if (Math.abs(dx) > dy) { swiping = true; } else { tracking = false; return; }
-        }
-        if (swiping && dx > 0) { drawer.style.transition = 'none'; drawer.style.transform = 'translateX(' + dx + 'px)'; }
-      }, { passive: true });
-      drawer.addEventListener('touchend', function(e) {
-        if (!swiping) { tracking = false; return; }
-        var dx = e.changedTouches[0].clientX - startX;
-        drawer.style.transition = '';
-        if (dx > 72) { window.thCloseWalletPicker && window.thCloseWalletPicker(); }
-        else { drawer.style.transform = 'translateX(0)'; }
-        tracking = false; swiping = false;
-      }, { passive: true });
-    };
-  })();
-  

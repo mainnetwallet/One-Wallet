@@ -6,6 +6,15 @@ Per-build release notes are published on the [Releases](../../releases) page.
 ## [Unreleased]
 
 ### Changed
+- **Swipe to close (same everywhere):** every side drawer now closes with a swipe right and every bottom sheet with a swipe down, using ONE gesture
+  (`sheet-swipe-close.js`) instead of about ten separate copies that behaved differently (80px / 72px / 60px / 55px thresholds, some with no
+  flick, some that froze half-way when the WebView cancelled the touch, some that ignored a sideways wobble). Now: direction locks after 8px,
+  closes at 60px or a quick flick, light resistance near the end, snaps back otherwise, a touch cancel or the app losing focus always finishes
+  the gesture, and a list scrolled away from its top scrolls instead of closing. Swiping the dim area closes too. Drawers: Swap / Bridge
+  wallet panels, Delegation group, Connected Wallets, Browser wallet (new), RPC manager, Swap wallet, Send from / to, Home chain group,
+  Base Swap Bot, Transfer Hub and Smart Wallet pickers. Sheets: token action, token remove, add-token chain list, swap / bridge / send
+  confirm, currency, token chain, exchange selector / pair, send / chain / history pickers. The list of who uses it is one file
+  (`swipe-close-registry.js`); `wallet-picker-sync-and-swipe.js` is now `wallet-picker-sync.js`. The dim area no longer fades while dragging.
 - **Wallet drawers:** every wallet picker now uses one shared drawer list (`wallet-drawer-ui.js`, `wallet-drawer-ui.css`) - Connected Wallets, Browser wallet, Swap wallet (profile + step 1), Swap signing wallet, Delegation, Transfer Hub picker, Base swap bot picker, Send FROM / TO, Home wallet and Bridge sender / recipient. **Single select** drawers (Browser, Swap signing, Send, Home, Bridge, Transfer Hub single / address) show radio rows: a group only expands and you pick one wallet from it, no multi tick. **Multi select** drawers (Connected Wallets, Swap wallet, Delegation, Transfer Hub multi, Base swap bot) show checkboxes: tick a group for all its wallets (partial shows a dash), or expand it and tick any wallets. The separate "groups -> keys" screens and back arrow are gone. Selection state, storage and key handling are unchanged. Transfer Hub / Base swap bot pickers now also tick the wallets of a group that is already loaded in the field.
 - **Transfer Hub home:** the Send / Manage / Tools tabs are gone - all tools are listed together on one screen under small Send, Manage and Tools labels, with slightly tighter rows so everything fits without scrolling (`main-dashboard.html`, `th-hub-home-redesign.css`, `hub-home-tabs.js`).
 - **Logs (Self, W2W, Token Approval, NFT Transfer):** tapping Logs now only expands the log box downwards - nothing above it changes or hides and the page does not scroll by itself (the earlier auto scroll-into-view is removed; on the fill-screen Self / W2W layouts the screen grows by the log box height so the cards keep their spacing).

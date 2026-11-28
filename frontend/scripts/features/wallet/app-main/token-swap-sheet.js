@@ -86,29 +86,9 @@ function showTokenSwapSheet(t) {
   overlay.addEventListener('click', e => { if (e.target === overlay) closeSheet(); });
   overlay.querySelector('#tas-close-x').addEventListener('click', closeSheet);
 
-  // ── Swipe-down-to-close ──
-  (function() {
-    const inner = overlay.querySelector('#token-action-inner');
-    let startY = 0, curY = 0, dragging = false;
-    inner.addEventListener('touchstart', function(e) {
-      startY = e.touches[0].clientY; curY = startY; dragging = true;
-      inner.style.transition = 'none';
-    }, { passive: true });
-    inner.addEventListener('touchmove', function(e) {
-      if (!dragging) return;
-      curY = e.touches[0].clientY;
-      const dy = Math.max(0, curY - startY);
-      inner.style.transform = 'translateY(' + dy + 'px)';
-      overlay.style.opacity = String(Math.max(0, 1 - dy / 220));
-    }, { passive: true });
-    inner.addEventListener('touchend', function() {
-      if (!dragging) return;
-      dragging = false;
-      inner.style.transition = 'transform 0.35s cubic-bezier(0.34,1.2,0.64,1)';
-      const dy = curY - startY;
-      if (dy > 80) { closeSheet(); } else { inner.style.transform = 'none'; overlay.style.opacity = '1'; }
-    });
-  })();
+  // Swipe down to close: shared gesture (scripts/shared/ui/sheet-swipe-close.js)
+  attachSheetSwipeClose(overlay.querySelector('#token-action-inner'), { closeFn: closeSheet });
+  attachBackdropSwipeClose(overlay, closeSheet);
 
   overlay.querySelector('#tas-header-chart-btn').addEventListener('click', function() {
     closeSheet();

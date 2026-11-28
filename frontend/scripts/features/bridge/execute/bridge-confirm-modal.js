@@ -168,34 +168,5 @@
       setTimeout(function(){ modal.style.display = 'none'; }, 380);
     };
 
-    // Swipe-down to dismiss bridge confirm sheet
-    (function() {
-      var sheet, startY, startTY;
-      function _bind() {
-        sheet = document.getElementById('br-confirm-sheet');
-        if (!sheet || sheet._brSwipeBound) return;
-        sheet._brSwipeBound = true;
-        sheet.addEventListener('touchstart', function(e) {
-          startY  = e.touches[0].clientY;
-          startTY = sheet.style.transform === 'translateY(0px)' ? 0 : 0;
-        }, { passive: true });
-        sheet.addEventListener('touchmove', function(e) {
-          var dy = e.touches[0].clientY - startY;
-          if (dy > 0) sheet.style.transform = 'translateY(' + dy + 'px)';
-        }, { passive: true });
-        sheet.addEventListener('touchend', function(e) {
-          var moved = parseFloat((sheet.style.transform || '').replace(/[^0-9.]/g,'')) || 0;
-          var threshold = sheet.offsetHeight * 0.35;
-          if (moved > threshold) {
-            window.brCloseConfirm();
-          } else {
-            sheet.style.transform = '';
-          }
-        }, { passive: true });
-      }
-      if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', _bind);
-      } else { _bind(); }
-      setTimeout(_bind, 500);
-    })();
+    // Swipe down to dismiss: shared gesture, see scripts/shared/ui/swipe-close-registry.js
     

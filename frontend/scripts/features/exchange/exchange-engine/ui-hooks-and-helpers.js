@@ -52,66 +52,7 @@ function excCloseOrderConfirm() { EXC.closeOrderConfirm(); }
 function excOpenPairPicker()    { EXC.openPairPicker(); }
 function excClosePairPicker()   { EXC.closePairPicker(); }
 
-// ── Swipe-down-to-close for bottom sheets ──
-(function() {
-  var _swipeConfigs = [
-    { panelId: 'exc-selector-panel', closeFn: function() { if(window.EXC) EXC.closeSelector(); } },
-    { panelId: 'exc-pair-panel',     closeFn: function() { if(window.EXC) EXC.closePairPicker(); } },
-  ];
-
-  var _active = null; // { panel, sheet, startY, closeFn }
-
-  document.addEventListener('touchstart', function(e) {
-    var t = e.touches[0];
-    for (var i = 0; i < _swipeConfigs.length; i++) {
-      var cfg = _swipeConfigs[i];
-      var panel = document.getElementById(cfg.panelId);
-      if (!panel || panel.parentElement.style.display === 'none') continue;
-      if (!panel.contains(e.target)) continue;
-      // Don't hijack if user is scrolling an inner list that has content above
-      var scrollEl = panel.querySelector('#exc-pair-list, #exc-selector-list');
-      if (scrollEl && scrollEl.scrollTop > 2) continue;
-      _active = { panel: panel, sheet: panel.parentElement, startY: t.clientY, lastY: t.clientY, closeFn: cfg.closeFn };
-      panel.style.transition = 'none';
-      break;
-    }
-  }, {passive: true});
-
-  document.addEventListener('touchmove', function(e) {
-    if (!_active) return;
-    var dy = e.touches[0].clientY - _active.startY;
-    _active.lastY = e.touches[0].clientY;
-    if (dy <= 0) { _active.panel.style.transform = ''; return; }
-    _active.panel.style.transform = 'translateY(' + dy + 'px)';
-    var opacity = Math.max(0.05, 0.6 * (1 - dy / 250));
-    _active.sheet.style.background = 'rgba(0,0,0,' + opacity + ')';
-  }, {passive: true});
-
-  document.addEventListener('touchend', function(e) {
-    if (!_active) return;
-    var dy = _active.lastY - _active.startY;
-    var panel = _active.panel;
-    var sheet = _active.sheet;
-    var closeFn = _active.closeFn;
-    _active = null;
-
-    if (dy >= 80) {
-      panel.style.transition = 'transform 0.28s ease';
-      panel.style.transform = 'translateY(110%)';
-      setTimeout(function() {
-        panel.style.transition = '';
-        panel.style.transform = '';
-        sheet.style.background = '';
-        closeFn();
-      }, 280);
-    } else {
-      panel.style.transition = 'transform 0.22s ease';
-      panel.style.transform = '';
-      sheet.style.background = '';
-      setTimeout(function() { panel.style.transition = ''; }, 220);
-    }
-  }, {passive: true});
-})();
+// Swipe-down-to-close for the selector / pair sheets: shared gesture, see scripts/shared/ui/swipe-close-registry.js
 function excFilterPairPicker()  { EXC.filterPairPicker(); }
 function excFilterMarkets()     { EXC.filterMarkets(); }
 function excSetQuote(q)         { EXC.setQuote(q); }

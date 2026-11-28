@@ -167,45 +167,9 @@ function _openTokenChainPickerModal(coin, platforms) {
     const modal = document.getElementById('tm-ccp-modal');
     if (modal) modal.style.transform = 'none';
 
-    // ── Swipe down to close ──
-    let _swStartY = 0, _swCurY = 0, _swDragging = false;
-    const _swHandle = overlay.querySelector('#tm-ccp-modal > div:first-child');
-    const _swTarget = modal;
-
-    function _swOnStart(e) {
-      const t = e.touches ? e.touches[0] : e;
-      _swStartY = t.clientY; _swCurY = t.clientY; _swDragging = true;
-      _swTarget.style.transition = 'none';
-    }
-    function _swOnMove(e) {
-      if (!_swDragging) return;
-      const t = e.touches ? e.touches[0] : e;
-      _swCurY = t.clientY;
-      const dy = Math.max(0, _swCurY - _swStartY);
-      _swTarget.style.transform = 'translateY(' + dy + 'px)';
-      if (dy > 10) e.preventDefault();
-    }
-    function _swOnEnd() {
-      if (!_swDragging) return;
-      _swDragging = false;
-      _swTarget.style.transition = 'transform 0.32s cubic-bezier(0.34,1.2,0.64,1)';
-      const dy = _swCurY - _swStartY;
-      if (dy > 80) {
-        _closeTmChainContractModal();
-      } else {
-        _swTarget.style.transform = 'none';
-      }
-    }
-
-    if (_swHandle) {
-      _swHandle.style.cursor = 'grab';
-      _swHandle.addEventListener('touchstart', _swOnStart, { passive: true });
-      _swHandle.addEventListener('touchmove', _swOnMove, { passive: false });
-      _swHandle.addEventListener('touchend', _swOnEnd);
-      _swHandle.addEventListener('mousedown', _swOnStart);
-      window.addEventListener('mousemove', _swOnMove);
-      window.addEventListener('mouseup', _swOnEnd);
-    }
+    // Swipe down to close: shared gesture (scripts/shared/ui/sheet-swipe-close.js)
+    if (modal) attachSheetSwipeClose(modal, { closeFn: _closeTmChainContractModal });
+    attachBackdropSwipeClose(overlay, _closeTmChainContractModal);
   }));
 }
 

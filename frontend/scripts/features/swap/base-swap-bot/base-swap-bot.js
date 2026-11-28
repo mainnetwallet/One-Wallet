@@ -253,48 +253,7 @@
         setTimeout(function() { overlay.style.display = 'none'; }, 320);
       };
 
-      // ── Right-swipe to close (attached once) ──
-      (function() {
-        var attached = false;
-        var _origBsbOpen = window.bsbOpenWalletPicker;
-        window.bsbOpenWalletPicker = function() {
-          _origBsbOpen.apply(this, arguments);
-          if (attached) return;
-          attached = true;
-          var drawer = document.getElementById('bsb-wallet-picker-drawer');
-          if (!drawer) return;
-          var startX = 0, startY = 0, tracking = false, swiping = false;
-          drawer.addEventListener('touchstart', function(e) {
-            startX = e.touches[0].clientX;
-            startY = e.touches[0].clientY;
-            tracking = true; swiping = false;
-          }, { passive: true });
-          drawer.addEventListener('touchmove', function(e) {
-            if (!tracking) return;
-            var dx = e.touches[0].clientX - startX;
-            var dy = Math.abs(e.touches[0].clientY - startY);
-            if (!swiping && Math.abs(dx) > 8) {
-              if (Math.abs(dx) > dy) { swiping = true; }
-              else { tracking = false; return; }
-            }
-            if (swiping && dx > 0) {
-              drawer.style.transition = 'none';
-              drawer.style.transform = 'translateX(' + dx + 'px)';
-            }
-          }, { passive: true });
-          drawer.addEventListener('touchend', function(e) {
-            if (!swiping) { tracking = false; return; }
-            var dx = e.changedTouches[0].clientX - startX;
-            drawer.style.transition = '';
-            if (dx > 72) {
-              window.bsbCloseWalletPicker && window.bsbCloseWalletPicker();
-            } else {
-              drawer.style.transform = 'translateX(0)';
-            }
-            tracking = false; swiping = false;
-          }, { passive: true });
-        };
-      })();
+      // Swipe right to close: shared gesture, see scripts/shared/ui/swipe-close-registry.js
 
       // Init log
       __NX.bsbLog('🦄 Base Swap Bot ready','lok');

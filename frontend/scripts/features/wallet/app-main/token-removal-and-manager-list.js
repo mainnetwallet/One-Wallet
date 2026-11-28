@@ -63,32 +63,9 @@ function showTokenDeleteConfirm(cardEl, t) {
     setTimeout(() => overlay.remove(), 260);
   }
 
-  // Swipe down to close
-  const _inner = overlay.querySelector('.tok-del-inner');
-  let _sd_startY = 0, _sd_startX = 0, _sd_dragging = false;
-  _inner.addEventListener('touchstart', function(e) {
-    _sd_startY = e.touches[0].clientY;
-    _sd_startX = e.touches[0].clientX;
-    _sd_dragging = true;
-    _inner.style.transition = 'none';
-  }, { passive: true });
-  _inner.addEventListener('touchmove', function(e) {
-    if (!_sd_dragging) return;
-    const dy = e.touches[0].clientY - _sd_startY;
-    const dx = e.touches[0].clientX - _sd_startX;
-    if (Math.abs(dx) > Math.abs(dy)) return; // horizontal scroll — ignore
-    if (dy > 0) {
-      _inner.style.transform = 'translateY(' + dy + 'px)';
-      overlay.style.opacity = String(Math.max(0, 1 - dy / 220));
-    }
-  }, { passive: true });
-  _inner.addEventListener('touchend', function(e) {
-    if (!_sd_dragging) return;
-    _sd_dragging = false;
-    _inner.style.transition = 'transform 0.28s cubic-bezier(0.34,1.2,0.64,1)';
-    const dy = e.changedTouches[0].clientY - _sd_startY;
-    if (dy > 80) { closeSheet(); } else { _inner.style.transform = 'none'; overlay.style.opacity = '1'; }
-  }, { passive: true });
+  // Swipe down to close: shared gesture (scripts/shared/ui/sheet-swipe-close.js)
+  attachSheetSwipeClose(overlay.querySelector('.tok-del-inner'), { closeFn: closeSheet });
+  attachBackdropSwipeClose(overlay, closeSheet);
 
   overlay.addEventListener('click', e => { if (e.target === overlay) closeSheet(); });
   overlay.querySelector('.tok-del-cancel').addEventListener('click', closeSheet);
