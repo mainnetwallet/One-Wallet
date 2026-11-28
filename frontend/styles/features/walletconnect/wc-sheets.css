@@ -1,6 +1,7 @@
 /* ── WalletConnect bottom sheets ── */
+/* z-index 20002: above the bottom nav (20000), otherwise the nav covers the Reject / Connect buttons at the bottom of the sheet */
 #wc-overlay {
-  position: fixed; inset: 0; z-index: 19500; background: rgba(0,0,0,.6);
+  position: fixed; inset: 0; z-index: 20002; background: rgba(0,0,0,.6);
   display: flex; align-items: flex-end; justify-content: center;
   opacity: 0; pointer-events: none; transition: opacity .22s ease;
   font-family: var(--font-ui);
