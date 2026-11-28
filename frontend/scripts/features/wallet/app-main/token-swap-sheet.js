@@ -47,12 +47,12 @@ function showTokenSwapSheet(t) {
       <div class="tas-ct">
         <button type="button" id="tas-ct-addr" class="tas-ct-addr" aria-label="Show full contract address"><span class="material-icons-round">tag</span><span id="tas-ct-addr-txt">${_tasShort}</span></button>
         <button type="button" id="tas-ct-copy" class="tas-ct-btn copy"><span class="material-icons-round">content_copy</span><span id="tas-ct-copy-txt">Copy</span></button>
-        <button type="button" id="tas-ct-explorer" class="tas-ct-btn sq" aria-label="Open in explorer"><span class="material-icons-round">open_in_new</span></button>
+        <button type="button" id="tas-ct-explorer" class="tas-ct-btn" aria-label="Open in explorer">Explorer</button>
       </div>` : (t.isNative ? `
       <div class="tas-label">Contract</div>
       <div class="tas-ct plain">
         <span class="tas-ct-native"><span class="material-icons-round">local_gas_station</span>Native token · pays gas fees</span>
-        <button type="button" id="tas-ct-explorer" class="tas-ct-btn" aria-label="Open explorer"><span class="material-icons-round">open_in_new</span>Explorer</button>
+        <button type="button" id="tas-ct-explorer" class="tas-ct-btn" aria-label="Open explorer">Explorer</button>
       </div>` : '');
 
   const overlay = document.createElement('div');

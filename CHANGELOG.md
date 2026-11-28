@@ -6,6 +6,7 @@ Per-build release notes are published on the [Releases](../../releases) page.
 ## [Unreleased]
 
 ### Changed
+- **Slimmer contract row:** the Contract card in the token sheet is thinner, the explorer button now says "Explorer" instead of showing an icon, and there is a small gap between Copy and Explorer.
 - **Home network pill without the x:** the small x on the network pill (Home, top right) is gone, so it no longer covers the network name. The pill now always shows the arrow and opens Select network, where All networks is the first row.
 - **Standard font in the new sheets:** the Delete token sheet and the new Contract row now use the app's normal UI font (Roboto, weight 500) instead of the heavy Syne display font that the title and buttons were picking up.
 - **Contract row in the token sheet:** tapping a token on Home now shows its contract address with a Copy button (tap the address to see it in full) and an Explorer button that opens the phone's own browser, not the in-app one. For a token it opens `<explorer>/token/<contract>?a=<your Home wallet>#transactions` (e.g. BscScan with that wallet's transfers of the token); for a native token (ETH, BNB ...) it opens `<explorer>/address/<your Home wallet>`. New `OneAndroid.openInSystemBrowser(url)` bridge method.
