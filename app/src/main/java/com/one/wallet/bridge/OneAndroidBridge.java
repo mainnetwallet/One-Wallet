@@ -218,6 +218,20 @@ public class OneAndroidBridge {
         a.openInAppBrowser(url, null);
     }
 
+    /** Opens this app's system settings page (used when camera access was denied). */
+    @JavascriptInterface
+    public void openAppSettings() {
+        MainActivity a = getActivity(); if (a == null) return;
+        a.runOnUiThread(() -> {
+            try {
+                Intent i = new Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+                        Uri.fromParts("package", a.getPackageName(), null));
+                i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                a.startActivity(i);
+            } catch (Exception ignored) {}
+        });
+    }
+
     /** Always opens the phone's own default browser (never the in-app browser), for any http(s) URL. */
     @JavascriptInterface
     public void openInSystemBrowser(String url) {

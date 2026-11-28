@@ -135,7 +135,7 @@ function renderTxHistory() {
     if ((filter === 'swap' || filter === 'send' || filter === 'bridge') && it.kind !== filter) return false;
     if (query) {
       const t = it.tx;
-      const hay = [t.pair, t.hash, t.recvHash, t.fromToken, t.toToken, t.fromChain, t.toChain, t.wallet, t.dex].join(' ').toLowerCase();
+      const hay = [t.pair, t.hash, t.recvHash, t.fromToken, t.toToken, t.fromChain, t.toChain, t.wallet, t.dex, t.dapp].join(' ').toLowerCase();
       if (hay.indexOf(query) === -1) return false;
     }
     return true;
@@ -257,6 +257,7 @@ function renderTxHistory() {
       }
       if (!tx.hash && !isBridge) details += `<div class="txh-dr"><span>Hash</span><code style="color:var(--text-muted)">${tx.isDry ? 'dry run' : '—'}</code></div>`;
       if (!isBridge && !isSend && tx.dex) details += `<div class="txh-dr"><span>Route</span><code>${esc(tx.dex)}</code></div>`;
+      if (tx.dapp) details += `<div class="txh-dr"><span>App</span><code>${esc(tx.dapp)}</code></div>`;
       if (walletLabel) details += `<div class="txh-dr"><span>Wallet</span><code>${walletLabel}</code></div>`;
       details += `<div class="txh-dr"><span>Time</span><code>${esc(new Date(tx.timestamp).toLocaleString())}</code></div>`;
 
