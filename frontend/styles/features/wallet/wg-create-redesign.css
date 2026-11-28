@@ -1,0 +1,130 @@
+
+  /* ══════════════════════════════════════════════════════════════
+     CREATE WALLETS — redesign (step 1 setup, step 2 review)
+     Scoped to #wg-create-overlay only. Roboto / system UI font,
+     system monospace for addresses.
+     ══════════════════════════════════════════════════════════════ */
+
+  #wg-create-overlay {
+    --wgc-font: Roboto, system-ui, -apple-system, 'Segoe UI', sans-serif;
+    --wgc-mono: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+    --wgc-card: var(--bg-raised);
+    --wgc-line: var(--border-subtle);
+    --wgc-sub: var(--text-secondary);
+  }
+  #wg-create-overlay *:not(.material-icons-round):not(.wgc-mono) { font-family: var(--wgc-font) !important; }
+  #wg-create-overlay .wgc-mono { font-family: var(--wgc-mono) !important; }
+
+  #wg-create-overlay .send-header-title { font-size: 18px; font-weight: 500; letter-spacing: 0; text-transform: none; }
+  #wg-create-overlay .wgc-step { font-size: 12px; color: var(--wgc-sub); white-space: nowrap; }
+
+  #wg-create-overlay .wgc-body { padding: 8px 16px 40px; }
+  #wg-create-overlay .wgc-step-panel { display: flex; flex-direction: column; gap: 18px; }
+
+  #wg-create-overlay .wgc-label { font-size: 13px; color: var(--wgc-sub); padding-left: 4px; }
+  #wg-create-overlay .wgc-field { display: flex; flex-direction: column; gap: 8px; }
+
+  #wg-create-overlay .wgc-name {
+    height: 50px; padding: 0 14px; border-radius: 14px;
+    background: var(--wgc-card); border: 1px solid var(--border-glow);
+    font-size: 15px; font-weight: 400; color: var(--text-primary);
+  }
+  #wg-create-overlay .wgc-name:focus { border-color: var(--accent-primary); outline: none; }
+
+  #wg-create-overlay .wgc-suggest { display: flex; gap: 8px; flex-wrap: wrap; }
+  #wg-create-overlay .wgc-sug {
+    padding: 6px 12px; border-radius: 999px; border: none; cursor: pointer;
+    background: var(--wgc-card); color: var(--wgc-sub); font-size: 12px;
+  }
+  #wg-create-overlay .wgc-sug:active { background: var(--bg-glass-hover); }
+
+  #wg-create-overlay .wgc-card {
+    background: var(--wgc-card); border: 1px solid var(--wgc-line);
+    border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 14px;
+  }
+  #wg-create-overlay .wgc-stepper { display: flex; align-items: center; justify-content: space-between; }
+  #wg-create-overlay .wgc-round {
+    width: 44px; height: 44px; border-radius: 50%; flex-shrink: 0; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--bg-glass); border: 1px solid var(--border-glow); color: var(--text-primary);
+  }
+  #wg-create-overlay .wgc-round:active { background: var(--bg-glass-hover); }
+  #wg-create-overlay .wgc-round .material-icons-round { font-size: 22px; }
+  #wg-create-overlay .wgc-count-wrap { text-align: center; min-width: 0; }
+  #wg-create-overlay .wgc-count {
+    width: 130px; text-align: center; background: transparent; border: none; outline: none;
+    font-size: 40px; font-weight: 500; line-height: 1.1; color: var(--text-primary);
+    padding: 0; -moz-appearance: textfield;
+  }
+  #wg-create-overlay .wgc-count::-webkit-outer-spin-button,
+  #wg-create-overlay .wgc-count::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+  #wg-create-overlay .wgc-count-sub { font-size: 13px; color: var(--wgc-sub); }
+
+  #wg-create-overlay .wgc-presets { display: flex; gap: 6px; }
+  #wg-create-overlay .wgc-presets .wg-count-preset {
+    flex: 1; padding: 9px 0; border-radius: 10px; font-size: 13px; font-weight: 400;
+    background: var(--bg-glass); border: 1px solid var(--border-glow); color: var(--wgc-sub);
+  }
+  #wg-create-overlay .wgc-presets .wg-count-preset.active {
+    background: rgba(99,102,241,0.18); border-color: var(--accent-primary); color: #a5b4fc;
+  }
+
+  #wg-create-overlay .wgc-note { display: flex; gap: 10px; align-items: flex-start; padding: 0 4px; font-size: 13px; line-height: 1.5; color: var(--wgc-sub); }
+  #wg-create-overlay .wgc-note .material-icons-round { font-size: 18px; color: var(--accent-green); margin-top: 1px; }
+
+  #wg-create-overlay .wgc-primary,
+  #wg-create-overlay .wgc-secondary {
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    padding: 14px; border-radius: 14px; font-size: 15px; cursor: pointer; transition: opacity 0.15s ease;
+  }
+  #wg-create-overlay .wgc-primary { width: 100%; background: var(--accent-primary); border: none; color: #fff; font-weight: 500; }
+  #wg-create-overlay .wgc-primary:active { opacity: 0.85; }
+  #wg-create-overlay .wgc-primary .material-icons-round,
+  #wg-create-overlay .wgc-secondary .material-icons-round { font-size: 18px; }
+  #wg-create-overlay .wgc-secondary { background: transparent; border: 1px solid var(--border-glow); color: var(--text-primary); }
+
+  /* ── Step 2 ── */
+  #wg-create-overlay .wgc-done { display: flex; align-items: center; gap: 12px; }
+  #wg-create-overlay .wgc-done-ico {
+    width: 42px; height: 42px; border-radius: 50%; flex-shrink: 0;
+    background: rgba(16,185,129,0.15); display: flex; align-items: center; justify-content: center;
+  }
+  #wg-create-overlay .wgc-done-ico .material-icons-round { font-size: 22px; color: var(--accent-green); }
+  #wg-create-overlay .wgc-done-title { font-size: 16px; font-weight: 500; color: var(--text-primary); }
+  #wg-create-overlay .wgc-done-sub { font-size: 13px; color: var(--wgc-sub); margin-top: 2px; word-break: break-word; }
+
+  #wg-create-overlay .wgc-warn {
+    display: flex; gap: 10px; align-items: flex-start; padding: 12px; border-radius: 12px;
+    background: rgba(245,158,11,0.12); color: #fbbf24; font-size: 13px; line-height: 1.5;
+  }
+  #wg-create-overlay .wgc-warn .material-icons-round { font-size: 18px; margin-top: 1px; }
+
+  #wg-create-overlay .wgc-list {
+    background: var(--wgc-card); border: 1px solid var(--wgc-line); border-radius: 16px; overflow: hidden;
+  }
+  #wg-create-overlay .wg-create-wallet-row {
+    display: flex; align-items: center; gap: 12px; padding: 12px 14px;
+    background: transparent; border: none; border-bottom: 1px solid var(--wgc-line); border-radius: 0;
+  }
+  #wg-create-overlay .wg-create-wallet-row:last-child { border-bottom: none; }
+  #wg-create-overlay .wgc-idx {
+    width: 30px; height: 30px; border-radius: 50%; flex-shrink: 0; font-size: 12px; color: #a5b4fc;
+    background: var(--bg-glass); display: flex; align-items: center; justify-content: center;
+  }
+  #wg-create-overlay .wgc-row-txt { flex: 1; min-width: 0; }
+  #wg-create-overlay .wgc-row-name { font-size: 14px; color: var(--text-primary); }
+  #wg-create-overlay .wgc-row-addr { font-size: 12px; color: var(--wgc-sub); margin-top: 1px; }
+  #wg-create-overlay .wgc-copy {
+    width: 36px; height: 36px; border-radius: 50%; flex-shrink: 0; cursor: pointer;
+    background: transparent; border: none; color: var(--wgc-sub);
+    display: flex; align-items: center; justify-content: center;
+  }
+  #wg-create-overlay .wgc-copy:active { background: var(--bg-glass-hover); }
+  #wg-create-overlay .wgc-copy .material-icons-round { font-size: 18px; }
+  #wg-create-overlay .wgc-more {
+    background: transparent; border: none; color: var(--accent-primary); font-size: 13px;
+    padding: 4px; cursor: pointer; align-self: center;
+  }
+  #wg-create-overlay .wgc-actions { display: flex; gap: 10px; margin-top: 2px; }
+  #wg-create-overlay .wgc-actions .wgc-primary,
+  #wg-create-overlay .wgc-actions .wgc-secondary { flex: 1; width: auto; font-size: 14px; padding: 13px 8px; }

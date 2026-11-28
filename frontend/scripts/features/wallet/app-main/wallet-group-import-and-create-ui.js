@@ -32,8 +32,25 @@ function closeWgImportModal() {
   haptic();
 }
 
-// ══════ CREATE WALLET UI ══════
-let _wgCreatedWallets = []; // [{privateKey, address}]
+// ══════ CREATE WALLET UI (step 1: setup, step 2: review) ══════
+let _wgCreatedWallets = []; // [{privateKey, address, mnemonic}]
+let _wgCreateStepNo = 1;
+let _wgCreateExpanded = false;
+const _WGC_COLLAPSED_ROWS = 5;
+
+function _wgCreateShowStep(n) {
+  _wgCreateStepNo = n;
+  const s1 = document.getElementById('wg-create-step1');
+  const s2 = document.getElementById('wg-create-step2');
+  if (s1) s1.style.display = n === 1 ? 'flex' : 'none';
+  if (s2) s2.style.display = n === 2 ? 'flex' : 'none';
+  const lbl = document.getElementById('wg-create-step-label');
+  if (lbl) lbl.textContent = 'Step ' + n + ' of 2';
+  const title = document.getElementById('wg-create-title');
+  if (title) title.textContent = n === 1 ? 'Create wallets' : 'Review wallets';
+  const body = document.querySelector('#wg-create-overlay .send-body');
+  if (body) body.scrollTop = 0;
+}
 
 function openWgCreateUI() {
   const _hasLock = !!localStorage.getItem('one_lock_pin') || !!localStorage.getItem('one_lock_pat') || !!localStorage.getItem('one_lock_cred_id');
@@ -48,18 +65,14 @@ function openWgCreateUI() {
   }
   // Reset state
   _wgCreatedWallets = [];
+  _wgCreateExpanded = false;
   const nameEl = document.getElementById('wg-create-name-input');
   const countEl = document.getElementById('wg-create-count-input');
   if (nameEl) nameEl.value = '';
-  if (countEl) countEl.value = '';
-  const previewEl = document.getElementById('wg-create-preview');
-  if (previewEl) previewEl.style.display = 'none';
-  const saveBtn = document.getElementById('wg-create-save-btn');
-  if (saveBtn) { saveBtn.style.display = 'none'; saveBtn.style.opacity = '0.5'; saveBtn.style.pointerEvents = 'none'; }
-  const badge = document.getElementById('wg-create-count-badge');
-  if (badge) badge.style.display = 'none';
+  if (countEl) countEl.value = '10';
   const listEl = document.getElementById('wg-create-wallet-list');
   if (listEl) listEl.innerHTML = '';
+  _wgCreateShowStep(1);
   // Dismiss keyboard before opening overlay
   if (document.activeElement && typeof document.activeElement.blur === 'function') {
     document.activeElement.blur();
@@ -71,11 +84,29 @@ function openWgCreateUI() {
 }
 
 function closeWgCreateUI() {
+  // Back from the review step goes to setup (generated wallets are discarded, nothing was saved yet)
+  if (_wgCreateStepNo === 2) {
+    _wgCreatedWallets = [];
+    _wgCreateExpanded = false;
+    const listEl = document.getElementById('wg-create-wallet-list');
+    if (listEl) listEl.innerHTML = '';
+    _wgCreateShowStep(1);
+    _wgCreateUpdateBtn();
+    haptic();
+    return;
+  }
   document.getElementById('wg-create-overlay')?.classList.remove('open');
   _wgCreatedWallets = [];
   haptic();
   // ── Return to Import Wallet Group ──
   document.getElementById('wg-import-overlay')?.classList.add('open');
+}
+
+function wgCreateSetName(v) {
+  const el = document.getElementById('wg-create-name-input');
+  if (el) el.value = v;
+  _wgCreateUpdateBtn();
+  haptic();
 }
 
 function wgCreateSetCount(n) {
@@ -84,6 +115,12 @@ function wgCreateSetCount(n) {
   _wgCreateSyncPresets();
   _wgCreateUpdateBtn();
   haptic();
+}
+
+function wgCreateStep(delta) {
+  const el = document.getElementById('wg-create-count-input');
+  const cur = parseInt(el?.value || '0') || 0;
+  wgCreateSetCount(Math.max(1, cur + delta));
 }
 
 function _wgCreateSyncPresets() {
@@ -97,35 +134,83 @@ function _wgCreateUpdateBtn() {
   const name = (document.getElementById('wg-create-name-input')?.value || '').trim();
   const cnt = parseInt(document.getElementById('wg-create-count-input')?.value || '0');
   const genBtn = document.getElementById('wg-create-gen-btn');
-  const saveBtn = document.getElementById('wg-create-save-btn');
   const genOk = name.length > 0 && cnt >= 1;
+  const label = document.getElementById('wg-create-gen-label');
+  if (label) label.textContent = cnt >= 1 ? 'Generate ' + cnt + ' wallet' + (cnt !== 1 ? 's' : '') : 'Generate wallets';
+  const sub = document.getElementById('wg-create-count-sub');
+  if (sub) sub.textContent = cnt === 1 ? 'wallet' : 'wallets';
   if (genBtn) {
     genBtn.style.opacity = genOk ? '1' : '0.5';
     genBtn.style.pointerEvents = genOk ? 'auto' : 'none';
   }
-  // Save button: only enable if name filled AND wallets already generated
-  const saveOk = name.length > 0 && _wgCreatedWallets.length > 0;
-  if (saveBtn && saveBtn.style.display !== 'none') {
-    saveBtn.style.opacity = saveOk ? '1' : '0.5';
-    saveBtn.style.pointerEvents = saveOk ? 'auto' : 'none';
+}
+
+function _wgCreateShortAddr(a) {
+  return a && a.length > 14 ? a.slice(0, 6) + '\u2026' + a.slice(-4) : (a || '');
+}
+
+function _wgCreateRenderList() {
+  const listEl = document.getElementById('wg-create-wallet-list');
+  const moreBtn = document.getElementById('wg-create-more-btn');
+  if (!listEl) return;
+  const total = _wgCreatedWallets.length;
+  const cap = Math.min(total, 200); // max 200 rows to avoid DOM bloat
+  const shown = _wgCreateExpanded ? cap : Math.min(cap, _WGC_COLLAPSED_ROWS);
+  let html = '';
+  for (let i = 0; i < shown; i++) {
+    const w = _wgCreatedWallets[i];
+    html += '<div class="wg-create-wallet-row">' +
+      '<div class="wgc-idx">' + String(i + 1).padStart(2, '0') + '</div>' +
+      '<div class="wgc-row-txt"><div class="wgc-row-name">Wallet ' + (i + 1) + '</div>' +
+      '<div class="wgc-row-addr wgc-mono">' + _wgCreateShortAddr(w.address) + '</div></div>' +
+      '<button type="button" class="wgc-copy" aria-label="Copy address" onclick="wgCreateCopyAddr(' + i + ')"><span class="material-icons-round">content_copy</span></button>' +
+      '</div>';
+  }
+  if (_wgCreateExpanded && total > cap) {
+    html += '<div class="wg-create-wallet-row" style="justify-content:center;color:var(--text-secondary);font-size:13px;">\u2026 and ' + (total - cap) + ' more (all are saved with the group)</div>';
+  }
+  listEl.innerHTML = html;
+  if (moreBtn) {
+    if (cap > _WGC_COLLAPSED_ROWS) {
+      moreBtn.style.display = 'block';
+      moreBtn.textContent = _wgCreateExpanded ? 'Show less' : 'Show ' + (cap - _WGC_COLLAPSED_ROWS) + ' more';
+    } else {
+      moreBtn.style.display = 'none';
+    }
+  }
+}
+
+function wgCreateToggleMore() {
+  _wgCreateExpanded = !_wgCreateExpanded;
+  _wgCreateRenderList();
+  haptic();
+}
+
+function wgCreateCopyAddr(i) {
+  const w = _wgCreatedWallets[i];
+  if (!w) return;
+  try {
+    navigator.clipboard.writeText(w.address).then(() => {
+      showToast('Address copied', 'check_circle');
+      haptic();
+    }, () => showToast('Copy failed', 'error'));
+  } catch (e) {
+    showToast('Copy failed', 'error');
   }
 }
 
 async function wgGenerateWallets() {
   const name = (document.getElementById('wg-create-name-input')?.value || '').trim();
   const cnt = parseInt(document.getElementById('wg-create-count-input')?.value || '0');
-  if (!name) { showToast('Group name দাও', 'error'); return; }
-  if (!cnt || cnt < 1) { showToast('কমপক্ষে 1 দাও', 'error'); return; }
+  if (!name) { showToast('Enter a group name', 'error'); return; }
+  if (!cnt || cnt < 1) { showToast('Enter at least 1 wallet', 'error'); return; }
 
   const genBtn = document.getElementById('wg-create-gen-btn');
-  if (genBtn) { genBtn.textContent = ''; genBtn.innerHTML = '<span class="material-icons-round" style="font-size:18px;animation:spin 0.8s linear infinite;">autorenew</span> GENERATING\u2026'; genBtn.style.pointerEvents = 'none'; }
-
-  const listEl = document.getElementById('wg-create-wallet-list');
-  const previewEl = document.getElementById('wg-create-preview');
-  if (previewEl) previewEl.style.display = 'flex';
-  if (listEl) listEl.innerHTML = '';
+  const genIdle = '<span class="material-icons-round">auto_awesome</span><span id="wg-create-gen-label"></span>';
+  if (genBtn) { genBtn.innerHTML = '<span class="material-icons-round" style="animation:spin 0.8s linear infinite;">autorenew</span><span>Generating\u2026</span>'; genBtn.style.pointerEvents = 'none'; }
 
   _wgCreatedWallets = [];
+  _wgCreateExpanded = false;
   const CHUNK = 50;
 
   try {
@@ -136,34 +221,26 @@ async function wgGenerateWallets() {
         _wgCreatedWallets.push({ privateKey: w.privateKey, address: w.address, mnemonic: w.mnemonic?.phrase || '' });
       }
       // Progress on button
-      if (genBtn) genBtn.innerHTML = '<span class="material-icons-round" style="font-size:18px;animation:spin 0.8s linear infinite;">autorenew</span> ' + _wgCreatedWallets.length + '/' + cnt + '\u2026';
-      // Yield — keep UI responsive
+      if (genBtn) genBtn.innerHTML = '<span class="material-icons-round" style="animation:spin 0.8s linear infinite;">autorenew</span><span>' + _wgCreatedWallets.length + '/' + cnt + '\u2026</span>';
+      // Yield - keep UI responsive
       await new Promise(r => setTimeout(r, 0));
     }
 
-    // Render preview (max 200 rows to avoid DOM bloat)
-    if (listEl) {
-      const display = _wgCreatedWallets.slice(0, 200);
-      listEl.innerHTML = display.map((w, i) =>
-        `<div class="wg-create-wallet-row">
-          <div class="wg-create-idx">#${i + 1}</div>
-          <div class="wg-create-addr">${w.address}</div>
-        </div>`
-      ).join('') + (cnt > 200 ? `<div class="wg-create-wallet-row" style="justify-content:center;color:var(--text-muted);font-size:11px;">\u2026 and ${cnt - 200} more</div>` : '');
-    }
+    const title = document.getElementById('wg-create-done-title');
+    if (title) title.textContent = cnt + ' wallet' + (cnt !== 1 ? 's' : '') + ' generated';
+    const sub = document.getElementById('wg-create-done-sub');
+    if (sub) sub.textContent = 'Group: ' + name;
+    _wgCreateRenderList();
+    _wgCreateShowStep(2);
 
-    const badge = document.getElementById('wg-create-count-badge');
-    if (badge) { badge.style.display = 'inline-block'; badge.textContent = cnt + ' WALLET' + (cnt !== 1 ? 'S' : ''); }
-
-    const saveBtn = document.getElementById('wg-create-save-btn');
-    if (saveBtn) { saveBtn.style.display = 'flex'; saveBtn.style.opacity = '1'; saveBtn.style.pointerEvents = 'auto'; }
-
-    if (genBtn) { genBtn.innerHTML = '<span class="material-icons-round" style="font-size:18px;">auto_awesome</span>GENERATE'; genBtn.style.pointerEvents = 'auto'; }
+    if (genBtn) { genBtn.innerHTML = genIdle; genBtn.style.pointerEvents = 'auto'; }
+    _wgCreateUpdateBtn();
 
     haptic();
-    showToast(cnt + ' wallet generated \u2713', 'check_circle');
+    showToast(cnt + ' wallet' + (cnt !== 1 ? 's' : '') + ' generated', 'check_circle');
   } catch(err) {
-    if (genBtn) { genBtn.innerHTML = '<span class="material-icons-round" style="font-size:18px;">auto_awesome</span>GENERATE'; genBtn.style.pointerEvents = 'auto'; }
+    if (genBtn) { genBtn.innerHTML = genIdle; genBtn.style.pointerEvents = 'auto'; }
+    _wgCreateUpdateBtn();
     showToast('Generate failed: ' + err.message, 'error');
   }
 }

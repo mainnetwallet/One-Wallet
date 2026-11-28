@@ -6,6 +6,11 @@ Per-build release notes are published on the [Releases](../../releases) page.
 ## [Unreleased]
 
 ### Changed
+- **Create wallets, new look:** the Create Wallet screen is now two steps. Step 1 (Setup): group name with quick suggestions (Fresh wallets, Airdrop, Testing),
+  a big wallet count with minus / plus buttons and presets (1, 5, 10, 25, 50, 100), a short privacy note and one "Generate N wallets" button. Step 2 (Review):
+  "N wallets generated" summary, a backup warning, a short list (first 5 wallets, "Show N more" for the rest) with a copy-address button per wallet, then
+  "Copy phrases" and "Save group". Back on the review step returns to setup. Uses the same Roboto / system monospace fonts as Import Wallet Group; styles
+  are scoped to `#wg-create-overlay` (new `wg-create-redesign.css`). Wallet generation, key handling and saving are unchanged.
 - **Rename wallets:** the "WALLET #N" row in a wallet group's detail (next to SCAN) has a pencil that opens a new rename dialog: tinted header with the
   group colour, name field with counter and clear button, quick names (Main, Trading, Savings, Gas, Bot), "Reset to Wallet N" and Save. The dialog is
   added to `<body>` so it shows above the group detail, and uses the clean UI font (Roboto) instead of the wide display font (inside `#app` it was hidden behind it). The name is stored on the group (`labels`, aligned with

@@ -1,25 +1,24 @@
 
 
 function wgCopyAllMnemonics() {
-  if (!_wgCreatedWallets.length) { showToast('আগে Generate করো', 'error'); return; }
+  if (!_wgCreatedWallets.length) { showToast('Generate wallets first', 'error'); return; }
   const lines = _wgCreatedWallets.map(w => w.mnemonic || '').filter(Boolean).join('\n');
+  const btn = document.getElementById('wg-copy-all-btn');
+  const idle = '<span class="material-icons-round">content_copy</span>Copy phrases';
   try {
     navigator.clipboard.writeText(lines).then(() => {
-      const btn = document.getElementById('wg-copy-all-btn');
       if (btn) {
-        btn.innerHTML = '<span class="material-icons-round" style="font-size:13px;">check</span>COPIED';
+        btn.innerHTML = '<span class="material-icons-round">check</span>Copied';
         btn.style.color = '#10b981';
         btn.style.borderColor = 'rgba(16,185,129,0.5)';
-        btn.style.background = 'rgba(16,185,129,0.15)';
         setTimeout(() => {
-          btn.innerHTML = '<span class="material-icons-round" style="font-size:13px;">content_copy</span>COPY';
-          btn.style.color = 'var(--accent-primary)';
-          btn.style.borderColor = 'rgba(99,102,241,0.3)';
-          btn.style.background = 'rgba(99,102,241,0.12)';
+          btn.innerHTML = idle;
+          btn.style.color = '';
+          btn.style.borderColor = '';
         }, 2000);
       }
       haptic();
-    });
+    }, () => showToast('Copy failed', 'error'));
   } catch(e) {
     showToast('Copy failed', 'error');
   }
