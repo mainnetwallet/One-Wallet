@@ -134,6 +134,7 @@ Per-build release notes are published on the [Releases](../../releases) page.
   fields, buttons and transfer logic are unchanged.
 
 ### Fixed
+- **WalletConnect sheets hidden behind the bottom bar:** the Connect, request and Add network sheets opened under the Home / Swap / Bridge / Profile / Settings bar, so the Reject and Connect (or Confirm) buttons at the bottom of the sheet could not be tapped. The sheets now open above the bar (`wc-sheets.css`, z-index 20002 instead of 19500).
 - **QR scanner never decoding on some phones:** when the WebView has `BarcodeDetector` but it cannot actually read (for example no Google Play services), the scanner kept retrying it forever and never tried the built-in `jsQR` decoder, so the camera showed but nothing was ever scanned. After 3 failed reads on a live frame it now switches to `jsQR` (`qr-scanner.js`).
 - **Clearer WalletConnect pairing errors:** if the app does not answer within 25 seconds, the message now says whether the WalletConnect relay itself is unreachable (check internet, Project ID and its allowed domains at cloud.reown.com) or the QR code is stale; before it always blamed the QR code. A relay refusal (unauthorized / origin not allowed / invalid Project ID) also gets its own message instead of a raw SDK error (`wc-engine.js`).
 - **Seed phrases stay matched after removing keys:** removing wallets from a group (Wallet Groups, EDIT) now also drops their stored seed phrases, so COPY PHRASES no longer pairs the remaining wallets with the wrong phrases.
