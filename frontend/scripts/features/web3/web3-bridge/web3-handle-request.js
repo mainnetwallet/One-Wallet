@@ -253,8 +253,8 @@ window.oneHandleWeb3Request = async function(reqId, method, paramsJson, originHo
         var bodyHtml = _W3M_BODY_STYLES + '<div class="w3m-network-badge">🔑 PERSONAL SIGN</div>' +
           '<div class="w3m-section-title">SIGNING AS</div>' +
           '<div class="w3m-address-box" style="display:flex;flex-direction:column;gap:3px;">' +
-            '<div style="font-size:11px;font-weight:700;color:#a78bfa;">' + (_getWalletLabelForAddress(fromAddr) || 'Wallet') + '</div>' +
-            '<div style="font-size:10px;color:#6b7280;font-family:monospace;">' + (fromAddr || 'Unknown') + '</div>' +
+            '<div style="font-size:11px;font-weight:700;color:#a78bfa;">' + _escHtml(_getWalletLabelForAddress(fromAddr) || 'Wallet') + '</div>' +
+            '<div style="font-size:10px;color:#6b7280;font-family:monospace;word-break:break-all;">' + _escHtml(fromAddr || 'Unknown') + '</div>' +
           '</div>' +
           '<div class="w3m-section-title">MESSAGE</div>' +
           '<div class="w3m-data-box">' + _escHtml(displayMsg) + '</div>' +
@@ -308,8 +308,8 @@ window.oneHandleWeb3Request = async function(reqId, method, paramsJson, originHo
         var bodyHtml2 = _W3M_BODY_STYLES + '<div class="w3m-network-badge">🔑 ETH SIGN (RAW)</div>' +
           '<div class="w3m-section-title">SIGNING AS</div>' +
           '<div class="w3m-address-box" style="display:flex;flex-direction:column;gap:3px;">' +
-            '<div style="font-size:11px;font-weight:700;color:#a78bfa;">' + (_getWalletLabelForAddress(fromAddr2) || 'Wallet') + '</div>' +
-            '<div style="font-size:10px;color:#6b7280;font-family:monospace;">' + (fromAddr2 || 'Unknown') + '</div>' +
+            '<div style="font-size:11px;font-weight:700;color:#a78bfa;">' + _escHtml(_getWalletLabelForAddress(fromAddr2) || 'Wallet') + '</div>' +
+            '<div style="font-size:10px;color:#6b7280;font-family:monospace;word-break:break-all;">' + _escHtml(fromAddr2 || 'Unknown') + '</div>' +
           '</div>' +
           '<div class="w3m-section-title">HASH</div>' +
           '<div class="w3m-data-box">' + _escHtml(hashToSign) + '</div>' +
@@ -370,8 +370,8 @@ window.oneHandleWeb3Request = async function(reqId, method, paramsJson, originHo
         var bodyHtml3 = _W3M_BODY_STYLES + '<div class="w3m-network-badge">🔏 EIP-712 TYPED SIGN</div>' +
           '<div class="w3m-section-title">SIGNING AS</div>' +
           '<div class="w3m-address-box" style="display:flex;flex-direction:column;gap:3px;">' +
-            '<div style="font-size:11px;font-weight:700;color:#a78bfa;">' + (_getWalletLabelForAddress(fromAddr3) || 'Wallet') + '</div>' +
-            '<div style="font-size:10px;color:#6b7280;font-family:monospace;">' + (fromAddr3 || 'Unknown') + '</div>' +
+            '<div style="font-size:11px;font-weight:700;color:#a78bfa;">' + _escHtml(_getWalletLabelForAddress(fromAddr3) || 'Wallet') + '</div>' +
+            '<div style="font-size:10px;color:#6b7280;font-family:monospace;word-break:break-all;">' + _escHtml(fromAddr3 || 'Unknown') + '</div>' +
           '</div>' +
           // domain.name is free text chosen by the requester; the address is what identifies the contract
           (typedDomain.name ? '<div class="w3m-section-title">APP NAME (SELF-REPORTED)</div><div class="w3m-address-box">' + _escHtml(typedDomain.name) + '</div>' : '') +
@@ -1367,8 +1367,8 @@ window.oneHandleWeb3Request = async function(reqId, method, paramsJson, originHo
         var bodyHtml5 = _W3M_BODY_STYLES + '<div class="w3m-network-badge">✍️ SIGN TX (NO SEND)</div>' +
           '<div class="w3m-section-title">TRANSACTION</div>' +
           '<div class="w3m-address-box">' +
-          '<div class="w3m-tx-row"><span class="w3m-tx-label">To</span><span class="w3m-tx-value">' + (txP2.to||'?') + '</span></div>' +
-          '<div class="w3m-tx-row"><span class="w3m-tx-label">Value</span><span class="w3m-tx-value">' + _fmtValue(txP2.value, chainId) + ' ' + _getChainSymbol(chainId) + '</span></div>' +
+          '<div class="w3m-tx-row"><span class="w3m-tx-label">To</span><span class="w3m-tx-value" style="word-break:break-all;">' + _escHtml(txP2.to||'?') + '</span></div>' +
+          '<div class="w3m-tx-row"><span class="w3m-tx-label">Value</span><span class="w3m-tx-value">' + _escHtml(_fmtValue(txP2.value, chainId) + ' ' + _getChainSymbol(chainId)) + '</span></div>' +
           '</div>';
 
         var doSignTx = async function() {
