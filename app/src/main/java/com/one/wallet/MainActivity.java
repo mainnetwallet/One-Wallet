@@ -22,6 +22,7 @@ import android.webkit.PermissionRequest;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.webkit.WebResourceRequest;
+import android.webkit.WebResourceResponse;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -267,6 +268,19 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * True only for a file: URL that points into the APK's bundled assets/resources. The wallet UI runs from
+     * file:///android_asset/ with file-URL cross-origin access enabled (the page calls many third-party APIs
+     * directly), so without this guard any script that got into the page could read other app files
+     * (file:///data/data/...) with XHR and send them out. See shouldInterceptRequest below.
+     */
+    static boolean isBundledAssetUri(Uri u) {
+        if (u == null) return false;
+        String p = u.getPath();
+        if (p == null || p.contains("..") || p.contains("\\")) return false;
+        return p.startsWith("/android_asset/") || p.startsWith("/android_res/");
+    }
+
     @SuppressLint("SetJavaScriptEnabled")
     private void setupWebView() {
         WebSettings settings = webView.getSettings();
@@ -327,6 +341,19 @@ public class MainActivity extends AppCompatActivity {
                     return true;
                 }
                 return false;
+            }
+
+            @Override
+            public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
+                Uri u = request.getUrl();
+                if (u != null && "file".equalsIgnoreCase(u.getScheme()) && !isBundledAssetUri(u)) {
+                    // Anything under file:// that is not the bundled UI (app data, other apps' world-readable
+                    // files, /proc ...) is refused, for navigations and for XHR/fetch/img/script alike.
+                    return new WebResourceResponse("text/plain", "utf-8", 403, "Forbidden",
+                        new java.util.HashMap<String, String>(),
+                        new java.io.ByteArrayInputStream(new byte[0]));
+                }
+                return super.shouldInterceptRequest(view, request);
             }
 
             @Override

@@ -1081,6 +1081,11 @@ public class InAppBrowserActivity extends AppCompatActivity {
         s.setCacheMode(WebSettings.LOAD_DEFAULT);
         s.setDatabaseEnabled(true);
         s.setMixedContentMode(WebSettings.MIXED_CONTENT_NEVER_ALLOW);
+        // dApp pages are untrusted web content: they never need to read local files, and a page must not be able
+        // to turn a file: URL into a cross-origin read (explicit so it does not depend on platform defaults).
+        s.setAllowFileAccess(false);
+        s.setAllowFileAccessFromFileURLs(false);
+        s.setAllowUniversalAccessFromFileURLs(false);
         s.setMediaPlaybackRequiresUserGesture(false);
         s.setOffscreenPreRaster(true);
         wv.setLayerType(View.LAYER_TYPE_HARDWARE, null);
