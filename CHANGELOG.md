@@ -6,6 +6,10 @@ Per-build release notes are published on the [Releases](../../releases) page.
 ## [Unreleased]
 
 ### Changed
+- **Wallet drawer, new look:** group cards are now tinted pills with a round wallet avatar and a smaller 13px name; wallet cards under a group are
+  slim single-line rows ("Wallet 1", key icon, short address) pushed 20% in from the left and joined to the group by a thin line, so an expanded
+  group takes much less height. Same shared drawer, so Swap, Send, Bridge, Transfer Hub and the other pickers all change together. Selection
+  logic is unchanged.
 - **Swipe to close (same everywhere):** every side drawer now closes with a swipe right and every bottom sheet with a swipe down, using ONE gesture
   (`sheet-swipe-close.js`) instead of about ten separate copies that behaved differently (80px / 72px / 60px / 55px thresholds, some with no
   flick, some that froze half-way when the WebView cancelled the touch, some that ignored a sideways wobble). Now: direction locks after 8px,

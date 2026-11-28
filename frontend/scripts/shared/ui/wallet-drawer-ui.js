@@ -62,8 +62,8 @@
       + 'No wallet groups<br><span style="font-size:11px;opacity:.6;">Import in Settings first</span></div>';
   }
 
-  function checkbox(state) {
-    var cls = state === 1 ? ' on' : (state === 2 ? ' part' : '');
+  function checkbox(state, small) {
+    var cls = (state === 1 ? ' on' : (state === 2 ? ' part' : '')) + (small ? ' wdu-sm' : '');
     var icon = state === 2 ? 'remove' : 'check';
     return '<span class="wdu-chk' + cls + '"><i class="material-icons-round">' + icon + '</i></span>';
   }
@@ -111,13 +111,14 @@
       else if (multi && selCount > 0) sub = selCount + ' of ' + total + ' selected';
       else sub = plural(total, 'wallet') + (!multi && selCount > 0 ? ' · active' : '');
 
-      html += '<div class="wdu-group' + (selCount > 0 ? ' wdu-has-sel' : '') + (open ? ' wdu-open' : '') + '">'
+      html += '<div class="wdu-group' + (selCount > 0 ? ' wdu-has-sel' : '') + (open ? ' wdu-open' : '') + '"'
+        + ' style="--wdu-bg:' + clr.bg + ';--wdu-bd:' + clr.border + ';--wdu-ac:' + clr.accent + ';">'
         + '<div class="wdu-ghead" data-act="expand" data-gi="' + gi + '">'
-        + '<span class="wdu-num" style="background:' + clr.num + ';box-shadow:0 2px 10px ' + clr.glow + ';">' + esc(g.emoji || (gi + 1)) + '</span>'
+        + '<span class="wdu-num">' + (g.emoji ? esc(g.emoji) : '<i class="material-icons-round">account_balance_wallet</i>') + '</span>'
         + '<span class="wdu-gtxt"><span class="wdu-gname">' + esc(g.name || ('Group ' + (gi + 1))) + '</span>'
         + '<span class="wdu-gsub">' + esc(sub) + '</span></span>'
         + (multi ? '<span class="wdu-hit" data-act="group" data-gi="' + gi + '" role="checkbox" aria-label="Select all wallets in group">' + checkbox(state) + '</span>' : '')
-        + '<i class="material-icons-round wdu-chev">expand_more</i>'
+        + '<span class="wdu-cv"><i class="material-icons-round wdu-chev">expand_more</i></span>'
         + '</div>';
 
       if (open) {
@@ -133,11 +134,11 @@
             };
           }
           html += '<div class="wdu-key' + (sel ? ' wdu-sel' : '') + '" data-act="key" data-gi="' + gi + '" data-ki="' + ki + '">'
-            + '<span class="wdu-kn">' + (ki + 1) + '</span>'
-            + '<span class="wdu-ktxt"><span class="wdu-ktitle">' + esc(info.title) + '</span>'
-            + '<span class="wdu-ksub">' + esc(info.sub) + '</span></span>'
+            + '<i class="material-icons-round wdu-kn">vpn_key</i>'
+            + '<span class="wdu-ktitle">' + esc(info.title) + '</span>'
+            + '<span class="wdu-ksub">' + esc(info.sub) + '</span>'
             + (o.keyAction ? '<span class="wdu-kx" data-act="keyx" data-gi="' + gi + '" data-ki="' + ki + '" aria-label="' + esc(o.keyAction.label || 'Action') + '"><i class="material-icons-round">' + esc(o.keyAction.icon) + '</i></span>' : '')
-            + (multi ? checkbox(sel ? 1 : 0) : radio(sel))
+            + (multi ? checkbox(sel ? 1 : 0, true) : radio(sel))
             + '</div>';
         }
         html += '</div>';
