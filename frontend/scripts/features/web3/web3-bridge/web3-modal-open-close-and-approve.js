@@ -28,8 +28,8 @@ function _openModal(opts) {
         _txWalletBadge = '<div style="display:flex;align-items:center;gap:8px;background:rgba(167,139,250,0.08);border:1px solid rgba(167,139,250,0.2);border-radius:10px;padding:8px 12px;margin-bottom:10px;">' +
           '<div style="width:7px;height:7px;border-radius:50%;background:#10b981;box-shadow:0 0 5px rgba(16,185,129,0.6);flex-shrink:0;"></div>' +
           '<div style="flex:1;min-width:0;">' +
-            '<div style="font-size:11px;font-weight:700;color:#a78bfa;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + (_txWLabel || 'Connected Wallet') + '</div>' +
-            '<div style="font-size:10px;color:#4b5563;font-family:monospace;">' + _txShort + '</div>' +
+            '<div style="font-size:11px;font-weight:700;color:#a78bfa;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + _escHtml(_txWLabel || 'Connected Wallet') + '</div>' +
+            '<div style="font-size:10px;color:#4b5563;font-family:monospace;">' + _escHtml(_txShort) + '</div>' +
           '</div>' +
         '</div>';
       }

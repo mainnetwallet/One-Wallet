@@ -295,6 +295,13 @@ async function silentPriceRefresh() {
   const missingCb = filteredTokens.filter(t => !t.cgId || !priceData[t.cgId]);
   if (missingCb.length > 0) {
     await Promise.allSettled(missingCb.map(async t => {
+      // Unverified contract token: its symbol is attacker-controlled text — price it by contract+chain
+      // only, never by ticker (a scam token called "ETH" must not show ETH's price).
+      if (!oneSymbolPriceAllowed(t)) {
+        const cd = await _fetchPriceByContract(t);
+        if (cd) priceData['__tid__' + t.id] = cd;
+        return;
+      }
       // 1. Coinbase
       if (t.cbPair) {
         try {

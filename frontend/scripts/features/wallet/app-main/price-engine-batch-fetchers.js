@@ -163,3 +163,19 @@ async function fetchPricesBinance() {
   return _batchFetchBinance(cgIds);
 }
 
+// ── Unverified contract tokens: price by CONTRACT + CHAIN only (never by ticker) ──
+// See oneSymbolPriceAllowed() in core/sanitize-and-fetch.js. Returns { usd, usd_24h_change } or null.
+async function _fetchPriceByContract(t) {
+  try {
+    const addr = t && (t.contract || t.address);
+    if (!addr || !/^0x[0-9a-fA-F]{40}$/.test(addr)) return null;
+    const res = await fetch('https://api.dexscreener.com/latest/dex/tokens/' + addr, { signal: AbortSignal.timeout(6000) });
+    if (!res.ok) return null;
+    const data = await res.json();
+    const pair = oneDexPickPair(data && data.pairs, t);
+    if (!pair) return null;
+    const usd = parseFloat(pair.priceUsd);
+    if (!(usd > 0)) return null;
+    return { usd, usd_24h_change: parseFloat(pair.priceChange && pair.priceChange.h24) || 0 };
+  } catch (e) { return null; }
+}

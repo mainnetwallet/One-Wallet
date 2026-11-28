@@ -66,6 +66,12 @@ function _sendTokPrice(t) {
       if (pd && pd.usd) return pd.usd;
     }
   } catch (e) {}
+  // Unverified contract token: no ticker-based price (stable => $1 / ETH price); only its contract-based price
+  if (!oneSymbolPriceAllowed(t)) {
+    const _tc = (typeof TOKEN_CONFIG !== 'undefined' ? TOKEN_CONFIG : []).find(x => x.id === t.id);
+    const _p = (_tc && _tc.price) || t.price || 0;
+    return _p > 0 ? _p : 0;
+  }
   const sym = String(t.sub || '').toUpperCase();
   if (_SEND_STABLES.indexOf(sym) !== -1) return 1;
   if (sym === 'ETH' || sym === 'WETH') return sendPrices.ETH || 0;

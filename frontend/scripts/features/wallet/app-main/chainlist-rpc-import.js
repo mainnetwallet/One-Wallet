@@ -45,10 +45,12 @@ function hcpClRenderResults(chains) {
 
   chains.forEach(c => {
     const alreadyAdded = existingIds.has(c.chainId);
-    const sym = c.nativeCurrency?.symbol || 'ETH';
+    const _esc = window.oneSanitize || (x => String(x == null ? '' : x).replace(/[&<>"']/g, ch => '&#' + ch.charCodeAt(0) + ';'));
+    const sym = _esc(c.nativeCurrency?.symbol || 'ETH');
     const allRpcs = (c.rpc || []).filter(r => r.startsWith('https://') && !r.includes('${') && !r.includes('API_KEY') && !r.includes('api-key'));
     const hasRpc = allRpcs.length > 0;
-    const icon = c.icon ? `https://icons.llamao.fi/icons/chains/rsz_${c.icon}.jpg` : '';
+    const cid = Number(c.chainId) || 0; // numeric only: it is interpolated into onclick="..."
+    const icon = (c.icon && /^[A-Za-z0-9_-]+$/.test(String(c.icon))) ? `https://icons.llamao.fi/icons/chains/rsz_${c.icon}.jpg` : '';
 
     const item = document.createElement('div');
     item.className = 'hcp-cl-row';
@@ -58,16 +60,16 @@ function hcpClRenderResults(chains) {
         ${icon ? `<img src="${icon}" width="28" height="28" alt="" style="position:absolute;inset:6px;border-radius:50%;object-fit:cover;background:var(--bg-raised);" onerror="this.remove()" />` : ''}
       </div>
       <div style="flex:1;min-width:0;">
-        <div class="hcp-chain-name" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${c.name}</div>
-        <div class="hcp-chain-sub">ID ${c.chainId} · ${sym}</div>
+        <div class="hcp-chain-name" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${_esc(c.name)}</div>
+        <div class="hcp-chain-sub">ID ${cid} · ${sym}</div>
         ${!hasRpc ? `<div class="hcp-rpc-note warn">No public RPC</div>` : `<div class="hcp-rpc-note">${allRpcs.length} RPC endpoint${allRpcs.length > 1 ? 's' : ''}</div>`}
       </div>
       ${alreadyAdded
         ? `<div class="hcp-act">
-             ${hasRpc ? `<button class="hcp-btn-rpc" onclick="hcpAddRpcFromChainList(event,${c.chainId})" title="Add RPCs from chainlist to this chain">+ RPC</button>` : ''}
+             ${hasRpc ? `<button class="hcp-btn-rpc" onclick="hcpAddRpcFromChainList(event,${cid})" title="Add RPCs from chainlist to this chain">+ RPC</button>` : ''}
              <span class="hcp-added"><span class="material-icons-round">check</span>Added</span>
            </div>`
-        : `<button class="hcp-btn-add" onclick="hcpAddFromChainList(event, ${c.chainId})">Add</button>`
+        : `<button class="hcp-btn-add" onclick="hcpAddFromChainList(event, ${cid})">Add</button>`
       }
     `;
     container.appendChild(item);

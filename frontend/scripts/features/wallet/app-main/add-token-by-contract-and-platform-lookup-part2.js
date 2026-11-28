@@ -159,6 +159,11 @@ async function doTmSearch(query) {
   let cgResults = [], cmcResults = [];
 
   function _renderResults(coins, source, accentColor) {
+    // Search rows come from third-party APIs (CoinGecko / DexScreener / CMC) where anyone can list a token with
+    // any name, symbol or logo. Reduce every coin to plain, quote-free fields before it reaches innerHTML,
+    // an attribute or a querySelector string below.
+    if (coins && window.oneCleanCoin) coins = coins.map(window.oneCleanCoin).filter(Boolean);
+    source = window.oneCleanText ? window.oneCleanText(source, 32, '') : source;
     if (!coins || coins.length === 0) return;
     if (resultsList) {
       const srcLabel = document.createElement('div');
@@ -182,7 +187,7 @@ async function doTmSearch(query) {
       item.style.animationDelay = (i * 0.04) + 's';
       const sym2 = (coin.symbol || '').slice(0,2).toUpperCase() || '?';
       const iconHtml = coin.thumb
-        ? `<img src="${coin.thumb}" alt="${sym2}" style="width:100%;height:100%;object-fit:cover;border-radius:12px;" onerror="this.style.display='none';this.parentNode.innerHTML='<span style=\\'font-size:13px;font-weight:800;\\'>${sym2}</span>'"/>`
+        ? `<img src="${oneSanitize(coin.thumb)}" alt="${oneSanitize(sym2)}" style="width:100%;height:100%;object-fit:cover;border-radius:12px;" onerror="this.style.display='none';this.parentNode.innerHTML='<span style=\\'font-size:13px;font-weight:800;\\'>${sym2}</span>'"/>`
         : `<span style="font-size:13px;font-weight:800;">${sym2}</span>`;
       const rank = coin.market_cap_rank
         ? `<span style="font-size:9px;background:rgba(255,255,255,0.06);padding:1px 6px;border-radius:5px;margin-left:4px;">#${coin.market_cap_rank}</span>`
@@ -194,12 +199,12 @@ async function doTmSearch(query) {
       item.innerHTML = `
         <div class="tm-token-icon" style="background:rgba(${accentColor},0.12);">${iconHtml}</div>
         <div class="tm-token-info">
-          <div class="tm-token-name">${coin.name}${rank}</div>
-          <div class="tm-token-sub">${(coin.symbol||'').toUpperCase()} · ${source} · ${chainTag}</div>
+          <div class="tm-token-name">${oneSanitize(coin.name)}${rank}</div>
+          <div class="tm-token-sub">${oneSanitize((coin.symbol||'').toUpperCase())} · ${oneSanitize(source)} · ${chainTag}</div>
         </div>
         ${isAdded
           ? `<div class="tm-already-badge">ADDED</div>`
-          : `<div class="tm-add-btn" id="tmadd-${coin.id}"><span class="material-icons-round">add</span></div>`
+          : `<div class="tm-add-btn" id="tmadd-${oneSanitize(coin.id)}"><span class="material-icons-round">add</span></div>`
         }
       `;
       if (!isAdded) {
@@ -378,7 +383,9 @@ async function doTmSearch(query) {
       const cgMatch = cgResults.find(cg => (cg.symbol || '').toLowerCase() === cmcSym);
 
       if (cgMatch && resultsList) {
-        const existingEl = resultsList.querySelector('[data-coin-id="' + cgMatch.id + '"]');
+        // rows are keyed by the cleaned id (see _renderResults), so look up by the same cleaned id
+        const _cgKey = String(cgMatch.id == null ? '' : cgMatch.id).replace(/[^A-Za-z0-9_.:-]/g, '').slice(0, 120);
+        const existingEl = _cgKey ? resultsList.querySelector('[data-coin-id="' + _cgKey + '"]') : null;
         if (existingEl) {
           // Update subtitle with gradient "CMC & CoinGecko" badge
           const subEl = existingEl.querySelector('.tm-token-sub');

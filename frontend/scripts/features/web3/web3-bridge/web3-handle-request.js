@@ -2,7 +2,10 @@
 
 
 // ── Main dispatcher ────────────────────────────────────────
-window.oneHandleWeb3Request = async function(reqId, method, paramsJson) {
+window.oneHandleWeb3Request = async function(reqId, method, paramsJson, originHost) {
+  // Host of the tab that made this request. Captured per request: window._oneActiveBrowserHost
+  // is only "the page that started loading last", which may be another tab.
+  var _siteHost = originHost || _getBrowserHost();
   var params = [];
   try { params = JSON.parse(paramsJson || '[]'); } catch(_) {}
 
@@ -149,40 +152,84 @@ window.oneHandleWeb3Request = async function(reqId, method, paramsJson) {
       }
 
       // ── wallet_addEthereumChain ─────────────────────────────
+      // The user must approve a new network: it brings its own RPC endpoint (which decides what balances and
+      // fees the wallet shows) and was previously added silently by any dApp page. Every field shown here is
+      // the sanitized copy (oneCleanChainlistEntry) and is escaped again for the sheet.
       case 'wallet_addEthereumChain': {
-        try {
-          var addP = params[0] || {};
-          var addChainId = addP.chainId ? parseInt(addP.chainId, 16) : NaN;
-          if (addChainId && !isNaN(addChainId) &&
-              typeof getAllChains === 'function' && typeof loadCustomChains === 'function' &&
-              typeof saveCustomChains === 'function') {
-            var _allCh4 = getAllChains();
-            if (!_allCh4.find(function(c){ return c.chainId === addChainId; })) {
-              var addRpc = (addP.rpcUrls && addP.rpcUrls[0]) || '';
-              var newCustomChain = {
-                id: 'custom-' + addChainId,
-                chainId: addChainId,
-                emoji: '🔗',
-                name: addP.chainName || ('Chain ' + addChainId),
-                nativeSym: (addP.nativeCurrency && addP.nativeCurrency.symbol) || 'ETH',
-                rpc: addRpc,
-                rpcs: addRpc ? [addRpc] : [],
-                explorer: (addP.blockExplorerUrls && addP.blockExplorerUrls[0]) || '',
-                builtIn: false,
-                color: '#6366f1',
-                // Store dApp-supplied icon so the tx modal can show it
-                logoURI: (addP.iconUrls && addP.iconUrls[0]) || addP.iconUrl || null,
-              };
-              var _customs4 = loadCustomChains();
-              _customs4.push(newCustomChain);
-              saveCustomChains(_customs4);
-              if (typeof window.brSyncChainToPicker === 'function') {
-                try { window.brSyncChainToPicker(newCustomChain); } catch(_) {}
-              }
+        var addP = params[0] || {};
+        var addChainId = addP.chainId ? parseInt(addP.chainId, 16) : NaN;
+        if (!addChainId || isNaN(addChainId) ||
+            typeof getAllChains !== 'function' || typeof loadCustomChains !== 'function' ||
+            typeof saveCustomChains !== 'function') {
+          _reject('Invalid chain parameters'); break;
+        }
+        if (getAllChains().find(function(c){ return c.chainId === addChainId; })) {
+          _resolve(null); break;            // already known: nothing to add (EIP-3085)
+        }
+        var _addClean = (typeof oneCleanChainlistEntry === 'function') ? oneCleanChainlistEntry({
+          chainId: addChainId,
+          name: addP.chainName || ('Chain ' + addChainId),
+          nativeCurrency: addP.nativeCurrency,
+          rpc: Array.isArray(addP.rpcUrls) ? addP.rpcUrls : [],
+          explorers: (Array.isArray(addP.blockExplorerUrls) ? addP.blockExplorerUrls : []).map(function(u){ return { url: u }; })
+        }) : null;
+        if (!_addClean) { _reject('Invalid chain parameters'); break; }
+        var addRpc = _addClean.rpc[0] || '';
+        var addExplorer = (_addClean.explorers[0] && _addClean.explorers[0].url) || '';
+        var addIcon = (typeof oneSafeImgUrl === 'function') ? oneSafeImgUrl((Array.isArray(addP.iconUrls) && addP.iconUrls[0]) || addP.iconUrl || '') : '';
+        if (/[\s"'<>`\\]/.test(addIcon)) addIcon = '';
+
+        var _addRow = function(label, value) {
+          return '<div class="w3m-tx-row"><span class="w3m-tx-label">' + label + '</span><span class="w3m-tx-value" style="word-break:break-all;">' + _escHtml(value) + '</span></div>';
+        };
+        var bodyHtmlAdd = _W3M_BODY_STYLES + '<div class="w3m-network-badge">➕ ADD NETWORK</div>' +
+          '<div class="w3m-section-title">NETWORK (SELF-REPORTED BY THE SITE)</div>' +
+          '<div class="w3m-address-box">' +
+            _addRow('Name', _addClean.name) +
+            _addRow('Chain ID', String(addChainId)) +
+            _addRow('Currency', _addClean.nativeCurrency.symbol) +
+            _addRow('RPC URL', addRpc || '(none)') +
+            _addRow('Explorer', addExplorer || '(none)') +
+          '</div>' +
+          '<div class="w3m-warn-box"><div class="w3m-warn-icon">⚠️</div>' +
+          '<div class="w3m-warn-text">' + (addRpc && /^http:\/\//i.test(addRpc) ? 'This RPC is not encrypted (http). ' : '') +
+          'The RPC server decides which balances and fees you see for this network. Only add networks you trust.</div></div>';
+
+        var doAddChain = async function() {
+          // Not a sign/send request, so nothing else closes the native confirmation sheet after Approve
+          try { if (window.OneAndroid && OneAndroid.dismissTxModal) OneAndroid.dismissTxModal(reqId); } catch(_) {}
+          try {
+            var newCustomChain = {
+              id: 'custom-' + addChainId,
+              chainId: addChainId,
+              emoji: '🔗',
+              name: _addClean.name,
+              nativeSym: _addClean.nativeCurrency.symbol,
+              rpc: addRpc,
+              rpcs: addRpc ? [addRpc] : [],
+              explorer: addExplorer,
+              builtIn: false,
+              color: '#6366f1',
+              logoURI: addIcon || null,
+            };
+            var _customs4 = loadCustomChains();
+            _customs4.push(newCustomChain);
+            saveCustomChains(_customs4);
+            if (typeof window.brSyncChainToPicker === 'function') {
+              try { window.brSyncChainToPicker(newCustomChain); } catch(_) {}
             }
-          }
-        } catch(_) {}
-        _resolve(null); break;
+            _resolve(null);
+          } catch(e) { _reject('Could not add network'); }
+        };
+
+        if (_w3mOpen) {
+          (function(_rId,_meth,_bHtml,_doAdd,_rej){
+            _w3mQueue.push(function() { _openModal({ reqId:_rId, method:_meth, actionLabel:'ADD NETWORK', siteHost:_siteHost, bodyHtml:_bHtml, approveLabel:'Add network', onApprove:_doAdd, onReject:function(){ _rej('User rejected'); } }); });
+          })(reqId, method, bodyHtmlAdd, doAddChain, _reject);
+        } else {
+          _openModal({ reqId, method, actionLabel: 'ADD NETWORK', siteHost: _siteHost, bodyHtml: bodyHtmlAdd, approveLabel: 'Add network', onApprove: doAddChain, onReject: function(){ _reject('User rejected'); } });
+        }
+        break;
       }
 
       // ── wallet_watchAsset ───────────────────────────────────
@@ -250,8 +297,8 @@ window.oneHandleWeb3Request = async function(reqId, method, paramsJson) {
         var bodyHtml = _W3M_BODY_STYLES + '<div class="w3m-network-badge">🔑 PERSONAL SIGN</div>' +
           '<div class="w3m-section-title">SIGNING AS</div>' +
           '<div class="w3m-address-box" style="display:flex;flex-direction:column;gap:3px;">' +
-            '<div style="font-size:11px;font-weight:700;color:#a78bfa;">' + (_getWalletLabelForAddress(fromAddr) || 'Wallet') + '</div>' +
-            '<div style="font-size:10px;color:#6b7280;font-family:monospace;">' + (fromAddr || 'Unknown') + '</div>' +
+            '<div style="font-size:11px;font-weight:700;color:#a78bfa;">' + _escHtml(_getWalletLabelForAddress(fromAddr) || 'Wallet') + '</div>' +
+            '<div style="font-size:10px;color:#6b7280;font-family:monospace;word-break:break-all;">' + _escHtml(fromAddr || 'Unknown') + '</div>' +
           '</div>' +
           '<div class="w3m-section-title">MESSAGE</div>' +
           '<div class="w3m-data-box">' + _escHtml(displayMsg) + '</div>' +
@@ -282,10 +329,10 @@ window.oneHandleWeb3Request = async function(reqId, method, paramsJson) {
         if (_w3mOpen) {
           // Snapshot all closure vars to prevent concurrent-request pollution
           (function(_rId,_meth,_bHtml,_doSign,_rej){
-            _w3mQueue.push(function() { _openModal({ reqId:_rId, method:_meth, title:'Sign Message', actionLabel:'personal_sign', siteHost:_getBrowserHost(), bodyHtml:_bHtml, approveLabel:'Sign', onApprove:_doSign, onReject:function(){ _rej('User rejected'); } }); });
+            _w3mQueue.push(function() { _openModal({ reqId:_rId, method:_meth, title:'Sign Message', actionLabel:'personal_sign', siteHost:_siteHost, bodyHtml:_bHtml, approveLabel:'Sign', onApprove:_doSign, onReject:function(){ _rej('User rejected'); } }); });
           })(reqId, method, bodyHtml, doSign, _reject);
         } else {
-          _openModal({ reqId, method, title: 'Sign Message', actionLabel: 'personal_sign', siteHost: _getBrowserHost(), bodyHtml, approveLabel: 'Sign', onApprove: doSign, onReject: function(){ _reject('User rejected'); } });
+          _openModal({ reqId, method, title: 'Sign Message', actionLabel: 'personal_sign', siteHost: _siteHost, bodyHtml, approveLabel: 'Sign', onApprove: doSign, onReject: function(){ _reject('User rejected'); } });
         }
         break;
       }
@@ -305,8 +352,8 @@ window.oneHandleWeb3Request = async function(reqId, method, paramsJson) {
         var bodyHtml2 = _W3M_BODY_STYLES + '<div class="w3m-network-badge">🔑 ETH SIGN (RAW)</div>' +
           '<div class="w3m-section-title">SIGNING AS</div>' +
           '<div class="w3m-address-box" style="display:flex;flex-direction:column;gap:3px;">' +
-            '<div style="font-size:11px;font-weight:700;color:#a78bfa;">' + (_getWalletLabelForAddress(fromAddr2) || 'Wallet') + '</div>' +
-            '<div style="font-size:10px;color:#6b7280;font-family:monospace;">' + (fromAddr2 || 'Unknown') + '</div>' +
+            '<div style="font-size:11px;font-weight:700;color:#a78bfa;">' + _escHtml(_getWalletLabelForAddress(fromAddr2) || 'Wallet') + '</div>' +
+            '<div style="font-size:10px;color:#6b7280;font-family:monospace;word-break:break-all;">' + _escHtml(fromAddr2 || 'Unknown') + '</div>' +
           '</div>' +
           '<div class="w3m-section-title">HASH</div>' +
           '<div class="w3m-data-box">' + _escHtml(hashToSign) + '</div>' +
@@ -337,9 +384,9 @@ window.oneHandleWeb3Request = async function(reqId, method, paramsJson) {
         };
 
         if (_w3mOpen) {
-          _w3mQueue.push(function() { _openModal({ reqId, method, actionLabel: 'eth_sign', siteHost: _getBrowserHost(), bodyHtml: bodyHtml2, approveLabel: 'Sign', onApprove: doEthSign, onReject: function(){ _reject('User rejected'); } }); });
+          _w3mQueue.push(function() { _openModal({ reqId, method, actionLabel: 'eth_sign', siteHost: _siteHost, bodyHtml: bodyHtml2, approveLabel: 'Sign', onApprove: doEthSign, onReject: function(){ _reject('User rejected'); } }); });
         } else {
-          _openModal({ reqId, method, actionLabel: 'eth_sign', siteHost: _getBrowserHost(), bodyHtml: bodyHtml2, approveLabel: 'Sign', onApprove: doEthSign, onReject: function(){ _reject('User rejected'); } });
+          _openModal({ reqId, method, actionLabel: 'eth_sign', siteHost: _siteHost, bodyHtml: bodyHtml2, approveLabel: 'Sign', onApprove: doEthSign, onReject: function(){ _reject('User rejected'); } });
         }
         break;
       }
@@ -360,16 +407,19 @@ window.oneHandleWeb3Request = async function(reqId, method, paramsJson) {
 
         var msgPreview = '';
         try { msgPreview = JSON.stringify(typedData.message || typedData, null, 2); } catch(_) { msgPreview = String(typedDataRaw); }
-        if (msgPreview.length > 500) msgPreview = msgPreview.slice(0,500) + '...';
+        // Shown in full (the sheet scrolls): a spender or recipient can come late in the message
+        if (msgPreview.length > 20000) msgPreview = msgPreview.slice(0,20000) + '\n… (truncated: message is too long to show in full)';
 
         var typedDomain = typedData.domain || {};
         var bodyHtml3 = _W3M_BODY_STYLES + '<div class="w3m-network-badge">🔏 EIP-712 TYPED SIGN</div>' +
           '<div class="w3m-section-title">SIGNING AS</div>' +
           '<div class="w3m-address-box" style="display:flex;flex-direction:column;gap:3px;">' +
-            '<div style="font-size:11px;font-weight:700;color:#a78bfa;">' + (_getWalletLabelForAddress(fromAddr3) || 'Wallet') + '</div>' +
-            '<div style="font-size:10px;color:#6b7280;font-family:monospace;">' + (fromAddr3 || 'Unknown') + '</div>' +
+            '<div style="font-size:11px;font-weight:700;color:#a78bfa;">' + _escHtml(_getWalletLabelForAddress(fromAddr3) || 'Wallet') + '</div>' +
+            '<div style="font-size:10px;color:#6b7280;font-family:monospace;word-break:break-all;">' + _escHtml(fromAddr3 || 'Unknown') + '</div>' +
           '</div>' +
-          (typedDomain.name ? '<div class="w3m-section-title">CONTRACT</div><div class="w3m-address-box">' + _escHtml(typedDomain.name) + '</div>' : '') +
+          // domain.name is free text chosen by the requester; the address is what identifies the contract
+          (typedDomain.name ? '<div class="w3m-section-title">APP NAME (SELF-REPORTED)</div><div class="w3m-address-box">' + _escHtml(typedDomain.name) + '</div>' : '') +
+          (typedDomain.verifyingContract ? '<div class="w3m-section-title">VERIFYING CONTRACT</div><div class="w3m-address-box">' + _escHtml(typedDomain.verifyingContract) + '</div>' : '') +
           '<div class="w3m-section-title">MESSAGE PREVIEW</div>' +
           '<div class="w3m-data-box">' + _escHtml(msgPreview) + '</div>' +
           '<div class="w3m-warn-box"><div class="w3m-warn-icon">⚠️</div>' +
@@ -454,9 +504,9 @@ window.oneHandleWeb3Request = async function(reqId, method, paramsJson) {
         };
 
         if (_w3mOpen) {
-          _w3mQueue.push(function() { _openModal({ reqId, method, actionLabel: method, siteHost: _getBrowserHost(), bodyHtml: bodyHtml3, approveLabel: 'Sign', onApprove: doTypedSign, onReject: function(){ _reject('User rejected'); } }); });
+          _w3mQueue.push(function() { _openModal({ reqId, method, actionLabel: method, siteHost: _siteHost, bodyHtml: bodyHtml3, approveLabel: 'Sign', onApprove: doTypedSign, onReject: function(){ _reject('User rejected'); } }); });
         } else {
-          _openModal({ reqId, method, actionLabel: method, siteHost: _getBrowserHost(), bodyHtml: bodyHtml3, approveLabel: 'Sign', onApprove: doTypedSign, onReject: function(){ _reject('User rejected'); } });
+          _openModal({ reqId, method, actionLabel: method, siteHost: _siteHost, bodyHtml: bodyHtml3, approveLabel: 'Sign', onApprove: doTypedSign, onReject: function(){ _reject('User rejected'); } });
         }
         break;
       }
@@ -542,7 +592,7 @@ window.oneHandleWeb3Request = async function(reqId, method, paramsJson) {
         var valDisplay = _fmtValue(txParams.value, chainId);
         var sym        = _getChainSymbol(chainId);
         var chainName  = _getChainName(chainId);
-        var toShort    = txParams.to ? txParams.to.slice(0,8) + '...' + txParams.to.slice(-6) : 'Contract';
+        var toFull     = txParams.to || 'Contract deployment';
         var hasData    = txParams.data && txParams.data !== '0x' && txParams.data.length > 2;
 
         // ── ERC20 transfer/approve decode ──────────────────────────────────────
@@ -605,11 +655,9 @@ window.oneHandleWeb3Request = async function(reqId, method, paramsJson) {
                 : (_whole.toString() + (_fracStr ? '.' + _fracStr : ''));
               // Token symbol from resolved meta or fallback
               var _tokSym = _tokSym2 ? _tokSym2 : 'Token·' + (txParams.to ? txParams.to.slice(-4) : '????');
-              var _toShortErc = _toRaw.length >= 10 ? _toRaw.slice(0,8) + '...' + _toRaw.slice(-6) : _toRaw;
               _erc20Info = {
                 type:      _sel4 === '0xa9059cbb' ? 'ERC-20 Transfer' : 'ERC-20 Approve',
                 recipient: _toRaw,
-                recipientShort: _toShortErc,
                 amount:    _amtDisplay,
                 symbol:    _tokSym,
                 decimals:  _tokDec,
@@ -664,7 +712,6 @@ window.oneHandleWeb3Request = async function(reqId, method, paramsJson) {
               _erc20Info = {
                 type:      'ERC-20 TransferFrom',
                 recipient: _tfTo,
-                recipientShort: _tfTo.slice(0,8) + '...' + _tfTo.slice(-6),
                 amount:    _tfAmt,
                 symbol:    _tfSym,
                 decimals:  _tfDec,
@@ -1096,13 +1143,13 @@ window.oneHandleWeb3Request = async function(reqId, method, paramsJson) {
         var _modalToRow, _modalAmountRow, _modalTypeRow = '';
         if (_erc20Info) {
           // ERC20: show decoded recipient, amount, token symbol, contract
-          _modalToRow = '<div class="w3m-tx-row"><span class="w3m-tx-label">To</span><span class="w3m-tx-value">' + _escHtml(_erc20Info.recipientShort) + '</span></div>';
+          _modalToRow = '<div class="w3m-tx-row"><span class="w3m-tx-label">' + (_erc20Info.type === 'ERC-20 Approve' ? 'Spender' : 'To') + '</span><span class="w3m-tx-value">' + _escHtml(_erc20Info.recipient) + '</span></div>';
           _modalAmountRow = '<div class="w3m-tx-row"><span class="w3m-tx-label">Amount</span><span class="w3m-tx-value" style="color:#10b981;font-weight:700;">' + _escHtml(_erc20Info.amount + ' ' + _erc20Info.symbol) + '</span></div>';
           _modalTypeRow = '<div class="w3m-tx-row"><span class="w3m-tx-label">Type</span><span class="w3m-tx-value" style="color:#a78bfa;">' + _escHtml(_erc20Info.type) + '</span></div>' +
-            '<div class="w3m-tx-row"><span class="w3m-tx-label">Contract</span><span class="w3m-tx-value">' + _escHtml(_erc20Info.contract ? _erc20Info.contract.slice(0,8)+'...'+_erc20Info.contract.slice(-6) : '?') + '</span></div>';
+            '<div class="w3m-tx-row"><span class="w3m-tx-label">Contract</span><span class="w3m-tx-value">' + _escHtml(_erc20Info.contract || '?') + '</span></div>';
         } else {
           // Native ETH / generic contract tx
-          _modalToRow = '<div class="w3m-tx-row"><span class="w3m-tx-label">To</span><span class="w3m-tx-value">' + _escHtml(toShort) + '</span></div>';
+          _modalToRow = '<div class="w3m-tx-row"><span class="w3m-tx-label">To</span><span class="w3m-tx-value">' + _escHtml(toFull) + '</span></div>';
           // Only show Value row if ETH value is non-zero, OR if there is no calldata (pure ETH send)
           var _rawVal = txParams.value ? BigInt(txParams.value) : 0n;
           if (_rawVal > 0n || !hasData) {
@@ -1115,10 +1162,9 @@ window.oneHandleWeb3Request = async function(reqId, method, paramsJson) {
             var _actionLabel = _knownSel
               ? _knownSel.name + ' — ' + _knownSel.desc
               : txParams.data.slice(0,10) + '... (unknown)';
-            var _contractShort = txParams.to ? txParams.to.slice(0,8) + '...' + txParams.to.slice(-6) : '?';
             _modalTypeRow =
               '<div class="w3m-tx-row"><span class="w3m-tx-label">Action</span><span class="w3m-tx-value" style="color:#a78bfa;">' + _escHtml(_actionLabel) + '</span></div>' +
-              '<div class="w3m-tx-row"><span class="w3m-tx-label">Contract</span><span class="w3m-tx-value">' + _escHtml(_contractShort) + '</span></div>';
+              '<div class="w3m-tx-row"><span class="w3m-tx-label">Contract</span><span class="w3m-tx-value">' + _escHtml(txParams.to || '?') + '</span></div>';
           } else {
             _modalTypeRow = '';
           }
@@ -1136,7 +1182,7 @@ window.oneHandleWeb3Request = async function(reqId, method, paramsJson) {
           '<div class="w3m-address-box">' +
           '<div class="w3m-tx-row"><span class="w3m-tx-label">From</span><span class="w3m-tx-value" style="display:flex;flex-direction:column;align-items:flex-end;gap:2px;">' +
             '<span style="color:#a78bfa;font-weight:700;">' + _escHtml(_getWalletLabelForAddress(fromAddr4) || '') + '</span>' +
-            '<span>' + _escHtml(fromAddr4 ? fromAddr4.slice(0,8)+'...'+fromAddr4.slice(-6) : '?') + '</span>' +
+            '<span style="word-break:break-all;">' + _escHtml(fromAddr4 || '?') + '</span>' +
           '</span></div>' +
           _modalToRow +
           _modalAmountRow +
@@ -1342,9 +1388,9 @@ window.oneHandleWeb3Request = async function(reqId, method, paramsJson) {
         };
 
         if (_w3mOpen) {
-          _w3mQueue.push(function() { _openModal({ reqId, method, actionLabel: 'SEND TX', siteHost: _getBrowserHost(), bodyHtml: bodyHtml4, approveLabel: 'Confirm & Send', onApprove: doSendTx, onReject: function(){ _reject('User rejected'); } }); });
+          _w3mQueue.push(function() { _openModal({ reqId, method, actionLabel: 'SEND TX', siteHost: _siteHost, bodyHtml: bodyHtml4, approveLabel: 'Confirm & Send', onApprove: doSendTx, onReject: function(){ _reject('User rejected'); } }); });
         } else {
-          _openModal({ reqId, method, actionLabel: 'SEND TX', siteHost: _getBrowserHost(), bodyHtml: bodyHtml4, approveLabel: 'Confirm & Send', onApprove: doSendTx, onReject: function(){ _reject('User rejected'); } });
+          _openModal({ reqId, method, actionLabel: 'SEND TX', siteHost: _siteHost, bodyHtml: bodyHtml4, approveLabel: 'Confirm & Send', onApprove: doSendTx, onReject: function(){ _reject('User rejected'); } });
         }
         break;
       }
@@ -1365,8 +1411,8 @@ window.oneHandleWeb3Request = async function(reqId, method, paramsJson) {
         var bodyHtml5 = _W3M_BODY_STYLES + '<div class="w3m-network-badge">✍️ SIGN TX (NO SEND)</div>' +
           '<div class="w3m-section-title">TRANSACTION</div>' +
           '<div class="w3m-address-box">' +
-          '<div class="w3m-tx-row"><span class="w3m-tx-label">To</span><span class="w3m-tx-value">' + (txP2.to||'?') + '</span></div>' +
-          '<div class="w3m-tx-row"><span class="w3m-tx-label">Value</span><span class="w3m-tx-value">' + _fmtValue(txP2.value, chainId) + ' ' + _getChainSymbol(chainId) + '</span></div>' +
+          '<div class="w3m-tx-row"><span class="w3m-tx-label">To</span><span class="w3m-tx-value" style="word-break:break-all;">' + _escHtml(txP2.to||'?') + '</span></div>' +
+          '<div class="w3m-tx-row"><span class="w3m-tx-label">Value</span><span class="w3m-tx-value">' + _escHtml(_fmtValue(txP2.value, chainId) + ' ' + _getChainSymbol(chainId)) + '</span></div>' +
           '</div>';
 
         var doSignTx = async function() {
@@ -1400,9 +1446,9 @@ window.oneHandleWeb3Request = async function(reqId, method, paramsJson) {
         };
 
         if (_w3mOpen) {
-          _w3mQueue.push(function() { _openModal({ reqId, method, actionLabel: 'SIGN TX', siteHost: _getBrowserHost(), bodyHtml: bodyHtml5, approveLabel: 'Sign', onApprove: doSignTx, onReject: function(){ _reject('User rejected'); } }); });
+          _w3mQueue.push(function() { _openModal({ reqId, method, actionLabel: 'SIGN TX', siteHost: _siteHost, bodyHtml: bodyHtml5, approveLabel: 'Sign', onApprove: doSignTx, onReject: function(){ _reject('User rejected'); } }); });
         } else {
-          _openModal({ reqId, method, actionLabel: 'SIGN TX', siteHost: _getBrowserHost(), bodyHtml: bodyHtml5, approveLabel: 'Sign', onApprove: doSignTx, onReject: function(){ _reject('User rejected'); } });
+          _openModal({ reqId, method, actionLabel: 'SIGN TX', siteHost: _siteHost, bodyHtml: bodyHtml5, approveLabel: 'Sign', onApprove: doSignTx, onReject: function(){ _reject('User rejected'); } });
         }
         break;
       }

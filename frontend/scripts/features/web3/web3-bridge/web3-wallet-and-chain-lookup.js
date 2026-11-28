@@ -124,7 +124,7 @@ function _fmtValue(hexVal, chainId) {
     var num = parseFloat(eth);
     if (num === 0) return '0';
     return num.toFixed(num < 0.001 ? 8 : num < 1 ? 6 : 4);
-  } catch(_) { return hexVal; }
+  } catch(_) { return String(hexVal == null ? '' : hexVal).replace(/[^0-9a-zA-Z.x]/g, '').slice(0, 80) || '?'; } // dApp-controlled text: never return it raw
 }
 
 function _getChainSymbol(chainId) {

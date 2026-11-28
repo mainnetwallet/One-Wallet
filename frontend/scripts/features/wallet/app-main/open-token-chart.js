@@ -1282,7 +1282,12 @@ function openTokenChart(t) {
   window._tcfToken  = t;
   window._tcfTf     = '5m';
   window._tcfChartType = 'candle'; // always candlestick now
-  window._tcfActiveCoin = (t.sub || 'BTC').toUpperCase().replace('USDT','').replace('/','');
+  // An unverified contract token must not pull the chart of a listed coin that merely shares its ticker
+  // (a scam token called "ETH" would show the ETH chart). Give it a key no exchange lists => "NO DATA";
+  // its price/market bar comes from its own contract (see oneSymbolPriceAllowed).
+  window._tcfActiveCoin = oneSymbolPriceAllowed(t)
+    ? (t.sub || 'BTC').toUpperCase().replace('USDT','').replace('/','')
+    : ('X' + String(t.contract || t.id || '').replace(/^0x/i, '').slice(0, 8)).toUpperCase().replace(/[^A-Z0-9]/g, '');
 
   // ── Load persisted drawings for this coin ──
   _dtLoadDrawings(window._tcfActiveCoin);

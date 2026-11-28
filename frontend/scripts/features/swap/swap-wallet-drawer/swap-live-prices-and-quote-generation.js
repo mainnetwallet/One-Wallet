@@ -119,13 +119,22 @@ async function swFetchLivePricesAndGenerateQuotes(fromAmt) {
 
   // Helper: get price for a token
   async function _fetchTokenPrice(token) {
+    // A token's ticker is attacker-controlled text. Symbol-based price steps (symbol cache, "USDC" => $1,
+    // CoinGecko id = ticker) run only for tokens whose identity is known: native / default / has a CoinGecko id /
+    // same contract as a bundled token of this network. Any other contract token is never priced by ticker.
+    const _symOk = (function() {
+      if (oneSymbolPriceAllowed(token)) return true;
+      const c = String(token.contract || '').toLowerCase();
+      const bundled = (typeof TOKENS_BY_NETWORK !== 'undefined' && TOKENS_BY_NETWORK[SW.network && SW.network.id]) || [];
+      return !!c && bundled.some(b => String(b.contract || '').toLowerCase() === c);
+    })();
     // 1. globalPriceCache via cgId (already fetched by home section — no extra network call needed)
     if (typeof _globalPriceCache !== 'undefined' && _globalPriceCache && token.cgId) {
       const cached = _globalPriceCache[token.cgId];
       if (cached && cached.usd > 0) return cached.usd;
     }
     // 2. globalPriceCache symbol-based lookup
-    if (typeof _globalPriceCache !== 'undefined' && _globalPriceCache) {
+    if (_symOk && typeof _globalPriceCache !== 'undefined' && _globalPriceCache) {
       for (const k of Object.keys(_globalPriceCache)) {
         if (k.toLowerCase() === (token.sym || '').toLowerCase()) {
           const v = _globalPriceCache[k];
@@ -141,7 +150,7 @@ async function swFetchLivePricesAndGenerateQuotes(fromAmt) {
       const _match = _st.find(t =>
         (token.cgId && t.cgId === token.cgId) ||
         (token.contract && t.contract && t.contract.toLowerCase() === token.contract.toLowerCase() && t.chainId === (SW.network?.chainId)) ||
-        (token.sym && t.sub && t.sub.toLowerCase() === token.sym.toLowerCase() && t.chainId === (SW.network?.chainId))
+        (_symOk && token.sym && t.sub && t.sub.toLowerCase() === token.sym.toLowerCase() && t.chainId === (SW.network?.chainId))
       );
       if (_match?.price > 0) return _match.price;
       // also try globalPriceCache with matched token's cgId
@@ -151,6 +160,7 @@ async function swFetchLivePricesAndGenerateQuotes(fromAmt) {
     } catch(_) {}
     // 5. Stablecoins always = $1
     const sym = (token.sym || '').toUpperCase();
+    if (!_symOk) return 0;   // unverified contract token: no ticker-based $1 / CoinGecko-id guess
     if (/^(USDC|USDT|DAI|BUSD|TUSD|USDP|GUSD|FRAX|LUSD|CRVUSD|PYUSD)$/.test(sym)) return 1;
     // 6. CoinGecko fallback (no CORS issues, works for all chains)
     const cgId = token.cgId || sym.toLowerCase();

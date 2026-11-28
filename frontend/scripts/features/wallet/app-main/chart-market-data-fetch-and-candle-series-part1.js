@@ -1,7 +1,7 @@
 
 
 async function _tcfFetchMarketData(t) {
-  const sym = _cgIdToSymbol(t.cgId || '') || t.sub?.toUpperCase();
+  const sym = _cgIdToSymbol(t.cgId || '') || (oneSymbolPriceAllowed(t) ? t.sub?.toUpperCase() : null);
 
   // ── Parallel fetch: Binance + CoinGecko run simultaneously ──
   // Winner = first valid price, with Binance preferred
