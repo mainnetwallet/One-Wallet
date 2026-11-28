@@ -152,40 +152,84 @@ window.oneHandleWeb3Request = async function(reqId, method, paramsJson, originHo
       }
 
       // ── wallet_addEthereumChain ─────────────────────────────
+      // The user must approve a new network: it brings its own RPC endpoint (which decides what balances and
+      // fees the wallet shows) and was previously added silently by any dApp page. Every field shown here is
+      // the sanitized copy (oneCleanChainlistEntry) and is escaped again for the sheet.
       case 'wallet_addEthereumChain': {
-        try {
-          var addP = params[0] || {};
-          var addChainId = addP.chainId ? parseInt(addP.chainId, 16) : NaN;
-          if (addChainId && !isNaN(addChainId) &&
-              typeof getAllChains === 'function' && typeof loadCustomChains === 'function' &&
-              typeof saveCustomChains === 'function') {
-            var _allCh4 = getAllChains();
-            if (!_allCh4.find(function(c){ return c.chainId === addChainId; })) {
-              var addRpc = (addP.rpcUrls && addP.rpcUrls[0]) || '';
-              var newCustomChain = {
-                id: 'custom-' + addChainId,
-                chainId: addChainId,
-                emoji: '🔗',
-                name: addP.chainName || ('Chain ' + addChainId),
-                nativeSym: (addP.nativeCurrency && addP.nativeCurrency.symbol) || 'ETH',
-                rpc: addRpc,
-                rpcs: addRpc ? [addRpc] : [],
-                explorer: (addP.blockExplorerUrls && addP.blockExplorerUrls[0]) || '',
-                builtIn: false,
-                color: '#6366f1',
-                // Store dApp-supplied icon so the tx modal can show it
-                logoURI: (addP.iconUrls && addP.iconUrls[0]) || addP.iconUrl || null,
-              };
-              var _customs4 = loadCustomChains();
-              _customs4.push(newCustomChain);
-              saveCustomChains(_customs4);
-              if (typeof window.brSyncChainToPicker === 'function') {
-                try { window.brSyncChainToPicker(newCustomChain); } catch(_) {}
-              }
+        var addP = params[0] || {};
+        var addChainId = addP.chainId ? parseInt(addP.chainId, 16) : NaN;
+        if (!addChainId || isNaN(addChainId) ||
+            typeof getAllChains !== 'function' || typeof loadCustomChains !== 'function' ||
+            typeof saveCustomChains !== 'function') {
+          _reject('Invalid chain parameters'); break;
+        }
+        if (getAllChains().find(function(c){ return c.chainId === addChainId; })) {
+          _resolve(null); break;            // already known: nothing to add (EIP-3085)
+        }
+        var _addClean = (typeof oneCleanChainlistEntry === 'function') ? oneCleanChainlistEntry({
+          chainId: addChainId,
+          name: addP.chainName || ('Chain ' + addChainId),
+          nativeCurrency: addP.nativeCurrency,
+          rpc: Array.isArray(addP.rpcUrls) ? addP.rpcUrls : [],
+          explorers: (Array.isArray(addP.blockExplorerUrls) ? addP.blockExplorerUrls : []).map(function(u){ return { url: u }; })
+        }) : null;
+        if (!_addClean) { _reject('Invalid chain parameters'); break; }
+        var addRpc = _addClean.rpc[0] || '';
+        var addExplorer = (_addClean.explorers[0] && _addClean.explorers[0].url) || '';
+        var addIcon = (typeof oneSafeImgUrl === 'function') ? oneSafeImgUrl((Array.isArray(addP.iconUrls) && addP.iconUrls[0]) || addP.iconUrl || '') : '';
+        if (/[\s"'<>`\\]/.test(addIcon)) addIcon = '';
+
+        var _addRow = function(label, value) {
+          return '<div class="w3m-tx-row"><span class="w3m-tx-label">' + label + '</span><span class="w3m-tx-value" style="word-break:break-all;">' + _escHtml(value) + '</span></div>';
+        };
+        var bodyHtmlAdd = _W3M_BODY_STYLES + '<div class="w3m-network-badge">➕ ADD NETWORK</div>' +
+          '<div class="w3m-section-title">NETWORK (SELF-REPORTED BY THE SITE)</div>' +
+          '<div class="w3m-address-box">' +
+            _addRow('Name', _addClean.name) +
+            _addRow('Chain ID', String(addChainId)) +
+            _addRow('Currency', _addClean.nativeCurrency.symbol) +
+            _addRow('RPC URL', addRpc || '(none)') +
+            _addRow('Explorer', addExplorer || '(none)') +
+          '</div>' +
+          '<div class="w3m-warn-box"><div class="w3m-warn-icon">⚠️</div>' +
+          '<div class="w3m-warn-text">' + (addRpc && /^http:\/\//i.test(addRpc) ? 'This RPC is not encrypted (http). ' : '') +
+          'The RPC server decides which balances and fees you see for this network. Only add networks you trust.</div></div>';
+
+        var doAddChain = async function() {
+          // Not a sign/send request, so nothing else closes the native confirmation sheet after Approve
+          try { if (window.OneAndroid && OneAndroid.dismissTxModal) OneAndroid.dismissTxModal(reqId); } catch(_) {}
+          try {
+            var newCustomChain = {
+              id: 'custom-' + addChainId,
+              chainId: addChainId,
+              emoji: '🔗',
+              name: _addClean.name,
+              nativeSym: _addClean.nativeCurrency.symbol,
+              rpc: addRpc,
+              rpcs: addRpc ? [addRpc] : [],
+              explorer: addExplorer,
+              builtIn: false,
+              color: '#6366f1',
+              logoURI: addIcon || null,
+            };
+            var _customs4 = loadCustomChains();
+            _customs4.push(newCustomChain);
+            saveCustomChains(_customs4);
+            if (typeof window.brSyncChainToPicker === 'function') {
+              try { window.brSyncChainToPicker(newCustomChain); } catch(_) {}
             }
-          }
-        } catch(_) {}
-        _resolve(null); break;
+            _resolve(null);
+          } catch(e) { _reject('Could not add network'); }
+        };
+
+        if (_w3mOpen) {
+          (function(_rId,_meth,_bHtml,_doAdd,_rej){
+            _w3mQueue.push(function() { _openModal({ reqId:_rId, method:_meth, actionLabel:'ADD NETWORK', siteHost:_siteHost, bodyHtml:_bHtml, approveLabel:'Add network', onApprove:_doAdd, onReject:function(){ _rej('User rejected'); } }); });
+          })(reqId, method, bodyHtmlAdd, doAddChain, _reject);
+        } else {
+          _openModal({ reqId, method, actionLabel: 'ADD NETWORK', siteHost: _siteHost, bodyHtml: bodyHtmlAdd, approveLabel: 'Add network', onApprove: doAddChain, onReject: function(){ _reject('User rejected'); } });
+        }
+        break;
       }
 
       // ── wallet_watchAsset ───────────────────────────────────
