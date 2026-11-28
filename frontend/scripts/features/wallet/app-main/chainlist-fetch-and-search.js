@@ -53,7 +53,7 @@ function hcpSwitchTab(tab) {
       if (input) {
         if (input.value.trim()) hcpClSearch();
         else hcpClRenderResults([]);
-        setTimeout(() => input.focus(), 200);
+        // no input.focus(): opening Chainlist must not pop up the phone keyboard (it opens when the user taps the search)
       }
     });
   }
