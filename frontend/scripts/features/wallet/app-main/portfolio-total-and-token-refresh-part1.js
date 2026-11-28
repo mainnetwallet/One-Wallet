@@ -330,7 +330,6 @@ async function silentPriceRefresh() {
   const _sprBalFetches = [];
 
   // ── Now update all cards with fresh price + balance ──
-  let _freshTotal = 0;
   for (const t of filteredTokens) {
     const card = document.getElementById('token-card-' + t.id);
     if (!card) continue;
@@ -393,7 +392,6 @@ async function silentPriceRefresh() {
         card.dataset.usdValue = '0';
       }
     }
-    if (hasBalance) _freshTotal += usdValNum;
 
     // Update live price label — only if changed
     const lpEl = document.getElementById('tlp-' + t.id);
@@ -411,23 +409,9 @@ async function silentPriceRefresh() {
     }
   }
 
-  // Recompute portfolio total ONCE after all tokens updated
-  // Only update if we got at least some fresh USD data — never zero-out from a partial refresh
-  if (_freshTotal > 0) {
-    _portfolioTotalUsd = _freshTotal;
-    updatePortfolioTotal();
-  } else if (_freshTotal === 0) {
-    // All balances are zero — verify by checking if ANY card has a non-zero balance
-    var _anyBal = false;
-    document.querySelectorAll('.token-card[data-usd-value]').forEach(function(c) {
-      if (parseFloat(c.dataset.usdValue || '0') > 0) _anyBal = true;
-    });
-    if (!_anyBal) {
-      _portfolioTotalUsd = 0;
-      updatePortfolioTotal();
-    }
-    // else: keep existing displayed total — balances fetched but prices missing
-  }
+  // Recompute the portfolio total ONCE from every card. A token whose price did not arrive in this
+  // round keeps its previous data-usd-value, so a partial refresh can no longer shrink the total.
+  _recalcPortfolioTotal();
 
   // ── Re-sort by USD value descending after fresh data ──
   (function _sortAfterRefresh() {

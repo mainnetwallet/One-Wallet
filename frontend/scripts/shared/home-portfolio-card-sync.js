@@ -54,6 +54,7 @@
       if (usd <= 0) return;
       var chEl = c.querySelector('.tlp-change');
       var pct = chEl ? parseFloat((chEl.textContent || '').replace(/\u2212/g, '-').replace(/[^0-9.+\-]/g, '')) : NaN;
+      if (chEl && isNaN(pct)) pct = 0;   // no 24h data / exactly 0.00% -> flat, still part of the total
       if (isNaN(pct) || pct <= -99.9) return;
       now += usd;
       prev += usd / (1 + pct / 100);

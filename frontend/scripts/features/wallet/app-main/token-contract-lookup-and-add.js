@@ -50,7 +50,7 @@ async function _readTokenMeta(addr, rpcList) {
         const [name, symbol, decimals] = await Promise.all([
           contract.name(), contract.symbol(), contract.decimals(),
         ]);
-        if (symbol) return { name, symbol, decimals: Number(decimals), resolvedAddr: addr };
+        if (symbol) return { name: oneCleanText(name, 64, ''), symbol: oneCleanText(symbol, 24, ''), decimals: Number(decimals), resolvedAddr: addr };
       } catch {}
       // Proxy fallback — resolve implementation and read from there
       const impl = await _resolveProxyImpl(addr, provider);
@@ -60,7 +60,7 @@ async function _readTokenMeta(addr, rpcList) {
           const [name, symbol, decimals] = await Promise.all([
             implContract.name(), implContract.symbol(), implContract.decimals(),
           ]);
-          if (symbol) return { name, symbol, decimals: Number(decimals), resolvedAddr: impl, isProxy: true };
+          if (symbol) return { name: oneCleanText(name, 64, ''), symbol: oneCleanText(symbol, 24, ''), decimals: Number(decimals), resolvedAddr: impl, isProxy: true };
         } catch {}
       }
     } catch {}
@@ -90,9 +90,9 @@ async function _cgLookupByContract(addr, chainId) {
   if (!data || !data.id) return null;
   return {
     id: data.id,
-    name: data.name || '',
-    symbol: (data.symbol || '').toUpperCase(),
-    thumb: data.image?.thumb || data.image?.small || null,
+    name: oneCleanText(data.name, 64, ''),
+    symbol: oneCleanText(data.symbol, 24, '').toUpperCase(),
+    thumb: oneSafeImgUrl(data.image?.thumb || data.image?.small || '') || null,
   };
 }
 

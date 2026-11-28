@@ -16,7 +16,7 @@ function loadSavedTokens() {
       return [...DEFAULT_TOKENS];
     }
     // Purge old duplicate IDs and fix stale names from DEFAULT_TOKENS
-    let saved = JSON.parse(raw).filter(t => !REMOVED_TOKEN_IDS.has(t.id));
+    let saved = JSON.parse(raw).filter(t => t && !REMOVED_TOKEN_IDS.has(t.id)).map(oneCleanToken);
     // Update name/isNative fields from DEFAULT_TOKENS (fixes old cached "(Native)" names)
     saved = saved.map(t => {
       const def = DEFAULT_TOKENS.find(d => d.id === t.id);
@@ -51,7 +51,7 @@ function loadSavedTokens() {
 function saveTokenList(tokens) {
   try {
     const storageKey = _getTmStorageKey();
-    localStorage.setItem(storageKey, JSON.stringify(tokens));
+    localStorage.setItem(storageKey, JSON.stringify((Array.isArray(tokens) ? tokens : []).map(oneCleanToken)));
   } catch {}
 }
 
