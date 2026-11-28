@@ -60,6 +60,8 @@
     ['one-lock-setup-sheet', 'one-lock-setup', function () {
       if (typeof oneLock !== 'undefined' && oneLock && typeof oneLock.closeSetup === 'function') oneLock.closeSetup(false);
     }],
+    // Add Keys (Wallet Groups > ADD). Swiping down on the sheet or the dim area closes it.
+    ['wgak-sheet',         'wgak-overlay',         call('closeWgakModal')],
     ['send-confirm-sheet',  'send-confirm-overlay', function () {
       var ov = document.getElementById('send-confirm-overlay');
       if (ov) { ov.style.opacity = '0'; ov.style.pointerEvents = 'none'; }

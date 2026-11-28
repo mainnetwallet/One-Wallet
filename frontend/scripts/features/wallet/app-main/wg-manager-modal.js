@@ -45,22 +45,21 @@ function renderWgManagerList() {
         </div>
         <div style="padding:3px 9px;border-radius:7px;background:rgba(99,102,241,0.12);border:1px solid rgba(99,102,241,0.25);font-size:9px;font-weight:800;color:var(--neon-purple);font-family:var(--font-mono);flex-shrink:0;">${g.keys.length} KEYS</div>
       </div>
-      <!-- Add keys row -->
-      <div onclick="wgmAddKeys('${g.id}')" style="display:flex;align-items:center;justify-content:center;gap:6px;padding:11px 8px;cursor:pointer;background:transparent;transition:background 0.2s;border-top:1px solid var(--border-subtle);" onmousedown="this.style.background='rgba(16,185,129,0.1)'" onmouseup="this.style.background=''" ontouchstart="this.style.background='rgba(16,185,129,0.1)'" ontouchend="this.style.background=''">
-        <span class="material-icons-round" style="font-size:15px;color:#34d399;">add</span>
-        <span style="font-size:11px;font-weight:700;color:#34d399;font-family:var(--font-mono);letter-spacing:0.5px;">ADD KEYS</span>
-      </div>
       <!-- Action buttons -->
       <div style="display:flex;border-top:1px solid var(--border-subtle);">
-        <div onclick="wgmRename('${g.id}')" style="flex:1;display:flex;align-items:center;justify-content:center;gap:6px;padding:11px 8px;cursor:pointer;background:transparent;transition:background 0.2s;border-right:1px solid var(--border-subtle);" onmousedown="this.style.background='rgba(99,102,241,0.1)'" onmouseup="this.style.background=''" ontouchstart="this.style.background='rgba(99,102,241,0.1)'" ontouchend="this.style.background=''">
+        <div onclick="wgmRename('${g.id}')" style="flex:1;display:flex;align-items:center;justify-content:center;gap:4px;padding:11px 4px;cursor:pointer;background:transparent;transition:background 0.2s;border-right:1px solid var(--border-subtle);" onmousedown="this.style.background='rgba(99,102,241,0.1)'" onmouseup="this.style.background=''" ontouchstart="this.style.background='rgba(99,102,241,0.1)'" ontouchend="this.style.background=''">
           <span class="material-icons-round" style="font-size:15px;color:var(--accent-primary);">edit</span>
           <span style="font-size:11px;font-weight:700;color:var(--accent-primary);font-family:var(--font-mono);letter-spacing:0.5px;">RENAME</span>
         </div>
-        <div onclick="wgmEditKeys('${g.id}')" style="flex:1;display:flex;align-items:center;justify-content:center;gap:6px;padding:11px 8px;cursor:pointer;background:transparent;transition:background 0.2s;border-right:1px solid var(--border-subtle);" onmousedown="this.style.background='rgba(245,158,11,0.1)'" onmouseup="this.style.background=''" ontouchstart="this.style.background='rgba(245,158,11,0.1)'" ontouchend="this.style.background=''">
+        <div onclick="wgmEditKeys('${g.id}')" style="flex:1;display:flex;align-items:center;justify-content:center;gap:4px;padding:11px 4px;cursor:pointer;background:transparent;transition:background 0.2s;border-right:1px solid var(--border-subtle);" onmousedown="this.style.background='rgba(245,158,11,0.1)'" onmouseup="this.style.background=''" ontouchstart="this.style.background='rgba(245,158,11,0.1)'" ontouchend="this.style.background=''">
           <span class="material-icons-round" style="font-size:15px;color:var(--accent-amber);">edit</span>
           <span style="font-size:11px;font-weight:700;color:var(--accent-amber);font-family:var(--font-mono);letter-spacing:0.5px;">EDIT</span>
         </div>
-        <div onclick="wgmDelete('${g.id}')" style="flex:1;display:flex;align-items:center;justify-content:center;gap:6px;padding:11px 8px;cursor:pointer;background:transparent;transition:background 0.2s;" onmousedown="this.style.background='rgba(244,63,94,0.1)'" onmouseup="this.style.background=''" ontouchstart="this.style.background='rgba(244,63,94,0.1)'" ontouchend="this.style.background=''">
+        <div onclick="wgmAddKeys('${g.id}')" style="flex:1;display:flex;align-items:center;justify-content:center;gap:4px;padding:11px 4px;cursor:pointer;background:transparent;transition:background 0.2s;border-right:1px solid var(--border-subtle);" onmousedown="this.style.background='rgba(16,185,129,0.1)'" onmouseup="this.style.background=''" ontouchstart="this.style.background='rgba(16,185,129,0.1)'" ontouchend="this.style.background=''">
+          <span class="material-icons-round" style="font-size:15px;color:#34d399;">add</span>
+          <span style="font-size:11px;font-weight:700;color:#34d399;font-family:var(--font-mono);letter-spacing:0.5px;">ADD</span>
+        </div>
+        <div onclick="wgmDelete('${g.id}')" style="flex:1;display:flex;align-items:center;justify-content:center;gap:4px;padding:11px 4px;cursor:pointer;background:transparent;transition:background 0.2s;" onmousedown="this.style.background='rgba(244,63,94,0.1)'" onmouseup="this.style.background=''" ontouchstart="this.style.background='rgba(244,63,94,0.1)'" ontouchend="this.style.background=''">
           <span class="material-icons-round" style="font-size:15px;color:var(--accent-red);">delete</span>
           <span style="font-size:11px;font-weight:700;color:var(--accent-red);font-family:var(--font-mono);letter-spacing:0.5px;">DELETE</span>
         </div>
