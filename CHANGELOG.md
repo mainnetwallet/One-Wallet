@@ -6,6 +6,7 @@ Per-build release notes are published on the [Releases](../../releases) page.
 ## [Unreleased]
 
 ### Changed
+- **Delete token sheet, new look:** long-pressing a token now opens a cleaner Remove sheet: the token logo with a red delete badge, a big "Remove USDC?" title, the network and contract as chips, a short note that only the wallet entry is removed (your balance stays on-chain, add it again anytime), and a solid red DELETE button next to CANCEL. Native tokens get a matching "can't be removed" sheet with a GOT IT button. Swipe down and tap outside still close it; removal logic is unchanged.
 - **No flicker when swiping Swap > Select token closed:** after the swipe the sheet used to jump back to its open position while the dim layer was still fading out, which showed as a flash. The sheet now stays off-screen until the fade ends (`holdMs` option in `sheet-swipe-close.js`, set for `sw-token-sheet` in the swipe registry).
 - **No keyboard on Chainlist:** opening the Chainlist tab in Select network no longer pops up the phone keyboard. It shows only when you tap the search box.
 - **Wallet Groups no longer closes on swipe down:** the Manage Wallet Groups screen now stays open when you scroll or swipe down; it closes only with the back arrow or the phone's back button.
