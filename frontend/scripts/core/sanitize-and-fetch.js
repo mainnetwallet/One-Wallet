@@ -53,6 +53,40 @@
     return o;
   };
 
+  // ── Price identity ──────────────────────────────────────────────────────────────────────────
+  // A token's symbol is only text the token contract returns about itself. Pricing an unverified
+  // contract token by its ticker (Coinbase "ETH-USD", CoinGecko/DexScreener symbol search, the
+  // symbol-keyed price cache, "USDC" => $1) lets a scam token named "ETH" show real ETH's price.
+  // Symbol-based price lookups are therefore allowed only for:
+  //   - chain native coins (no contract),
+  //   - the built-in default tokens,
+  //   - tokens that carry a CoinGecko id (matched by CoinGecko itself, priced by id not ticker).
+  // Every other contract token is priced by its CONTRACT ADDRESS on its OWN chain (oneDexPickPair).
+  window.oneSymbolPriceAllowed = function(t) {
+    if (!t || typeof t !== 'object') return false;
+    if (t.isDefault || t.isNative) return true;
+    var c = t.contract || t.address;
+    if (!c || /^0x0*$/.test(String(c))) return true;
+    return !!t.cgId;
+  };
+
+  // DexScreener chain slugs by EVM chainId. Unknown chain => no pair (we never guess a chain).
+  var ONE_DS_CHAIN = { 1: 'ethereum', 10: 'optimism', 56: 'bsc', 137: 'polygon', 324: 'zksync',
+                       8453: 'base', 42161: 'arbitrum', 43114: 'avalanche', 59144: 'linea', 534352: 'scroll' };
+
+  // From a DexScreener /tokens/<address> response pick the pair whose BASE token is exactly this
+  // contract on exactly this chain (the endpoint returns the address on every chain), deepest liquidity first.
+  window.oneDexPickPair = function(pairs, t) {
+    var addr = String((t && (t.contract || t.address)) || '').toLowerCase();
+    var slug = ONE_DS_CHAIN[Number(t && t.chainId) || 8453];
+    if (!addr || !slug || !Array.isArray(pairs)) return null;
+    var ok = pairs.filter(function(p) {
+      return p && p.chainId === slug && p.baseToken && String(p.baseToken.address || '').toLowerCase() === addr && parseFloat(p.priceUsd) > 0;
+    });
+    ok.sort(function(a, b) { return ((b.liquidity && b.liquidity.usd) || 0) - ((a.liquidity && a.liquidity.usd) || 0); });
+    return ok[0] || null;
+  };
+
   // Fetch with timeout wrapper — default 15s
   window.oneFetch = function(url, options, timeoutMs) {
     timeoutMs = timeoutMs || 15000;

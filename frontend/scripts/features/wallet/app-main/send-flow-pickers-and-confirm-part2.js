@@ -94,7 +94,13 @@ function onSendAmountInput() {
   // Price estimate — use ETH price for ETH/WETH-like tokens, stablecoin = 1
   const sym = tokInfo?.symbol?.toUpperCase() || '';
   let price = 0;
-  if (sym === 'ETH' || sym === 'WETH') price = sendPrices.ETH || 0;
+  if (tokInfo && tokInfo.symPriceOk === false) {
+    // Unverified contract token: never priced by its ticker ("ETH" / "USDC" are just text it returns).
+    // Use only the contract-based price the home screen already resolved for this token, if any.
+    const _tc = (typeof TOKEN_CONFIG !== 'undefined' ? TOKEN_CONFIG : []).find(x => x.id === tok);
+    price = (_tc && _tc.price > 0) ? _tc.price : 0;
+  }
+  else if (sym === 'ETH' || sym === 'WETH') price = sendPrices.ETH || 0;
   else if (sym === 'USDC' || sym === 'USDT' || sym === 'DAI' || sym === 'USDBC') price = 1;
   else price = sendPrices[sym] || 0;
   const usd = amt * price;
@@ -136,7 +142,7 @@ function getSendTokenInfo(tokenId) {
   }
   const t = loadSavedTokens().find(t => t.id === tokenId && (t.chainId || 8453) === sendSelectedChainId) ||
              loadSavedTokens().find(t => t.id === tokenId);
-  if (t) return { symbol: t.sub, decimals: t.decimals || 18, native: false, contract: t.contract };
+  if (t) return { symbol: t.sub, decimals: t.decimals || 18, native: false, contract: t.contract, symPriceOk: oneSymbolPriceAllowed(t) };
   if (SEND_TOKENS && SEND_TOKENS[tokenId]) return SEND_TOKENS[tokenId];
   return null;
 }

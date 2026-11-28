@@ -77,6 +77,7 @@ function _nxsw_getTokens() {
       contract: t.contract || null,
       cgId:     t.cgId || null,
       isNative: t.isNative || false,
+      isDefault: !!t.isDefault,   // price gate (oneSymbolPriceAllowed): built-in token
       logoURI:  t.logoUrl || t.logoURI || (typeof _nxsw_TOKEN_LOGOS !== 'undefined' ? _nxsw_TOKEN_LOGOS[(t.sub||'').toUpperCase()] || _nxsw_TOKEN_LOGOS[t.sub] : null) || null,
     };
   });

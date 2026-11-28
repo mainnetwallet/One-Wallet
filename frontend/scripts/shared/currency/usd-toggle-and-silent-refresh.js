@@ -162,7 +162,7 @@
         }
 
         // Update global price cache silently
-        if (typeof _globalPriceCache !== 'undefined' && _globalPriceCache && t.sub) {
+        if (typeof _globalPriceCache !== 'undefined' && _globalPriceCache && t.sub && oneSymbolPriceAllowed(t)) {
           _globalPriceCache[t.sub.toLowerCase()] = { usd: price, usd_24h_change: change24h };
         }
       });

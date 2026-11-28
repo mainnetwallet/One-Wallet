@@ -438,6 +438,13 @@ async function _loadTokensImpl() {
     const missingTokens = filteredTokens.filter(t => !t.cgId || !priceData[t.cgId]);
     if (missingTokens.length > 0) {
       await Promise.allSettled(missingTokens.map(async t => {
+        // Unverified contract token: its symbol is attacker-controlled text — price it by contract+chain
+        // only, never by ticker (a scam token called "ETH" must not show ETH's price).
+        if (!oneSymbolPriceAllowed(t)) {
+          const cd = await _fetchPriceByContract(t);
+          if (cd) priceData['__tid__' + t.id] = cd;
+          return;
+        }
         // 1. Try Coinbase first (fastest)
         if (t.cbPair) {
           try {
@@ -513,7 +520,8 @@ async function _loadTokensImpl() {
       if (price > 0) {
         t.price = price;
         // Also update globalPriceCache by symbol (for custom chains without cgId)
-        if (t.sub && typeof _globalPriceCache !== 'undefined' && _globalPriceCache) {
+        // Symbol-keyed cache entries only from tokens whose ticker is trustworthy (else a scam "ETH" overwrites real ETH)
+        if (t.sub && oneSymbolPriceAllowed(t) && typeof _globalPriceCache !== 'undefined' && _globalPriceCache) {
           _globalPriceCache[t.sub.toLowerCase()] = { usd: price, usd_24h_change: pd.usd_24h_change || 0 };
         }
       }

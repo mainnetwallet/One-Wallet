@@ -33,7 +33,8 @@ async function _tcfFetchDexScreener(t) {
     const res = await fetch(`https://api.dexscreener.com/latest/dex/tokens/${addr}`, { signal: AbortSignal.timeout(8000) });
     if (!res.ok) return null;
     const data = await res.json();
-    const pair = (data.pairs || []).sort((a,b) => (b.liquidity?.usd||0)-(a.liquidity?.usd||0))[0];
+    // Only the pair of THIS contract on THIS chain (the endpoint lists the address on every chain)
+    const pair = oneDexPickPair(data.pairs, { contract: addr, chainId });
     if (!pair) return null;
     const price  = parseFloat(pair.priceUsd || 0);
     const change = parseFloat(pair.priceChange?.h24 || 0);
@@ -90,7 +91,7 @@ async function _tcfFetchBinanceTicker(sym) {
 
 // ── CoinMarketCap live price fetch for chart overlay ──
 async function _tcfFetchCoinMarketCap(t) {
-  const sym = _cgIdToSymbol(t.cgId || '') || t.sub?.toUpperCase();
+  const sym = _cgIdToSymbol(t.cgId || '') || (oneSymbolPriceAllowed(t) ? t.sub?.toUpperCase() : null);
   if (!sym && !t.cgId) return null;
   try {
     const queryParam = sym ? `symbol=${sym.toUpperCase()}` : `slug=${t.cgId}`;
