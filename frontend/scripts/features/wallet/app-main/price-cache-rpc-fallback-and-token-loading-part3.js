@@ -77,6 +77,7 @@ async function _loadTokensImpl() {
   // ── INSTANT RENDER: use cached prices if available → zero flicker on chain switch/re-open ──
   // If fresh price cache exists, render immediately with real prices (no 0→value flash)
   // If cached cards already exist in DOM (from snapshot restore), skip re-render to avoid flash
+  var _holdSortUntilLoaded = false; // set when the list came from a snapshot (keep saved order until data complete)
   const _cachedNow = Date.now();
   const _hasFreshCache = _globalPriceCache && (_cachedNow - _globalPriceCacheTime) < _PRICE_CACHE_TTL;
   const _hasCardNow = list.querySelectorAll('.token-card').length > 0;
@@ -105,7 +106,8 @@ async function _loadTokensImpl() {
         renderTokenCard(t, initPrice, initChange, null, list, i);
       } else {
         // Card exists (from snapshot restore) — inject proper logo if icon only has text
-        // ── Clear saved-order lock so live USD sort takes over once balances load ──
+        // ── Saved-order lock is released only after price + ALL balances are in (see _debouncedSort) ──
+        if (existingCard.dataset.savedOrder !== undefined) _holdSortUntilLoaded = true;
         delete existingCard.dataset.savedOrder;
         const iconDiv = existingCard.querySelector('.token-icon');
         if (iconDiv) {
@@ -134,11 +136,17 @@ async function _loadTokensImpl() {
   }
   if (_homeTokenSearchQuery) _renderFilteredTokenCards();
 
-  // ── Central sort function: USD value desc, zero-balance always at bottom ──
+  // ── Restored-from-snapshot lists keep last session's order until price AND every balance are in,
+  // then re-sort ONCE (only changes if balances really changed). Re-sorting on each partial result
+  // (balance arrived but price not yet -> USD 0 -> card drops, then jumps back) made rows jump.
+  var _ltPriceDone = false;
+  var _ltAllBalDone = (validatedKeys.length === 0);
+
 
   // ── DEBOUNCED SORT — only re-orders once per batch of balance updates ──
   let _sortDebounceTimer = null;
   function _debouncedSort() {
+    if (_holdSortUntilLoaded && !(_ltPriceDone && _ltAllBalDone)) return;
     if (_sortDebounceTimer) clearTimeout(_sortDebounceTimer);
     _sortDebounceTimer = setTimeout(() => {
       _sortDebounceTimer = null;
@@ -212,6 +220,7 @@ async function _loadTokensImpl() {
 
   // ── START balance fetch IMMEDIATELY (parallel with price fetch) ──
   // Don't wait for fetchAllPrices — start RPC calls now so both resolve around same time
+  const _balFetchPromises = [];
   if (validatedKeys.length > 0) {
     const _providers = {};
     const _rpcValidated = {}; // track chains already validated — don't re-validate every load
@@ -327,6 +336,7 @@ async function _loadTokensImpl() {
       }
 
       if (fetchPromise) {
+        _balFetchPromises.push(fetchPromise.catch(() => null));
         fetchPromise.then(balance => {
           if (_mySession !== _loadTokensSession) return;
           // null = RPC failed — keep existing cached balance, do NOT overwrite with 0
@@ -358,9 +368,13 @@ async function _loadTokensImpl() {
           _smoothSet(balEl, balStr);
 
           // Compute USD using shared price map (populated when prices arrive)
-          const price = _sharedPriceMap[t.id] || 0;
+          // Live price may not be in yet — fall back to the last known (cached) price so the card's
+          // USD value (and so its position) doesn't collapse to 0 and bounce back when price arrives.
+          const price = _sharedPriceMap[t.id]
+            || ((_globalPriceCache && _globalPriceCache[t.cgId] && _globalPriceCache[t.cgId].usd) || 0)
+            || t.price || 0;
           const usdValue = balance > 0 && price > 0 ? balance * price : 0;
-          card.dataset.usdValue = usdValue.toFixed(6);
+          if (price > 0 || balance <= 0) card.dataset.usdValue = usdValue.toFixed(6);
 
           if (usdEl && price > 0) {
             const usdValStr = usdValue > 0 ? _formatCurrencyDisplay(usdValue) : '';
@@ -380,9 +394,18 @@ async function _loadTokensImpl() {
     });
   }
 
+  // ── All balance fetches settled → release the hold, one final sort ──
+  (function _watchAllBalances() {
+    if (!_balFetchPromises.length) { _ltAllBalDone = true; return; }
+    Promise.allSettled(_balFetchPromises).then(function() {
+      if (_mySession !== _loadTokensSession) return;
+      _ltAllBalDone = true;
+      _debouncedSort();
+    });
+  })();
+
   // ── Coordinated save: fires once AFTER both price fetch AND all balance fetches complete ──
   // Prevents partial saves where price is fresh but balance isn't (or vice versa)
-  let _ltPriceDone = false;
   let _ltBalanceDone = (validatedKeys.length === 0); // no wallets → balance side immediately done
   let _ltSaveTimer = null;
   function _ltTrySave() {
@@ -527,6 +550,7 @@ async function _loadTokensImpl() {
     });
     // Recalculate total from DOM after all tokens processed — single source of truth
     _recalcPortfolioTotal();
+    _ltPriceDone = true;
     _debouncedSort();
     // Signal price side done — coordinated save will fire when both price+balance complete
     _ltPriceDone = true;

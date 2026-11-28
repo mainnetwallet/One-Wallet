@@ -115,6 +115,9 @@ function homeApplyWallet() {
       walletSel.value = hwSelectedKey; // keep DOM in sync
     }
   }
+  // <select> can be empty for a moment while it is repopulated on app open — the persisted
+  // selection is the ground truth, so restore THIS wallet's cached list (keeps the saved order).
+  if (!pk && typeof hwSelectedKey !== 'undefined' && hwSelectedKey) pk = hwSelectedKey;
   let addr = '';
   try { addr = pk ? new ethers.Wallet(pk).address : ''; } catch {}
   homeActiveKey = pk || null;
