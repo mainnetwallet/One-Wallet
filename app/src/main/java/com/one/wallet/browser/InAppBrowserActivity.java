@@ -1080,7 +1080,7 @@ public class InAppBrowserActivity extends AppCompatActivity {
         s.setDisplayZoomControls(false);
         s.setCacheMode(WebSettings.LOAD_DEFAULT);
         s.setDatabaseEnabled(true);
-        s.setMixedContentMode(WebSettings.MIXED_CONTENT_COMPATIBILITY_MODE);
+        s.setMixedContentMode(WebSettings.MIXED_CONTENT_NEVER_ALLOW);
         s.setMediaPlaybackRequiresUserGesture(false);
         s.setOffscreenPreRaster(true);
         wv.setLayerType(View.LAYER_TYPE_HARDWARE, null);
