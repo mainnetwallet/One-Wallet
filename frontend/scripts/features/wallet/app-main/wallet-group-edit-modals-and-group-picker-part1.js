@@ -21,6 +21,10 @@ function wgekRemoveSelected() {
     g.labels = g.labels.filter((_, i) => !toRemove.has(i));
     if (!g.labels.some(l => !!l)) delete g.labels;
   }
+  // Seed phrases are index-aligned with keys too: drop the removed wallets' phrases so the rest stay matched
+  if (Array.isArray(g.mnemonics) && g.mnemonics.length) {
+    g.mnemonics = g.mnemonics.filter((_, i) => !toRemove.has(i));
+  }
   saveWalletGroups(groups);
   renderWalletGroupsList();
   renderSwapGroupList && renderSwapGroupList();
