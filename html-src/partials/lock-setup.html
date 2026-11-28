@@ -1,5 +1,5 @@
 <div id="one-lock-setup" class="nlks-backdrop" onclick="oneLock._backdropClick(event)">
-  <div class="nlks-sheet">
+  <div class="nlks-sheet" id="one-lock-setup-sheet">
 
     <!-- Header -->
     <div class="nlks-header">
@@ -137,7 +137,7 @@
       <!-- Pattern setup -->
       <div id="nlks-pattern-setup" style="display:none;flex-direction:column;align-items:center;">
         <div style="font-size:13px;color:var(--text-secondary);margin-bottom:12px;" id="nlks-pat-label">Draw a new pattern (min 3 dots)</div>
-        <canvas id="nlks-pattern-canvas" width="270" height="270" style="touch-action:none;cursor:crosshair;border-radius:16px;"></canvas>
+        <canvas id="nlks-pattern-canvas" data-swipe-ignore width="270" height="270" style="touch-action:none;cursor:crosshair;border-radius:16px;"></canvas>
         <div id="nlks-pat-err" style="margin-top:10px;font-size:12px;color:var(--accent-red);min-height:16px;"></div>
         <div style="display:flex;gap:10px;margin-top:12px;">
           <button onclick="oneLock._goStep(0)" style="padding:10px 18px;background:var(--bg-glass);border:1px solid var(--border-subtle);border-radius:10px;color:var(--text-secondary);font-size:12px;cursor:pointer;font-family:var(--font-display);">Back</button>

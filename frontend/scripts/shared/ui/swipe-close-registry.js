@@ -56,6 +56,10 @@
     ['sw-confirm-sheet',    'sw-confirm-modal',     call('swCloseConfirm')],
     ['br-confirm-sheet',    'br-confirm-modal',     call('brCloseConfirm')],
     ['currency-picker-sheet', 'currency-picker-overlay', call('closeCurrencyPicker')],
+    // App Lock setup (Settings > App Lock). The pattern pad is marked data-swipe-ignore so drawing a pattern never drags the sheet.
+    ['one-lock-setup-sheet', 'one-lock-setup', function () {
+      if (typeof oneLock !== 'undefined' && oneLock && typeof oneLock.closeSetup === 'function') oneLock.closeSetup(false);
+    }],
     ['send-confirm-sheet',  'send-confirm-overlay', function () {
       var ov = document.getElementById('send-confirm-overlay');
       if (ov) { ov.style.opacity = '0'; ov.style.pointerEvents = 'none'; }
