@@ -18,11 +18,11 @@ function showTokenDeleteConfirm(cardEl, t) {
   const chain = (typeof getAllChains === 'function' ? getAllChains() : []).find(c => c.chainId === (t.chainId || 8453));
   const chainName = chain ? chain.name : 'Network ' + (t.chainId || 8453);
   const shortAddr = t.contract ? t.contract.slice(0, 6) + '…' + t.contract.slice(-4) : '';
-  const chip = (icon, text, mono) => `<div style="display:flex;align-items:center;gap:5px;padding:6px 10px;border-radius:999px;background:var(--bg-glass);border:1px solid var(--border-subtle);font-size:10px;font-weight:700;color:var(--text-secondary);${mono ? 'font-family:var(--font-mono);' : ''}"><span class="material-icons-round" style="font-size:13px;color:var(--text-muted);">${icon}</span>${text}</div>`;
-  const btnBase = 'padding:15px 10px;text-align:center;border-radius:var(--radius-lg);font-size:13px;font-weight:800;letter-spacing:0.6px;cursor:pointer;transition:transform 0.12s ease;display:flex;align-items:center;justify-content:center;gap:6px;';
+  const chip = (icon, text, mono) => `<div style="display:flex;align-items:center;gap:5px;padding:6px 10px;border-radius:999px;background:var(--bg-glass);border:1px solid var(--border-subtle);font-size:11px;font-weight:500;color:var(--text-secondary);${mono ? 'font-family:var(--font-mono);' : ''}"><span class="material-icons-round" style="font-size:13px;color:var(--text-muted);">${icon}</span>${text}</div>`;
+  const btnBase = 'padding:15px 10px;text-align:center;border-radius:var(--radius-lg);font-size:14px;font-weight:500;letter-spacing:0.4px;cursor:pointer;transition:transform 0.12s ease;display:flex;align-items:center;justify-content:center;gap:6px;';
   const press = `onmousedown="this.style.transform='scale(0.97)'" onmouseup="this.style.transform=''" ontouchstart="this.style.transform='scale(0.97)'" ontouchend="this.style.transform=''"`;
   const shell = (tone, badgeIcon, inner) => `
-      <div class="tok-del-inner" style="width:100%;max-width:100%;background:linear-gradient(180deg,var(--bg-surface) 0%,var(--bg-deep) 100%);border-radius:28px 28px 0 0;border:1px solid var(--border-subtle);border-bottom:none;box-shadow:0 -1px 0 0 ${tone}66,0 -18px 50px rgba(0,0,0,0.55);padding:10px 20px 28px;transform:translateY(100%);transition:transform 0.28s cubic-bezier(0.34,1.2,0.64,1);">
+      <div class="tok-del-inner" style="width:100%;max-width:100%;background:linear-gradient(180deg,var(--bg-surface) 0%,var(--bg-deep) 100%);border-radius:28px 28px 0 0;border:1px solid var(--border-subtle);border-bottom:none;box-shadow:0 -1px 0 0 ${tone}66,0 -18px 50px rgba(0,0,0,0.55);padding:10px 20px 28px;font-family:var(--font-ui);transform:translateY(100%);transition:transform 0.28s cubic-bezier(0.34,1.2,0.64,1);">
         <div style="width:40px;height:4px;background:rgba(255,255,255,0.16);border-radius:2px;margin:0 auto 22px;"></div>
         <div style="display:flex;flex-direction:column;align-items:center;text-align:center;">
           <div style="position:relative;width:68px;height:68px;margin-bottom:16px;">
@@ -37,7 +37,7 @@ function showTokenDeleteConfirm(cardEl, t) {
   if (t.isNative) {
     // Native token — cannot delete, show info sheet instead
     overlay.innerHTML = shell('#6366f1', 'lock', `
-          <div style="font-size:19px;font-weight:800;color:var(--text-primary);letter-spacing:-0.2px;"><span style="color:var(--neon-purple);">${esc(t.sub)}</span> can't be removed</div>
+          <div style="font-size:19px;font-weight:500;color:var(--text-primary);letter-spacing:0;"><span style="color:var(--neon-purple);">${esc(t.sub)}</span> can't be removed</div>
           <div style="font-size:12px;color:var(--text-muted);line-height:1.6;margin-top:6px;max-width:290px;">It is the native token of ${esc(chainName)} and is needed to pay gas fees.</div>
           <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-top:16px;">${chip('language', esc(chainName))}${chip('local_gas_station', 'Gas token')}</div>
         </div>
@@ -47,7 +47,7 @@ function showTokenDeleteConfirm(cardEl, t) {
       </div>`);
   } else {
     overlay.innerHTML = shell('#f43f5e', 'delete', `
-          <div style="font-size:19px;font-weight:800;color:var(--text-primary);letter-spacing:-0.2px;">Remove <span style="color:var(--accent-red);">${esc(t.sub)}</span>?</div>
+          <div style="font-size:19px;font-weight:500;color:var(--text-primary);letter-spacing:0;">Remove <span style="color:var(--accent-red);">${esc(t.sub)}</span>?</div>
           <div style="font-size:12px;color:var(--text-muted);line-height:1.6;margin-top:6px;">${esc(t.name)} will be removed from My Tokens.</div>
           <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-top:16px;">${chip('language', esc(chainName))}${shortAddr ? chip('tag', esc(shortAddr), true) : ''}</div>
           <div style="display:flex;align-items:flex-start;gap:8px;margin-top:16px;padding:10px 12px;border-radius:var(--radius-md);background:rgba(244,63,94,0.06);border:1px solid rgba(244,63,94,0.16);text-align:left;">
@@ -66,7 +66,7 @@ function showTokenDeleteConfirm(cardEl, t) {
   const logoBox = overlay.querySelector('.tok-del-logo');
   try { if (logoBox && typeof getTokenLogoEl === 'function') { const el = getTokenLogoEl(t); el.style.borderRadius = '22px'; logoBox.appendChild(el); } } catch (_) {}
   if (logoBox && !logoBox.firstChild) {
-    logoBox.style.cssText += 'display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:800;color:var(--text-primary);';
+    logoBox.style.cssText += 'display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:500;color:var(--text-primary);';
     logoBox.textContent = (t.icon || t.sub || '?').slice(0, 2).toUpperCase();
   }
 
