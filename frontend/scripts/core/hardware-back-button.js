@@ -37,6 +37,7 @@
     { id: 'hw-wallet-overlay',        close: () => typeof hwCloseWalletPicker    === 'function' && hwCloseWalletPicker()     },
     { id: 'token-chart-full-overlay',  close: () => typeof closeTokenChartFull   === 'function' && closeTokenChartFull()   },
     { id: 'swap-wallet-drawer-overlay', close: () => typeof closeSwapWalletDrawer === 'function' && closeSwapWalletDrawer() },
+    { id: 'nx-console-modal',            isOpen: el => el.style.display === 'flex', close: () => typeof closeConsoleLogPanel === 'function' && closeConsoleLogPanel() },
     { id: 'rpc-manager-overlay',          close: () => typeof closeRpcManager         === 'function' && closeRpcManager()         },
     { id: 'wgm-delete-sheet',               close: () => { const s = document.getElementById('wgm-delete-sheet'); if (s) { s.classList.remove('open'); if (s.parentNode) s.parentNode.removeChild(s); } } },
     { id: 'sw-settings-modal',            close: () => typeof window.swCloseSettings  === 'function' && window.swCloseSettings()  },

@@ -1,0 +1,114 @@
+  /* ══════════════════════════════════════════════
+     CONSOLE LOG PANEL  (Settings > Console log)
+     Full-screen sheet. Severity is shown by the left edge of each entry (red / amber / cyan), not by labels.
+     Uses only theme variables, so Dark / Light / System all work.
+     ══════════════════════════════════════════════ */
+  #nx-console-modal.clp {
+    position: fixed; inset: 0; z-index: 20001;
+    display: none; flex-direction: column;
+    background: var(--bg-deep);
+    font-family: var(--font-ui);
+    -webkit-tap-highlight-color: transparent;
+  }
+  #nx-console-modal.clp[style*="flex"] { animation: clpIn 0.22s cubic-bezier(0.25, 1, 0.5, 1); }
+  @keyframes clpIn { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+  @media (prefers-reduced-motion: reduce) { #nx-console-modal.clp[style*="flex"] { animation: none; } }
+
+  /* ── Header ── */
+  #nx-console-modal .clp-head {
+    display: flex; align-items: center; gap: 8px; flex-shrink: 0;
+    padding: calc(12px + env(safe-area-inset-top, 0px)) 14px 12px;
+  }
+  #nx-console-modal .clp-ib {
+    width: 38px; height: 38px; border-radius: 12px; flex-shrink: 0; padding: 0;
+    display: flex; align-items: center; justify-content: center; cursor: pointer;
+    background: var(--bg-glass); border: 1px solid var(--border-subtle); color: var(--text-secondary);
+    transition: background 0.15s ease, transform 0.1s ease;
+  }
+  #nx-console-modal .clp-ib:active { background: var(--bg-glass-hover); transform: scale(0.94); }
+  #nx-console-modal .clp-ib .material-icons-round { font-size: 19px; pointer-events: none; }
+  #nx-console-modal .clp-title { flex: 1; min-width: 0; margin-left: 4px; }
+  #nx-console-modal .clp-h1 { font-family: var(--font-display); font-size: 18px; font-weight: 700; color: var(--text-primary); line-height: 1.15; }
+  #nx-console-modal .clp-sub { font-family: var(--font-mono); font-size: 11px; color: var(--text-secondary); margin-top: 3px; }
+
+  /* ── Capture strip ── */
+  #nx-console-modal .clp-cap {
+    display: flex; align-items: center; gap: 12px; flex-shrink: 0; cursor: pointer;
+    margin: 0 14px 10px; padding: 11px 14px; border-radius: 14px;
+    background: var(--bg-surface); border: 1px solid var(--border-subtle);
+  }
+  #nx-console-modal .clp-dot {
+    width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0;
+    background: var(--text-muted); opacity: 0.55; transition: background 0.2s, box-shadow 0.2s, opacity 0.2s;
+  }
+  #nx-console-modal .clp-cap.on .clp-dot { background: var(--accent-green); opacity: 1; box-shadow: 0 0 0 4px rgba(16,185,129,0.16); }
+  #nx-console-modal .clp-cap-tx { flex: 1; min-width: 0; }
+  #nx-console-modal .clp-cap-t { font-size: 14px; font-weight: 500; color: var(--text-primary); }
+  #nx-console-modal .clp-cap-s { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
+
+  /* ── Search + filter chips ── */
+  #nx-console-modal .clp-tools { flex-shrink: 0; padding: 0 14px 8px; border-bottom: 1px solid var(--border-subtle); }
+  #nx-console-modal .clp-search {
+    display: flex; align-items: center; gap: 8px; height: 40px; padding: 0 12px; margin: 0 0 10px;
+    border-radius: 12px; background: var(--bg-surface); border: 1px solid var(--border-subtle);
+    transition: border-color 0.15s ease;
+  }
+  #nx-console-modal .clp-search:focus-within { border-color: var(--border-glow); }
+  #nx-console-modal .clp-search .material-icons-round { font-size: 18px; color: var(--text-secondary); }
+  #nx-console-modal .clp-search input {
+    flex: 1; min-width: 0; height: 100%; padding: 0; margin: 0;
+    background: transparent; border: 0; outline: 0; box-shadow: none; -webkit-appearance: none; appearance: none;
+    font-family: var(--font-mono); font-size: 13px; color: var(--text-primary);
+  }
+  #nx-console-modal .clp-search input::placeholder { color: var(--text-secondary); opacity: 0.7; }
+  #nx-console-modal .clp-search input::-webkit-search-cancel-button { display: none; }
+  #nx-console-modal .clp-x { display: none; cursor: pointer; padding: 4px; margin-right: -4px; }
+  #nx-console-modal .clp-search.has-q .clp-x { display: block; }
+
+  #nx-console-modal .clp-chips { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; padding-bottom: 2px; margin: 0 -14px; padding-left: 14px; padding-right: 14px; }
+  #nx-console-modal .clp-chips::-webkit-scrollbar { display: none; }
+  #nx-console-modal .clp-chip {
+    --c: var(--accent-primary);
+    display: flex; align-items: center; gap: 6px; flex-shrink: 0; height: 32px; padding: 0 12px; border-radius: 16px; cursor: pointer;
+    font-family: var(--font-ui); font-size: 13px; color: var(--text-secondary);
+    background: transparent; border: 1px solid var(--border-subtle);
+    transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+  }
+  #nx-console-modal .clp-chip i { width: 7px; height: 7px; border-radius: 50%; background: var(--c); flex-shrink: 0; }
+  #nx-console-modal .clp-chip b { font-family: var(--font-mono); font-size: 11px; font-weight: 500; opacity: 0.8; }
+  #nx-console-modal .clp-chip.a { color: var(--text-primary); border-color: var(--c); background: color-mix(in srgb, var(--c) 14%, transparent); font-weight: 500; }
+  #nx-console-modal .clp-chip.zero:not(.a) { opacity: 0.45; }
+
+  /* ── Entries (newest first) ── */
+  #nx-console-modal .clp-list { flex: 1; min-height: 0; overflow-y: auto; -webkit-overflow-scrolling: touch; overscroll-behavior-y: contain; padding-bottom: calc(24px + env(safe-area-inset-bottom, 0px)); }
+  #nx-console-modal .clp-e {
+    --c: transparent;
+    padding: 10px 16px 11px 14px; border-bottom: 1px solid var(--border-subtle);
+    box-shadow: inset 3px 0 0 var(--c);
+  }
+  #nx-console-modal .clp-e.lv-error { --c: #f6465d; background: rgba(246,70,93,0.07); }
+  #nx-console-modal .clp-e.lv-warn  { --c: #f5a623; background: rgba(245,166,35,0.07); }
+  #nx-console-modal .clp-e.lv-info  { --c: #06b6d4; }
+  #nx-console-modal .clp-e.can-open { cursor: pointer; }
+  #nx-console-modal .clp-meta { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; font-family: var(--font-mono); font-size: 11px; color: var(--text-secondary); }
+  #nx-console-modal .clp-lv { font-weight: 700; }
+  #nx-console-modal .lv-error .clp-lv { color: #f6465d; }
+  #nx-console-modal .lv-warn  .clp-lv { color: #f5a623; }
+  #nx-console-modal .lv-info  .clp-lv { color: #06b6d4; }
+  #nx-console-modal .clp-rep { padding: 0 6px; border-radius: 8px; background: var(--bg-raised); color: var(--text-primary); font-size: 10.5px; line-height: 17px; }
+  #nx-console-modal .clp-more { margin-left: auto; font-size: 17px !important; opacity: 0.7; transition: transform 0.2s ease; }
+  #nx-console-modal .clp-e.open .clp-more { transform: rotate(180deg); }
+  #nx-console-modal .clp-msg {
+    font-family: var(--font-mono); font-size: 12px; line-height: 1.55; color: var(--text-primary);
+    white-space: pre-wrap; word-break: break-word; overflow-wrap: anywhere;
+  }
+  #nx-console-modal .clp-e.can-open:not(.open) .clp-msg { display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; }
+  #nx-console-modal .clp-msg mark { background: rgba(99,102,241,0.35); color: inherit; border-radius: 3px; padding: 0 1px; }
+
+  /* ── Empty state ── */
+  #nx-console-modal .clp-empty { display: flex; flex-direction: column; align-items: center; text-align: center; padding: 64px 32px; }
+  #nx-console-modal .clp-empty-ic { width: 56px; height: 56px; border-radius: 18px; display: flex; align-items: center; justify-content: center; background: var(--bg-glass); border: 1px solid var(--border-subtle); margin-bottom: 16px; }
+  #nx-console-modal .clp-empty-ic .material-icons-round { font-size: 26px; color: var(--text-secondary); }
+  #nx-console-modal .clp-empty-t { font-size: 15px; font-weight: 500; color: var(--text-primary); }
+  #nx-console-modal .clp-empty-s { font-size: 13px; line-height: 1.5; color: var(--text-secondary); margin-top: 6px; max-width: 260px; }
+  #nx-console-modal .clp-empty-b { margin-top: 18px; height: 36px; padding: 0 16px; border-radius: 12px; cursor: pointer; font-family: var(--font-ui); font-size: 13px; font-weight: 500; color: var(--text-primary); background: var(--bg-glass); border: 1px solid var(--border-subtle); }
