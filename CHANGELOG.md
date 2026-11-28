@@ -8,7 +8,7 @@ Per-build release notes are published on the [Releases](../../releases) page.
 ### Changed
 - **Rename wallets:** the "WALLET #N" row in a wallet group's detail (next to SCAN) has a pencil that opens a new rename dialog: tinted header with the
   group colour, name field with counter and clear button, quick names (Main, Trading, Savings, Gas, Bot), "Reset to Wallet N" and Save. The dialog is
-  added to `<body>` so it shows above the group detail (inside `#app` it was hidden behind it). The name is stored on the group (`labels`, aligned with
+  added to `<body>` so it shows above the group detail, and uses the clean UI font (Roboto) instead of the wide display font (inside `#app` it was hidden behind it). The name is stored on the group (`labels`, aligned with
   the keys), shows on the wallet cards in every drawer (the drawers themselves have no edit icon), and follows its key when keys are removed or the
   group's keys are edited. Wallet cards are two lines (name over address).
 - **Rounded side drawers:** all side drawers (Connected Wallets, Browser wallet, Swap, Delegation, Send FROM/TO, Bridge, Transfer Hub, Base swap

@@ -110,7 +110,7 @@
 }
 .wdu-rn-ov.open { opacity: 1; pointer-events: all; }
 .wdu-rn-card {
-  width: 100%; max-width: 360px; overflow: hidden; border-radius: 24px;
+  width: 100%; max-width: 360px; overflow: hidden; border-radius: 24px; font-family: var(--font-ui);
   background: var(--bg-surface); border: 1px solid var(--wdu-bd, var(--border-subtle));
   transform: translateY(14px) scale(.97); transition: transform .26s cubic-bezier(.22,1,.36,1);
 }
@@ -125,7 +125,7 @@
 }
 .wdu-rn-ico .material-icons-round { font-size: 20px; }
 .wdu-rn-ht { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
-.wdu-rn-title { font-size: 15px; font-weight: 800; color: var(--text-primary); }
+.wdu-rn-title { font-size: 16px; font-weight: 700; color: var(--text-primary); }
 .wdu-rn-sub { font-family: var(--font-mono); font-size: 11px; color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .wdu-rn-x {
   width: 30px; height: 30px; border-radius: 50%; flex-shrink: 0; background: var(--bg-raised);
@@ -144,21 +144,21 @@
 .wdu-rn-field:focus-within { border-color: var(--wdu-ac, var(--accent-primary)); }
 #wdu-rename-input {
   flex: 1; min-width: 0; height: 100%; padding: 0; border: none; outline: none; background: transparent;
-  font-family: var(--font-display); font-size: 15px; font-weight: 700; color: var(--text-primary);
+  font-family: inherit; font-size: 16px; font-weight: 500; color: var(--text-primary);
 }
 .wdu-rn-clear { display: flex; align-items: center; color: var(--text-muted); cursor: pointer; visibility: hidden; }
 .wdu-rn-clear .material-icons-round { font-size: 19px; }
 .wdu-rn-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
 .wdu-rn-chip {
-  padding: 6px 12px; border-radius: 99px; cursor: pointer; font-size: 12px; font-weight: 700;
+  padding: 7px 13px; border-radius: 99px; cursor: pointer; font-family: inherit; font-size: 13px; font-weight: 500;
   background: var(--wdu-bg, var(--bg-glass)); border: 1px solid var(--wdu-bd, var(--border-subtle)); color: var(--wdu-ac, var(--accent-primary));
 }
 .wdu-rn-reset {
   display: none; align-items: center; gap: 6px; margin-top: 12px; padding: 0; border: none; background: none; cursor: pointer;
-  font-size: 12px; font-weight: 700; color: var(--text-secondary);
+  font-family: inherit; font-size: 13px; font-weight: 500; color: var(--text-secondary);
 }
 .wdu-rn-reset .material-icons-round { font-size: 16px; }
 .wdu-rn-btns { display: flex; gap: 8px; margin-top: 16px; }
-.wdu-rn-btns button { height: 46px; border-radius: 14px; cursor: pointer; font-family: var(--font-display); font-size: 13px; font-weight: 800; }
+.wdu-rn-btns button { height: 46px; border-radius: 14px; cursor: pointer; font-family: inherit; font-size: 15px; font-weight: 500; }
 .wdu-rn-cancel { flex: 1; background: var(--bg-raised); border: 1px solid var(--border-subtle); color: var(--text-secondary); }
 .wdu-rn-save { flex: 2; border: none; color: #0a0a14; background: var(--wdu-ac, var(--accent-primary)); }
