@@ -1,31 +1,52 @@
 <!-- ══════ SEND MODAL ══════ -->
-<!-- ── QR Scanner Modal (Send To Address) ── -->
-<div id="send-qr-modal-overlay" onclick="if(event.target===this)closeSendQrScanner()">
+<!-- ── QR Scanner (address / WalletConnect / website) ── -->
+<div id="send-qr-modal-overlay" role="dialog" aria-label="Scan QR code">
   <div id="send-qr-inner">
-    <div id="send-qr-header">
-      <div>
-        <div id="send-qr-title">Scan QR Code</div>
-        <div id="send-qr-subtitle">POINT CAMERA AT WALLET ADDRESS QR</div>
-      </div>
-      <div id="send-qr-close" onclick="closeSendQrScanner()"
-        onmousedown="this.style.opacity='.6'" onmouseup="this.style.opacity='1'"
-        ontouchstart="this.style.opacity='.6'" ontouchend="this.style.opacity='1'">
-        <span class="material-icons-round" style="font-size:17px;color:var(--text-muted);">close</span>
-      </div>
-    </div>
     <div id="send-qr-video-wrap">
       <video id="send-qr-video" autoplay playsinline muted></video>
       <canvas id="send-qr-canvas"></canvas>
+      <div id="send-qr-shade"></div>
       <div id="send-qr-aim">
-        <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M10 30 L10 10 L30 10" stroke="#6366f1" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
-          <path d="M70 10 L90 10 L90 30" stroke="#6366f1" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
-          <path d="M90 70 L90 90 L70 90" stroke="#6366f1" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
-          <path d="M30 90 L10 90 L10 70" stroke="#6366f1" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
+        <span class="qr-corner tl"></span><span class="qr-corner tr"></span>
+        <span class="qr-corner bl"></span><span class="qr-corner br"></span>
+        <span id="send-qr-line"></span>
+        <span id="send-qr-check" class="material-icons-round">check</span>
       </div>
     </div>
-    <div id="send-qr-status">Camera initializing...</div>
+
+    <div id="send-qr-header">
+      <div id="send-qr-close" role="button" aria-label="Close" onclick="closeSendQrScanner()">
+        <span class="material-icons-round">close</span>
+      </div>
+      <div id="send-qr-titles">
+        <div id="send-qr-title">Scan QR code</div>
+        <div id="send-qr-subtitle">Address, WalletConnect or website</div>
+      </div>
+      <div id="send-qr-torch" role="button" aria-label="Flashlight" onclick="qrToggleTorch()" style="display:none">
+        <span class="material-icons-round">flashlight_on</span>
+      </div>
+    </div>
+
+    <div id="send-qr-footer">
+      <div id="send-qr-status" data-kind="scan">Camera initializing...</div>
+      <div id="send-qr-chips">
+        <span class="qr-chip"><span class="material-icons-round">account_balance_wallet</span>Address</span>
+        <span class="qr-chip"><span class="material-icons-round">link</span>WalletConnect</span>
+        <span class="qr-chip"><span class="material-icons-round">language</span>Website</span>
+      </div>
+      <button id="send-qr-gallery" type="button" onclick="qrPickImage()">
+        <span class="material-icons-round">image</span>Scan from gallery
+      </button>
+      <input id="send-qr-file" type="file" accept="image/*" style="display:none" onchange="qrImageChosen(this)">
+    </div>
+
+    <div id="send-qr-perm">
+      <span class="material-icons-round qr-perm-ico">photo_camera</span>
+      <div class="qr-perm-title">Camera access needed</div>
+      <div id="send-qr-perm-text">Allow the camera to scan wallet addresses,<br>WalletConnect codes and website QR codes.</div>
+      <button id="send-qr-perm-btn" type="button" onclick="_requestQrCameraPermission()">Allow camera</button>
+      <button type="button" class="qr-perm-sec" onclick="qrPickImage()">Scan from gallery instead</button>
+    </div>
   </div>
 </div>
 

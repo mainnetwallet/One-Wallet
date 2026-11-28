@@ -5,6 +5,10 @@ Per-build release notes are published on the [Releases](../../releases) page.
 
 ## [Unreleased]
 
+### Added
+- **Smart QR scanner:** the scanner (Home top bar and the Send "To" field) now recognises what it scanned. A wallet address (plain, `ethereum:` or EIP-681, with checksum check) opens Send with the recipient filled in; a website QR opens in the in-app browser; a WalletConnect code starts a pairing (connect-confirm sheet, see below). Anything else shows "This QR code is not supported" and the camera keeps scanning. Only `http(s)` links are opened; `javascript:`, `file:`, `intent:` and links with a user:password part are refused.
+- **New scanner look:** full-screen camera with a rounded viewfinder, scanning line, green check on success, flashlight button (when the camera has one), "Scan from gallery" for QR images, and a clean camera-permission screen with an "Open app settings" button. Decoding is lighter (every 2nd frame, downscaled). New `OneAndroid.openAppSettings()` bridge method. Code: `scripts/features/scan/` (`qr-classify.js` is pure and unit-testable, `qr-scanner.js`), styles in `styles/features/scan/qr-scanner.css`.
+
 ### Changed
 - **Slimmer contract row:** the Contract card in the token sheet is thinner, the explorer button now says "Explorer" instead of showing an icon, and there is a small gap between Copy and Explorer.
 - **Home network pill without the x:** the small x on the network pill (Home, top right) is gone, so it no longer covers the network name. The pill now always shows the arrow and opens Select network, where All networks is the first row.
