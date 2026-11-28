@@ -69,7 +69,7 @@
 }
 .wdu-keys::-webkit-scrollbar { display: none; }
 .wdu-key {
-  display: flex; align-items: center; gap: 8px; padding: 0 10px; height: 34px; flex-shrink: 0;
+  display: flex; align-items: center; gap: 8px; padding: 4px 8px 4px 10px; min-height: 40px; flex-shrink: 0;
   border-radius: 10px; border: 1px solid var(--border-subtle); background: var(--bg-glass); cursor: pointer;
   -webkit-tap-highlight-color: transparent; transition: background .15s, border-color .15s;
 }
@@ -77,16 +77,40 @@
 .wdu-key.wdu-sel { background: var(--wdu-bg, rgba(99,102,241,.1)); border-color: var(--wdu-ac, var(--accent-primary)); }
 .wdu-kn { font-size: 15px; color: var(--text-muted); flex-shrink: 0; }
 .wdu-key.wdu-sel .wdu-kn { color: var(--wdu-ac, var(--accent-primary)); }
-.wdu-ktitle { flex: 1; min-width: 0; font-size: 12px; font-weight: 600; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.wdu-ksub { flex-shrink: 1; min-width: 0; max-width: 46%; font-family: var(--font-mono); font-size: 10.5px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.wdu-ktxt { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px; }
+.wdu-ktitle { min-width: 0; font-size: 12px; font-weight: 600; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.wdu-ksub { min-width: 0; font-family: var(--font-mono); font-size: 10.5px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .wdu-kx {
   width: 26px; height: 26px; border-radius: 8px; flex-shrink: 0;
   display: flex; align-items: center; justify-content: center;
   border: 1px solid var(--border-subtle); background: var(--bg-raised); color: var(--text-muted); cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
 }
+.wdu-kx:active { opacity: .7; }
 .wdu-kx .material-icons-round { font-size: 14px; }
 
 .wdu-empty {
   text-align: center; padding: 44px 20px; line-height: 2;
   font-family: var(--font-mono); font-size: 12px; color: var(--text-muted);
 }
+
+/* Every side drawer shares the Home drawer shape: big rounded left corners (top-left and bottom-left) */
+#hw-group-modal, #cw-drawer, #br-browser-wallet-drawer, #swap-wallet-drawer, #del-group-drawer,
+#rpc-manager-drawer, #sw-wallet-panel, #br-wallet-panel, #send-from-wg-modal, #send-to-wg-modal,
+#bsb-wallet-picker-drawer, #sup-wallet-picker-drawer, #th-wallet-picker-drawer {
+  border-radius: var(--radius-xl) 0 0 var(--radius-xl);
+  overflow: hidden;
+}
+
+/* Rename wallet dialog (opened by the pencil on a wallet card) */
+#wdu-rename-overlay { z-index: 9700; }
+.wdu-rn-title { font-size: 16px; font-weight: 800; margin-bottom: 4px; }
+.wdu-rn-sub { font-family: var(--font-mono); font-size: 11px; color: var(--text-muted); margin-bottom: 14px; }
+#wdu-rename-input { font-family: var(--font-display); font-size: 14px; font-weight: 700; margin-bottom: 14px; }
+.wdu-rn-btns { display: flex; gap: 8px; }
+.wdu-rn-btns button {
+  padding: 12px; border-radius: var(--radius-md); cursor: pointer;
+  font-family: var(--font-display); font-size: 13px; font-weight: 800;
+}
+.wdu-rn-cancel { flex: 1; background: var(--bg-raised); border: 1px solid var(--border-subtle); color: var(--text-secondary); font-weight: 700; }
+.wdu-rn-save { flex: 2; border: none; color: #fff; background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary)); box-shadow: var(--glow-primary); }

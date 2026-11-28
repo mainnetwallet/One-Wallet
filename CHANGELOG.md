@@ -6,6 +6,12 @@ Per-build release notes are published on the [Releases](../../releases) page.
 ## [Unreleased]
 
 ### Changed
+- **Rename wallets:** every wallet card in the wallet drawers has a pencil that renames it, and the "WALLET #N" row in a wallet group's detail
+  (next to SCAN) has the same pencil. The name is stored on the group (`labels`, aligned with the keys; empty name goes back to "Wallet N"), shows
+  in every drawer, and follows its key when keys are removed or the group's keys are edited. Wallet cards are now two lines (name over address)
+  so the pencil fits next to the check.
+- **Rounded side drawers:** all side drawers (Connected Wallets, Browser wallet, Swap, Delegation, Send FROM/TO, Bridge, Transfer Hub, Base swap
+  bot, RPC manager) now have the same big rounded top-left and bottom-left corners as the Home group drawer.
 - **Wallet drawer, new look:** group cards are now tinted pills with a round wallet avatar and a smaller 13px name; wallet cards under a group are
   slim single-line rows ("Wallet 1", key icon, short address) pushed 20% in from the left and joined to the group by a thin line, so an expanded
   group takes much less height. Same shared drawer, so Swap, Send, Bridge, Transfer Hub and the other pickers all change together. Selection

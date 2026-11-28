@@ -16,6 +16,11 @@ function wgekRemoveSelected() {
   if (!g) return;
   const toRemove = _wgEditKeysSelected;
   g.keys = g.keys.filter((_, i) => !toRemove.has(i));
+  // Wallet names follow their keys: drop the names of the removed wallets too
+  if (Array.isArray(g.labels)) {
+    g.labels = g.labels.filter((_, i) => !toRemove.has(i));
+    if (!g.labels.some(l => !!l)) delete g.labels;
+  }
   saveWalletGroups(groups);
   renderWalletGroupsList();
   renderSwapGroupList && renderSwapGroupList();

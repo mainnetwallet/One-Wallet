@@ -344,6 +344,15 @@ function _doSaveWalletGroup(name, validKeys, source, mnemonics) {
     const idx = groups.findIndex(g => g.id === wgEditingId);
     if (idx !== -1) {
       groups[idx].name = name;
+      // Wallet names follow their keys (matched by key), new keys get the default name
+      if (Array.isArray(groups[idx].labels)) {
+        const _oldKeys = groups[idx].keys || [];
+        const _oldLabels = groups[idx].labels;
+        const _nameOf = {};
+        _oldKeys.forEach((k, i) => { if (_oldLabels[i]) _nameOf[k] = _oldLabels[i]; });
+        const _newLabels = validKeys.map(k => _nameOf[k] || '');
+        if (_newLabels.some(l => !!l)) groups[idx].labels = _newLabels; else delete groups[idx].labels;
+      }
       groups[idx].keys = validKeys;
       saveWalletGroups(groups);
       wgEditingId = null;

@@ -64,8 +64,9 @@ async function openWgDetailUI(groupId) {
     row.innerHTML = `
       <div style="display:flex;align-items:center;gap:6px;">
         <div style="width:18px;height:18px;border-radius:5px;background:${p.bg};border:1px solid ${p.border};display:flex;align-items:center;justify-content:center;font-family:var(--font-mono);font-size:9px;font-weight:900;color:${p.txt};flex-shrink:0;">${i+1}</div>
-        <div style="font-size:9px;font-weight:700;color:var(--text-secondary);font-family:var(--font-mono);letter-spacing:0.8px;">WALLET #${i+1}</div>
+        <div class="wgd-name" style="font-size:9px;font-weight:700;color:var(--text-secondary);font-family:var(--font-mono);letter-spacing:0.8px;min-width:0;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">WALLET #${i+1}</div>
         <div style="flex:1;"></div>
+        <div class="wgd-rename" role="button" aria-label="Rename wallet" style="display:flex;align-items:center;justify-content:center;width:22px;height:20px;border-radius:6px;background:rgba(99,102,241,0.09);border:1px solid rgba(99,102,241,0.2);cursor:pointer;flex-shrink:0;"><span class="material-icons-round" style="font-size:11px;color:rgba(99,102,241,0.85);">edit</span></div>
         ${addr ? `<div onclick="event.stopPropagation();(function(){var _cid=(typeof sendSelectedChainId!=='undefined'?sendSelectedChainId:8453);var _exp=window.getTHExplorer?window.getTHExplorer(_cid):'https://etherscan.io';window.open(_exp+'/address/${addr}','_blank');})()" style="display:flex;align-items:center;gap:3px;padding:2px 6px;border-radius:6px;background:rgba(99,102,241,0.09);border:1px solid rgba(99,102,241,0.2);cursor:pointer;"><span class="material-icons-round" style="font-size:9px;color:rgba(99,102,241,0.7);">open_in_new</span><span style="font-size:8px;font-family:var(--font-mono);color:rgba(99,102,241,0.6);font-weight:700;letter-spacing:0.5px;">SCAN</span></div>` : ''}
       </div>
       <div style="height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.06),transparent);"></div>
@@ -86,6 +87,19 @@ async function openWgDetailUI(groupId) {
         </div>
       </div>
     `;
+    const nameEl = row.querySelector('.wgd-name');
+    const setName = () => {
+      const lg = (loadWalletGroups().find(x => x.id === groupId) || {});
+      const custom = lg.labels && lg.labels[i];
+      nameEl.textContent = custom ? custom : 'WALLET #' + (i + 1);
+      nameEl.style.color = custom ? 'var(--text-primary)' : 'var(--text-secondary)';
+    };
+    setName();
+    row.querySelector('.wgd-rename').addEventListener('click', e => {
+      e.stopPropagation();
+      haptic && haptic();
+      if (window.WDU && WDU.renameWallet) WDU.renameWallet(groupId, i, setName);
+    });
     row.querySelector('.wgd-copy-addr').addEventListener('click', e => {
       e.stopPropagation();
       if (!addr) return;
