@@ -6,6 +6,7 @@ Per-build release notes are published on the [Releases](../../releases) page.
 ## [Unreleased]
 
 ### Changed
+- **Add keys to an existing group:** every card in Wallet Groups has a new ADD KEYS row. It opens a sheet to paste one or many private keys (one per line), skips duplicates and invalid keys with a live count, and lets you insert them at any position (blank = end). Wallet names and seed phrases stay matched to their keys. The pasted text is cleared when the sheet closes. New `wg-add-keys.js` and `#wgak-overlay`.
 - **Settings page, new look:** grouped sections (Wallets, Security, Network, Preferences, Developer) in rounded cards with uniform rows and one icon style, a small title with the version, and a protection summary card at the top ("Your wallet is protected" with app lock, gasless and group count; turns amber with a tap-to-set-up shortcut when app lock is off). App Lock moved to Security, Console Log to Developer, the Dark Mode switch became a Dark / Light selector, and the Base Paymaster row keeps its toggle and expandable URL panel. Styles are scoped to `#page-settings` (new `settings-page-redesign.css`). All element IDs and handlers are unchanged, so wallet groups, RPC, paymaster, currency, haptics, notifications, app lock and console log work as before.
 - **Create wallets, new look:** the Create Wallet screen is now two steps. Step 1 (Setup): group name with quick suggestions (Fresh wallets, Airdrop, Testing),
   a big wallet count with minus / plus buttons and presets (1, 5, 10, 25, 50, 100), a short privacy note and one "Generate N wallets" button. Step 2 (Review):
@@ -115,6 +116,7 @@ Per-build release notes are published on the [Releases](../../releases) page.
   fields, buttons and transfer logic are unchanged.
 
 ### Fixed
+- **Seed phrases stay matched after removing keys:** removing wallets from a group (Wallet Groups, EDIT) now also drops their stored seed phrases, so COPY PHRASES no longer pairs the remaining wallets with the wrong phrases.
 - **Explorer links were matched by text anywhere in the address:** a link was opened in the system browser if an
   explorer name appeared anywhere in it, even in a query like `?u=etherscan.io`. Only links whose host is an explorer
   (or a subdomain of one) are now treated as explorer links. Also removed an unused public CORS-proxy entry from the
