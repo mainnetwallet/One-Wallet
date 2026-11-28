@@ -2,7 +2,10 @@
 
 
 // ── Main dispatcher ────────────────────────────────────────
-window.oneHandleWeb3Request = async function(reqId, method, paramsJson) {
+window.oneHandleWeb3Request = async function(reqId, method, paramsJson, originHost) {
+  // Host of the tab that made this request. Captured per request: window._oneActiveBrowserHost
+  // is only "the page that started loading last", which may be another tab.
+  var _siteHost = originHost || _getBrowserHost();
   var params = [];
   try { params = JSON.parse(paramsJson || '[]'); } catch(_) {}
 
@@ -282,10 +285,10 @@ window.oneHandleWeb3Request = async function(reqId, method, paramsJson) {
         if (_w3mOpen) {
           // Snapshot all closure vars to prevent concurrent-request pollution
           (function(_rId,_meth,_bHtml,_doSign,_rej){
-            _w3mQueue.push(function() { _openModal({ reqId:_rId, method:_meth, title:'Sign Message', actionLabel:'personal_sign', siteHost:_getBrowserHost(), bodyHtml:_bHtml, approveLabel:'Sign', onApprove:_doSign, onReject:function(){ _rej('User rejected'); } }); });
+            _w3mQueue.push(function() { _openModal({ reqId:_rId, method:_meth, title:'Sign Message', actionLabel:'personal_sign', siteHost:_siteHost, bodyHtml:_bHtml, approveLabel:'Sign', onApprove:_doSign, onReject:function(){ _rej('User rejected'); } }); });
           })(reqId, method, bodyHtml, doSign, _reject);
         } else {
-          _openModal({ reqId, method, title: 'Sign Message', actionLabel: 'personal_sign', siteHost: _getBrowserHost(), bodyHtml, approveLabel: 'Sign', onApprove: doSign, onReject: function(){ _reject('User rejected'); } });
+          _openModal({ reqId, method, title: 'Sign Message', actionLabel: 'personal_sign', siteHost: _siteHost, bodyHtml, approveLabel: 'Sign', onApprove: doSign, onReject: function(){ _reject('User rejected'); } });
         }
         break;
       }
@@ -337,9 +340,9 @@ window.oneHandleWeb3Request = async function(reqId, method, paramsJson) {
         };
 
         if (_w3mOpen) {
-          _w3mQueue.push(function() { _openModal({ reqId, method, actionLabel: 'eth_sign', siteHost: _getBrowserHost(), bodyHtml: bodyHtml2, approveLabel: 'Sign', onApprove: doEthSign, onReject: function(){ _reject('User rejected'); } }); });
+          _w3mQueue.push(function() { _openModal({ reqId, method, actionLabel: 'eth_sign', siteHost: _siteHost, bodyHtml: bodyHtml2, approveLabel: 'Sign', onApprove: doEthSign, onReject: function(){ _reject('User rejected'); } }); });
         } else {
-          _openModal({ reqId, method, actionLabel: 'eth_sign', siteHost: _getBrowserHost(), bodyHtml: bodyHtml2, approveLabel: 'Sign', onApprove: doEthSign, onReject: function(){ _reject('User rejected'); } });
+          _openModal({ reqId, method, actionLabel: 'eth_sign', siteHost: _siteHost, bodyHtml: bodyHtml2, approveLabel: 'Sign', onApprove: doEthSign, onReject: function(){ _reject('User rejected'); } });
         }
         break;
       }
@@ -454,9 +457,9 @@ window.oneHandleWeb3Request = async function(reqId, method, paramsJson) {
         };
 
         if (_w3mOpen) {
-          _w3mQueue.push(function() { _openModal({ reqId, method, actionLabel: method, siteHost: _getBrowserHost(), bodyHtml: bodyHtml3, approveLabel: 'Sign', onApprove: doTypedSign, onReject: function(){ _reject('User rejected'); } }); });
+          _w3mQueue.push(function() { _openModal({ reqId, method, actionLabel: method, siteHost: _siteHost, bodyHtml: bodyHtml3, approveLabel: 'Sign', onApprove: doTypedSign, onReject: function(){ _reject('User rejected'); } }); });
         } else {
-          _openModal({ reqId, method, actionLabel: method, siteHost: _getBrowserHost(), bodyHtml: bodyHtml3, approveLabel: 'Sign', onApprove: doTypedSign, onReject: function(){ _reject('User rejected'); } });
+          _openModal({ reqId, method, actionLabel: method, siteHost: _siteHost, bodyHtml: bodyHtml3, approveLabel: 'Sign', onApprove: doTypedSign, onReject: function(){ _reject('User rejected'); } });
         }
         break;
       }
@@ -1342,9 +1345,9 @@ window.oneHandleWeb3Request = async function(reqId, method, paramsJson) {
         };
 
         if (_w3mOpen) {
-          _w3mQueue.push(function() { _openModal({ reqId, method, actionLabel: 'SEND TX', siteHost: _getBrowserHost(), bodyHtml: bodyHtml4, approveLabel: 'Confirm & Send', onApprove: doSendTx, onReject: function(){ _reject('User rejected'); } }); });
+          _w3mQueue.push(function() { _openModal({ reqId, method, actionLabel: 'SEND TX', siteHost: _siteHost, bodyHtml: bodyHtml4, approveLabel: 'Confirm & Send', onApprove: doSendTx, onReject: function(){ _reject('User rejected'); } }); });
         } else {
-          _openModal({ reqId, method, actionLabel: 'SEND TX', siteHost: _getBrowserHost(), bodyHtml: bodyHtml4, approveLabel: 'Confirm & Send', onApprove: doSendTx, onReject: function(){ _reject('User rejected'); } });
+          _openModal({ reqId, method, actionLabel: 'SEND TX', siteHost: _siteHost, bodyHtml: bodyHtml4, approveLabel: 'Confirm & Send', onApprove: doSendTx, onReject: function(){ _reject('User rejected'); } });
         }
         break;
       }
@@ -1400,9 +1403,9 @@ window.oneHandleWeb3Request = async function(reqId, method, paramsJson) {
         };
 
         if (_w3mOpen) {
-          _w3mQueue.push(function() { _openModal({ reqId, method, actionLabel: 'SIGN TX', siteHost: _getBrowserHost(), bodyHtml: bodyHtml5, approveLabel: 'Sign', onApprove: doSignTx, onReject: function(){ _reject('User rejected'); } }); });
+          _w3mQueue.push(function() { _openModal({ reqId, method, actionLabel: 'SIGN TX', siteHost: _siteHost, bodyHtml: bodyHtml5, approveLabel: 'Sign', onApprove: doSignTx, onReject: function(){ _reject('User rejected'); } }); });
         } else {
-          _openModal({ reqId, method, actionLabel: 'SIGN TX', siteHost: _getBrowserHost(), bodyHtml: bodyHtml5, approveLabel: 'Sign', onApprove: doSignTx, onReject: function(){ _reject('User rejected'); } });
+          _openModal({ reqId, method, actionLabel: 'SIGN TX', siteHost: _siteHost, bodyHtml: bodyHtml5, approveLabel: 'Sign', onApprove: doSignTx, onReject: function(){ _reject('User rejected'); } });
         }
         break;
       }

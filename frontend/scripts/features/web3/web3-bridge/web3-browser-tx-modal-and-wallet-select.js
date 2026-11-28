@@ -62,6 +62,22 @@ window._oneModalRejectFromBrowser = function(reqId) {
   }
 };
 
+// Called by Java when the tabs behind these requests navigated away or closed. Only those requests
+// are discarded; requests from other tabs stay pending. Nothing is signed or answered.
+window._oneDropBrowserRequests = function(ids) {
+  var gone = function(id) { return ids.indexOf(Number(id)) !== -1; };
+  if (window._onePendingBrowserReqId && gone(window._onePendingBrowserReqId)) {
+    window._onePendingBrowserReqId = null;
+  }
+  if (_w3mCurrentReq && gone(_w3mCurrentReq.reqId)) {
+    var overlay = document.getElementById('one-w3-modal-overlay');
+    if (overlay) overlay.classList.remove('active');
+    window._oneModalRejectFromBrowser(_w3mCurrentReq.reqId);
+  }
+  // A dropped request that is still queued is discarded when its turn comes: Java has no record of
+  // it, so showTxModal answers with another call to this function.
+};
+
 // Fallback: called by Java when InAppBrowserActivity is not open
 // Shows the built-in overlay modal instead of dApp-injected modal
 window._oneFallbackOpenModal = function(reqId) {

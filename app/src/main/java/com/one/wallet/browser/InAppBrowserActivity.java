@@ -162,6 +162,58 @@ public class InAppBrowserActivity extends AppCompatActivity {
     }
     public static boolean isValidMethod(String s)  { return s != null && METHOD_RE.matcher(s).matches(); }
 
+    // ── Web3 request identity ───────────────────────────────────────────────────────────────
+    // addJavascriptInterface exposes OneWeb3Bridge to every frame of a page, including
+    // third-party iframes, and the bridge cannot tell which frame called it. Each call therefore
+    // has to carry a token that only the provider injected into the top frame knows. The token is
+    // bound to the top document's origin, so one site's token is useless while a tab shows another.
+    private static final byte[] BRIDGE_SECRET = new byte[32];
+    static { new java.security.SecureRandom().nextBytes(BRIDGE_SECRET); }
+
+    /** Same string as JavaScript's location.origin for an http(s) URL, else null. */
+    static String originOf(String url) {
+        if (!isHttpUrl(url)) return null;
+        Uri u = Uri.parse(url.trim());
+        String authority = u.getEncodedAuthority();
+        if (u.getScheme() == null || authority == null) return null;
+        authority = authority.substring(authority.lastIndexOf('@') + 1)
+            .toLowerCase(java.util.Locale.ROOT);
+        String scheme = u.getScheme().toLowerCase(java.util.Locale.ROOT);
+        String defaultPort = "https".equals(scheme) ? ":443" : ":80";
+        if (authority.endsWith(defaultPort)) {
+            authority = authority.substring(0, authority.length() - defaultPort.length());
+        }
+        return authority.isEmpty() ? null : scheme + "://" + authority;
+    }
+
+    /** What the confirmation sheet shows: the host for https, the full origin for plain http. */
+    static String displayHost(String origin) {
+        return origin.startsWith("https://") ? origin.substring("https://".length()) : origin;
+    }
+
+    static String bridgeToken(String origin) {
+        try {
+            javax.crypto.Mac mac = javax.crypto.Mac.getInstance("HmacSHA256");
+            mac.init(new javax.crypto.spec.SecretKeySpec(BRIDGE_SECRET, "HmacSHA256"));
+            StringBuilder hex = new StringBuilder();
+            for (byte b : mac.doFinal(origin.getBytes(java.nio.charset.StandardCharsets.UTF_8))) {
+                hex.append(String.format(java.util.Locale.ROOT, "%02x", b & 0xff));
+            }
+            return hex.toString();
+        } catch (java.security.GeneralSecurityException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
+    /** True when {@code token} belongs to the document {@code wv} is showing. UI thread only. */
+    private static boolean isTokenFor(WebView wv, String token) {
+        String origin = originOf(wv.getUrl());
+        if (origin == null || token == null) return false;
+        return java.security.MessageDigest.isEqual(
+            bridgeToken(origin).getBytes(java.nio.charset.StandardCharsets.UTF_8),
+            token.getBytes(java.nio.charset.StandardCharsets.UTF_8));
+    }
+
     /** Returns {@code s} as a complete, double-quoted JavaScript string literal (quotes included). */
     public static String jsStr(String s) {
         String q = JSONObject.quote(s == null ? "" : s);
@@ -358,6 +410,9 @@ public class InAppBrowserActivity extends AppCompatActivity {
     // FULL inject: used only in onPageFinished (once per page load)
     private static final String WEB3_PROVIDER_JS =
         "(function() {\n" +
+        "  // Install only in the document this token was made for (it may have navigated meanwhile)\n" +
+        "  if (String(window.location.origin) !== __ONE_ORIGIN__) return;\n" +
+        "  var _bridgeToken = '__ONE_BRIDGE_TOKEN__';\n" +
         "  // Guard: if already injected this page, skip full re-init to preserve listeners\n" +
         "  if (window._oneWeb3Injected) {\n" +
         "    // Re-announce to catch any dApp that fires eip6963:requestProvider late\n" +
@@ -392,7 +447,7 @@ public class InAppBrowserActivity extends AppCompatActivity {
         "      var id = (window._oneW3ReqCounter = (window._oneW3ReqCounter||0)+1);\n" +
         "      window._oneW3Pending[id] = {resolve: resolve, reject: reject};\n" +
         "      try {\n" +
-        "        window.OneWeb3Bridge.handleRequest(id, method, JSON.stringify(params || []));\n" +
+        "        window.OneWeb3Bridge.handleRequest(_bridgeToken, id, method, JSON.stringify(params || []));\n" +
         "      } catch(e) {\n" +
         "        delete window._oneW3Pending[id];\n" +
         "        reject(new Error('OneWeb3Bridge not available'));\n" +
@@ -812,6 +867,7 @@ public class InAppBrowserActivity extends AppCompatActivity {
         Tab tab = tabs.get(index);
         webViewContainer.removeView(tab.webView);
         tab.webView.stopLoading();
+        dropRequestsForTab(tab.webView);
         mPageSeq.remove(tab.webView); // cancel any pending delayed restores for this WebView
         tab.webView.destroy();
         tab.webView = null; // prevent dangling reference
@@ -1035,7 +1091,7 @@ public class InAppBrowserActivity extends AppCompatActivity {
         wv.setLongClickable(false);
         wv.setHapticFeedbackEnabled(false);
 
-        wv.addJavascriptInterface(new OneWeb3Bridge(), "OneWeb3Bridge");
+        wv.addJavascriptInterface(new OneWeb3Bridge(wv), "OneWeb3Bridge");
         // NOTE: no page-visible chain/wallet setters. The chain and wallet are changed only by the
         // native pickers (see the chain picker and wallet drawer), never by dApp page JS.
 
@@ -1059,29 +1115,9 @@ public class InAppBrowserActivity extends AppCompatActivity {
                 // Increment seq so any pending restoreSelectedWalletIntoPage delayed
                 // callbacks from the PREVIOUS page load are automatically no-op'd.
                 nextPageSeq(view);
-                // Clear pending Web3 state in main wallet JS on navigation
-                // so stale reqIds and queue don't bleed across pages
-                WebView _mvNav = MainActivity.getMainWebView();
-                if (_mvNav != null) {
-                    _mvNav.post(() -> _mvNav.evaluateJavascript(
-                        "(function(){" +
-                        "if(window._onePendingBrowserReqId){" +
-                        "  try{OneAndroid.web3Reject(window._onePendingBrowserReqId,'Page navigated');}catch(_){}" +
-                        "  window._onePendingBrowserReqId=null;" +
-                        "}" +
-                        "window._w3mQueue=[];" +
-                        "window._w3mOpen=false;" +
-                        "window._w3mCurrentReq=null;" +
-                        "})()", null));
-                }
-                // Clear stale sReqTabMap entries for this WebView
-                sReqTabMap.entrySet().removeIf(e -> {
-                    WebView ref = e.getValue() != null ? e.getValue().get() : null;
-                    return ref == null || ref == view;
-                });
-                // The main-side pending request was just cleared above; close the native confirmation
-                // if the tab that is navigating is the one the user is looking at.
-                if (view == activeWebView()) dismissNativeTxConfirm();
+                // This tab's document is going away: drop its pending requests (and its open
+                // confirmation). Other tabs' requests are left alone.
+                dropRequestsForTab(view);
                 final String host2 = extractDomain(url);
                 // Snapshot seq AFTER nextPageSeq() was already called above for this navigation
                 final int host2Seq = mPageSeq.getOrDefault(view, 0);
@@ -1112,7 +1148,13 @@ public class InAppBrowserActivity extends AppCompatActivity {
                 if (tab != null && tab.desktopMode) {
                     injectDesktopViewport(view);
                 }
-                view.evaluateJavascript(WEB3_PROVIDER_JS.replace("__ONE_CHAIN_ID__", selectedChainId != null ? selectedChainId : "0x1"), null);
+                final String pageOrigin = originOf(view.getUrl());
+                if (pageOrigin != null) {
+                    view.evaluateJavascript(WEB3_PROVIDER_JS
+                        .replace("__ONE_CHAIN_ID__", selectedChainId != null ? selectedChainId : "0x1")
+                        .replace("__ONE_BRIDGE_TOKEN__", bridgeToken(pageOrigin))
+                        .replace("__ONE_ORIGIN__", jsStr(pageOrigin)), null);
+                }
                 // ── Inject CSS to disable text selection globally (prevents copy/translate toolbar) ──
                 view.evaluateJavascript(
                     "(function(){" +
@@ -1395,68 +1437,86 @@ public class InAppBrowserActivity extends AppCompatActivity {
     // Web3 Bridge (unchanged logic, targets active tab WebView)
     // ══════════════════════════════════════════════════════════════
     public class OneWeb3Bridge {
+        private final WebView owner; // the tab this bridge instance is attached to
+
+        OneWeb3Bridge(WebView owner) { this.owner = owner; }
+
         @JavascriptInterface
-        public void handleRequest(final int reqId, final String method, final String paramsJson) {
-            WebView mv = MainActivity.getMainWebView();
-            if (!isValidMethod(method)) { resolveError(reqId, "Unsupported method"); return; }
-            android.util.Log.d("OneWeb3", "Request #" + reqId + " method=" + method);
-            if (mv == null) { resolveError(reqId, "One Wallet not available"); return; }
-            // Record which WebView (tab) originated this request for correct response routing.
-            // activeWebView() reads main-thread state, so snapshot it safely on the UI thread
-            // before posting the JS eval. Use a temp array to capture the ref across the runOnUiThread.
-            final WebView[] originHolder = new WebView[1];
-            try {
-                // If we are already on the main thread this is a no-op; if not it blocks briefly.
-                if (android.os.Looper.myLooper() == android.os.Looper.getMainLooper()) {
-                    originHolder[0] = activeWebView();
-                } else {
-                    java.util.concurrent.CountDownLatch latch = new java.util.concurrent.CountDownLatch(1);
-                    runOnUiThread(() -> { originHolder[0] = activeWebView(); latch.countDown(); });
-                    latch.await(200, java.util.concurrent.TimeUnit.MILLISECONDS);
-                }
-            } catch (Exception ignored) {}
-            WebView originWv = originHolder[0];
-            if (originWv != null) sReqTabMap.put(reqId, new WeakReference<>(originWv));
-            String escaped = paramsJson == null ? "[]" : paramsJson.replace("\\", "\\\\").replace("`", "\\`").replace("$", "\\$");
-            String escapedMethod = jsStr(method);
-            mv.post(() -> mv.evaluateJavascript(
-                "(function(){\n  try {\n    if (typeof oneHandleWeb3Request === 'function') {\n" +
-                "      oneHandleWeb3Request(" + reqId + ", " + escapedMethod + ", `" + escaped + "`);\n" +
-                "    } else { window._oneWeb3Fallback && window._oneWeb3Fallback(" + reqId + ", " + escapedMethod + ", `" + escaped + "`); }\n" +
-                "  } catch(e) { console.error('[OneWeb3] dispatch error:', e); }\n})()", null));
+        public void handleRequest(final String token, final int pageReqId, final String method,
+                                  final String paramsJson) {
+            // WebView state is only readable on the UI thread
+            runOnUiThread(() -> dispatchWeb3Request(owner, token, pageReqId, method, paramsJson));
         }
 
         // NOTE: there is deliberately no modalApprove()/modalReject() here. The confirmation UI is
         // native (see showNativeTxConfirm) so page JS can neither see nor press Approve.
 
         /**
-         * Returns the persisted browser wallet address (from SharedPreferences).
-         * Called by oneHandleWeb3Request during eth_requestAccounts to restore
-         * _oneBrowserSelectedAddress after page navigation or app backgrounding,
-         * so signing methods (personal_sign etc.) work without requiring the user
-         * to re-connect their wallet on every page load.
-         */
-        @JavascriptInterface
-        public String getPersistedBrowserWallet() {
-            String addr = selectedWalletAddress;
-            if (addr == null || addr.isEmpty()) {
-                addr = getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
-                        .getString(KEY_SELECTED_WALLET, "");
-            }
-            return (addr != null && addr.matches("0x[0-9a-fA-F]{40}")) ? addr : "";
-        }
-
-        /**
          * Opens the given URL in a new in-app browser tab.
          * Called from the TX success toast's "View on Explorer →" tap handler.
          */
         @JavascriptInterface
-        public void openInAppBrowser(final String url, final String ignored) {
+        public void openInAppBrowser(final String token, final String url) {
             if (!isHttpUrl(url)) return;
-            InAppBrowserActivity a = sInstance != null ? sInstance.get() : null;
-            if (a == null) return;
-            a.runOnUiThread(() -> a.openNewTabPublic(url));
+            runOnUiThread(() -> {
+                if (!isDestroyed() && tabForWebView(owner) != null && isTokenFor(owner, token)) {
+                    openNewTabPublic(url);
+                }
+            });
         }
+    }
+
+    /** Registers a request from a tab's top document and hands it to the wallet. UI thread only. */
+    private void dispatchWeb3Request(WebView tabWv, String token, int pageReqId, String method,
+                                     String paramsJson) {
+        if (isDestroyed() || tabForWebView(tabWv) == null) return;
+        if (!isTokenFor(tabWv, token)) {
+            // An iframe or a stale document. Nothing is sent back: the id it passed could belong
+            // to a real request of the top document.
+            android.util.Log.w("OneWeb3", "Dropped a request that is not from the tab's top document");
+            return;
+        }
+        final String origin = originOf(tabWv.getUrl());
+        final String host = displayHost(origin);
+        // The wallet only ever sees this id. Page ids start at 1 in every tab and are chosen by
+        // the page, so they cannot identify a request.
+        final int reqId = sNextReqId.getAndIncrement();
+        sPending.put(reqId, new Web3Pending(tabWv, pageReqId, origin, host));
+        if (!isValidMethod(method)) { rejectFromMain(reqId, "Unsupported method"); return; }
+        android.util.Log.d("OneWeb3", "Request #" + reqId + " method=" + method);
+        final WebView mv = MainActivity.getMainWebView();
+        if (mv == null) { rejectFromMain(reqId, "One Wallet not available"); return; }
+        String escaped = paramsJson == null ? "[]" : paramsJson.replace("\\", "\\\\").replace("`", "\\`").replace("$", "\\$");
+        String args = reqId + ", " + jsStr(method) + ", `" + escaped + "`, " + jsStr(host);
+        mv.post(() -> mv.evaluateJavascript(
+            "(function(){\n  try {\n    if (typeof oneHandleWeb3Request === 'function') {\n" +
+            "      oneHandleWeb3Request(" + args + ");\n" +
+            "    } else { window._oneWeb3Fallback && window._oneWeb3Fallback(" + args + "); }\n" +
+            "  } catch(e) { console.error('[OneWeb3] dispatch error:', e); }\n})()", null));
+    }
+
+    /** Forgets every pending request of {@code view} and tells the wallet to discard them. */
+    private void dropRequestsForTab(WebView view) {
+        StringBuilder ids = new StringBuilder();
+        java.util.Iterator<java.util.Map.Entry<Integer, Web3Pending>> it = sPending.entrySet().iterator();
+        while (it.hasNext()) {
+            java.util.Map.Entry<Integer, Web3Pending> e = it.next();
+            WebView tabWv = e.getValue().tab.get();
+            if (tabWv != null && tabWv != view) continue;
+            if (e.getKey() == txConfirmReqId) dismissNativeTxConfirm();
+            if (ids.length() > 0) ids.append(',');
+            ids.append(e.getKey());
+            it.remove();
+        }
+        if (ids.length() > 0) tellWalletToDrop(ids.toString());
+    }
+
+    private static void tellWalletToDrop(String commaSeparatedIds) {
+        final WebView mv = MainActivity.getMainWebView();
+        if (mv == null) return;
+        mv.post(() -> mv.evaluateJavascript(
+            "window._oneDropBrowserRequests && window._oneDropBrowserRequests([" + commaSeparatedIds + "]);",
+            null));
     }
 
     // ── Per-WebView page-load sequence counter ──────────────────
@@ -1478,35 +1538,54 @@ public class InAppBrowserActivity extends AppCompatActivity {
     }
     private static WeakReference<InAppBrowserActivity> sInstance;
 
-    // ── reqId → originating WebView map for correct multi-tab routing ──
-    private static final java.util.concurrent.ConcurrentHashMap<Integer, WeakReference<WebView>>
-        sReqTabMap = new java.util.concurrent.ConcurrentHashMap<>();
+    // ── Pending Web3 requests, keyed by the wallet-side id ──
+    private static final class Web3Pending {
+        final WeakReference<WebView> tab;
+        final int pageReqId;  // the id the page's provider is waiting on
+        final String origin;  // top-document origin when the request was made
+        final String host;    // what the confirmation sheet shows
+
+        Web3Pending(WebView tabWv, int pageReqId, String origin, String host) {
+            this.tab = new WeakReference<>(tabWv);
+            this.pageReqId = pageReqId;
+            this.origin = origin;
+            this.host = host;
+        }
+
+        /** The requesting tab, or null if it is gone or now shows another site. UI thread only. */
+        WebView liveTab() {
+            WebView wv = tab.get();
+            return wv != null && origin.equals(originOf(wv.getUrl())) ? wv : null;
+        }
+    }
+
+    private static final AtomicInteger sNextReqId = new AtomicInteger(1);
+    private static final java.util.concurrent.ConcurrentHashMap<Integer, Web3Pending>
+        sPending = new java.util.concurrent.ConcurrentHashMap<>();
 
     public static void resolveFromMain(final int reqId, final String resultJson) {
-        InAppBrowserActivity a = sInstance != null ? sInstance.get() : null;
-        if (a == null) return;
-        // Route to the tab that originated this request, not necessarily the active tab
-        WeakReference<WebView> ref = sReqTabMap.remove(reqId);
-        WebView wv = (ref != null) ? ref.get() : null;
-        if (wv == null) wv = a.activeWebView();
-        if (wv == null) return;
-        final WebView target = wv;
         String escaped = resultJson == null ? "null" : resultJson.replace("\\", "\\\\").replace("`", "\\`").replace("$", "\\$");
-        target.post(() -> target.evaluateJavascript("window._oneW3Resolve && window._oneW3Resolve(" + reqId + ", `" + escaped + "`);", null));
+        deliverToRequester(reqId, "window._oneW3Resolve", "`" + escaped + "`");
     }
 
     public static void rejectFromMain(final int reqId, final String message) {
-        InAppBrowserActivity a = sInstance != null ? sInstance.get() : null;
-        if (a == null) return;
-        WeakReference<WebView> ref = sReqTabMap.remove(reqId);
-        WebView wv = (ref != null) ? ref.get() : null;
-        if (wv == null) wv = a.activeWebView();
-        if (wv == null) return;
-        final WebView target = wv;
         // jsStr() JSON-quotes the message (backslash, quote, newlines, U+2028/9), so any reject text
         // reaches the dApp as a valid JS string and its promise always settles.
-        String safeMsg = jsStr(message == null ? "User rejected" : message);
-        target.post(() -> target.evaluateJavascript("window._oneW3Reject && window._oneW3Reject(" + reqId + ", " + safeMsg + ");", null));
+        deliverToRequester(reqId, "window._oneW3Reject",
+            jsStr(message == null ? "User rejected" : message));
+    }
+
+    /** Answers only the tab that asked, and only while it still shows the site that asked. */
+    private static void deliverToRequester(final int reqId, final String fn, final String jsArg) {
+        InAppBrowserActivity a = sInstance != null ? sInstance.get() : null;
+        if (a == null) return;
+        a.runOnUiThread(() -> {
+            Web3Pending pending = sPending.remove(reqId);
+            if (pending == null) return; // answered already, or the tab navigated / closed
+            WebView target = pending.liveTab();
+            if (target == null) return;
+            target.evaluateJavascript(fn + " && " + fn + "(" + pending.pageReqId + ", " + jsArg + ");", null);
+        });
     }
 
     public static void updateAccountState(final String accountsJson, final String chainId) {
@@ -1526,18 +1605,15 @@ public class InAppBrowserActivity extends AppCompatActivity {
         final InAppBrowserActivity a = sInstance != null ? sInstance.get() : null;
         if (a == null) return;
         a.runOnUiThread(() -> {
-            // Show the host of the tab that actually made this request (recorded in sReqTabMap by
-            // handleRequest), not the global "last page started" value the wallet JS passes in:
-            // another tab loading a page in the meantime must not change what the user sees.
-            String originHost = siteHost;
-            WeakReference<WebView> ref = sReqTabMap.get(reqId);
-            WebView originWv = ref != null ? ref.get() : null;
-            if (originWv != null) {
-                String u = originWv.getUrl();
-                String h = u != null ? a.extractDomain(u) : null;
-                if (h != null && !h.isEmpty() && !"New Tab".equals(h)) originHost = h;
+            // The host shown is the one recorded when the tab made this request. The siteHost the
+            // wallet JS passes in is not used. A request whose tab is gone is not shown at all.
+            Web3Pending pending = sPending.get(reqId);
+            if (pending == null || pending.liveTab() == null) {
+                sPending.remove(reqId);
+                tellWalletToDrop(String.valueOf(reqId));
+                return;
             }
-            a.showNativeTxConfirm(reqId, actionLabel, originHost, bodyHtml, approveLabel);
+            a.showNativeTxConfirm(reqId, actionLabel, pending.host, bodyHtml, approveLabel);
         });
     }
 
@@ -1605,8 +1681,8 @@ public class InAppBrowserActivity extends AppCompatActivity {
         host.setTextColor(0xFFE5E7EB);
         host.setTextSize(13f);
         host.setTypeface(host.getTypeface(), android.graphics.Typeface.BOLD);
-        host.setSingleLine(true);
-        host.setEllipsize(android.text.TextUtils.TruncateAt.END);
+        // Never truncated: the end of a long host name is the part that identifies the site
+        host.setSingleLine(false);
         sheet.addView(host);
 
         TextView action = new TextView(this);
@@ -1737,17 +1813,23 @@ public class InAppBrowserActivity extends AppCompatActivity {
     public static void injectTxSuccess(final String txHash, final String explorerUrl) {
         InAppBrowserActivity a = sInstance != null ? sInstance.get() : null;
         if (a == null) return;
-        WebView wv = a.activeWebView();
+        a.runOnUiThread(() -> a.showTxSuccessToast(txHash, explorerUrl));
+    }
+
+    private void showTxSuccessToast(String txHash, String explorerUrl) {
+        WebView wv = activeWebView();
         if (wv == null) return;
-        String safeHash = txHash == null ? "" : txHash.replace("\"", "\\\"");
+        String origin = originOf(wv.getUrl());
+        if (origin == null) return;
+        String safeHash = txHash == null ? "" : txHash;
         String shortHash = safeHash.length() > 14
             ? safeHash.substring(0, 8) + "..." + safeHash.substring(safeHash.length() - 6)
             : safeHash;
-        String safeShort = shortHash.replace("\"", "\\\"");
-        String safeUrl = explorerUrl == null ? "" : explorerUrl.replace("\\", "\\\\").replace("\"", "\\\"");
+        String url = explorerUrl != null && isHttpUrl(explorerUrl) ? explorerUrl : "";
 
         StringBuilder sb = new StringBuilder();
         sb.append("(function(){");
+        sb.append("if(String(window.location.origin)!==").append(jsStr(origin)).append(")return;");
         sb.append("var _SID='_one_tx_success_toast';");
         sb.append("var old=document.getElementById(_SID); if(old){clearTimeout(old._timer);old.remove();}");
         // Toast container
@@ -1774,25 +1856,25 @@ public class InAppBrowserActivity extends AppCompatActivity {
         sb.append("title.textContent='Transaction Submitted';");
         sb.append("var sub=document.createElement('div');");
         sb.append("sub.style.cssText='font-size:11px;color:#6b7280;font-family:monospace;';");
-        sb.append("sub.textContent='").append(safeShort).append("';");
+        sb.append("sub.textContent=").append(jsStr(shortHash)).append(";");
         sb.append("var link=document.createElement('div');");
         sb.append("link.style.cssText='font-size:11px;color:#6366f1;margin-top:3px;font-weight:600;';");
         sb.append("link.textContent='View on Explorer →';");
         sb.append("txt.appendChild(title); txt.appendChild(sub);");
-        if (!safeUrl.isEmpty()) {
+        if (!url.isEmpty()) {
             sb.append("txt.appendChild(link);");
         }
         sb.append("t.appendChild(txt);");
         sb.append("document.body.appendChild(t);");
         // Tap to open explorer — use OneAndroid.openExternalUrl so it opens in the
         // system browser, not inside the dApp WebView (fixes jumper.xyz/%22https:... bug)
-        if (!safeUrl.isEmpty()) {
+        if (!url.isEmpty()) {
             sb.append("t.onclick=function(){" +
                 "try{" +
                     "if(typeof OneWeb3Bridge!=='undefined'&&OneWeb3Bridge.openInAppBrowser){" +
-                        "OneWeb3Bridge.openInAppBrowser('" + safeUrl + "',null);" +
+                        "OneWeb3Bridge.openInAppBrowser('" + bridgeToken(origin) + "'," + jsStr(url) + ");" +
                     "}else{" +
-                        "window.open('" + safeUrl + "','_blank','noopener,noreferrer');" +
+                        "window.open(" + jsStr(url) + ",'_blank','noopener,noreferrer');" +
                     "}" +
                 "}catch(e){}" +
             "};");
@@ -2025,7 +2107,6 @@ public class InAppBrowserActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    private void resolveError(int reqId, String msg) { rejectFromMain(reqId, msg); }
 
     // ── Lifecycle ────────────────────────────────────────────────
     @Override
@@ -2049,11 +2130,8 @@ public class InAppBrowserActivity extends AppCompatActivity {
     @Override protected void onResume() {
         super.onResume();
         sInstance = new WeakReference<>(this);
-        // Clean up any stale reqId entries whose WebView refs have been GC'd
-        sReqTabMap.entrySet().removeIf(e -> {
-            WebView ref = e.getValue() != null ? e.getValue().get() : null;
-            return ref == null;
-        });
+        // Clean up pending requests whose WebView refs have been GC'd
+        sPending.values().removeIf(p -> p.tab.get() == null);
     }
 
     @Override
