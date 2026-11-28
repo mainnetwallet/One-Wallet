@@ -363,7 +363,8 @@ window.oneHandleWeb3Request = async function(reqId, method, paramsJson, originHo
 
         var msgPreview = '';
         try { msgPreview = JSON.stringify(typedData.message || typedData, null, 2); } catch(_) { msgPreview = String(typedDataRaw); }
-        if (msgPreview.length > 500) msgPreview = msgPreview.slice(0,500) + '...';
+        // Shown in full (the sheet scrolls): a spender or recipient can come late in the message
+        if (msgPreview.length > 20000) msgPreview = msgPreview.slice(0,20000) + '\n… (truncated: message is too long to show in full)';
 
         var typedDomain = typedData.domain || {};
         var bodyHtml3 = _W3M_BODY_STYLES + '<div class="w3m-network-badge">🔏 EIP-712 TYPED SIGN</div>' +
@@ -372,7 +373,9 @@ window.oneHandleWeb3Request = async function(reqId, method, paramsJson, originHo
             '<div style="font-size:11px;font-weight:700;color:#a78bfa;">' + (_getWalletLabelForAddress(fromAddr3) || 'Wallet') + '</div>' +
             '<div style="font-size:10px;color:#6b7280;font-family:monospace;">' + (fromAddr3 || 'Unknown') + '</div>' +
           '</div>' +
-          (typedDomain.name ? '<div class="w3m-section-title">CONTRACT</div><div class="w3m-address-box">' + _escHtml(typedDomain.name) + '</div>' : '') +
+          // domain.name is free text chosen by the requester; the address is what identifies the contract
+          (typedDomain.name ? '<div class="w3m-section-title">APP NAME (SELF-REPORTED)</div><div class="w3m-address-box">' + _escHtml(typedDomain.name) + '</div>' : '') +
+          (typedDomain.verifyingContract ? '<div class="w3m-section-title">VERIFYING CONTRACT</div><div class="w3m-address-box">' + _escHtml(typedDomain.verifyingContract) + '</div>' : '') +
           '<div class="w3m-section-title">MESSAGE PREVIEW</div>' +
           '<div class="w3m-data-box">' + _escHtml(msgPreview) + '</div>' +
           '<div class="w3m-warn-box"><div class="w3m-warn-icon">⚠️</div>' +
@@ -545,7 +548,7 @@ window.oneHandleWeb3Request = async function(reqId, method, paramsJson, originHo
         var valDisplay = _fmtValue(txParams.value, chainId);
         var sym        = _getChainSymbol(chainId);
         var chainName  = _getChainName(chainId);
-        var toShort    = txParams.to ? txParams.to.slice(0,8) + '...' + txParams.to.slice(-6) : 'Contract';
+        var toFull     = txParams.to || 'Contract deployment';
         var hasData    = txParams.data && txParams.data !== '0x' && txParams.data.length > 2;
 
         // ── ERC20 transfer/approve decode ──────────────────────────────────────
@@ -608,11 +611,9 @@ window.oneHandleWeb3Request = async function(reqId, method, paramsJson, originHo
                 : (_whole.toString() + (_fracStr ? '.' + _fracStr : ''));
               // Token symbol from resolved meta or fallback
               var _tokSym = _tokSym2 ? _tokSym2 : 'Token·' + (txParams.to ? txParams.to.slice(-4) : '????');
-              var _toShortErc = _toRaw.length >= 10 ? _toRaw.slice(0,8) + '...' + _toRaw.slice(-6) : _toRaw;
               _erc20Info = {
                 type:      _sel4 === '0xa9059cbb' ? 'ERC-20 Transfer' : 'ERC-20 Approve',
                 recipient: _toRaw,
-                recipientShort: _toShortErc,
                 amount:    _amtDisplay,
                 symbol:    _tokSym,
                 decimals:  _tokDec,
@@ -667,7 +668,6 @@ window.oneHandleWeb3Request = async function(reqId, method, paramsJson, originHo
               _erc20Info = {
                 type:      'ERC-20 TransferFrom',
                 recipient: _tfTo,
-                recipientShort: _tfTo.slice(0,8) + '...' + _tfTo.slice(-6),
                 amount:    _tfAmt,
                 symbol:    _tfSym,
                 decimals:  _tfDec,
@@ -1099,13 +1099,13 @@ window.oneHandleWeb3Request = async function(reqId, method, paramsJson, originHo
         var _modalToRow, _modalAmountRow, _modalTypeRow = '';
         if (_erc20Info) {
           // ERC20: show decoded recipient, amount, token symbol, contract
-          _modalToRow = '<div class="w3m-tx-row"><span class="w3m-tx-label">To</span><span class="w3m-tx-value">' + _escHtml(_erc20Info.recipientShort) + '</span></div>';
+          _modalToRow = '<div class="w3m-tx-row"><span class="w3m-tx-label">' + (_erc20Info.type === 'ERC-20 Approve' ? 'Spender' : 'To') + '</span><span class="w3m-tx-value">' + _escHtml(_erc20Info.recipient) + '</span></div>';
           _modalAmountRow = '<div class="w3m-tx-row"><span class="w3m-tx-label">Amount</span><span class="w3m-tx-value" style="color:#10b981;font-weight:700;">' + _escHtml(_erc20Info.amount + ' ' + _erc20Info.symbol) + '</span></div>';
           _modalTypeRow = '<div class="w3m-tx-row"><span class="w3m-tx-label">Type</span><span class="w3m-tx-value" style="color:#a78bfa;">' + _escHtml(_erc20Info.type) + '</span></div>' +
-            '<div class="w3m-tx-row"><span class="w3m-tx-label">Contract</span><span class="w3m-tx-value">' + _escHtml(_erc20Info.contract ? _erc20Info.contract.slice(0,8)+'...'+_erc20Info.contract.slice(-6) : '?') + '</span></div>';
+            '<div class="w3m-tx-row"><span class="w3m-tx-label">Contract</span><span class="w3m-tx-value">' + _escHtml(_erc20Info.contract || '?') + '</span></div>';
         } else {
           // Native ETH / generic contract tx
-          _modalToRow = '<div class="w3m-tx-row"><span class="w3m-tx-label">To</span><span class="w3m-tx-value">' + _escHtml(toShort) + '</span></div>';
+          _modalToRow = '<div class="w3m-tx-row"><span class="w3m-tx-label">To</span><span class="w3m-tx-value">' + _escHtml(toFull) + '</span></div>';
           // Only show Value row if ETH value is non-zero, OR if there is no calldata (pure ETH send)
           var _rawVal = txParams.value ? BigInt(txParams.value) : 0n;
           if (_rawVal > 0n || !hasData) {
@@ -1118,10 +1118,9 @@ window.oneHandleWeb3Request = async function(reqId, method, paramsJson, originHo
             var _actionLabel = _knownSel
               ? _knownSel.name + ' — ' + _knownSel.desc
               : txParams.data.slice(0,10) + '... (unknown)';
-            var _contractShort = txParams.to ? txParams.to.slice(0,8) + '...' + txParams.to.slice(-6) : '?';
             _modalTypeRow =
               '<div class="w3m-tx-row"><span class="w3m-tx-label">Action</span><span class="w3m-tx-value" style="color:#a78bfa;">' + _escHtml(_actionLabel) + '</span></div>' +
-              '<div class="w3m-tx-row"><span class="w3m-tx-label">Contract</span><span class="w3m-tx-value">' + _escHtml(_contractShort) + '</span></div>';
+              '<div class="w3m-tx-row"><span class="w3m-tx-label">Contract</span><span class="w3m-tx-value">' + _escHtml(txParams.to || '?') + '</span></div>';
           } else {
             _modalTypeRow = '';
           }
@@ -1139,7 +1138,7 @@ window.oneHandleWeb3Request = async function(reqId, method, paramsJson, originHo
           '<div class="w3m-address-box">' +
           '<div class="w3m-tx-row"><span class="w3m-tx-label">From</span><span class="w3m-tx-value" style="display:flex;flex-direction:column;align-items:flex-end;gap:2px;">' +
             '<span style="color:#a78bfa;font-weight:700;">' + _escHtml(_getWalletLabelForAddress(fromAddr4) || '') + '</span>' +
-            '<span>' + _escHtml(fromAddr4 ? fromAddr4.slice(0,8)+'...'+fromAddr4.slice(-6) : '?') + '</span>' +
+            '<span style="word-break:break-all;">' + _escHtml(fromAddr4 || '?') + '</span>' +
           '</span></div>' +
           _modalToRow +
           _modalAmountRow +
