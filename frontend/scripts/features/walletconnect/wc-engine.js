@@ -13,8 +13,14 @@ var _wcKit = null;
 var _wcInitPromise = null;
 var _wcPairTimer = null;
 
+// The app's own WalletConnect Project ID (cloud.reown.com). It is a public identifier, not a secret: every wallet ships it in its client code.
+// Keep "Allowed domains" empty in that project: One Wallet runs from file:///android_asset/, so the relay sees no real web origin.
+var WC_DEFAULT_PROJECT_ID = '2c779015e958dfad1f4bf86d2423cc6e';
+// A valid ID saved in localStorage (one_wc_project_id) wins over the built-in one
 function wcGetProjectId() {
-  try { return (localStorage.getItem(WC_PROJECT_KEY) || '').trim(); } catch (e) { return ''; }
+  var saved = '';
+  try { saved = (localStorage.getItem(WC_PROJECT_KEY) || '').trim(); } catch (e) {}
+  return /^[0-9a-f]{32}$/i.test(saved) ? saved : WC_DEFAULT_PROJECT_ID;
 }
 function wcSetProjectId(id) {
   id = String(id || '').trim();

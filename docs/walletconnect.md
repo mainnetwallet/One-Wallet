@@ -20,8 +20,10 @@ Refused on purpose: `javascript:`, `file:`, `intent:`, `data:` and URLs with a `
 - `scripts/features/walletconnect/wc-engine.js`: init, `wcPair(uri)`, proposal analysis, approve/reject, sessions, request execution.
 - `scripts/features/walletconnect/wc-ui.js`: every sheet (`#wc-overlay` from `html-src/partials/walletconnect.html`): connecting, connect-confirm,
   sign / transaction request, Connected apps (Settings > Network), Project ID setup.
-- **Project ID**: WalletConnect needs a free Project ID from <https://cloud.reown.com>. The first pairing asks for it once and stores it in
-  `localStorage` (`one_wc_project_id`). To ship a default, set it in `wcGetProjectId()`.
+- **Project ID**: WalletConnect needs a Project ID from <https://cloud.reown.com>. One Wallet ships its own (`WC_DEFAULT_PROJECT_ID` in `wc-engine.js`), so
+  users set up nothing. It is a public identifier, not a secret. Keep **Allowed domains** empty in that project (the app runs from `file://`).
+  A valid ID saved in `localStorage` (`one_wc_project_id`) wins over the built-in one. Because an ID is always available, the old "Set up WalletConnect"
+  sheet (`wcOpenProjectIdSheet`) is no longer shown; the code is kept as a fallback.
 - Supported requests: `personal_sign`, `eth_signTypedData(_v3/_v4)`, `eth_sendTransaction`, `wallet_switchEthereumChain`, `wallet_addEthereumChain`.
   `eth_sign` and `eth_signTransaction` are refused. Every sign/send shows a sheet; unlimited ERC-20
   approvals and `setApprovalForAll` get a red warning. Requests for a chain that is not added in One Wallet are refused.

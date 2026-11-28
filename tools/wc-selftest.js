@@ -34,8 +34,14 @@ const ns = ctx.OneWC.buildApprovedNamespaces({ proposal: { ...proposal, required
 eq(ns.eip155.chains, chains);
 assert.ok(ns.eip155.methods.includes('personal_sign') && ns.eip155.accounts.length === 2);
 
+// project id: built-in default, a saved valid ID wins, a corrupt saved value falls back to the default
+assert.strictEqual(ctx.WC_DEFAULT_PROJECT_ID, '2c779015e958dfad1f4bf86d2423cc6e');
+assert.ok(/^[0-9a-f]{32}$/.test(ctx.WC_DEFAULT_PROJECT_ID));
+assert.strictEqual(ctx.wcGetProjectId(), ctx.WC_DEFAULT_PROJECT_ID);
+store.one_wc_project_id = 'garbage'; assert.strictEqual(ctx.wcGetProjectId(), ctx.WC_DEFAULT_PROJECT_ID); delete store.one_wc_project_id;
 // project id validation
 assert.strictEqual(ctx.wcSetProjectId('nope'), false);
+assert.strictEqual(ctx.wcGetProjectId(), ctx.WC_DEFAULT_PROJECT_ID);          // a refused ID changes nothing
 assert.strictEqual(ctx.wcSetProjectId('0123456789abcdef0123456789abcdef'), true);
 assert.strictEqual(ctx.wcGetProjectId(), '0123456789abcdef0123456789abcdef');
 
