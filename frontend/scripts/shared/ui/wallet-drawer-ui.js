@@ -18,7 +18,6 @@
 //     keyInfo:   function (gi, ki, pk) -> { title, sub }      optional
 //     groupSub:  function (gi, selCount, total) -> string     optional
 //     keyAction: { icon, label, onTap(gi, ki, el) }           optional extra button per wallet
-//     rename:    false                            optional, hides the per-wallet rename (pencil) button
 //     hint:      string | false                   optional, false hides the hint row
 //     topHtml:   string                           optional html shown above the hint row
 //     emptyHtml: string                           optional
@@ -75,19 +74,31 @@
   }
 
   var _rn = null;
+  var QUICK_NAMES = ['Main', 'Trading', 'Savings', 'Gas', 'Bot'];
+
+  function el(id) { return document.getElementById(id); }
 
   function closeRename() {
-    var ov = document.getElementById('wdu-rename-overlay');
+    var ov = el('wdu-rename-overlay');
     if (ov) ov.classList.remove('open');
-    var inp = document.getElementById('wdu-rename-input');
+    var inp = el('wdu-rename-input');
     if (inp) inp.blur();
     _rn = null;
   }
 
-  function commitRename() {
+  function updateCounter() {
+    var inp = el('wdu-rename-input');
+    var cnt = el('wdu-rename-count');
+    var clr = el('wdu-rename-clear');
+    if (cnt && inp) cnt.textContent = inp.value.length + '/24';
+    if (clr && inp) clr.style.visibility = inp.value ? 'visible' : 'hidden';
+  }
+
+  function commitRename(forceName) {
     if (!_rn) return;
-    var inp = document.getElementById('wdu-rename-input');
-    var name = ((inp && inp.value) || '').replace(/\s+/g, ' ').trim().slice(0, 24);
+    var inp = el('wdu-rename-input');
+    var raw = (typeof forceName === 'string') ? forceName : ((inp && inp.value) || '');
+    var name = raw.replace(/\s+/g, ' ').trim().slice(0, 24);
     var st = _rn;
     var groups = (typeof loadWalletGroups === 'function') ? loadWalletGroups() : [];
     var g = null;
@@ -109,45 +120,78 @@
     if (typeof st.done === 'function') st.done(name);
   }
 
+  // Built once and appended to <body>: #app is a stacking context, so a dialog inside it would sit under the
+  // body-level overlays (wallet group detail, drawers) instead of on top of them.
   function ensureRenameModal() {
-    var ov = document.getElementById('wdu-rename-overlay');
+    var ov = el('wdu-rename-overlay');
     if (ov) return ov;
     ov = document.createElement('div');
     ov.id = 'wdu-rename-overlay';
-    ov.className = 'wg-edit-overlay';
-    ov.innerHTML = '<div class="wg-edit-box">'
-      + '<div class="wdu-rn-title">Rename wallet</div>'
-      + '<div class="wdu-rn-sub" id="wdu-rename-sub"></div>'
-      + '<input type="text" id="wdu-rename-input" class="send-input" maxlength="24" placeholder="Wallet name" autocomplete="off" spellcheck="false" />'
+    ov.className = 'wdu-rn-ov';
+    var chips = QUICK_NAMES.map(function (q) {
+      return '<button type="button" class="wdu-rn-chip" data-q="' + q + '">' + q + '</button>';
+    }).join('');
+    ov.innerHTML = '<div class="wdu-rn-card" role="dialog" aria-modal="true" aria-label="Rename wallet">'
+      + '<div class="wdu-rn-head">'
+      + '<span class="wdu-rn-ico"><i class="material-icons-round">vpn_key</i></span>'
+      + '<span class="wdu-rn-ht"><span class="wdu-rn-title">Rename wallet</span>'
+      + '<span class="wdu-rn-sub" id="wdu-rename-sub"></span></span>'
+      + '<span class="wdu-rn-x" id="wdu-rename-x" role="button" aria-label="Close"><i class="material-icons-round">close</i></span>'
+      + '</div>'
+      + '<div class="wdu-rn-body">'
+      + '<div class="wdu-rn-lbl"><span>WALLET NAME</span><span id="wdu-rename-count">0/24</span></div>'
+      + '<div class="wdu-rn-field">'
+      + '<input type="text" id="wdu-rename-input" maxlength="24" placeholder="Wallet name" autocomplete="off" spellcheck="false" />'
+      + '<span class="wdu-rn-clear" id="wdu-rename-clear" role="button" aria-label="Clear"><i class="material-icons-round">cancel</i></span>'
+      + '</div>'
+      + '<div class="wdu-rn-chips">' + chips + '</div>'
+      + '<button type="button" class="wdu-rn-reset" id="wdu-rename-reset"><i class="material-icons-round">restart_alt</i><span id="wdu-rename-reset-t"></span></button>'
       + '<div class="wdu-rn-btns">'
-      + '<button type="button" class="wdu-rn-cancel" id="wdu-rename-cancel">CANCEL</button>'
-      + '<button type="button" class="wdu-rn-save" id="wdu-rename-save">SAVE NAME</button>'
-      + '</div></div>';
-    (document.getElementById('app') || document.body).appendChild(ov);
+      + '<button type="button" class="wdu-rn-cancel" id="wdu-rename-cancel">Cancel</button>'
+      + '<button type="button" class="wdu-rn-save" id="wdu-rename-save">Save name</button>'
+      + '</div></div></div>';
+    document.body.appendChild(ov);
+    var inp = el('wdu-rename-input');
     ov.addEventListener('click', function (e) { if (e.target === ov) closeRename(); });
-    document.getElementById('wdu-rename-cancel').addEventListener('click', closeRename);
-    document.getElementById('wdu-rename-save').addEventListener('click', commitRename);
-    document.getElementById('wdu-rename-input').addEventListener('keydown', function (e) {
+    el('wdu-rename-x').addEventListener('click', closeRename);
+    el('wdu-rename-cancel').addEventListener('click', closeRename);
+    el('wdu-rename-save').addEventListener('click', function () { commitRename(); });
+    el('wdu-rename-reset').addEventListener('click', function () { commitRename(''); });
+    el('wdu-rename-clear').addEventListener('click', function () { inp.value = ''; updateCounter(); inp.focus(); });
+    ov.querySelectorAll('.wdu-rn-chip').forEach(function (b) {
+      b.addEventListener('click', function () { inp.value = b.getAttribute('data-q'); updateCounter(); inp.focus(); });
+    });
+    inp.addEventListener('input', updateCounter);
+    inp.addEventListener('keydown', function (e) {
       if (e.key === 'Enter') { e.preventDefault(); commitRename(); }
       else if (e.key === 'Escape') { closeRename(); }
     });
     return ov;
   }
 
-  // Opens the rename dialog for wallet `ki` of group `gid`. Leave the name empty to go back to "Wallet N".
+  // Opens the rename dialog for wallet `ki` of group `gid`. An empty name goes back to "Wallet N".
   function renameWallet(gid, ki, done) {
     var g = liveGroup(gid);
     if (!g || !g.keys || ki < 0 || ki >= g.keys.length) return;
     var ov = ensureRenameModal();
     _rn = { gid: gid, ki: ki, done: done };
     var cur = (g.labels && g.labels[ki]) ? String(g.labels[ki]) : '';
-    var inp = document.getElementById('wdu-rename-input');
-    var sub = document.getElementById('wdu-rename-sub');
+    var gi = 0;
+    try { gi = Math.max(0, loadWalletGroups().indexOf(g)); } catch (_) {}
+    var clr = colorFor(gi);
+    var card = ov.querySelector('.wdu-rn-card');
+    card.style.setProperty('--wdu-bg', clr.bg);
+    card.style.setProperty('--wdu-bd', clr.border);
+    card.style.setProperty('--wdu-ac', clr.accent);
+    var inp = el('wdu-rename-input');
     inp.value = cur;
     inp.placeholder = 'Wallet ' + (ki + 1);
-    if (sub) sub.textContent = (g.name || 'Group') + ' \u00b7 Wallet #' + (ki + 1);
+    el('wdu-rename-sub').textContent = (g.name || 'Group') + ' \u00b7 ' + short(addressOf(g.keys[ki]), 6, 4);
+    el('wdu-rename-reset').style.display = cur ? 'flex' : 'none';
+    el('wdu-rename-reset-t').textContent = 'Reset to Wallet ' + (ki + 1);
+    updateCounter();
     ov.classList.add('open');
-    setTimeout(function () { try { inp.focus(); inp.select(); } catch (_) {} }, 80);
+    setTimeout(function () { try { inp.focus(); inp.select(); } catch (_) {} }, 120);
   }
 
   function plural(n, word) { return n + ' ' + word + (n === 1 ? '' : 's'); }
@@ -196,7 +240,6 @@
       var total = keys.length;
       var clr = colorFor(gi);
       var open = !!(o.isOpen && o.isOpen(gi));
-      var canRename = o.rename !== false && g.id != null;
 
       var selCount = 0;
       for (var k = 0; k < total; k++) { if (o.isKeySel && o.isKeySel(gi, k)) selCount++; }
@@ -235,7 +278,6 @@
             + '<i class="material-icons-round wdu-kn">vpn_key</i>'
             + '<span class="wdu-ktxt"><span class="wdu-ktitle">' + esc(info.title) + '</span>'
             + '<span class="wdu-ksub">' + esc(info.sub) + '</span></span>'
-            + (canRename ? '<span class="wdu-kx" data-act="rename" data-gi="' + gi + '" data-ki="' + ki + '" role="button" aria-label="Rename wallet"><i class="material-icons-round">edit</i></span>' : '')
             + (o.keyAction ? '<span class="wdu-kx" data-act="keyx" data-gi="' + gi + '" data-ki="' + ki + '" aria-label="' + esc(o.keyAction.label || 'Action') + '"><i class="material-icons-round">' + esc(o.keyAction.icon) + '</i></span>' : '')
             + (multi ? checkbox(sel ? 1 : 0, true) : radio(sel))
             + '</div>';
@@ -261,11 +303,6 @@
     if (act === 'expand' && o.onExpand) o.onExpand(gi);
     else if (act === 'group' && o.onGroup) o.onGroup(gi);
     else if (act === 'key' && o.onKey) o.onKey(gi, ki);
-    else if (act === 'rename') {
-      e.stopPropagation();
-      var rg = (o.groups || [])[gi];
-      if (rg) renameWallet(rg.id, ki, function () { renderList(container, container._wduOpts); });
-    }
     else if (act === 'keyx' && o.keyAction && o.keyAction.onTap) {
       e.stopPropagation();
       o.keyAction.onTap(gi, ki, t);
