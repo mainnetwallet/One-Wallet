@@ -77,6 +77,8 @@
   }
   #page-settings .st-seg-b .material-icons-round { font-size: 15px; }
   #page-settings .st-seg-b.a { background: var(--bg-surface); color: var(--text-primary); font-weight: 500; }
+  #page-settings .st-seg-b:not(.a) .st-lb { display: none; }  /* 3 options: only the selected one shows its label */
+  #page-settings .st-seg-b:not(.a) { padding: 6px 9px; }
 
   /* Paymaster panel */
   #page-settings .st-pn { padding: 2px 14px 14px; }

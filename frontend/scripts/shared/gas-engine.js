@@ -296,54 +296,83 @@ window.OneGas = (function() {
 })();
 
 /* ─────────────────────────────────────────────────────────────
-   DARK / LIGHT THEME TOGGLE
+   SYSTEM / DARK / LIGHT THEME
+   Saved choice (localStorage 'one-theme'): 'system' (default) | 'dark' | 'light'.
+   'system' follows the phone's theme. The Android WebView theme is a fixed dark AppCompat theme, so
+   prefers-color-scheme alone would always say "dark" — the native bridge (OneAndroid.isSystemDark)
+   is asked first, matchMedia is the fallback (browser / PWA).
    ───────────────────────────────────────────────────────────── */
-window._applyTheme = function(mode) {
+window._systemIsLight = function() {
+  try {
+    if (window.OneAndroid && typeof window.OneAndroid.isSystemDark === 'function') {
+      return !window.OneAndroid.isSystemDark();
+    }
+  } catch(e) {}
+  try { return !!(window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches); } catch(e) {}
+  return false;
+};
+
+window._getThemePref = function() {
+  let saved = null;
+  try { saved = localStorage.getItem('one-theme'); } catch(e) {}
+  return (saved === 'light' || saved === 'dark' || saved === 'system') ? saved : 'system';
+};
+
+// pref: 'system' | 'dark' | 'light'
+window._applyTheme = function(pref) {
+  if (pref !== 'light' && pref !== 'dark') pref = 'system';
+  const isLight = pref === 'system' ? window._systemIsLight() : pref === 'light';
   const body = document.body;
-  const isLight = mode === 'light';
-  if (isLight) body.classList.add('light-mode');
-  else body.classList.remove('light-mode');
+  if (body) body.classList.toggle('light-mode', isLight);
   // Settings > Appearance segmented control
   try {
     document.querySelectorAll('#st-theme-seg .st-seg-b').forEach(function(b) {
-      b.classList.toggle('a', b.getAttribute('data-theme') === (isLight ? 'light' : 'dark'));
+      b.classList.toggle('a', b.getAttribute('data-theme') === pref);
     });
   } catch(e) {}
 };
 
 window.setThemeMode = function(mode) {
-  const isLight = document.body.classList.contains('light-mode');
-  if ((mode === 'light') === isLight) return;
-  window.toggleThemeMode();
-};
-
-window.toggleThemeMode = function() {
-  const isLight = document.body.classList.contains('light-mode');
-  const newMode = isLight ? 'dark' : 'light';
-  try { localStorage.setItem('one-theme', newMode); } catch(e) {}
-  window._applyTheme(newMode);
+  if (mode !== 'light' && mode !== 'dark') mode = 'system';
+  if (mode === window._getThemePref()) return;
+  try { localStorage.setItem('one-theme', mode); } catch(e) {}
+  window._applyTheme(mode);
   try { if (typeof haptic === 'function') haptic(); } catch(e) {}
   try {
     if (typeof showToast === 'function') {
-      showToast(newMode === 'light' ? '☀️ Light Mode' : '🌙 Dark Mode', 'info');
+      showToast(mode === 'light' ? '☀️ Light Mode' : mode === 'dark' ? '🌙 Dark Mode' : '📱 System theme', 'info');
     }
   } catch(e) {}
 };
 
-// Restore saved preference on load
+// Kept for older callers: flips between explicit dark / light
+window.toggleThemeMode = function() {
+  const isLight = document.body.classList.contains('light-mode');
+  window.setThemeMode(isLight ? 'dark' : 'light');
+};
+
+// Phone theme changed while the app is open — only matters while 'System' is selected
+window._onSystemThemeChanged = function() {
+  if (window._getThemePref() === 'system') window._applyTheme('system');
+};
+
+// Restore saved preference on load (default: System)
 (function() {
-  let saved = 'dark';
-  try { saved = localStorage.getItem('one-theme') || 'dark'; } catch(e) {}
-  if (saved === 'light') {
-    try { document.body.classList.add('light-mode'); } catch(e) {}
-  }
-  // Update controls after DOM ready
-  function doApply() { window._applyTheme(saved); }
+  window._applyTheme(window._getThemePref());
+  function doApply() { window._applyTheme(window._getThemePref()); }
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', function() { setTimeout(doApply, 500); });
+    document.addEventListener('DOMContentLoaded', function() { doApply(); setTimeout(doApply, 500); });
   } else {
     setTimeout(doApply, 500);
   }
+  try {
+    const mq = window.matchMedia('(prefers-color-scheme: light)');
+    if (mq.addEventListener) mq.addEventListener('change', window._onSystemThemeChanged);
+    else if (mq.addListener) mq.addListener(window._onSystemThemeChanged);
+  } catch(e) {}
+  document.addEventListener('visibilitychange', function() {
+    if (!document.hidden) window._onSystemThemeChanged();
+  });
 })();
 
 /* ─────────────────────────────────────────────────────────────

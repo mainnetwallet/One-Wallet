@@ -501,6 +501,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onConfigurationChanged(android.content.res.Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
+        // phone switched dark/light — let Settings > Appearance > System follow it
+        callJsOnMainWebView("if(window._onSystemThemeChanged)window._onSystemThemeChanged();");
         if (mChartFullscreen) {
             hideSystemUI();
         } else {

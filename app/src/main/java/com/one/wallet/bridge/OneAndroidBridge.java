@@ -183,6 +183,16 @@ public class OneAndroidBridge {
         return text != null ? text.toString().trim() : "";
     }
 
+    /** True when the phone is in dark theme (used by Settings > Appearance > System). */
+    @JavascriptInterface
+    public boolean isSystemDark() {
+        MainActivity a = getActivity();
+        if (a == null) return true;
+        int night = a.getResources().getConfiguration().uiMode
+                & android.content.res.Configuration.UI_MODE_NIGHT_MASK;
+        return night == android.content.res.Configuration.UI_MODE_NIGHT_YES;
+    }
+
     @JavascriptInterface
     public String getAndroidVersion() { return Build.VERSION.RELEASE; }
 
