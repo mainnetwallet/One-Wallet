@@ -549,10 +549,6 @@ function _updateWgManageBtn() {
     manageBtn.dataset.disabled = '';
     manageBtn.style.opacity = '1';
     manageBtn.style.cursor = 'pointer';
-    manageBtn.onmousedown = function(){ this.style.transform='scale(0.93)'; };
-    manageBtn.onmouseup   = function(){ this.style.transform=''; };
-    manageBtn.ontouchstart= function(){ this.style.transform='scale(0.93)'; };
-    manageBtn.ontouchend  = function(){ this.style.transform=''; };
   } else {
     manageBtn.dataset.disabled = '1';
     manageBtn.style.opacity = '0.35';

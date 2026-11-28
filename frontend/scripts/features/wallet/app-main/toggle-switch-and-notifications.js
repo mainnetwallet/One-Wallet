@@ -135,3 +135,27 @@ function _enableNotif(el, sub) {
   showToast('Notifications enabled ✓', 'notifications_active');
 }
 
+// ── Settings: protection summary card ──
+function refreshSettingsStatus() {
+  try {
+    var card = document.getElementById('st-status');
+    if (!card) return;
+    var lockOn = false, pmOn = false, n = 0;
+    try { lockOn = localStorage.getItem('one_bio_lock') === 'on'; } catch(e) {}
+    var pm = document.getElementById('settings-cfg-paymaster');
+    if (pm) pmOn = pm.classList.contains('on');
+    try { if (typeof loadWalletGroups === 'function') n = (loadWalletGroups() || []).length; } catch(e) {}
+    var title = document.getElementById('st-status-title');
+    var sub = document.getElementById('st-status-sub');
+    var glyph = document.getElementById('st-status-glyph');
+    card.classList.toggle('warn', !lockOn);
+    if (glyph) glyph.textContent = lockOn ? 'verified_user' : 'gpp_maybe';
+    if (lockOn) {
+      if (title) title.textContent = 'Your wallet is protected';
+      if (sub) sub.textContent = 'App lock on · Gasless ' + (pmOn ? 'on' : 'off') + ' · ' + n + ' group' + (n !== 1 ? 's' : '');
+    } else {
+      if (title) title.textContent = 'App lock is off';
+      if (sub) sub.textContent = 'Tap to set a PIN, pattern or biometric';
+    }
+  } catch(e) {}
+}

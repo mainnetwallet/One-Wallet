@@ -158,6 +158,7 @@ function renderWalletGroupsList() {
   const totalWallets = groups.reduce((sum, g) => sum + ((g && g.keys && g.keys.length) || 0), 0);
 
   if (totalBadge) totalBadge.textContent = n + ' GROUP' + (n !== 1 ? 'S' : '');
+  if (typeof refreshSettingsStatus === 'function') refreshSettingsStatus();
 
   const statGroups = document.getElementById('wg-stat-groups');
   const statWallets = document.getElementById('wg-stat-wallets');

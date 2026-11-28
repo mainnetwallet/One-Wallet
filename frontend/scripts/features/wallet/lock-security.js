@@ -521,6 +521,7 @@ window.oneLock = (function() {
       if(hasBio)methods.push('Biometric');
       sub.textContent=methods.length?methods.join(' · '):'Set PIN, Pattern or Biometric';
     }
+    if(typeof refreshSettingsStatus==='function')refreshSettingsStatus();
   }
   function _syncToggleUI(on){
     var tog=document.getElementById('toggle-app-lock');

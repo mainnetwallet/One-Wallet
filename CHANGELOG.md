@@ -6,6 +6,7 @@ Per-build release notes are published on the [Releases](../../releases) page.
 ## [Unreleased]
 
 ### Changed
+- **Settings page, new look:** grouped sections (Wallets, Security, Network, Preferences, Developer) in rounded cards with uniform rows and one icon style, a small title with the version, and a protection summary card at the top ("Your wallet is protected" with app lock, gasless and group count; turns amber with a tap-to-set-up shortcut when app lock is off). App Lock moved to Security, Console Log to Developer, the Dark Mode switch became a Dark / Light selector, and the Base Paymaster row keeps its toggle and expandable URL panel. Styles are scoped to `#page-settings` (new `settings-page-redesign.css`). All element IDs and handlers are unchanged, so wallet groups, RPC, paymaster, currency, haptics, notifications, app lock and console log work as before.
 - **Create wallets, new look:** the Create Wallet screen is now two steps. Step 1 (Setup): group name with quick suggestions (Fresh wallets, Airdrop, Testing),
   a big wallet count with minus / plus buttons and presets (1, 5, 10, 25, 50, 100), a short privacy note and one "Generate N wallets" button. Step 2 (Review):
   "N wallets generated" summary, a backup warning, a short list (first 5 wallets, "Show N more" for the rest) with a copy-address button per wallet, then

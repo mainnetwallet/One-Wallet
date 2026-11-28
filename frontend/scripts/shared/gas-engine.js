@@ -300,30 +300,21 @@ window.OneGas = (function() {
    ───────────────────────────────────────────────────────────── */
 window._applyTheme = function(mode) {
   const body = document.body;
-  const track    = document.getElementById('theme-toggle-track');
-  const thumb    = document.getElementById('theme-toggle-thumb');
-  const icon     = document.getElementById('theme-menu-icon-glyph');
-  const iconWrap = document.getElementById('theme-menu-icon');
-  const title    = document.getElementById('theme-menu-title');
-  const sub      = document.getElementById('theme-menu-sub');
+  const isLight = mode === 'light';
+  if (isLight) body.classList.add('light-mode');
+  else body.classList.remove('light-mode');
+  // Settings > Appearance segmented control
+  try {
+    document.querySelectorAll('#st-theme-seg .st-seg-b').forEach(function(b) {
+      b.classList.toggle('a', b.getAttribute('data-theme') === (isLight ? 'light' : 'dark'));
+    });
+  } catch(e) {}
+};
 
-  if (mode === 'light') {
-    body.classList.add('light-mode');
-    if (track)    { track.classList.add('light'); }
-    if (thumb)    { thumb.textContent = '☀️'; }
-    if (icon)     { icon.textContent = 'light_mode'; icon.style.color = '#f59e0b'; }
-    if (iconWrap) { iconWrap.style.background = 'rgba(245,158,11,0.15)'; }
-    if (title)    { title.textContent = 'Light Mode'; }
-    if (sub)      { sub.textContent = 'Switch to dark mode'; }
-  } else {
-    body.classList.remove('light-mode');
-    if (track)    { track.classList.remove('light'); }
-    if (thumb)    { thumb.textContent = '🌙'; }
-    if (icon)     { icon.textContent = 'dark_mode'; icon.style.color = '#a78bfa'; }
-    if (iconWrap) { iconWrap.style.background = 'rgba(99,102,241,0.15)'; }
-    if (title)    { title.textContent = 'Dark Mode'; }
-    if (sub)      { sub.textContent = 'Switch to light mode'; }
-  }
+window.setThemeMode = function(mode) {
+  const isLight = document.body.classList.contains('light-mode');
+  if ((mode === 'light') === isLight) return;
+  window.toggleThemeMode();
 };
 
 window.toggleThemeMode = function() {

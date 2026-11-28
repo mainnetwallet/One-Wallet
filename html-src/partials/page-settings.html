@@ -1,186 +1,149 @@
     <!-- ╔══════ SETTINGS PAGE ══════╗ -->
     <div class="page" id="page-settings">
 
-      <div class="settings-hero">
-        <div class="settings-icon-big">
-          <span class="material-icons-round">settings</span>
-        </div>
-        <div class="settings-title-block">
-          <h2>Settings</h2>
-          <p>CUSTOMIZE YOUR EXPERIENCE</p>
+      <div class="st-head">
+        <h2 class="st-title">Settings</h2>
+        <div class="st-ver">v2.5.1</div>
+      </div>
+
+      <!-- Protection summary (filled by refreshSettingsStatus) -->
+      <div class="st-status" id="st-status" onclick="oneLock.openSetup()">
+        <div class="st-status-ic" id="st-status-ic"><span class="material-icons-round" id="st-status-glyph">verified_user</span></div>
+        <div class="st-tx">
+          <div class="st-tt" id="st-status-title">Security</div>
+          <div class="st-sb" id="st-status-sub">App lock, gasless and wallet groups</div>
         </div>
       </div>
 
-      <div class="glow-line"></div>
-
-      <!-- ══ WALLET GROUPS ══ -->
-      <div class="menu-group">
-        <div style="display:flex;align-items:center;justify-content:space-between;padding:0 0 10px;">
-          <div class="menu-group-label" style="padding:0;margin:0;">WALLET GROUPS</div>
-          <div style="display:flex;align-items:center;gap:8px;">
-            <div id="wg-total-badge" style="font-size:9px;font-weight:800;font-family:var(--font-mono);color:var(--text-muted);letter-spacing:1px;">0 GROUPS</div>
-            <div id="wg-manage-btn" onclick="if(!this.dataset.disabled)openWgManager()" style="display:flex;align-items:center;gap:5px;cursor:not-allowed;padding:6px 12px;background:var(--bg-glass);border:1px solid var(--border-subtle);border-radius:10px;transition:all 0.2s ease;opacity:0.35;pointer-events:auto;" data-disabled="1">
-              <span class="material-icons-round" style="font-size:15px;color:var(--accent-primary)">manage_accounts</span>
-              <span style="font-size:10px;font-weight:700;color:var(--text-secondary);font-family:var(--font-mono);letter-spacing:1px;">MANAGE</span>
-            </div>
+      <!-- ══ WALLETS ══ -->
+      <div class="st-lb">Wallets</div>
+      <div class="st-gp">
+        <div class="st-rw" onclick="openWgImportModal()">
+          <div class="st-ic"><span class="material-icons-round">group_add</span></div>
+          <div class="st-tx">
+            <div class="st-tt">Import wallet group</div>
+            <div class="st-sb">Paste keys, name it, save</div>
           </div>
+          <span class="material-icons-round st-ch">chevron_right</span>
         </div>
-
-        <div class="menu-item" style="flex-direction:row;align-items:center;gap:14px;margin-bottom:12px;cursor:pointer;" onclick="openWgImportModal()" onmousedown="this.style.background='var(--bg-glass-hover)'" onmouseup="this.style.background=''" ontouchstart="this.style.background='var(--bg-glass-hover)'" ontouchend="this.style.background=''">
-          <div class="menu-icon" style="background:rgba(99,102,241,0.15);">
-            <span class="material-icons-round" style="color:var(--accent-primary)">group_add</span>
+        <div class="st-rw" id="wg-manage-btn" data-disabled="1" style="opacity:0.35;cursor:not-allowed;" onclick="if(!this.dataset.disabled)openWgManager()">
+          <div class="st-ic"><span class="material-icons-round">manage_accounts</span></div>
+          <div class="st-tx">
+            <div class="st-tt">Manage groups</div>
+            <div class="st-sb">Rename, edit keys or delete the selected group</div>
           </div>
-          <div class="menu-text" style="flex:1">
-            <div class="menu-title">Import Wallet Group</div>
-            <div class="menu-sub">Paste keys • Give a name • Save</div>
-          </div>
-          <div class="menu-arrow"><span class="material-icons-round">chevron_right</span></div>
-        </div>
-
-
-
-      </div><!-- /WALLET GROUPS menu-group -->
-
-      <!-- Network -->
-      <div class="menu-group">
-        <div class="menu-group-label">NETWORK</div>
-
-        <div class="menu-item" onclick="openRpcManager()" style="cursor:pointer;">
-          <div class="menu-icon" style="background:rgba(6,182,212,0.15);">
-            <span class="material-icons-round" style="color:var(--accent-tertiary)">dns</span>
-          </div>
-          <div class="menu-text">
-            <div class="menu-title">Custom RPC</div>
-            <div class="menu-sub" id="rpc-manager-sub">Manage RPC endpoints per chain</div>
-          </div>
-          <span class="material-icons-round" style="color:var(--text-muted);font-size:18px;">chevron_right</span>
-        </div>
-
-        <!-- Base Paymaster URL -->
-        <div class="menu-item" style="flex-direction:column;align-items:stretch;padding:0;overflow:hidden;cursor:default;">
-          <div onclick="(function(h){var p=document.getElementById('settings-pm-panel');var open=p.style.display!=='none';p.style.display=open?'none':'block';h.querySelector('.settings-pm-chevron').style.transform=open?'rotate(0deg)':'rotate(180deg)';})(this)"
-            style="display:flex;align-items:center;gap:12px;padding:14px 16px;cursor:pointer;transition:background 0.2s;"
-            onmousedown="this.style.background='var(--bg-raised)'" onmouseup="this.style.background=''"
-            ontouchstart="this.style.background='var(--bg-raised)'" ontouchend="this.style.background=''">
-            <div class="menu-icon" style="background:rgba(16,185,129,0.15);flex-shrink:0;">
-              <span class="material-icons-round" style="color:var(--accent-green)">bolt</span>
-            </div>
-            <div class="menu-text" style="flex:1;">
-              <div class="menu-title">Base Paymaster</div>
-              <div class="menu-sub" id="settings-pm-sub">Gasless via ERC-4337</div>
-            </div>
-            <div onclick="event.stopPropagation();(function(t){t.classList.toggle('on');var isOn=t.classList.contains('on');var h=document.getElementById('cfg-paymaster');if(h){if(isOn)h.classList.add('on');else h.classList.remove('on');}try{localStorage.setItem('one_paymaster_enabled',isOn?'on':'off');}catch(e){}onPaymasterToggle();var msgs=['Paymaster ON','Paymaster OFF'];showToast(isOn?msgs[0]:msgs[1],isOn?'check_circle':'cancel');haptic();})(this);"
-              class="toggle on" id="settings-cfg-paymaster" style="margin-right:6px;flex-shrink:0;"></div>
-            <span class="material-icons-round settings-pm-chevron" style="font-size:18px;color:var(--text-muted);transition:transform 0.3s;transform:rotate(0deg);flex-shrink:0;">expand_more</span>
-          </div>
-          <div id="settings-pm-panel" style="display:none;padding:0 16px 16px;border-top:1px solid var(--border-subtle);">
-            <div style="font-size:9px;font-weight:700;color:var(--text-muted);letter-spacing:1.5px;font-family:var(--font-mono);padding:10px 0 6px;">BUNDLER &amp; PAYMASTER URL</div>
-            <input type="text" id="settings-paymaster-url-input" class="config-input"
-              placeholder="https://api.developer.coinbase.com/rpc/v1/base/..."
-              style="width:100%;font-family:var(--font-mono);font-size:10px;box-sizing:border-box;"
-              oninput="syncPaymasterUrlFromSettings(this.value)"
-              autocomplete="off" spellcheck="false" />
-            <div style="display:flex;gap:8px;align-items:center;margin-top:8px;flex-wrap:wrap;">
-              <div onclick="savePaymasterUrlFromSettings()"
-                style="font-size:9px;font-family:var(--font-mono);color:#fff;cursor:pointer;padding:5px 12px;background:linear-gradient(135deg,var(--accent-primary),var(--accent-secondary));border-radius:8px;font-weight:700;letter-spacing:0.5px;">
-                SAVE
-              </div>
-              <div onclick="setDefaultPaymasterUrlFromSettings()"
-                style="font-size:9px;font-family:var(--font-mono);color:var(--accent-primary);cursor:pointer;padding:4px 10px;background:rgba(99,102,241,0.1);border:1px solid rgba(99,102,241,0.25);border-radius:8px;">
-                USE DEFAULT
-              </div>
-              <span id="settings-pm-status" style="font-size:9px;font-family:var(--font-mono);color:var(--accent-green);"></span>
-            </div>
-          </div>
-        </div>
-
-      </div>
-
-      <!-- App -->
-      <div class="menu-group">
-        <div class="menu-group-label">APP</div>
-
-        <!-- ── CURRENCY DISPLAY ── -->
-        <div class="menu-item" onclick="openCurrencyPicker()" style="cursor:pointer;">
-          <div class="menu-icon" style="background:rgba(16,185,129,0.15);">
-            <span class="material-icons-round" style="color:var(--accent-green)">currency_exchange</span>
-          </div>
-          <div class="menu-text">
-            <div class="menu-title">Currency Display</div>
-            <div class="menu-sub" id="currency-menu-sub">USD — US Dollar</div>
-          </div>
-          <span class="material-icons-round" style="color:var(--text-muted);font-size:18px;">chevron_right</span>
-        </div>
-
-        <!-- ── DARK / LIGHT MODE TOGGLE ── -->
-        <div class="menu-item" onclick="toggleThemeMode()" style="cursor:pointer;">
-          <div class="menu-icon" id="theme-menu-icon" style="background:rgba(99,102,241,0.15);">
-            <span class="material-icons-round" id="theme-menu-icon-glyph" style="color:var(--neon-purple)">dark_mode</span>
-          </div>
-          <div class="menu-text">
-            <div class="menu-title" id="theme-menu-title">Dark Mode</div>
-            <div class="menu-sub" id="theme-menu-sub">Switch to light mode</div>
-          </div>
-          <div class="theme-toggle-track" id="theme-toggle-track" onclick="event.stopPropagation();toggleThemeMode()">
-            <div class="theme-toggle-thumb" id="theme-toggle-thumb">🌙</div>
-          </div>
-        </div>
-
-        <div class="menu-item" onclick="toggleSwitch('toggle-haptic');rippleEffect(this,event)">
-          <div class="menu-icon" style="background:rgba(167,139,250,0.15);">
-            <span class="material-icons-round" style="color:var(--neon-purple)">vibration</span>
-          </div>
-          <div class="menu-text">
-            <div class="menu-title">Haptic Feedback</div>
-            <div class="menu-sub">Vibrate on actions</div>
-          </div>
-          <div class="toggle on" id="toggle-haptic" onclick="event.stopPropagation();toggleSwitch('toggle-haptic')"></div>
-        </div>
-
-        <!-- Notifications -->
-        <div class="menu-item" onclick="toggleNotifications();rippleEffect(this,event)">
-          <div class="menu-icon" style="background:rgba(244,63,94,0.15);">
-            <span class="material-icons-round" style="color:var(--accent-red)">notifications</span>
-          </div>
-          <div class="menu-text">
-            <div class="menu-title">Notifications</div>
-            <div class="menu-sub" id="notif-toggle-sub">Allow push notifications</div>
-          </div>
-          <div class="toggle" id="toggle-notif" onclick="event.stopPropagation();toggleNotifications()"></div>
-        </div>
-
-        <!-- App Lock Setup -->
-        <div class="menu-item" onclick="oneLock.openSetup()" style="cursor:pointer;">
-          <div class="menu-icon" style="background:rgba(16,185,129,0.15);">
-            <span class="material-icons-round" style="color:var(--accent-green)">security</span>
-          </div>
-          <div class="menu-text">
-            <div class="menu-title">App Lock Setup</div>
-            <div class="menu-sub" id="lock-setup-sub">Set PIN, Pattern or Biometric</div>
-          </div>
-          <span class="material-icons-round" style="color:var(--text-muted);font-size:18px;">chevron_right</span>
-        </div>
-
-        <!-- Console Log -->
-        <div class="menu-item" onclick="openConsoleLogPanel()" style="cursor:pointer;">
-          <div class="menu-icon" style="background:rgba(6,182,212,0.15);">
-            <span class="material-icons-round" style="color:var(--accent-tertiary)">terminal</span>
-          </div>
-          <div class="menu-text">
-            <div class="menu-title">Console Log</div>
-            <div class="menu-sub" id="console-log-menu-sub">Off — tap to view &amp; enable</div>
-          </div>
-          <div class="toggle" id="console-log-menu-toggle" onclick="event.stopPropagation();toggleConsoleLogCapture()"></div>
-        </div>
-
-      </div>
-
-      <!-- App info -->
-      <div style="padding:12px 20px 8px; text-align:center;">
-        <div style="font-family:var(--font-mono);font-size:10px;color:var(--text-muted);letter-spacing:2px;">
-          ONE WALLET v2.5.1
+          <span class="st-vl st-cap" id="wg-total-badge">0 GROUPS</span>
+          <span class="material-icons-round st-ch">chevron_right</span>
         </div>
       </div>
+
+      <!-- ══ SECURITY ══ -->
+      <div class="st-lb">Security</div>
+      <div class="st-gp">
+        <div class="st-rw" onclick="oneLock.openSetup()">
+          <div class="st-ic"><span class="material-icons-round">lock</span></div>
+          <div class="st-tx">
+            <div class="st-tt">App lock</div>
+            <div class="st-sb" id="lock-setup-sub">Set PIN, Pattern or Biometric</div>
+          </div>
+          <span class="material-icons-round st-ch">chevron_right</span>
+        </div>
+      </div>
+
+      <!-- ══ NETWORK ══ -->
+      <div class="st-lb">Network</div>
+      <div class="st-gp">
+        <div class="st-rw" onclick="openRpcManager()">
+          <div class="st-ic"><span class="material-icons-round">dns</span></div>
+          <div class="st-tx">
+            <div class="st-tt">Custom RPC</div>
+            <div class="st-sb" id="rpc-manager-sub">Manage RPC endpoints per chain</div>
+          </div>
+          <span class="material-icons-round st-ch">chevron_right</span>
+        </div>
+
+        <!-- Base Paymaster -->
+        <div class="st-rw" onclick="(function(h){var p=document.getElementById('settings-pm-panel');var open=p.style.display!=='none'&&p.style.display!=='';p.style.display=open?'none':'block';h.querySelector('.settings-pm-chevron').style.transform=open?'rotate(0deg)':'rotate(180deg)';})(this)">
+          <div class="st-ic"><span class="material-icons-round">bolt</span></div>
+          <div class="st-tx">
+            <div class="st-tt">Base paymaster</div>
+            <div class="st-sb" id="settings-pm-sub">Gasless via ERC-4337</div>
+          </div>
+          <div onclick="event.stopPropagation();(function(t){t.classList.toggle('on');var isOn=t.classList.contains('on');var h=document.getElementById('cfg-paymaster');if(h){if(isOn)h.classList.add('on');else h.classList.remove('on');}try{localStorage.setItem('one_paymaster_enabled',isOn?'on':'off');}catch(e){}onPaymasterToggle();var msgs=['Paymaster ON','Paymaster OFF'];showToast(isOn?msgs[0]:msgs[1],isOn?'check_circle':'cancel');haptic();if(typeof refreshSettingsStatus==='function')refreshSettingsStatus();})(this);"
+            class="st-tg on" id="settings-cfg-paymaster"></div>
+          <span class="material-icons-round st-ch settings-pm-chevron" style="transition:transform 0.25s;">expand_more</span>
+        </div>
+        <div class="st-pn" id="settings-pm-panel" style="display:none;">
+          <div class="st-field-label">Bundler and paymaster URL</div>
+          <input type="text" id="settings-paymaster-url-input" class="config-input"
+            placeholder="https://api.developer.coinbase.com/rpc/v1/base/..."
+            oninput="syncPaymasterUrlFromSettings(this.value)"
+            autocomplete="off" spellcheck="false" />
+          <div class="st-actions">
+            <div class="st-bt" onclick="savePaymasterUrlFromSettings()">Save</div>
+            <div class="st-bt sec" onclick="setDefaultPaymasterUrlFromSettings()">Use default</div>
+            <span id="settings-pm-status" class="st-pm-status"></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ PREFERENCES ══ -->
+      <div class="st-lb">Preferences</div>
+      <div class="st-gp">
+        <div class="st-rw" onclick="openCurrencyPicker()">
+          <div class="st-ic"><span class="material-icons-round">currency_exchange</span></div>
+          <div class="st-tx">
+            <div class="st-tt">Currency</div>
+            <div class="st-sb" id="currency-menu-sub">USD — US Dollar</div>
+          </div>
+          <span class="material-icons-round st-ch">chevron_right</span>
+        </div>
+
+        <!-- Appearance -->
+        <div class="st-rw st-static">
+          <div class="st-ic"><span class="material-icons-round">contrast</span></div>
+          <div class="st-tx">
+            <div class="st-tt">Appearance</div>
+          </div>
+          <div class="st-seg" id="st-theme-seg">
+            <div class="st-seg-b a" data-theme="dark" onclick="setThemeMode('dark')"><span class="material-icons-round">dark_mode</span>Dark</div>
+            <div class="st-seg-b" data-theme="light" onclick="setThemeMode('light')"><span class="material-icons-round">light_mode</span>Light</div>
+          </div>
+        </div>
+
+        <div class="st-rw" onclick="toggleSwitch('toggle-haptic');rippleEffect(this,event)">
+          <div class="st-ic"><span class="material-icons-round">vibration</span></div>
+          <div class="st-tx">
+            <div class="st-tt">Haptic feedback</div>
+            <div class="st-sb">Vibrate on actions</div>
+          </div>
+          <div class="st-tg on" id="toggle-haptic" onclick="event.stopPropagation();toggleSwitch('toggle-haptic')"></div>
+        </div>
+
+        <div class="st-rw" onclick="toggleNotifications();rippleEffect(this,event)">
+          <div class="st-ic"><span class="material-icons-round">notifications</span></div>
+          <div class="st-tx">
+            <div class="st-tt">Notifications</div>
+            <div class="st-sb" id="notif-toggle-sub">Allow push notifications</div>
+          </div>
+          <div class="st-tg" id="toggle-notif" onclick="event.stopPropagation();toggleNotifications()"></div>
+        </div>
+      </div>
+
+      <!-- ══ DEVELOPER ══ -->
+      <div class="st-lb">Developer</div>
+      <div class="st-gp">
+        <div class="st-rw" onclick="openConsoleLogPanel()">
+          <div class="st-ic"><span class="material-icons-round">terminal</span></div>
+          <div class="st-tx">
+            <div class="st-tt">Console log</div>
+            <div class="st-sb" id="console-log-menu-sub">Off — tap to view &amp; enable</div>
+          </div>
+          <div class="st-tg" id="console-log-menu-toggle" onclick="event.stopPropagation();toggleConsoleLogCapture()"></div>
+        </div>
+      </div>
+
+      <div class="st-foot">One Wallet</div>
 
       <div class="scroll-pad"></div>
       </div><!-- /prof-tools-scroll -->

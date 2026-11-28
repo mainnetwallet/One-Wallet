@@ -353,7 +353,7 @@ function switchPage(page) {
     }
   }
   if (page === 'profile') { applySettingsGroupSelection && applySettingsGroupSelection(); _updateAllToolBadges && _updateAllToolBadges(); if (typeof updateProfileStats === 'function') updateProfileStats(); try { var _pp = document.getElementById('page-profile'); if (_pp) _pp.scrollTop = 0; var _pf = _pp && _pp.querySelector(':focus'); if (_pf) _pf.blur(); } catch(e) {} }
-  if (page === 'settings') { renderWalletGroupsList && renderWalletGroupsList(); typeof _rpcUpdateSettingsBadge === 'function' && _rpcUpdateSettingsBadge(); }
+  if (page === 'settings') { renderWalletGroupsList && renderWalletGroupsList(); typeof _rpcUpdateSettingsBadge === 'function' && _rpcUpdateSettingsBadge(); typeof refreshSettingsStatus === 'function' && refreshSettingsStatus(); }
   if (page === 'swap') { renderSwapGroupList && renderSwapGroupList(); typeof swInit === 'function' && swInit(); }
   if (page === 'nansen') { /* Nansen multi-wallet swap page — reinit if needed */ }
   if (page === 'delegation') { if (typeof delSyncActiveChain === 'function') delSyncActiveChain(); if (typeof delPopulateGroupSelect === 'function') delPopulateGroupSelect(); if (typeof delGoToStep === 'function') delGoToStep(_delCurrentStep || 1); }
