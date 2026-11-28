@@ -9,6 +9,7 @@ var _qrScanStream = null;
 var _qrScanAnim = null;
 var _qrBarcodeDetector = null;
 var _qrCanvasRetry = 0;
+var _qrDetectFails = 0;
 var _qrCameraStarted = false;
 var _qrTorchOn = false;
 var _qrHandling = false;
@@ -60,6 +61,7 @@ async function _startQrCamera() {
   _stopQrCamera();
   _qrCameraStarted = false;
   _qrCanvasRetry = 0;
+  _qrDetectFails = 0;
   _qrFrame = 0;
 
   var video = document.getElementById('send-qr-video');
@@ -178,9 +180,13 @@ function _qrScanLoop() {
 
   if (_qrBarcodeDetector) {
     _qrBarcodeDetector.detect(video).then(function (codes) {
+      _qrDetectFails = 0;
       if (codes && codes.length > 0 && codes[0].rawValue) { _handleQrResult(codes[0].rawValue); return; }
       _qrScanAnim = requestAnimationFrame(_qrScanLoop);
     }).catch(function () {
+      // BarcodeDetector can exist but be unusable in a WebView (e.g. no Google Play services). Retrying it
+      // forever means the code is never decoded, so after 3 failures on a live frame switch to jsQR.
+      if (video.readyState >= 2 && ++_qrDetectFails >= 3) _qrBarcodeDetector = null;
       _qrScanAnim = requestAnimationFrame(_qrScanLoop);
     });
     return;

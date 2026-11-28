@@ -48,6 +48,14 @@ cp walletconnect.min.js ../frontend/vendor/
 `node tools/wc-selftest.js` (no network): proposal analysis, `buildApprovedNamespaces`, project-id validation.
 `python3 tools/check_assets.py` and `python3 tools/build_html.py --check` as usual.
 
+### Troubleshooting pairing
+
+- "No answer from the app": the QR code is stale or the app is offline. Refresh the QR code and scan again.
+- "Cannot reach the WalletConnect relay" / "WalletConnect refused the connection": the phone cannot open the relay socket, or the Project ID is wrong.
+  One Wallet runs from `file:///android_asset/`, so the relay sees no real web origin: if the project at cloud.reown.com has an **allowed domains** list,
+  empty it (an empty list allows every origin).
+- The scanner reads with `BarcodeDetector` when the WebView has a working one, otherwise with `vendor/jsqr.min.js` (it falls back by itself after 3 failed reads).
+
 ### Not verified on a device
 
 The relay connection (wss to relay.walletconnect.org), a real pairing and a real signature have not been run on a phone yet.

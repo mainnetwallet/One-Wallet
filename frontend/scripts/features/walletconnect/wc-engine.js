@@ -101,6 +101,12 @@ function wcBootIfSessions() {
   try { if (localStorage.getItem(WC_HAS_SESS_KEY) === '1' && wcGetProjectId()) wcInit().catch(function () {}); } catch (e) {}
 }
 
+// Is the relay socket open? Unknown (older SDK / no property) counts as up, so the old message is kept
+function _wcRelayUp(kit) {
+  try { var r = kit && kit.core && kit.core.relayer; return r && typeof r.connected === 'boolean' ? r.connected : true; } catch (e) { return true; }
+}
+var WC_RELAY_HELP = 'Check your internet, and that the Project ID is right and its allowed domains at cloud.reown.com are empty.';
+
 // ── Pairing from a scanned/pasted wc: link ──
 async function wcPair(uri) {
   if (!wcGetProjectId()) { if (typeof wcOpenProjectIdSheet === 'function') wcOpenProjectIdSheet(uri); return; }
@@ -112,7 +118,9 @@ async function wcPair(uri) {
     // the dApp must answer with a proposal; if not, the QR is stale or the dApp is offline
     _wcPairTimer = setTimeout(function () {
       if (typeof wcHideConnecting === 'function' && wcHideConnecting(true)) {
-        _wcToast('No answer from the app. Refresh its QR code and scan again.', 'warning');
+        // relay down is a different problem from a stale QR: say which one it is
+        if (_wcRelayUp(kit)) _wcToast('No answer from the app. Refresh its QR code and scan again.', 'warning');
+        else _wcToast('Cannot reach the WalletConnect relay. ' + WC_RELAY_HELP, 'warning');
       }
     }, 25000);
     await kit.pair({ uri: uri });
@@ -123,6 +131,7 @@ async function wcPair(uri) {
     if (m === 'NO_PROJECT_ID') { wcOpenProjectIdSheet(uri); return; }
     if (/expired/i.test(m)) _wcToast('This QR code has expired. Refresh it and scan again.', 'warning');
     else if (/pairing already exists|already/i.test(m)) _wcToast('This QR code was already used. Refresh it and scan again.', 'warning');
+    else if (/unauthorized|origin not allowed|invalid (key|project)|\b(401|403)\b/i.test(m)) _wcToast('WalletConnect refused the connection. ' + WC_RELAY_HELP, 'error');
     else _wcToast('Could not connect: ' + m.slice(0, 80), 'error');
   }
 }
