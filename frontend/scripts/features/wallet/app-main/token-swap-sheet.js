@@ -1,4 +1,37 @@
 
+// ── Contract row helpers (copy address / open explorer in the phone's own browser) ──
+// Wallet that is connected on Home right now (the one whose balance the token card shows)
+function _tasHomeAddress() {
+  try {
+    if (typeof hwSelectedKey !== 'undefined' && hwSelectedKey && typeof ethers !== 'undefined') return new ethers.Wallet(hwSelectedKey).address;
+  } catch (_) {}
+  return '';
+}
+const _TAS_ADDR_RE = /^0x[0-9a-fA-F]{40}$/;
+// Token  -> <explorer>/token/<contract>?a=<Home wallet>#transactions  (that wallet's transfers of this token)
+// Native -> <explorer>/address/<Home wallet>                          (that wallet's page)
+function _tasExplorerUrl(t, chainId) {
+  const base = (typeof window.getTHExplorer === 'function' ? window.getTHExplorer(chainId) : '') || 'https://etherscan.io';
+  const wallet = _tasHomeAddress();
+  if (t.isNative || !_TAS_ADDR_RE.test(t.contract || '')) return wallet ? base + '/address/' + wallet : base;
+  return base + '/token/' + t.contract + (wallet ? '?a=' + wallet + '#transactions' : '');
+}
+// Always the phone's default browser (not the in-app browser), even for custom-chain explorers
+function _tasOpenExternal(url) {
+  try {
+    if (window.OneAndroid && typeof OneAndroid.openInSystemBrowser === 'function') { OneAndroid.openInSystemBrowser(url); return; }
+    if (window.OneAndroid && typeof OneAndroid.openExternalUrl === 'function') { OneAndroid.openExternalUrl(url); return; }
+  } catch (_) {}
+  window.open(url, '_blank', 'noopener,noreferrer');
+}
+function _tasCopy(text) {
+  try {
+    if (window.OneAndroid && typeof OneAndroid.copyToClipboard === 'function') { OneAndroid.copyToClipboard(text); return; }   // shows its own "Copied!" toast
+  } catch (_) {}
+  try { navigator.clipboard.writeText(text); } catch (_) {}
+  if (typeof showToast === 'function') showToast('Contract copied', 'content_copy');
+}
+
 // ── TOKEN ACTION SHEET (click on token card) ──
 // ── SWAP SHEET: single click on token card ──
 function showTokenSwapSheet(t) {
@@ -7,6 +40,20 @@ function showTokenSwapSheet(t) {
 
   const chainName = t.chainId ? (getAllChains().find(c => c.chainId === t.chainId)?.name || 'Chain ' + t.chainId) : 'Base';
   const chainId   = t.chainId || 8453;
+  const _tasHasContract = !t.isNative && _TAS_ADDR_RE.test(t.contract || '');
+  const _tasShort = _tasHasContract ? t.contract.slice(0, 6) + '…' + t.contract.slice(-4) : '';
+  const ctHtml = _tasHasContract ? `
+      <div class="tas-label">Contract</div>
+      <div class="tas-ct">
+        <button type="button" id="tas-ct-addr" class="tas-ct-addr" aria-label="Show full contract address"><span class="material-icons-round">tag</span><span id="tas-ct-addr-txt">${_tasShort}</span></button>
+        <button type="button" id="tas-ct-copy" class="tas-ct-btn copy"><span class="material-icons-round">content_copy</span><span id="tas-ct-copy-txt">Copy</span></button>
+        <button type="button" id="tas-ct-explorer" class="tas-ct-btn sq" aria-label="Open in explorer"><span class="material-icons-round">open_in_new</span></button>
+      </div>` : (t.isNative ? `
+      <div class="tas-label">Contract</div>
+      <div class="tas-ct plain">
+        <span class="tas-ct-native"><span class="material-icons-round">local_gas_station</span>Native token · pays gas fees</span>
+        <button type="button" id="tas-ct-explorer" class="tas-ct-btn" aria-label="Open explorer"><span class="material-icons-round">open_in_new</span>Explorer</button>
+      </div>` : '');
 
   const overlay = document.createElement('div');
   overlay.id = 'token-action-sheet';
@@ -31,6 +78,7 @@ function showTokenSwapSheet(t) {
         <span class="tas-bal-right"><span class="tas-bal-amt" id="tas-bal-amt"></span><span class="tas-bal-usd" id="tas-bal-usd"></span></span>
       </div>
 
+      ${ctHtml}
       <div class="tas-label">Actions</div>
       <div class="tas-list">
         <button type="button" id="tas-send-btn" class="tas-item">
@@ -85,6 +133,26 @@ function showTokenSwapSheet(t) {
   }
   overlay.addEventListener('click', e => { if (e.target === overlay) closeSheet(); });
   overlay.querySelector('#tas-close-x').addEventListener('click', closeSheet);
+
+  // Contract row: tap the address to show / hide the full address, Copy, open in explorer
+  const _ctAddr = overlay.querySelector('#tas-ct-addr');
+  if (_ctAddr) _ctAddr.addEventListener('click', () => {
+    const txt = overlay.querySelector('#tas-ct-addr-txt');
+    const full = _ctAddr.classList.toggle('open');
+    txt.textContent = full ? t.contract : _tasShort;
+    haptic && haptic();
+  });
+  const _ctCopy = overlay.querySelector('#tas-ct-copy');
+  if (_ctCopy) _ctCopy.addEventListener('click', () => {
+    _tasCopy(t.contract);
+    haptic && haptic();
+    const ic = _ctCopy.querySelector('.material-icons-round'), tx = overlay.querySelector('#tas-ct-copy-txt');
+    _ctCopy.classList.add('ok'); ic.textContent = 'check'; tx.textContent = 'Copied';
+    clearTimeout(_ctCopy._t);
+    _ctCopy._t = setTimeout(() => { _ctCopy.classList.remove('ok'); ic.textContent = 'content_copy'; tx.textContent = 'Copy'; }, 1500);
+  });
+  const _ctExp = overlay.querySelector('#tas-ct-explorer');
+  if (_ctExp) _ctExp.addEventListener('click', () => { _tasOpenExternal(_tasExplorerUrl(t, chainId)); haptic && haptic(); });
 
   // Swipe down to close: shared gesture (scripts/shared/ui/sheet-swipe-close.js)
   attachSheetSwipeClose(overlay.querySelector('#token-action-inner'), { closeFn: closeSheet });

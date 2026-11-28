@@ -218,6 +218,22 @@ public class OneAndroidBridge {
         a.openInAppBrowser(url, null);
     }
 
+    /** Always opens the phone's own default browser (never the in-app browser), for any http(s) URL. */
+    @JavascriptInterface
+    public void openInSystemBrowser(String url) {
+        if (url == null) return;
+        String lower = url.toLowerCase().trim();
+        if (!lower.startsWith("https://") && !lower.startsWith("http://")) return;
+        MainActivity a = getActivity(); if (a == null) return;
+        a.runOnUiThread(() -> {
+            try {
+                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url.trim()));
+                browserIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                a.startActivity(browserIntent);
+            } catch (Exception ignored) {}
+        });
+    }
+
     @JavascriptInterface
     public void openInAppBrowser(String url, String title) {
         if (url == null || url.trim().isEmpty()) return;
