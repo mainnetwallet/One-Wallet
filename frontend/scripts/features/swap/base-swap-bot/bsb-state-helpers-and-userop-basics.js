@@ -62,6 +62,11 @@
         b.appendChild(d);b.scrollTop=b.scrollHeight;
       }
       function _bsbUpdateProfileBadge(){
+        var pill=document.getElementById('bsb-status-pill');
+        if(pill){
+          pill.classList.toggle('bsb-running',!!__NX.bsbRunning);
+          var pl=pill.querySelector('span');if(pl)pl.textContent=__NX.bsbRunning?'Running':'Idle';
+        }
         var badge=document.getElementById('bsb-menu-indicator');
         if(!badge)return;
         if(__NX.bsbRunning){

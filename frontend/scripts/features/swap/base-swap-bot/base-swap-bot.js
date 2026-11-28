@@ -43,9 +43,9 @@
             var w=new ethers.Wallet(k);
             __NX.bsbWallets.push({key:k,addr:w.address,idx:i});
             var d=document.createElement('div');
-            d.style.cssText='background:var(--bg-surface);border:1px solid var(--border-subtle);border-radius:8px;padding:9px 10px;margin-bottom:6px;display:flex;align-items:center;gap:8px;';
+            d.className='bsb-key-row';
             d.id='bsb-ki'+i;
-            d.innerHTML='<div id="bsb-dot'+i+'" style="width:8px;height:8px;border-radius:50%;background:var(--text-muted);flex-shrink:0;"></div><div style="flex:1;font-size:10px;color:#3b82f6;word-break:break-all;font-family:var(--font-mono);">#'+__NX.bsbWallets.length+' '+w.address.slice(0,8)+'…'+w.address.slice(-6)+'</div><div id="bsb-lbl'+i+'" style="font-size:10px;color:var(--text-muted);flex-shrink:0;font-family:var(--font-mono);">Ready</div>';
+            d.innerHTML='<div id="bsb-dot'+i+'" class="bsb-key-dot"></div><div class="bsb-key-n">#'+__NX.bsbWallets.length+'</div><div class="bsb-key-addr">'+w.address.slice(0,8)+'…'+w.address.slice(-6)+'</div><div id="bsb-lbl'+i+'" class="bsb-key-lbl">Ready</div>';
             list.appendChild(d);
           }catch(e){__NX.bsbLog('❌ Key line '+(i+1)+' invalid','le');}
         });
@@ -96,21 +96,47 @@
         if(n<1||n>3)return;
         [1,2,3].forEach(function(i){
           var panel=__NX.bsbGid('bsb-step'+i);
-          if(panel)panel.style.display=(i===n)?'block':'none';
+          if(panel)panel.style.display=(i===n)?'flex':'none';
           var sc=__NX.bsbGid('bsb-sc'+i);
           var si=__NX.bsbGid('bsb-si'+i);
-          var conn=__NX.bsbGid('bsb-conn'+(i<3?i:''));
           if(sc)sc.textContent=i<n?'✓':String(i);
           if(si){
             si.style.opacity='1';
-            if(i<n){sc.style.cssText='width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:bold;border:2px solid #10b981;background:#10b981;color:#fff;font-family:var(--font-mono);';}
-            else if(i===n){sc.style.cssText='width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:bold;border:2px solid #3b82f6;background:#3b82f6;color:#fff;box-shadow:0 0 12px rgba(59,130,246,.4);font-family:var(--font-mono);';}
-            else{sc.style.cssText='width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:bold;border:2px solid var(--border-subtle);background:var(--bg-raised);color:var(--text-muted);font-family:var(--font-mono);';}
+            si.classList.toggle('bsb-done',i<n);
+            si.classList.toggle('bsb-active',i===n);
           }
-          if(i<=2){var cn=__NX.bsbGid('bsb-conn'+i);if(cn)cn.style.background=i<n?'#10b981':'var(--border-subtle)';}
         });
         __NX.bsbCurrentStep=n;
         var cont=__NX.bsbGid('bsb-container');if(cont)cont.scrollTop=0;
+        var body=document.querySelector('#bsb-step'+n+' .bsb-body');if(body)body.scrollTop=0;
+      };
+
+      // ── Contract bottom sheet (read-only contract fields; ids unchanged) ──
+      window.bsbOpenSheet=function(key){
+        var ov=__NX.bsbGid('bsb-sheet-overlay');if(!ov)return;
+        var found=null;
+        ov.querySelectorAll('.bsb-sheet-pane').forEach(function(p){
+          var on=p.getAttribute('data-sheet')===key;
+          p.style.display=on?'block':'none';
+          if(on)found=p;
+        });
+        if(!found)return;
+        var t=__NX.bsbGid('bsb-sheet-title'),sb=__NX.bsbGid('bsb-sheet-sub'),ic=__NX.bsbGid('bsb-sheet-icon');
+        if(t)t.textContent=found.getAttribute('data-title')||'';
+        if(sb)sb.textContent=found.getAttribute('data-sub')||'';
+        if(ic){
+          var icon=found.getAttribute('data-icon');
+          if(icon){ic.style.setProperty('--c','#a5b4fc');ic.innerHTML='<span class="material-icons-round">'+icon+'</span>';}
+          else{ic.style.setProperty('--c',found.getAttribute('data-color')||'#a5b4fc');ic.textContent=found.getAttribute('data-letter')||'';}
+        }
+        var body=ov.querySelector('.bsb-sheet-body');if(body)body.scrollTop=0;
+        ov.style.display='block';
+        requestAnimationFrame(function(){requestAnimationFrame(function(){ov.classList.add('bsb-open');});});
+      };
+      window.bsbCloseSheet=function(){
+        var ov=__NX.bsbGid('bsb-sheet-overlay');if(!ov)return;
+        ov.classList.remove('bsb-open');
+        setTimeout(function(){if(!ov.classList.contains('bsb-open'))ov.style.display='none';},320);
       };
 
       window.bsbOpenWalletPicker = function() {

@@ -1,0 +1,98 @@
+        <!-- Contract detail bottom sheet (all read-only contract fields live here; ids unchanged) -->
+        <div id="bsb-sheet-overlay" class="bsb-sheet-overlay" onclick="if(event.target===this)bsbCloseSheet()">
+          <div class="bsb-sheet" id="bsb-sheet">
+            <div class="bsb-sheet-handle"></div>
+            <div class="bsb-sheet-head">
+              <div class="bsb-pi" id="bsb-sheet-icon"></div>
+              <div class="bsb-sheet-titles"><div class="bsb-sheet-title" id="bsb-sheet-title"></div><div class="bsb-sheet-sub" id="bsb-sheet-sub"></div></div>
+              <button class="bsb-sheet-close" onclick="bsbCloseSheet()"><span class="material-icons-round">close</span></button>
+            </div>
+            <div class="bsb-sheet-body">
+          <div class="bsb-sheet-pane" data-sheet="core" data-title="Locked config" data-sub="Read only" data-letter="L" data-color="" data-icon="lock" style="display:none;">
+          <div class="bsb-fld"><label>Bundler / Paymaster URL (Coinbase)</label><input id="bsb-pm" value="https://api.developer.coinbase.com/rpc/v1/base/A6jXZc7eEPBCQQEErk6jTcw5LRWUnwzv" readonly class="bsb-input bsb-nosel"/></div>
+          <div class="bsb-hint">⚙️ Settings → Base Paymaster থেকে change করুন</div>
+          <div class="bsb-fld"><label>Chain ID</label><input id="bsb-chainId" type="number" value="8453" readonly class="bsb-input bsb-nosel"/></div>
+          <div class="bsb-fld"><label>EntryPoint v0.6.0</label><input id="bsb-ep" value="0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789" readonly class="bsb-input"/></div>
+          <div class="bsb-fld"><label>Simple Account Factory</label><input id="bsb-factory" value="0x9406Cc6185a346906296840746125a0E44976454" readonly class="bsb-input"/></div>
+          </div>
+          <div class="bsb-sheet-pane" data-sheet="uni" data-title="Uniswap V4" data-sub="Read only · Base mainnet" data-letter="U" data-color="#f472b6" data-icon="" style="display:none;">
+          <div class="bsb-fld"><label>PoolManager</label><input id="bsb-poolMgr" value="0x498581fF718922c3f8e6A244956aF099B2652b2b" readonly class="bsb-input bsb-nosel"/></div>
+          <div class="bsb-fld"><label>PositionManager</label><input id="bsb-posMgr" value="0x7C5f5A4bBd8fD63184577525326123B519429bDc" readonly class="bsb-input bsb-nosel"/></div>
+          <div class="bsb-fld"><label>UniversalRouter</label><input id="bsb-router" value="0x6fF5693b99212Da76ad316178A184AB56D299b43" readonly class="bsb-input bsb-nosel"/></div>
+          <div class="bsb-fld"><label>Permit2</label><input id="bsb-p2" value="0x000000000022D473030F116dDEE9F6B43aC78BA3" readonly class="bsb-input bsb-nosel"/></div>
+          <div class="bsb-fld"><label>Fee Tier</label>
+            <select id="bsb-fee" disabled class="bsb-input">
+              <option value="500">500 — 0.05%</option>
+              <option value="3000" selected>3000 — 0.3%</option>
+              <option value="10000">10000 — 1%</option>
+            </select></div>
+          <div class="bsb-fld"><label>Tick Spacing</label><input id="bsb-tick" type="number" value="60" readonly class="bsb-input bsb-nosel"/></div>
+          </div>
+          <div class="bsb-sheet-pane" data-sheet="aero" data-title="Aerodrome" data-sub="Read only · Base mainnet" data-letter="A" data-color="#60a5fa" data-icon="" style="display:none;">
+          <div class="bsb-fld"><label>Router</label><input id="bsb-aero-router" value="0xcF77a3Ba9A5CA399B7c97c74d54e5b1Beb874E43" readonly class="bsb-input bsb-nosel"/></div>
+          <div class="bsb-fld"><label>Factory</label><input id="bsb-aero-factory" value="0x420DD381b31aEf6683db6B902084cB0FFECe40Da" readonly class="bsb-input bsb-nosel"/></div>
+          <div class="bsb-fld"><label>Fee Tier</label>
+            <select id="bsb-aero-fee" disabled class="bsb-input">
+              <option value="100">100 — 0.01%</option>
+              <option value="500" selected>500 — 0.05%</option>
+              <option value="3000">3000 — 0.3%</option>
+              <option value="10000">10000 — 1%</option>
+            </select></div>
+          </div>
+          <div class="bsb-sheet-pane" data-sheet="baseswap" data-title="BaseSwap V2" data-sub="Read only · Base mainnet" data-letter="B" data-color="#22d3ee" data-icon="" style="display:none;">
+          <div class="bsb-fld"><label>Router</label><input id="bsb-baseswap-router" value="0x327Df1E6de05895d2ab08513aaDD9313Fe505d86" readonly class="bsb-input bsb-nosel"/></div>
+          <div class="bsb-fld"><label>Fee Tier</label>
+            <select id="bsb-baseswap-fee" disabled class="bsb-input">
+              <option value="500">500 — 0.05%</option>
+              <option value="3000" selected>3000 — 0.3%</option>
+              <option value="10000">10000 — 1%</option>
+            </select></div>
+          </div>
+          <div class="bsb-sheet-pane" data-sheet="swapbased" data-title="SwapBased V2" data-sub="Read only · Base mainnet" data-letter="S" data-color="#fbbf24" data-icon="" style="display:none;">
+          <div class="bsb-fld"><label>Router</label><input id="bsb-swapbased-router" value="0xaAa3b1f1BD7bcc97fd1917C18aaBe968345E72A7" readonly class="bsb-input bsb-nosel"/></div>
+          <div class="bsb-fld"><label>Fee Tier</label>
+            <select id="bsb-swapbased-fee" disabled class="bsb-input">
+              <option value="500">500 — 0.05%</option>
+              <option value="3000" selected>3000 — 0.3%</option>
+              <option value="10000">10000 — 1%</option>
+            </select></div>
+          </div>
+          <div class="bsb-sheet-pane" data-sheet="rocket" data-title="RocketSwap V2" data-sub="Read only · Base mainnet" data-letter="R" data-color="#fb923c" data-icon="" style="display:none;">
+          <div class="bsb-fld"><label>Router</label><input id="bsb-rocketswap-router" value="0x4cf76043B3f97ba06917cBd90F9e3A2AAC1B306e" readonly class="bsb-input bsb-nosel"/></div>
+          <div class="bsb-fld"><label>Fee Tier</label>
+            <select id="bsb-rocketswap-fee" disabled class="bsb-input">
+              <option value="500">500 — 0.05%</option>
+              <option value="3000" selected>3000 — 0.3%</option>
+              <option value="10000">10000 — 1%</option>
+            </select></div>
+          </div>
+          <div class="bsb-sheet-pane" data-sheet="alien" data-title="Alien Base V2" data-sub="Read only · Base mainnet" data-letter="A" data-color="#4ade80" data-icon="" style="display:none;">
+          <div class="bsb-fld"><label>Router</label><input id="bsb-alienbase-router" value="0x8c1A3cF8f83074169FE5D7aD50B978e1cD6b37c7" readonly class="bsb-input bsb-nosel"/></div>
+          <div class="bsb-fld"><label>Fee Tier</label>
+            <select id="bsb-alienbase-fee" disabled class="bsb-input">
+              <option value="500">500 — 0.05%</option>
+              <option value="3000" selected>3000 — 0.3%</option>
+              <option value="10000">10000 — 1%</option>
+            </select></div>
+          </div>
+          <div class="bsb-sheet-pane" data-sheet="sushi" data-title="SushiSwap V3" data-sub="Read only · Base mainnet" data-letter="S" data-color="#fb7185" data-icon="" style="display:none;">
+          <div class="bsb-fld"><label>NonfungiblePositionManager</label><input id="bsb-sushi-nfpm" value="0x80C7DD17B01855a6D2347444a0FCC36136a314de" readonly class="bsb-input bsb-nosel"/></div>
+          <div class="bsb-fld"><label>Fee Tier</label>
+            <select id="bsb-sushi-fee" disabled class="bsb-input">
+              <option value="500">500 — 0.05%</option>
+              <option value="3000" selected>3000 — 0.3%</option>
+              <option value="10000">10000 — 1%</option>
+            </select></div>
+          </div>
+          <div class="bsb-sheet-pane" data-sheet="cake" data-title="PancakeSwap V3" data-sub="Read only · Base mainnet" data-letter="P" data-color="#2dd4bf" data-icon="" style="display:none;">
+          <div class="bsb-fld"><label>NonfungiblePositionManager</label><input id="bsb-cake-nfpm" value="0x46A15B0b27311cedF172AB29E4f4766fbE7F4364" readonly class="bsb-input bsb-nosel"/></div>
+          <div class="bsb-fld"><label>Fee Tier</label>
+            <select id="bsb-cake-fee" disabled class="bsb-input">
+              <option value="500" selected>500 — 0.05%</option>
+              <option value="3000">3000 — 0.3%</option>
+              <option value="10000">10000 — 1%</option>
+            </select></div>
+          </div>
+            </div>
+          </div>
+        </div><!-- /bsb-sheet-overlay -->
