@@ -1,5 +1,5 @@
     <!-- ╔══════ SWAP WALLET PANEL (Bridge-style side drawer) ══════╗ -->
-    <div id="sw-wallet-panel-overlay" onclick="if(!event.target.closest('#sw-wallet-panel')){swCloseWalletPanel();}" style="position:fixed;top:0;left:0;right:0;bottom:calc(var(--nav-height) + env(safe-area-inset-bottom, 0px));z-index:9200;background:rgba(5,5,8,0.92);opacity:0;will-change:opacity;transform:translateZ(0);-webkit-transform:translateZ(0);pointer-events:none;transition:opacity 0.25s ease;">
+    <div id="sw-wallet-panel-overlay" onclick="if(event.target===this){swCloseWalletPanel();}" style="position:fixed;top:0;left:0;right:0;bottom:calc(var(--nav-height) + env(safe-area-inset-bottom, 0px));z-index:9200;background:rgba(5,5,8,0.92);opacity:0;will-change:opacity;transform:translateZ(0);-webkit-transform:translateZ(0);pointer-events:none;transition:opacity 0.25s ease;">
       <div id="sw-wallet-panel" style="position:absolute;top:0;right:0;width:72%;max-width:310px;height:100%;background:var(--bg-deep);border-left:1px solid var(--border-subtle);display:flex;flex-direction:column;transform:translateX(100%);transition:transform 0.38s cubic-bezier(0.22,1,0.36,1);overflow:hidden;">
         <!-- Panel header -->
         <div style="padding:14px 16px 12px;border-bottom:1px solid var(--border-subtle);flex-shrink:0;display:flex;align-items:center;gap:10px;">
