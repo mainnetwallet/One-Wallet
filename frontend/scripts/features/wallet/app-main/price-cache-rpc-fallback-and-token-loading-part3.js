@@ -467,7 +467,7 @@ async function _loadTokensImpl() {
               const cgData = await cgRes.json();
               const match = (cgData.coins || []).find(c => c.symbol && c.symbol.toLowerCase() === symLower && c.market_cap_rank && c.market_cap_rank < 500);
               if (match && match.id) {
-                const cgPriceUrl = 'https://api.coingecko.com/api/v3/simple/price?ids=' + match.id + '&vs_currencies=usd&include_24hr_change=true';
+                const cgPriceUrl = 'https://api.coingecko.com/api/v3/simple/price?ids=' + encodeURIComponent(match.id) + '&vs_currencies=usd&include_24hr_change=true';
                 const gpRes = await fetch(cgPriceUrl, { signal: AbortSignal.timeout(4000) });
                 if (gpRes.ok) {
                   const gpData = await gpRes.json();

@@ -237,8 +237,11 @@ async function _clFetchRaw() {
       return [];
     }
     // Store ALL chains (no testnet filtering here)
+    // chainid.network is a third-party list: every entry is reduced to plain, markup-free fields here
+    // (oneCleanChainlistEntry) before anything renders it, so a poisoned name can't run script in the wallet.
     _clRawData = baseData
-      .filter(c => c.chainId && c.name)
+      .map(c => (window.oneCleanChainlistEntry ? window.oneCleanChainlistEntry(c) : null))
+      .filter(Boolean)
       .map(c => {
         const baseRpcs  = c.rpc || [];
         const extraRpcs = extraData[c.chainId] || [];

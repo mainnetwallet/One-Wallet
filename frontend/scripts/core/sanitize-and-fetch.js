@@ -53,6 +53,60 @@
     return o;
   };
 
+  // A coin row from a third-party search API (CoinGecko /search, DexScreener, CMC) before it is rendered
+  // into the "add token" results list. Names/symbols/ids/thumbs there are attacker-controllable (anyone
+  // can list a token called  <img src=x onerror=...>), and they go into innerHTML, attribute values and
+  // querySelector strings, so every field is reduced to a plain, quote-free shape here.
+  window.oneCleanCoin = function(c) {
+    if (!c || typeof c !== 'object') return null;
+    var o = window.oneCleanToken(c);
+    var id = String(o.id == null ? '' : o.id).replace(/[^A-Za-z0-9_.:-]/g, '').slice(0, 120);
+    if (!id) return null;
+    o.id = id;
+    o.name = window.oneCleanText(c.name, 64, '') || window.oneCleanText(c.symbol, 24, '?');
+    o.symbol = window.oneCleanText(c.symbol, 24, '').toUpperCase();
+    var rank = Number(c.market_cap_rank);
+    o.market_cap_rank = (isFinite(rank) && rank > 0 && rank < 1e7) ? Math.floor(rank) : null;
+    o._source = window.oneCleanText(c._source, 32, '');
+    o._cmcSlug = String(c._cmcSlug == null ? '' : c._cmcSlug).replace(/[^A-Za-z0-9_.-]/g, '').slice(0, 80);
+    var cmcId = Number(c._cmcId);
+    o._cmcId = (isFinite(cmcId) && cmcId > 0) ? Math.floor(cmcId) : null;
+    return o;
+  };
+
+  // One entry of the public chainid.network / ChainList JSON, reduced to the fields the wallet uses, each
+  // in a safe shape (plain text names, https/http URLs without quote/markup characters, a bare icon id).
+  // Returns null for an entry that has no usable chainId or name. Chain names and symbols from that list
+  // are interpolated into innerHTML and into the custom chain that gets saved, so they must carry no markup.
+  window.oneCleanChainlistEntry = function(c) {
+    if (!c || typeof c !== 'object') return null;
+    var id = Number(c.chainId);
+    if (!isFinite(id) || id <= 0 || id > 2147483647 || Math.floor(id) !== id) return null;
+    var name = window.oneCleanText(c.name, 64, '');
+    if (!name) return null;
+    var urlOk = function(u) {
+      return typeof u === 'string' && u.length < 300 && /^https?:\/\//i.test(u) && !/[\s"'<>`\\]/.test(u);
+    };
+    var nc = (c.nativeCurrency && typeof c.nativeCurrency === 'object') ? c.nativeCurrency : {};
+    var dec = Number(nc.decimals);
+    var sym = window.oneCleanText(nc.symbol, 16, '') || 'ETH';
+    return {
+      chainId: id,
+      name: name,
+      shortName: window.oneCleanText(c.shortName, 32, ''),
+      nativeCurrency: {
+        name: window.oneCleanText(nc.name, 64, '') || sym,
+        symbol: sym,
+        decimals: (isFinite(dec) && dec >= 0 && dec <= 36) ? Math.floor(dec) : 18
+      },
+      rpc: (Array.isArray(c.rpc) ? c.rpc : []).filter(urlOk),
+      icon: /^[A-Za-z0-9_-]{1,64}$/.test(String(c.icon == null ? '' : c.icon)) ? String(c.icon) : '',
+      explorers: (Array.isArray(c.explorers) ? c.explorers : []).map(function(e) {
+        return { name: window.oneCleanText(e && e.name, 64, ''), url: urlOk(e && e.url) ? e.url : '' };
+      }).filter(function(e) { return e.url; })
+    };
+  };
+
   // ── Price identity ──────────────────────────────────────────────────────────────────────────
   // A token's symbol is only text the token contract returns about itself. Pricing an unverified
   // contract token by its ticker (Coinbase "ETH-USD", CoinGecko/DexScreener symbol search, the
