@@ -52,7 +52,8 @@
 
   // ── Bottom sheets (swipe down → close) ──
   var SHEETS = [
-    ['sw-token-sheet',      'sw-token-modal',       call('swCloseTokenPicker')],
+    // Swap > Select token closes by fading #sw-token-modal (0.22s), so the sheet is held off-screen meanwhile (4th item = options)
+    ['sw-token-sheet',      'sw-token-modal',       call('swCloseTokenPicker'), { holdMs: 400 }],
     ['sw-confirm-sheet',    'sw-confirm-modal',     call('swCloseConfirm')],
     ['br-confirm-sheet',    'br-confirm-modal',     call('brCloseConfirm')],
     ['currency-picker-sheet', 'currency-picker-overlay', call('closeCurrencyPicker')],
@@ -92,7 +93,7 @@
     for (i = 0; i < SHEETS.length; i++) {
       var s = SHEETS[i], sheet = document.getElementById(s[0]);
       if (!sheet) continue;
-      attachSheetSwipeClose(sheet, { closeFn: s[2] });
+      attachSheetSwipeClose(sheet, { closeFn: s[2], holdMs: s[3] && s[3].holdMs });
       attachBackdropSwipeClose(document.getElementById(s[1]), s[2]);
     }
     SHEET_CLASSES.forEach(function (cls) {

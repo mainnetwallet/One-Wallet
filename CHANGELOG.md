@@ -6,6 +6,7 @@ Per-build release notes are published on the [Releases](../../releases) page.
 ## [Unreleased]
 
 ### Changed
+- **No flicker when swiping Swap > Select token closed:** after the swipe the sheet used to jump back to its open position while the dim layer was still fading out, which showed as a flash. The sheet now stays off-screen until the fade ends (`holdMs` option in `sheet-swipe-close.js`, set for `sw-token-sheet` in the swipe registry).
 - **No keyboard on Chainlist:** opening the Chainlist tab in Select network no longer pops up the phone keyboard. It shows only when you tap the search box.
 - **Wallet Groups no longer closes on swipe down:** the Manage Wallet Groups screen now stays open when you scroll or swipe down; it closes only with the back arrow or the phone's back button.
 - **Select network, new look:** the Home network picker has a rounded tab switch (My networks with a network count, Chainlist), a bigger search that takes a name or chain ID, rows with a round logo, chain ID, a token-count pill and a check mark for the active network, and sentence-case titles. On Chainlist the Testnets button is now a switch next to the search, the empty screen is replaced by a Popular chains list (chains you have not added yet), and rows have Add / + RPC / Added actions. **Add custom network** now shows on the Chainlist tab only (it used to sit under My networks). Chain switching, adding and RPC logic are unchanged.

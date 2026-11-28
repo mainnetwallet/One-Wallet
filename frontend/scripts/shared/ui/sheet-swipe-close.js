@@ -25,6 +25,10 @@
 // Its `open` class is dropped right before closeFn runs, because a stylesheet like ".open .drawer { ... !important }"
 // would otherwise keep the panel forced open while closeFn is still closing it.
 //
+// `holdMs` (optional, default 0): for a closeFn that closes by FADING the overlay (not by moving the panel). The panel is
+// kept off-screen this long after closeFn runs, so it cannot jump back to its open position while the overlay fades out
+// (that jump was a visible flicker on the Swap "Select token" sheet). Use a bit more than the fade time.
+//
 // Opt-outs: put data-swipe-ignore on any element inside the panel (e.g. a slider) and a gesture that starts on it
 // is left alone.
 // ══════════════════════════════════════════════
@@ -66,6 +70,7 @@
     var closeFn = typeof opts.closeFn === 'function' ? opts.closeFn : function () {};
     var snapEase = opts.snapEase || 'transform ' + SNAP_MS + 'ms cubic-bezier(0.25,1,0.5,1)';
     var closeEase = opts.closeEase || 'transform ' + CLOSE_MS + 'ms cubic-bezier(0.4,0,0.6,1)';
+    var holdMs = +opts.holdMs || 0;
     var ZERO = horiz ? 'translateX(0)' : 'translateY(0)';
     var OFF = horiz ? 'translateX(110%)' : 'translateY(110%)';
 
@@ -133,7 +138,8 @@
           closeFn();
         } finally {
           closing = false;
-          giveBack();
+          if (holdMs > 0) release(holdMs);   // fade-style close: stay off-screen until the overlay is gone
+          else giveBack();
         }
       }, CLOSE_MS);
     }
