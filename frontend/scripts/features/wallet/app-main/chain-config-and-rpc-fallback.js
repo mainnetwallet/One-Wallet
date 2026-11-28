@@ -102,20 +102,57 @@ function getChainRpcs(chainId) {
   return chain.rpcs || [];
 }
 
+// ── Custom chains come from the user AND from untrusted dApps (wallet_addEthereumChain adds one
+// with dApp-supplied chainName / iconUrls / rpcUrls). Those fields are later interpolated into
+// innerHTML all over the UI, so a crafted logo URL or name ran script inside the wallet. Sanitise at
+// the single load/save choke point so every consumer (and any already-stored bad entry) is safe.
+function _ccText(v, max, fallback) {
+  var t = String(v == null ? '' : v).replace(/[\u0000-\u001f<>"'`&\\]/g, '').trim().slice(0, max);
+  return t || fallback;
+}
+function _ccUrl(v, schemes) {
+  if (typeof v !== 'string') return null;
+  var u = v.trim();
+  if (!u || u.length > 2048 || /[\s"'<>`\\]/.test(u)) return null;
+  return schemes.test(u) ? u : null;
+}
+function _sanitizeCustomChain(c) {
+  if (!c || typeof c !== 'object') return null;
+  var id = parseInt(c.chainId, 10);
+  if (!isFinite(id) || id <= 0) return null;
+  var out = Object.assign({}, c);
+  out.chainId   = id;
+  out.id        = _ccText(c.id, 40, 'custom-' + id).replace(/[^A-Za-z0-9_-]/g, '') || ('custom-' + id);
+  out.name      = _ccText(c.name, 64, 'Chain ' + id);
+  out.emoji     = _ccText(c.emoji, 8, '🔗');
+  if ('nativeSym' in c || !('symbol' in c)) out.nativeSym = _ccText(c.nativeSym, 16, 'ETH').replace(/[^A-Za-z0-9$._ -]/g, '') || 'ETH';
+  if ('symbol' in c) out.symbol = _ccText(c.symbol, 16, 'ETH').replace(/[^A-Za-z0-9$._ -]/g, '') || 'ETH';
+  out.logoURI   = _ccUrl(c.logoURI, /^https?:\/\//i);
+  out.explorer  = _ccUrl(c.explorer, /^https?:\/\//i) || '';
+  var rpcOk = /^(https?|wss?):\/\//i;
+  out.rpc       = _ccUrl(c.rpc, rpcOk) || '';
+  out.rpcs      = (Array.isArray(c.rpcs) ? c.rpcs : []).map(function(r) { return _ccUrl(r, rpcOk); }).filter(Boolean);
+  out.color     = (typeof c.color === 'string' && /^#[0-9a-fA-F]{6}$/.test(c.color)) ? c.color : '#6366f1';
+  return out;
+}
+function _sanitizeCustomChains(list) {
+  return (Array.isArray(list) ? list : []).map(_sanitizeCustomChain).filter(Boolean);
+}
+
 function loadCustomChains() {
   try {
     const key = _getGroupChainKey();
     const val = localStorage.getItem(key);
-    if (val) return JSON.parse(val) || [];
+    if (val) return _sanitizeCustomChains(JSON.parse(val));
     // Fallback: try global key (migration for old data)
     const global = localStorage.getItem(HCP_STORAGE_KEY);
-    return global ? JSON.parse(global) || [] : [];
+    return global ? _sanitizeCustomChains(JSON.parse(global)) : [];
   } catch { return []; }
 }
 function saveCustomChains(chains) {
   try {
     const key = _getGroupChainKey();
-    localStorage.setItem(key, JSON.stringify(chains));
+    localStorage.setItem(key, JSON.stringify(_sanitizeCustomChains(chains)));
   } catch {}
 }
 function getAllChains() {
