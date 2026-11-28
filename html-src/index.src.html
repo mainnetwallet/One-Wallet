@@ -44,6 +44,7 @@
 
 <script src="vendor/qrcode.min.js"></script>
 <script src="vendor/jsqr.min.js"></script>
+<script src="vendor/walletconnect.min.js"></script>
 <script src="vendor/lightweight-charts.standalone.production.js"></script>
 <link rel="stylesheet" href="styles/base/base-root-and-safe-area.css">
 <link rel="stylesheet" href="styles/base/light-mode-theme-overrides.css">
@@ -64,6 +65,7 @@
 <link rel="stylesheet" href="styles/features/wallet/tx-history-modal.css">
 <link rel="stylesheet" href="styles/features/send/send-modal.css">
 <link rel="stylesheet" href="styles/features/scan/qr-scanner.css">
+<link rel="stylesheet" href="styles/features/walletconnect/wc-sheets.css">
 <link rel="stylesheet" href="styles/features/wallet/token-manager-and-modal-anti-flicker.css">
 <link rel="stylesheet" href="styles/features/wallet/one-lock-method-picker.css">
 <link rel="stylesheet" href="styles/features/transfer/th-wrapper-header-and-chain-button.css">
@@ -260,6 +262,7 @@
 <!--@include partials/wallet-group-import-create.html-->
 
 <!--@include partials/send-flow.html-->
+<!--@include partials/walletconnect.html-->
 
 <script src="scripts/features/wallet/app-main/app-open-and-chart-price-fetchers-part1.js"></script>
 <script src="scripts/features/wallet/app-main/price-engine-batch-fetchers.js"></script>
@@ -329,6 +332,8 @@
 <script src="scripts/features/wallet/app-main/send-input-handlers.js"></script>
 <script src="scripts/features/scan/qr-classify.js"></script>
 <script src="scripts/features/scan/qr-scanner.js"></script>
+<script src="scripts/features/walletconnect/wc-engine.js"></script>
+<script src="scripts/features/walletconnect/wc-ui.js"></script>
 <script src="scripts/features/wallet/app-main/send-flow-pickers-and-confirm-part2.js"></script>
 <script src="scripts/features/wallet/app-main/send-flow-pickers-and-confirm-part3.js"></script>
 <script src="scripts/features/wallet/app-main/send-token-sheet.js"></script>

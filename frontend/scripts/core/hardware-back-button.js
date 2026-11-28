@@ -24,6 +24,7 @@
     { id: 'tm-overlay',               close: () => typeof closeTokenManager      === 'function' && closeTokenManager()      },
     { id: 'txh-overlay',              close: () => typeof closeTxHistory         === 'function' && closeTxHistory()         },
     { id: 'send-confirm-overlay',     isOpen: el => el.style.pointerEvents === 'auto' && el.style.display !== 'none', close: () => typeof closeSendConfirmSheet === 'function' && closeSendConfirmSheet() },
+    { id: 'wc-overlay',                close: () => typeof wcUiBack                === 'function' && wcUiBack()                },
     { id: 'send-qr-modal-overlay',    close: () => typeof closeSendQrScanner     === 'function' && closeSendQrScanner()     },
     { id: 'send-token-sheet',         close: () => typeof closeSendTokenSheet    === 'function' && closeSendTokenSheet()    },
     { id: 'send-overlay',             close: () => typeof closeSendModal         === 'function' && closeSendModal()         },
