@@ -6,54 +6,63 @@
       <div class="send-back-btn" onclick="closeWgImportModal()">
         <span class="material-icons-round">arrow_back</span>
       </div>
-      <div class="send-header-title">Import Wallet Group</div>
-      <div id="wg-import-modal-count" style="padding:4px 10px;border-radius:8px;background:var(--bg-glass);border:1px solid var(--border-subtle);font-size:10px;font-weight:700;color:var(--text-muted);font-family:var(--font-mono);display:none;">0 VALID</div>
+      <div class="send-header-title">Import wallet group</div>
     </div>
 
-    <div class="send-body" style="padding:16px 20px 40px;display:flex;flex-direction:column;gap:14px;">
+    <div class="send-body" style="padding:8px 16px 40px;display:flex;flex-direction:column;gap:20px;">
 
-      <!-- ── Import Key/Phrase button (top) ── -->
-      <div onclick="openWgKeyInputUI()"
-        style="display:flex;align-items:center;gap:14px;padding:16px;background:linear-gradient(135deg,rgba(99,102,241,0.12),rgba(139,92,246,0.08));border:1.5px solid rgba(99,102,241,0.35);border-radius:var(--radius-md);cursor:pointer;transition:all 0.2s ease;position:relative;overflow:hidden;"
-        onmousedown="this.style.background='linear-gradient(135deg,rgba(99,102,241,0.22),rgba(139,92,246,0.16))'"
-        onmouseup="this.style.background='linear-gradient(135deg,rgba(99,102,241,0.12),rgba(139,92,246,0.08))'"
-        ontouchstart="this.style.background='linear-gradient(135deg,rgba(99,102,241,0.22),rgba(139,92,246,0.16))'"
-        ontouchend="this.style.background='linear-gradient(135deg,rgba(99,102,241,0.12),rgba(139,92,246,0.08))'">
-        <!-- glow accent line -->
-        <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--accent-primary),var(--accent-secondary),transparent);opacity:0.7;border-radius:2px 2px 0 0;"></div>
-        <div style="width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg,rgba(99,102,241,0.25),rgba(139,92,246,0.2));border:1.5px solid rgba(99,102,241,0.4);display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 0 14px rgba(99,102,241,0.2);">
-          <span class="material-icons-round" style="font-size:20px;color:var(--accent-primary);">vpn_key</span>
+      <!-- ── Add wallets ── -->
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <div class="wg-sec-label">Add wallets</div>
+        <div class="wg-listcard">
+          <div class="wg-row" onclick="openWgKeyInputUI()">
+            <div class="wg-row-ico" style="background:rgba(99,102,241,0.2);">
+              <span class="material-icons-round" style="color:#a5b4fc;">vpn_key</span>
+            </div>
+            <div class="wg-row-txt">
+              <div class="wg-row-title">Import key or phrase</div>
+              <div class="wg-row-sub">Private key or recovery phrase</div>
+            </div>
+            <span class="material-icons-round wg-row-chev">chevron_right</span>
+          </div>
+          <div class="wg-sep"></div>
+          <div class="wg-row" onclick="openWgCreateUI()">
+            <div class="wg-row-ico" style="background:rgba(16,185,129,0.18);">
+              <span class="material-icons-round" style="color:#34d399;">add_circle</span>
+            </div>
+            <div class="wg-row-txt">
+              <div class="wg-row-title">Create new wallets</div>
+              <div class="wg-row-sub">Generate keys on this device</div>
+            </div>
+            <span class="material-icons-round wg-row-chev">chevron_right</span>
+          </div>
         </div>
-        <div style="flex:1;min-width:0;">
-          <div style="font-size:13px;font-weight:800;color:var(--text-primary);font-family:var(--font-display);letter-spacing:0.2px;">Import Key / Phrase</div>
-          <div style="font-size:10px;color:var(--text-secondary);font-family:var(--font-mono);margin-top:2px;">Private key or recovery phrase</div>
-        </div>
-        <span class="material-icons-round" style="font-size:20px;color:var(--accent-primary);opacity:0.8;">chevron_right</span>
       </div>
 
-      <!-- ── Create Wallet button ── -->
-      <div onclick="openWgCreateUI()"
-        style="display:flex;align-items:center;gap:14px;padding:16px;background:linear-gradient(135deg,rgba(16,185,129,0.10),rgba(5,150,105,0.07));border:1.5px solid rgba(16,185,129,0.32);border-radius:var(--radius-md);cursor:pointer;transition:all 0.2s ease;position:relative;overflow:hidden;"
-        onmousedown="this.style.background='linear-gradient(135deg,rgba(16,185,129,0.20),rgba(5,150,105,0.15))'"
-        onmouseup="this.style.background='linear-gradient(135deg,rgba(16,185,129,0.10),rgba(5,150,105,0.07))'"
-        ontouchstart="this.style.background='linear-gradient(135deg,rgba(16,185,129,0.20),rgba(5,150,105,0.15))'"
-        ontouchend="this.style.background='linear-gradient(135deg,rgba(16,185,129,0.10),rgba(5,150,105,0.07))'">
-        <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,rgba(16,185,129,0.8),rgba(52,211,153,0.8),transparent);opacity:0.7;border-radius:2px 2px 0 0;"></div>
-        <div style="width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg,rgba(16,185,129,0.22),rgba(5,150,105,0.18));border:1.5px solid rgba(16,185,129,0.4);display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 0 14px rgba(16,185,129,0.18);">
-          <span class="material-icons-round" style="font-size:20px;color:#10b981;">add_circle</span>
+      <!-- ── Totals ── -->
+      <div class="wg-stats">
+        <div class="wg-stat">
+          <div class="wg-stat-l">Groups</div>
+          <div class="wg-stat-n" id="wg-stat-groups">0</div>
         </div>
-        <div style="flex:1;min-width:0;">
-          <div style="font-size:13px;font-weight:800;color:var(--text-primary);font-family:var(--font-display);letter-spacing:0.2px;">Create Wallet</div>
-          <div style="font-size:10px;color:var(--text-secondary);font-family:var(--font-mono);margin-top:2px;">Generate new wallets instantly</div>
+        <div class="wg-stat">
+          <div class="wg-stat-l">Wallets</div>
+          <div class="wg-stat-n" id="wg-stat-wallets">0</div>
         </div>
-        <span class="material-icons-round" style="font-size:20px;color:#10b981;opacity:0.8;">chevron_right</span>
       </div>
 
       <!-- ── Wallet Groups list ── -->
-      <div id="wg-list-panel">
-        <div id="wg-list">
-          <div id="wg-empty" style="text-align:center;padding:20px 0;font-family:var(--font-mono);font-size:11px;color:var(--text-muted);letter-spacing:1px;">
-            NO WALLET GROUPS YET
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <div class="wg-list-head">
+          <div class="wg-sec-label" style="padding-left:0;">Your groups</div>
+          <div class="wg-hint">Hold a group to reorder</div>
+        </div>
+        <div id="wg-list-panel">
+          <div id="wg-list">
+            <div id="wg-empty" class="wg-empty-state">
+              <b>No wallet groups yet</b>
+              Import a key or create new wallets to add one.
+            </div>
           </div>
         </div>
       </div>

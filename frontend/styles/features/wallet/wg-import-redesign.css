@@ -1,0 +1,210 @@
+
+  /* ══════════════════════════════════════════════════════════════
+     IMPORT WALLET GROUP — redesign (overview + key / phrase input)
+     Scoped to #wg-import-overlay and #wg-keyinput-overlay only.
+     One standard font everywhere (Roboto, then the system UI font);
+     wallet addresses and keys use the system monospace font (.wg-mono).
+     ══════════════════════════════════════════════════════════════ */
+
+  #wg-import-overlay,
+  #wg-keyinput-overlay {
+    --wg-font: Roboto, system-ui, -apple-system, 'Segoe UI', sans-serif;
+    --wg-mono: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+    --wg-card: var(--bg-raised);
+    --wg-line: var(--border-subtle);
+    --wg-sub: var(--text-secondary);
+  }
+
+  #wg-import-overlay *:not(.material-icons-round):not(.wg-mono),
+  #wg-keyinput-overlay *:not(.material-icons-round):not(.wg-mono) {
+    font-family: var(--wg-font) !important;
+  }
+  #wg-import-overlay .wg-mono,
+  #wg-keyinput-overlay .wg-mono {
+    font-family: var(--wg-mono) !important;
+  }
+
+  #wg-import-overlay .send-header-title,
+  #wg-keyinput-overlay .send-header-title {
+    font-size: 18px; font-weight: 500; letter-spacing: 0; text-transform: none;
+  }
+
+  /* ── Shared bits ── */
+  .wg-sec-label { font-size: 13px; color: var(--wg-sub); padding-left: 4px; }
+  .wg-listcard {
+    background: var(--wg-card);
+    border: 1px solid var(--wg-line);
+    border-radius: 16px;
+    overflow: hidden;
+  }
+  .wg-sep { height: 1px; background: var(--wg-line); margin-left: 70px; }
+
+  /* ── Overview: add-wallets rows ── */
+  .wg-row {
+    display: flex; align-items: center; gap: 14px;
+    padding: 14px; cursor: pointer;
+    transition: background 0.15s ease;
+  }
+  .wg-row:active { background: var(--bg-glass-hover); }
+  .wg-row-ico {
+    width: 42px; height: 42px; border-radius: 12px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .wg-row-ico .material-icons-round { font-size: 22px; }
+  .wg-row-txt { flex: 1; min-width: 0; }
+  .wg-row-title { font-size: 15px; font-weight: 500; color: var(--text-primary); }
+  .wg-row-sub { font-size: 13px; color: var(--wg-sub); margin-top: 2px; }
+  .wg-row-chev { font-size: 20px; color: var(--wg-sub); }
+
+  /* ── Overview: stat tiles ── */
+  .wg-stats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .wg-stat { background: var(--bg-glass); border-radius: 14px; padding: 12px 14px; }
+  .wg-stat-l { font-size: 13px; color: var(--wg-sub); }
+  .wg-stat-n { font-size: 24px; font-weight: 500; margin-top: 2px; color: var(--text-primary); }
+
+  .wg-list-head { display: flex; justify-content: space-between; align-items: center; padding: 0 4px; }
+  .wg-list-head .wg-hint { font-size: 12px; color: var(--wg-sub); }
+
+  /* ── Overview: group list (rendered by renderWalletGroupsList) ── */
+  #wg-import-overlay #wg-list.wg-joined {
+    background: var(--wg-card);
+    border: 1px solid var(--wg-line);
+    border-radius: 16px;
+    overflow: hidden;
+  }
+  #wg-import-overlay #wg-list.wg-joined .wg-card {
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid var(--wg-line);
+    border-radius: 0;
+    box-shadow: none;
+    margin: 0;
+    transition: background 0.15s ease;
+  }
+  #wg-import-overlay #wg-list.wg-joined .wg-card:last-child { border-bottom: none; }
+  #wg-import-overlay #wg-list.wg-joined .wg-card:hover { border-color: var(--wg-line); box-shadow: none; }
+  #wg-import-overlay #wg-list.wg-joined .wg-card:active { background: var(--bg-glass-hover); }
+  #wg-import-overlay #wg-list .wg-header { padding: 12px 14px; gap: 14px; }
+
+  .wg-ava {
+    width: 42px; height: 42px; border-radius: 50%; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; font-weight: 500; line-height: 1;
+  }
+  .wg-ava.wg-ava-emoji { font-size: 20px; }
+  .wg-gtxt { flex: 1; min-width: 0; }
+  .wg-gname {
+    font-size: 15px; font-weight: 500; color: var(--text-primary);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .wg-gsub {
+    font-size: 13px; color: var(--wg-sub); margin-top: 2px;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .wg-gsub .wg-mono { font-size: 12px; }
+
+  .wg-empty-state {
+    text-align: center; padding: 28px 16px;
+    font-size: 14px; line-height: 1.5; color: var(--wg-sub);
+  }
+  .wg-empty-state .material-icons-round { font-size: 34px; display: block; margin-bottom: 8px; }
+  .wg-empty-state b { display: block; font-size: 15px; font-weight: 500; color: var(--text-primary); margin-bottom: 2px; }
+
+  /* ── Key / phrase screen ── */
+  .wg-field-label { font-size: 13px; color: var(--wg-sub); padding-left: 4px; }
+
+  #wg-keyinput-overlay #wg-name-input {
+    height: 50px; padding: 0 14px;
+    border-radius: 14px;
+    background: var(--wg-card);
+    border: 1px solid var(--border-glow);
+    font-size: 15px; font-weight: 400;
+    color: var(--text-primary);
+  }
+  #wg-keyinput-overlay #wg-name-input:focus { border-color: var(--accent-primary); outline: none; }
+
+  #wg-keyinput-overlay .wg-tab-bar {
+    display: grid; grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 4px; padding: 4px;
+    border-radius: 14px; border: none;
+    background: var(--bg-glass-hover);
+  }
+  #wg-keyinput-overlay .wg-tab {
+    height: 40px; padding: 0; border-radius: 11px;
+    font-size: 14px; font-weight: 400; letter-spacing: 0; text-transform: none;
+    color: var(--wg-sub);
+  }
+  #wg-keyinput-overlay .wg-tab .material-icons-round { font-size: 18px; }
+  #wg-keyinput-overlay .wg-tab.active {
+    background: var(--accent-primary); color: #fff; font-weight: 500; box-shadow: none;
+  }
+
+  .wg-keybox {
+    background: var(--wg-card);
+    border: 1px solid rgba(99,102,241,0.55);
+    border-radius: 14px;
+    overflow: hidden;
+  }
+  #wg-keyinput-overlay .wg-keybox .key-textarea {
+    display: block; width: 100%; box-sizing: border-box;
+    border: none; border-radius: 0; background: transparent;
+    padding: 14px; font-size: 12px; line-height: 2;
+    color: var(--text-primary);
+    outline: none; resize: none; box-shadow: none;
+  }
+  .wg-keybox-foot {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 6px 14px; border-top: 1px solid var(--wg-line);
+  }
+  .wg-keybox-hint { font-size: 13px; color: var(--wg-sub); }
+  .wg-keybox-act { display: flex; gap: 16px; }
+  .wg-link-btn {
+    display: flex; align-items: center; gap: 4px;
+    padding: 8px 0; background: none; border: none; cursor: pointer;
+    font-size: 14px; font-weight: 500; color: var(--neon-purple);
+  }
+  .wg-link-btn .material-icons-round { font-size: 16px; }
+
+  .wg-sum { display: none; flex-wrap: wrap; gap: 16px; font-size: 13px; padding-left: 4px; color: var(--text-primary); }
+  .wg-sum.show { display: flex; }
+  .wg-sum span { display: flex; align-items: center; gap: 6px; }
+  .wg-sum i { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+
+  .wg-prev { display: none; flex-direction: column; gap: 8px; }
+  .wg-prev.show { display: flex; }
+  .wg-prow { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-bottom: 1px solid var(--wg-line); }
+  .wg-prow:last-child { border-bottom: none; }
+  .wg-prow .material-icons-round { font-size: 20px; flex-shrink: 0; }
+  .wg-prow-name { flex: 1; min-width: 0; font-size: 15px; font-weight: 500; color: var(--text-primary); }
+  .wg-prow-addr { font-size: 12px; color: var(--wg-sub); }
+  .wg-prow.err { background: rgba(244,63,94,0.08); }
+  .wg-prow.err .wg-prow-name { font-size: 14px; font-weight: 400; color: var(--accent-red); }
+  .wg-prow.more .wg-prow-name { font-size: 13px; font-weight: 400; color: var(--wg-sub); }
+
+  /* Mnemonic panel: same standard type scale */
+  #wg-keyinput-overlay .wg-deriv-label { font-size: 13px; font-weight: 400; letter-spacing: 0; text-transform: none; color: var(--wg-sub); min-width: 44px; }
+  #wg-keyinput-overlay .wg-deriv-select,
+  #wg-keyinput-overlay .wg-wallet-range input[type=number],
+  #wg-keyinput-overlay .wg-wallet-range span { font-size: 13px; }
+  #wg-keyinput-overlay .wg-mnem-status { font-size: 13px; }
+  #wg-keyinput-overlay .wg-count-badge { font-size: 12px; letter-spacing: 0; text-transform: none; }
+
+  /* ── Primary action ── */
+  #wg-keyinput-overlay .wg-primary-btn {
+    width: 100%; height: 52px; border: none; border-radius: 14px;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    background: var(--accent-primary); color: #fff;
+    font-size: 16px; font-weight: 500; cursor: pointer;
+    opacity: 0.5; pointer-events: none;
+    transition: opacity 0.2s ease, transform 0.1s ease;
+  }
+  #wg-keyinput-overlay .wg-primary-btn:active { transform: scale(0.98); }
+
+  /* Phrase validation rows (built in JS with small inline sizes) */
+  #wg-keyinput-overlay #wg-mn-phrase-list span { font-size: 12px !important; }
+
+  /* The body scrolls: keep every block at its own height instead of squeezing it */
+  #wg-import-overlay .send-body > *,
+  #wg-keyinput-overlay .send-body > *,
+  #wg-keyinput-overlay .wg-panel > * { flex-shrink: 0; }
+  #wg-keyinput-overlay #wg-name-input { flex-shrink: 0; min-height: 50px; box-sizing: border-box; }

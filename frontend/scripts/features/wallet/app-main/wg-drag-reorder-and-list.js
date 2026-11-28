@@ -30,7 +30,7 @@
       position:fixed;left:${rect.left}px;top:${rect.top}px;
       width:${rect.width}px;z-index:9999;pointer-events:none;
       box-shadow:0 8px 32px rgba(99,102,241,0.45),0 2px 8px rgba(0,0,0,0.5);
-      border-color:rgba(99,102,241,0.7)!important;
+      border:1px solid rgba(99,102,241,0.7)!important;background:var(--bg-raised);border-radius:16px;
       transform:scale(1.025);opacity:0.97;
       transition:box-shadow 0.15s,transform 0.15s;
     `;
@@ -40,7 +40,7 @@
     const ph = document.createElement('div');
     ph.style.cssText = `height:${rect.height}px;border-radius:16px;
       background:rgba(99,102,241,0.08);border:2px dashed rgba(99,102,241,0.35);
-      margin-bottom:10px;transition:none;box-sizing:border-box;`;
+      margin-bottom:0;transition:none;box-sizing:border-box;`;
     card.parentNode.insertBefore(ph, card);
 
     card.style.opacity = '0';
@@ -134,82 +134,75 @@
   document.addEventListener('mouseup',    e => _drag && _onEnd(e));
 })();
 
+function _wgEsc(v) {
+  return String(v == null ? '' : v).replace(/[&<>"']/g, function (c) {
+    return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+  });
+}
+
+// Two letters for the group avatar: "Group 1–50" -> G1, "Trading batch A" -> TB
+function _wgInitials(name) {
+  const clean = String(name || '').trim();
+  if (!clean) return '?';
+  const words = clean.split(/\s+/).filter(Boolean);
+  const first = Array.from(words[0]);
+  const text = words.length > 1 ? first[0] + Array.from(words[1])[0] : first.slice(0, 2).join('');
+  return text.toUpperCase();
+}
+
 function renderWalletGroupsList() {
   const list = document.getElementById('wg-list');
   const totalBadge = document.getElementById('wg-total-badge');
   const groups = loadWalletGroups();
   const n = groups.length;
+  const totalWallets = groups.reduce((sum, g) => sum + ((g && g.keys && g.keys.length) || 0), 0);
 
   if (totalBadge) totalBadge.textContent = n + ' GROUP' + (n !== 1 ? 'S' : '');
+
+  const statGroups = document.getElementById('wg-stat-groups');
+  const statWallets = document.getElementById('wg-stat-wallets');
+  if (statGroups) statGroups.textContent = String(n);
+  if (statWallets) statWallets.textContent = String(totalWallets);
 
   // Update Manage button — enabled only when at least one group is selected
   _updateWgManageBtn();
 
-
-
   if (!list) return;
   list.innerHTML = '';
+  list.classList.toggle('wg-joined', n > 0);
 
   if (n === 0) {
-    list.innerHTML = `<div style="text-align:center;padding:30px 0 10px;font-family:var(--font-mono);font-size:11px;color:var(--text-muted);letter-spacing:1px;line-height:2;">
-      <div style="font-size:28px;margin-bottom:8px;">📁</div>
-      NO WALLET GROUPS YET<br>
-      <span style="font-size:10px;opacity:0.6;">Tap "Import Wallet Group" above to add one</span>
+    list.innerHTML = `<div class="wg-empty-state">
+      <span class="material-icons-round">folder_open</span>
+      <b>No wallet groups yet</b>
+      Import a key or create new wallets to add one.
     </div>`;
     return;
   }
 
   groups.forEach((g, idx) => {
     const clr = WG_COLORS[idx % WG_COLORS.length];
-    const date = new Date(g.createdAt).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'2-digit'});
     const emoji = g.emoji || '';
+    const count = g.keys.length;
+
+    // Only the first wallet's address is shown in the list (the full list lives in the group detail)
+    let addr = '';
+    try { if (count > 0) addr = new ethers.Wallet(g.keys[0]).address; } catch (_) {}
+    const shortAddr = addr ? addr.slice(0, 6) + '…' + addr.slice(-4) : '';
+
     const card = document.createElement('div');
     card.className = 'wg-card';
     card.id = 'wg-card-' + g.id;
     card.dataset.gid = g.id;
 
-    // Build address rows HTML
-    const addrRowsHtml = g.keys.map((pk, i) => {
-      let addr = '';
-      try { addr = new ethers.Wallet(pk).address; } catch {}
-      const short = addr ? addr.slice(0,8) + '…' + addr.slice(-6) : '—';
-      return `<div class="wg-addr-row" data-addr="${addr}"
-          onmousedown="this.style.background='rgba(34,211,238,0.07)'" onmouseup="this.style.background=''"
-          ontouchstart="this.style.background='rgba(34,211,238,0.07)'" ontouchend="this.style.background=''">
-          <div class="wg-addr-num">${i+1}</div>
-          <div style="flex:1;min-width:0;">
-            <div style="font-size:10px;font-weight:600;color:var(--text-secondary);">Wallet #${i+1}</div>
-            <div style="font-family:var(--font-mono);font-size:10px;color:var(--text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${short}</div>
-          </div>
-          <span class="material-icons-round" style="font-size:14px;color:var(--text-muted);flex-shrink:0;">content_copy</span>
-        </div>`;
-    }).join('');
-
     card.innerHTML = `
-      <!-- ── Card header ── -->
       <div class="wg-header" id="wg-header-${g.id}" style="cursor:pointer;user-select:none;">
-        <div class="wg-num-badge" style="background:${clr.num};">
-          ${emoji || String(idx+1).padStart(2,'0')}
+        <div class="wg-ava${emoji ? ' wg-ava-emoji' : ''}" style="background:${clr.bg};color:${clr.accent};">${emoji ? _wgEsc(emoji) : _wgEsc(_wgInitials(g.name))}</div>
+        <div class="wg-gtxt">
+          <div class="wg-gname">${_wgEsc(g.name)}</div>
+          <div class="wg-gsub">${count} wallet${count !== 1 ? 's' : ''}${shortAddr ? ' · <span class="wg-mono">' + shortAddr + '</span>' : ''}</div>
         </div>
-        <div style="flex:1;min-width:0;">
-          <div style="display:flex;align-items:center;gap:6px;">
-            <div class="wg-name">${g.name}</div>
-          </div>
-          <div class="wg-meta" style="display:flex;align-items:center;gap:6px;margin-top:3px;">
-            <span style="color:${clr.accent};font-weight:700;">${g.keys.length}</span> keys
-            <span style="opacity:0.4;">·</span>
-            <span>${date}</span>
-            <span style="opacity:0.4;">·</span>
-            <span style="font-size:9px;font-weight:700;padding:1px 6px;border-radius:5px;letter-spacing:0.5px;${g.source === 'created'
-              ? 'background:rgba(16,185,129,0.15);border:1px solid rgba(16,185,129,0.35);color:#10b981;'
-              : 'background:rgba(99,102,241,0.13);border:1px solid rgba(99,102,241,0.3);color:var(--accent-primary);'
-            }">${g.source === 'created' ? 'CREATED' : 'IMPORTED'}</span>
-          </div>
-        </div>
-        <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;">
-          <div class="wg-badge" style="color:${clr.accent};border-color:${clr.border};background:${clr.bg};">${g.keys.length} KEYS</div>
-          <span class="material-icons-round" style="font-size:18px;color:var(--accent-primary);flex-shrink:0;">chevron_right</span>
-        </div>
+        <span class="material-icons-round wg-row-chev">chevron_right</span>
       </div>
     `;
 
@@ -239,4 +232,3 @@ function renderWalletGroupsList() {
     list.appendChild(card);
   });
 }
-

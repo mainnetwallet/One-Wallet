@@ -75,10 +75,10 @@ function openWgKeyInputUI() {
   if (fromEl) fromEl.value = '0';
   const toEl = document.getElementById('wg-mn-to');
   if (toEl) toEl.value = '0';
-  const _wgIC1 = document.getElementById('wg-import-count');
-  if (_wgIC1) _wgIC1.style.display = 'none';
   const _wgSB1 = document.getElementById('wg-save-btn');
   if (_wgSB1) { _wgSB1.style.opacity = '0.5'; _wgSB1.style.pointerEvents = 'none'; }
+  _wgRenderKeyPreview();
+  _wgUpdateSaveBtn();
   document.getElementById('wg-keyinput-overlay')?.classList.add('open');
   setTimeout(() => { _wgUpdateSaveBtn(); }, 300);
   haptic();
@@ -106,15 +106,107 @@ function wgSwitchTab(tab, silent) {
 // ── Private key input handler ──
 function onWgKeyInput() {
   if (_wgActiveTab !== 'pk') { _wgUpdateSaveBtn(); return; }
-  const ta = document.getElementById('wg-key-textarea');
-  const lines = (ta?.value || '').split('\n').map(l => l.trim()).filter(Boolean);
-  const valid = lines.filter(isValidPrivateKey);
-  const countEl = document.getElementById('wg-import-count');
-  if (countEl) {
-    countEl.style.display = valid.length > 0 ? 'inline-block' : 'none';
-    countEl.textContent = valid.length + ' VALID';
-  }
+  _wgRenderKeyPreview();
   _wgUpdateSaveBtn();
+}
+
+// Reads the key box: unique valid keys, invalid lines and duplicates (never stored, only counted)
+function _wgAnalyzeKeys() {
+  const raw = document.getElementById('wg-key-textarea')?.value || '';
+  const seen = new Set();
+  const unique = [];
+  let invalid = 0, dup = 0, firstInvalidLine = 0;
+  raw.split('\n').forEach(function (line, i) {
+    const t = line.trim();
+    if (!t) return;
+    if (!isValidPrivateKey(t)) {
+      invalid++;
+      if (!firstInvalidLine) firstInvalidLine = i + 1;
+      return;
+    }
+    const k = normalizeKey(t);
+    if (seen.has(k)) { dup++; return; }
+    seen.add(k);
+    unique.push(k);
+  });
+  return { unique: unique, invalid: invalid, dup: dup, firstInvalidLine: firstInvalidLine };
+}
+
+// Summary dots + a short preview (first 3 wallets, first invalid line) under the key box
+function _wgRenderKeyPreview() {
+  const sumEl = document.getElementById('wg-key-summary');
+  const wrap  = document.getElementById('wg-key-preview-wrap');
+  const box   = document.getElementById('wg-key-preview');
+  if (!sumEl || !wrap || !box) return;
+
+  const a = _wgAnalyzeKeys();
+  const any = a.unique.length + a.invalid + a.dup > 0;
+  sumEl.classList.toggle('show', any);
+  wrap.classList.toggle('show', any);
+  if (!any) { sumEl.innerHTML = ''; box.innerHTML = ''; return; }
+
+  const dot = function (color, text) { return '<span><i style="background:' + color + ';"></i>' + text + '</span>'; };
+  let sum = dot('#34d399', a.unique.length + ' valid');
+  if (a.invalid) sum += dot('#fb7185', a.invalid + ' invalid');
+  if (a.dup) sum += dot('#fbbf24', a.dup + ' duplicate');
+  sumEl.innerHTML = sum;
+
+  let rows = '';
+  a.unique.slice(0, 3).forEach(function (key, i) {
+    let addr = '';
+    try { addr = new ethers.Wallet(key).address; } catch (_) {}
+    const short = addr ? addr.slice(0, 6) + '…' + addr.slice(-4) : '—';
+    rows += '<div class="wg-prow"><span class="material-icons-round" style="color:#34d399;">check_circle</span>'
+      + '<div class="wg-prow-name">Wallet ' + (i + 1) + '</div>'
+      + '<div class="wg-prow-addr wg-mono">' + short + '</div></div>';
+  });
+  if (a.unique.length > 3) {
+    const more = a.unique.length - 3;
+    rows += '<div class="wg-prow more"><span class="material-icons-round" style="color:var(--text-secondary);">more_horiz</span>'
+      + '<div class="wg-prow-name">and ' + more + ' more wallet' + (more !== 1 ? 's' : '') + '</div></div>';
+  }
+  if (a.invalid) {
+    const msg = a.invalid === 1
+      ? 'Line ' + a.firstInvalidLine + " isn't a valid key"
+      : 'Line ' + a.firstInvalidLine + ' and ' + (a.invalid - 1) + " more aren't valid keys";
+    rows += '<div class="wg-prow err"><span class="material-icons-round" style="color:#fb7185;">error</span>'
+      + '<div class="wg-prow-name">' + msg + '</div>'
+      + '<div class="wg-prow-addr">Skipped</div></div>';
+  }
+  box.innerHTML = rows;
+}
+
+// ── Paste / Clear buttons under the key and phrase boxes ──
+async function wgPasteInto(which) {
+  const isMn = which === 'mn';
+  const ta = document.getElementById(isMn ? 'wg-mn-bulk-textarea' : 'wg-key-textarea');
+  if (!ta) return;
+  let text = '';
+  try {
+    if (navigator.clipboard && navigator.clipboard.readText) text = await navigator.clipboard.readText();
+  } catch (_) {}
+  if (!text) {
+    try {
+      if (window.OneAndroid && typeof OneAndroid.getClipboardText === 'function') text = OneAndroid.getClipboardText() || '';
+    } catch (_) {}
+  }
+  if (!text) {
+    showToast("Couldn't read the clipboard. Paste into the box instead.", 'error');
+    ta.focus();
+    return;
+  }
+  ta.value = ta.value && !ta.value.endsWith('\n') ? ta.value + '\n' + text : ta.value + text;
+  if (isMn) wgOnMnemInput(); else onWgKeyInput();
+  haptic && haptic();
+}
+
+function wgClearInput(which) {
+  const isMn = which === 'mn';
+  const ta = document.getElementById(isMn ? 'wg-mn-bulk-textarea' : 'wg-key-textarea');
+  if (!ta) return;
+  ta.value = '';
+  if (isMn) wgOnMnemInput(); else onWgKeyInput();
+  haptic && haptic();
 }
 
 // ── Also update save btn when name changes ──
@@ -131,13 +223,16 @@ function _wgUpdateSaveBtn() {
   if (!btn) return;
   const nameVal = (document.getElementById('wg-name-input')?.value || '').trim();
   let canSave = false;
+  let count = 0;
   if (_wgActiveTab === 'pk') {
-    const ta = document.getElementById('wg-key-textarea');
-    const lines = (ta?.value || '').split('\n').map(l => l.trim()).filter(Boolean);
-    canSave = lines.filter(isValidPrivateKey).length > 0 && nameVal.length > 0;
+    count = _wgAnalyzeKeys().unique.length;
+    canSave = count > 0 && nameVal.length > 0;
   } else {
-    canSave = _wgDerivedKeys.length > 0 && nameVal.length > 0;
+    count = _wgDerivedKeys.length;
+    canSave = count > 0 && nameVal.length > 0;
   }
+  const label = document.getElementById('wg-save-label');
+  if (label) label.textContent = count > 0 ? 'Import ' + count + ' wallet' + (count !== 1 ? 's' : '') : 'Import wallets';
   btn.style.opacity = canSave ? '1' : '0.5';
   btn.style.pointerEvents = canSave ? 'auto' : 'none';
 }
@@ -185,7 +280,7 @@ async function _wgOnMnemInputAsync() {
   const badge = document.getElementById('wg-mn-line-badge');
   if (badge) {
     badge.style.display = results.length > 0 ? 'inline-block' : 'none';
-    badge.textContent = valid.length + ' VALID' + (invalid.length > 0 ? ' · ' + invalid.length + ' ERR' : '');
+    badge.textContent = valid.length + ' valid' + (invalid.length > 0 ? ' · ' + invalid.length + ' error' + (invalid.length !== 1 ? 's' : '') : '');
     badge.style.borderColor = invalid.length > 0 ? 'rgba(244,63,94,0.35)' : 'rgba(99,102,241,0.3)';
     badge.style.color = invalid.length > 0 ? 'var(--accent-red)' : 'var(--neon-purple)';
     badge.style.background = invalid.length > 0 ? 'rgba(244,63,94,0.12)' : 'rgba(99,102,241,0.15)';
@@ -284,7 +379,7 @@ async function _wgOnMnemInputAsync() {
     if (statusEl) statusEl.className = 'wg-mnem-status ok';
     if (statusIcon) statusIcon.textContent = 'check_circle';
     if (statusText) statusText.textContent = valid.length + ' phrase' + (valid.length !== 1 ? 's' : '') + ' · ' + _wgDerivedKeys.length + ' wallet' + (_wgDerivedKeys.length !== 1 ? 's' : '') + ' total';
-    if (countBadge) { countBadge.style.display = 'inline-block'; countBadge.textContent = _wgDerivedKeys.length + ' WALLETS'; }
+    if (countBadge) { countBadge.style.display = 'inline-block'; countBadge.textContent = _wgDerivedKeys.length + ' wallet' + (_wgDerivedKeys.length !== 1 ? 's' : ''); }
   } else {
     if (statusEl) statusEl.className = 'wg-mnem-status err';
     if (statusIcon) statusIcon.textContent = 'error';
@@ -399,11 +494,11 @@ function _doSaveWalletGroup(name, validKeys, source, mnemonics) {
   (document.getElementById('wg-name-input') || {}).value = '';
   (document.getElementById('wg-key-textarea') || {}).value = '';
   (document.getElementById('wg-mn-bulk-textarea') || {}).value = '';
-  const _wgIC2 = document.getElementById('wg-import-count');
-  if (_wgIC2) _wgIC2.style.display = 'none';
   const _wgSB2 = document.getElementById('wg-save-btn');
   if (_wgSB2) { _wgSB2.style.opacity = '0.5'; _wgSB2.style.pointerEvents = 'none'; }
   _wgDerivedKeys = [];
+  _wgRenderKeyPreview();
+  _wgUpdateSaveBtn();
   const listEl = document.getElementById('wg-mn-phrase-list');
   if (listEl) { listEl.innerHTML = ''; listEl.style.display = 'none'; }
   const badge = document.getElementById('wg-mn-line-badge');
