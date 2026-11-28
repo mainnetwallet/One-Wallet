@@ -3,6 +3,13 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<!-- ══ CONTENT SECURITY POLICY (wallet UI) ══
+     Damage limiter for any future XSS: no <object>/<embed>, no <base>, no form posts, frames only for the
+     WalletConnect verify iframe, scripts only from the bundle (no remote script can be pulled in), styles/fonts
+     only from the bundle + Google Fonts. 'unsafe-inline' stays for scripts because the UI still uses inline
+     on*= handlers; 'unsafe-eval' stays because ethers/sw-bootstrap use it. connect-src / img-src stay open to
+     http(s)/ws(s): users add their own RPC endpoints and token logos come from many hosts. -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'self' file: data: blob:; script-src 'self' file: blob: 'unsafe-inline' 'unsafe-eval'; style-src 'self' file: 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' file: data: https://fonts.gstatic.com; img-src 'self' file: data: blob: https: http:; media-src 'self' file: data: blob: https: http:; connect-src 'self' file: data: blob: https: http: wss: ws:; worker-src 'self' file: blob:; frame-src https://verify.walletconnect.com https://verify.walletconnect.org; object-src 'none'; base-uri 'none'; form-action 'none'">
 <!-- ── CONSOLE LOG CAPTURE: must run before any other script so nothing is missed ── -->
 <script src="scripts/core/console/console-capture.js"></script>
 <!-- ── NATIVE HTTP BRIDGE: must run early so all script blocks can use window.nxFetch ── -->
