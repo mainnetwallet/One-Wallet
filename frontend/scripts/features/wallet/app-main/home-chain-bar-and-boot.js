@@ -60,15 +60,12 @@ function setActiveChain(chainId) {
     }
   }
   (document.getElementById('home-chain-name') || {}).textContent = chainId === null ? 'All networks' : (chain.name.length > 8 ? chain.name.split(' ')[0] : chain.name);
-  // Dot indicator — hidden (replaced by clear button)
+  // Dot indicator — hidden
   const dot = document.getElementById('home-chain-dot');
   if (dot) dot.style.display = 'none';
-  // Clear × button — show when a chain is selected
-  const clearBtn = document.getElementById('home-chain-clear');
-  if (clearBtn) clearBtn.style.display = chainId !== null ? 'flex' : 'none';
-  // Arrow — show only on All Networks
+  // No clear (x) button: the pill always shows the arrow and opens the network picker (choose All networks there)
   const arrowEl = document.getElementById('home-chain-arrow');
-  if (arrowEl) arrowEl.style.display = chainId !== null ? 'none' : 'inline';
+  if (arrowEl) arrowEl.style.display = 'inline';
   // Update chain switch button style
   const btn = document.getElementById('home-chain-btn');
   if (btn) {
@@ -91,11 +88,6 @@ function setActiveChain(chainId) {
 
   // ── Re-apply wallet guard after any style changes ──
   if (typeof window.homeWalletGuardRefresh === 'function') window.homeWalletGuardRefresh();
-}
-
-function clearHomeChain() {
-  if (typeof setActiveChain === 'function') setActiveChain(null);
-  if (typeof loadTokens === 'function') loadTokens();
 }
 
 function hexToRgb(hex) {
