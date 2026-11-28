@@ -9,25 +9,39 @@ function hcpClClearSearch() {
   hcpClRenderResults([]);
 }
 
+// Chains suggested on the Chainlist tab before the user types anything
+const HCP_POPULAR_CHAIN_IDS = [1, 8453, 56, 42161, 10, 137, 43114, 59144, 534352, 324, 81457, 5000, 146, 130, 42220, 100];
+
 function hcpClRenderResults(chains) {
   const container = document.getElementById('hcp-cl-results');
   if (!container) return;
+  const q = document.getElementById('hcp-cl-search')?.value.trim();
+  let heading = '';
 
   if (!chains.length) {
-    const q = document.getElementById('hcp-cl-search')?.value.trim();
-    container.innerHTML = q ? '' : `
-      <div style="text-align:center;padding:32px 20px;">
-        <div style="width:52px;height:52px;border-radius:16px;background:rgba(99,102,241,0.08);border:1px solid rgba(99,102,241,0.15);display:flex;align-items:center;justify-content:center;margin:0 auto 12px;">
-          <span class="material-icons-round" style="font-size:24px;color:var(--accent-primary);opacity:0.5;">travel_explore</span>
-        </div>
-        <div style="font-size:13px;font-weight:700;color:var(--text-secondary);margin-bottom:6px;">Search ChainList</div>
-        <div style="font-size:11px;color:var(--text-muted);font-family:var(--font-mono);line-height:1.7;">Type a chain name or Chain ID<br>to discover any EVM network</div>
-      </div>`;
-    return;
+    if (q) { container.innerHTML = ''; return; }
+    // Nothing typed yet: suggest popular chains that are not added yet
+    const have = new Set(getAllChains().map(c => c.chainId).filter(Boolean));
+    const byId = {};
+    (_clAllChains || []).forEach(c => { byId[c.chainId] = c; });
+    const popular = (_clShowTestnets ? [] : HCP_POPULAR_CHAIN_IDS).filter(id => byId[id] && !have.has(id)).map(id => byId[id]);
+    if (!popular.length) {
+      container.innerHTML = `
+        <div style="text-align:center;padding:32px 20px;">
+          <div style="width:52px;height:52px;border-radius:16px;background:rgba(99,102,241,0.08);border:1px solid rgba(99,102,241,0.15);display:flex;align-items:center;justify-content:center;margin:0 auto 12px;">
+            <span class="material-icons-round" style="font-size:24px;color:var(--accent-primary);opacity:0.5;">travel_explore</span>
+          </div>
+          <div style="font-size:14px;font-weight:700;color:var(--text-secondary);margin-bottom:6px;">${_clShowTestnets ? 'Search testnets' : 'Search chainlist'}</div>
+          <div style="font-size:12px;color:var(--text-muted);line-height:1.7;">Type a name or chain ID<br>to find any EVM network. Not listed? Add a custom network below.</div>
+        </div>`;
+      return;
+    }
+    chains = popular;
+    heading = '<div class="hcp-sec">Popular chains</div>';
   }
 
   const existingIds = new Set(getAllChains().map(c => c.chainId).filter(Boolean));
-  container.innerHTML = '';
+  container.innerHTML = heading;
 
   chains.forEach(c => {
     const alreadyAdded = existingIds.has(c.chainId);
@@ -37,22 +51,23 @@ function hcpClRenderResults(chains) {
     const icon = c.icon ? `https://icons.llamao.fi/icons/chains/rsz_${c.icon}.jpg` : '';
 
     const item = document.createElement('div');
-    item.style.cssText = 'display:flex;align-items:center;gap:12px;padding:11px 12px;border-radius:14px;background:var(--bg-glass);border:1px solid var(--border-subtle);margin-bottom:7px;transition:all 0.2s;';
+    item.className = 'hcp-cl-row';
     item.innerHTML = `
-      <div style="width:40px;height:40px;border-radius:12px;background:var(--bg-raised);border:1px solid var(--border-subtle);display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden;">
-        ${icon ? `<img src="${icon}" width="28" height="28" style="border-radius:7px;object-fit:cover;" onerror="this.parentElement.innerHTML='<span style=\\'font-size:18px;\\'>🔗</span>'" />` : '<span style="font-size:18px;">🔗</span>'}
+      <div class="hcp-chain-emoji" style="overflow:hidden;">
+        <span style="font-size:18px;">🔗</span>
+        ${icon ? `<img src="${icon}" width="28" height="28" alt="" style="position:absolute;inset:6px;border-radius:50%;object-fit:cover;background:var(--bg-raised);" onerror="this.remove()" />` : ''}
       </div>
       <div style="flex:1;min-width:0;">
-        <div style="font-size:12px;font-weight:700;color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${c.name}</div>
-        <div style="font-size:10px;color:var(--text-muted);font-family:var(--font-mono);margin-top:2px;">Chain ID: ${c.chainId} · ${sym}</div>
-        ${!hasRpc ? `<div style="font-size:9px;color:var(--accent-amber);font-family:var(--font-mono);margin-top:2px;">⚠ No public RPC</div>` : `<div style="font-size:9px;color:${allRpcs.length>=5?'var(--neon-cyan)':'var(--accent-green)'};font-family:var(--font-mono);margin-top:2px;">✓ ${allRpcs.length} RPC endpoint${allRpcs.length > 1 ? 's' : ''}</div>`}
+        <div class="hcp-chain-name" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${c.name}</div>
+        <div class="hcp-chain-sub">ID ${c.chainId} · ${sym}</div>
+        ${!hasRpc ? `<div class="hcp-rpc-note warn">No public RPC</div>` : `<div class="hcp-rpc-note">${allRpcs.length} RPC endpoint${allRpcs.length > 1 ? 's' : ''}</div>`}
       </div>
       ${alreadyAdded
-        ? `<div style="display:flex;align-items:center;gap:5px;flex-shrink:0;">
-             ${hasRpc ? `<button onclick="hcpAddRpcFromChainList(event,${c.chainId})" title="Add RPCs from chainlist to this chain" style="padding:6px 9px;border-radius:8px;border:1px solid rgba(6,182,212,0.4);background:rgba(6,182,212,0.1);color:var(--neon-cyan);font-family:var(--font-mono);font-size:10px;font-weight:700;cursor:pointer;transition:all 0.2s;white-space:nowrap;" onmousedown="this.style.transform='scale(0.92)'" onmouseup="this.style.transform=''" ontouchstart="this.style.transform='scale(0.92)'" ontouchend="this.style.transform=''">+ RPC</button>` : ''}
-             <div style="padding:6px 10px;border-radius:8px;background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.25);font-size:10px;font-weight:700;color:var(--accent-green);font-family:var(--font-mono);">ADDED</div>
+        ? `<div class="hcp-act">
+             ${hasRpc ? `<button class="hcp-btn-rpc" onclick="hcpAddRpcFromChainList(event,${c.chainId})" title="Add RPCs from chainlist to this chain">+ RPC</button>` : ''}
+             <span class="hcp-added"><span class="material-icons-round">check</span>Added</span>
            </div>`
-        : `<button onclick="hcpAddFromChainList(event, ${c.chainId})" style="padding:7px 12px;border-radius:9px;border:1px solid rgba(99,102,241,0.45);background:rgba(99,102,241,0.12);color:var(--neon-purple);font-family:var(--font-mono);font-size:10px;font-weight:700;cursor:pointer;flex-shrink:0;transition:all 0.2s;" onmousedown="this.style.transform='scale(0.92)'" onmouseup="this.style.transform=''" ontouchstart="this.style.transform='scale(0.92)'" ontouchend="this.style.transform=''">+ ADD</button>`
+        : `<button class="hcp-btn-add" onclick="hcpAddFromChainList(event, ${c.chainId})">Add</button>`
       }
     `;
     container.appendChild(item);

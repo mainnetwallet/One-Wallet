@@ -73,10 +73,15 @@ function renderHcpList() {
 
   // Hide / show "Add Chain" footer based on wallet state
   const addFooter = document.getElementById('hcp-add-footer');
-  if (addFooter) addFooter.style.display = _walletReady ? '' : 'none';
+  // "Add custom network" lives on the Chainlist tab only
+  if (addFooter) addFooter.style.display = (_walletReady && _hcpActiveTab === 'chainlist') ? '' : 'none';
 
   // When no wallet: only show builtin chains (no custom, no delete btn)
   let allChains = _walletReady ? getAllChains() : BUILTIN_CHAINS;
+
+  // Network count on the tab (without the "All networks" row)
+  const _myCount = document.getElementById('hcp-my-count');
+  if (_myCount) _myCount.textContent = String(allChains.filter(c => c.chainId !== null).length);
 
   // Apply search filter
   if (_hcpMySearchQuery) {
@@ -109,8 +114,9 @@ function renderHcpList() {
       }</div>
       <div class="hcp-chain-info">
         <div class="hcp-chain-name">${chain.name}</div>
-        <div class="hcp-chain-sub">${chain.chainId ? 'Chain ID: ' + chain.chainId : 'All chains combined'} · ${tokenCount} token${tokenCount !== 1 ? 's' : ''}${!chain.builtIn && chain.rpcs ? ' · ' + chain.rpcs.length + ' RPC' : ''}</div>
+        <div class="hcp-chain-sub">${chain.chainId ? 'ID ' + chain.chainId : 'All chains combined'}${!chain.builtIn && chain.rpcs ? ' · ' + chain.rpcs.length + ' RPC' : ''}</div>
       </div>
+      <span class="hcp-pill">${tokenCount} token${tokenCount !== 1 ? 's' : ''}</span>
       ${isSelected ? '<span class="material-icons-round" style="font-size:18px;color:var(--accent-primary);flex-shrink:0;">check_circle</span>' : '<span style="width:18px;flex-shrink:0;"></span>'}
       ${(!chain.builtIn && _walletReady) ? `<div onclick="hcpDeleteCustomChain(event,'${chain.id}')" style="width:28px;height:28px;border-radius:8px;background:rgba(244,63,94,0.1);border:1px solid rgba(244,63,94,0.2);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;margin-left:4px;" onmousedown="this.style.opacity='.6'" onmouseup="this.style.opacity='1'" ontouchstart="this.style.opacity='.6'" ontouchend="this.style.opacity='1'"><span class="material-icons-round" style="font-size:14px;color:var(--accent-red);">delete</span></div>` : ''}
     `;

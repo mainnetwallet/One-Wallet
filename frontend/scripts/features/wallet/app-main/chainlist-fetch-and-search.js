@@ -31,26 +31,22 @@ function hcpSwitchTab(tab) {
   const addFooter = document.getElementById('hcp-add-footer');
 
   if (tab === 'my') {
-    tabMy.style.cssText = 'flex:1;padding:8px 0;border-radius:10px;border:1px solid rgba(99,102,241,0.5);background:rgba(99,102,241,0.18);color:var(--neon-purple);font-family:var(--font-mono);font-size:10px;font-weight:700;letter-spacing:1px;cursor:pointer;transition:all 0.2s;';
-    tabCl.style.cssText = 'flex:1;padding:8px 0;border-radius:10px;border:1px solid var(--border-subtle);background:var(--bg-glass);color:var(--text-muted);font-family:var(--font-mono);font-size:10px;font-weight:700;letter-spacing:1px;cursor:pointer;transition:all 0.2s;';
+    tabMy.classList.add('on');
+    tabCl.classList.remove('on');
     panelMy.style.display = 'flex';
     panelMy.style.flexDirection = 'column';
     panelCl.style.display = 'none';
-    if (addFooter) addFooter.style.display = '';
+    if (addFooter) addFooter.style.display = 'none'; // custom network is a Chainlist-only action
     renderHcpList();
   } else {
-    tabCl.style.cssText = 'flex:1;padding:8px 0;border-radius:10px;border:1px solid rgba(99,102,241,0.5);background:rgba(99,102,241,0.18);color:var(--neon-purple);font-family:var(--font-mono);font-size:10px;font-weight:700;letter-spacing:1px;cursor:pointer;transition:all 0.2s;';
-    tabMy.style.cssText = 'flex:1;padding:8px 0;border-radius:10px;border:1px solid var(--border-subtle);background:var(--bg-glass);color:var(--text-muted);font-family:var(--font-mono);font-size:10px;font-weight:700;letter-spacing:1px;cursor:pointer;transition:all 0.2s;';
+    tabCl.classList.add('on');
+    tabMy.classList.remove('on');
     panelMy.style.display = 'none';
     panelCl.style.display = 'flex';
-    if (addFooter) addFooter.style.display = 'none';
+    if (addFooter) addFooter.style.display = ''; // wallet is already checked above
     // Sync testnet toggle button visual state
     const tnBtn = document.getElementById('hcp-cl-testnet-btn');
-    if (tnBtn) {
-      tnBtn.style.background   = _clShowTestnets ? 'rgba(245,158,11,0.2)' : 'var(--bg-glass)';
-      tnBtn.style.color        = _clShowTestnets ? 'var(--accent-amber)'  : 'var(--text-muted)';
-      tnBtn.style.borderColor  = _clShowTestnets ? 'rgba(245,158,11,0.6)' : 'var(--border-subtle)';
-    }
+    if (tnBtn) { tnBtn.classList.toggle('on', _clShowTestnets); tnBtn.setAttribute('aria-checked', String(_clShowTestnets)); }
     // Pre-load chain data
     _clFetchChains().then(() => {
       const input = document.getElementById('hcp-cl-search');
@@ -94,11 +90,7 @@ function _clApplyFilter() {
 
 function hcpToggleKoreTestnet(btn) {
   _clShowTestnets = !_clShowTestnets;
-  if (btn) {
-    btn.style.background = _clShowTestnets ? 'rgba(245,158,11,0.2)' : 'var(--bg-glass)';
-    btn.style.color      = _clShowTestnets ? 'var(--accent-amber)' : 'var(--text-muted)';
-    btn.style.borderColor= _clShowTestnets ? 'rgba(245,158,11,0.6)' : 'var(--border-subtle)';
-  }
+  if (btn) { btn.classList.toggle('on', _clShowTestnets); btn.setAttribute('aria-checked', String(_clShowTestnets)); }
   // Clear search input
   const inp = document.getElementById('hcp-cl-search');
   if (inp) inp.value = '';
