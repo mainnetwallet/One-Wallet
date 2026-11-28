@@ -239,6 +239,11 @@ function delUpdateStats() {
   if (el('del-successCount')) el('del-successCount').textContent = delStats.success;
   if (el('del-failCount')) el('del-failCount').textContent = delStats.fail;
   if (el('del-skipCount')) el('del-skipCount').textContent = delStats.skip;
+  // Progress ring: share of wallets finished (done + failed + skipped)
+  const doneN = delStats.success + delStats.fail + delStats.skip;
+  const pct = delStats.total > 0 ? Math.min(100, Math.round(doneN / delStats.total * 100)) : 0;
+  if (el('del-ring')) el('del-ring').setAttribute('stroke-dashoffset', String(Math.round(226 * (1 - pct / 100))));
+  if (el('del-ring-pct')) el('del-ring-pct').textContent = pct + '%';
 }
 
 // ── RLP helpers ──
@@ -635,7 +640,7 @@ function delUpdateMaskedRows() {
   if (!rows) return;
   const keys = delParsePrivateKeys();
   if (!keys.length) {
-    rows.innerHTML = '<div style="color:var(--text-muted);font-size:10px;letter-spacing:1px;">Paste keys to see addresses…</div>';
+    rows.innerHTML = '<div class="dl-muted" style="padding:8px 0;">Paste keys to see addresses…</div>';
     return;
   }
   rows.innerHTML = keys.map(function(pk, i) {
@@ -646,11 +651,14 @@ function delUpdateMaskedRows() {
         addr = w.address;
       }
     } catch(e) { addr = ''; }
-    const masked = '••••••••••••••••••••••' + (pk.length > 6 ? pk.slice(-4) : '••••');
-    return '<div style="display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid var(--border-subtle);">'
-      + '<span style="color:var(--text-muted);font-size:9px;min-width:16px;text-align:right;">' + (i+1) + '</span>'
-      + '<span style="color:var(--text-muted);font-size:11px;letter-spacing:1px;flex-shrink:0;">' + masked + '</span>'
-      + (addr ? '<span style="color:var(--accent-primary);font-size:10px;margin-left:auto;white-space:nowrap;">' + addr.slice(0,6) + '…' + addr.slice(-4) + '</span>' : '<span style="color:var(--accent-red);font-size:10px;margin-left:auto;">invalid</span>')
+    const masked = '••••••••••' + (pk.length > 6 ? pk.slice(-4) : '••••');
+    return '<div class="dl-wrow">'
+      + '<span class="dl-wnum">' + (i+1) + '</span>'
+      + '<div style="flex:1;min-width:0;">'
+      + (addr ? '<div class="dl-waddr">' + addr.slice(0,6) + '…' + addr.slice(-4) + '</div>' : '<div class="dl-waddr">Invalid key</div>')
+      + '<div class="dl-wkey">' + masked + '</div>'
+      + '</div>'
+      + (addr ? '<span class="dl-chip dl-chip-accent">Ready</span>' : '<span class="dl-chip dl-chip-bad">Invalid</span>')
       + '</div>';
   }).join('');
 }

@@ -236,27 +236,6 @@
   body.light-mode .step-line { background: rgba(99,102,241,0.15) !important; }
   body.light-mode .step-label { color: #6366f1 !important; }
 
-  /* ── Delegation step bar (light mode) ── */
-  body.light-mode .del-step-dot {
-    background: #e8eaf5 !important;
-    border-color: rgba(99,102,241,0.25) !important;
-    color: #4338ca !important;
-  }
-  body.light-mode .del-step-item.active .del-step-dot {
-    background: linear-gradient(135deg,var(--accent-primary),var(--accent-secondary)) !important;
-    border-color: transparent !important;
-    color: #fff !important;
-  }
-  body.light-mode .del-step-item.done .del-step-dot {
-    background: linear-gradient(135deg,var(--accent-green),#059669) !important;
-    border-color: transparent !important;
-    color: #fff !important;
-  }
-  body.light-mode .del-step-label { color: #6366f1 !important; }
-  body.light-mode .del-step-item.active .del-step-label { color: var(--accent-secondary) !important; }
-  body.light-mode .del-step-item.done .del-step-label { color: var(--accent-green) !important; }
-  body.light-mode .del-step-connector { background: rgba(99,102,241,0.18) !important; }
-  body.light-mode .del-step-connector.filled { background: linear-gradient(90deg,var(--accent-primary),var(--accent-secondary)) !important; }
 
 
 

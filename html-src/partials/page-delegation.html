@@ -1,209 +1,220 @@
 <!-- ══════ EIP-7702 DELEGATION PAGE ══════ -->
-<div id="page-delegation" class="page" style="display:flex;flex-direction:column;overflow:hidden;padding-bottom:0;">
-  <div style="width: 100%; max-width: 100%; margin: 0 auto;height:100%;display:flex;flex-direction:column;">
+<div id="page-delegation" class="page dl-page" data-del-mode="d" style="display:flex;flex-direction:column;overflow:hidden;padding-bottom:0;">
+  <div class="dl-shell">
 
     <!-- Header -->
-    <div class="del-modal-header">
+    <div class="del-modal-header dl-header">
       <div class="del-back-btn" onclick="switchPage('profile')">
         <span class="material-icons-round">arrow_back</span>
       </div>
-      <div style="flex:1;">
-        <div class="del-modal-title">EIP-7702 Delegation</div>
-        <div style="font-size:9px;font-family:var(--font-mono);color:var(--text-muted);margin-top:1px;letter-spacing:1px;" id="del-header-step-label">STEP 1 OF 3 — NETWORK</div>
+      <div class="dl-header-text">
+        <div class="del-modal-title">EIP-7702 delegation</div>
+        <div class="dl-sub" id="del-header-step-label">Step 1 of 3 · Network</div>
       </div>
-      <div class="del-modal-badge" id="del-chain-badge" style="display:flex;align-items:center;gap:5px;cursor:pointer;" onclick="openDelChainPicker()" title="Tap to switch chain">
-        <span id="del-badge-emoji" style="font-size:13px;line-height:1;">🔵</span>
+      <div class="del-modal-badge dl-chain-chip" id="del-chain-badge" onclick="openDelChainPicker()" title="Tap to switch chain">
+        <span id="del-badge-emoji" class="dl-chip-emoji">🔵</span>
         <span id="del-badge-name">BASE</span>
       </div>
     </div>
 
-    <!-- ══ STEP PROGRESS BAR ══ -->
-    <div class="del-stepbar" id="del-stepbar">
-      <!-- Step 1 -->
+    <!-- Step tabs + progress -->
+    <div class="del-stepbar dl-steps" id="del-stepbar">
       <div class="del-step-item active" id="del-step-item-1" onclick="delGoToStep(1)">
         <div class="del-step-dot">1</div>
         <div class="del-step-label">Network</div>
         <div class="del-step-connector" id="del-conn-1-2"></div>
       </div>
-      <!-- Step 2 -->
       <div class="del-step-item" id="del-step-item-2" onclick="delGoToStep(2)">
         <div class="del-step-dot">2</div>
         <div class="del-step-label">Wallets</div>
         <div class="del-step-connector" id="del-conn-2-3"></div>
       </div>
-      <!-- Step 3 -->
       <div class="del-step-item" id="del-step-item-3" onclick="delGoToStep(3)">
         <div class="del-step-dot">3</div>
         <div class="del-step-label">Execute</div>
       </div>
     </div>
+    <div class="dl-progress"><i id="dl-prog-fill"></i></div>
 
     <!-- Body -->
-    <div class="del-modal-body" id="del-modal-body-scroll">
+    <div class="del-modal-body dl-body" id="del-modal-body-scroll">
 
-      <!-- ════════════════════
-           STEP 1 — NETWORK
-           ════════════════════ -->
+      <!-- ════ STEP 1 — NETWORK ════ -->
       <div class="del-step-panel active" id="del-panel-1">
 
-
-
-        <div style="margin-bottom:12px;">
-          <div class="del-config-label">Delegation Contract Address</div>
-          <input type="text" class="del-config-input" id="del-delegationAddress"
-            value="0x000100abaad02f1cfc8bbe32bd5a564817339e72">
-          <div class="del-preset-row">
-            <div class="del-preset-btn" id="del-btnRevoke">🔴 Revoke</div>
-          </div>
+        <div class="dl-label">Action</div>
+        <div class="dl-seg" id="dl-mode-seg">
+          <button type="button" class="on" id="dl-mode-d" onclick="delSetMode('d')">Delegate</button>
+          <button type="button" id="dl-mode-r" onclick="delSetMode('r')">Revoke</button>
         </div>
 
-        <!-- Custom Owner Function -->
-        <div style="margin-bottom:12px;">
-          <div class="del-config-label" style="display:flex;align-items:center;justify-content:space-between;">
-            <span>Owner Function</span>
-            <span style="font-size:9px;color:var(--accent-amber);font-weight:700;letter-spacing:1px;background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.25);padding:2px 7px;border-radius:5px;">OPTIONAL</span>
+        <div class="dl-label">Network</div>
+        <div class="dl-card dl-chain-card" id="del-active-chain-btn" onclick="openDelChainPicker()">
+          <span class="dl-chain-icon" id="del-chain-sel-emoji">🔵</span>
+          <div class="dl-grow">
+            <div class="dl-strong" id="del-chain-sel-name">Base</div>
+            <div class="dl-muted" id="del-chain-sel-id">Chain ID: 8453</div>
           </div>
-          <input type="text" class="del-config-input" id="del-ownerFunction"
-            placeholder="e.g. ownerAtIndex(uint256) or nextOwnerIndex()"
+          <span class="dl-link">Change</span>
+        </div>
+
+        <div class="dl-label">Delegation contract</div>
+        <div class="dl-card">
+          <div class="dl-row dl-between">
+            <span class="dl-chip dl-chip-ok" id="dl-contract-chip">Default contract</span>
+          </div>
+          <input type="text" class="dl-addr-input" id="del-delegationAddress"
+            value="0x000100abaad02f1cfc8bbe32bd5a564817339e72"
             autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
-          <div class="del-helper" style="margin-top:6px;">Leave blank for default (<code style="color:var(--neon-cyan);font-size:9px;">nextOwnerIndex()</code>).</div>
-          <div id="del-owner-fn-status" style="display:none;margin-top:6px;font-size:10px;font-family:var(--font-mono);color:var(--neon-purple);"></div>
+          <div class="dl-helper" id="dl-contract-help">Accounts will point to this contract after delegation.</div>
         </div>
 
-        <div style="margin-bottom:12px;">
-          <div class="del-config-label">RPC URLs (one per line)</div>
-          <textarea class="del-config-textarea" id="del-rpcUrls">https://base-mainnet.g.alchemy.com/v2/4Oc_WOXAqH_o6A9K2g5kPveiDofz_E5Q
+        <div class="dl-label">Advanced</div>
+        <div class="dl-card dl-flush">
+          <div class="dl-row dl-adv-head" onclick="dlToggleAdv()">
+            <span class="material-icons-round dl-adv-icon">tune</span>
+            <div class="dl-grow">
+              <div class="dl-strong">Owner function and RPCs</div>
+              <div class="dl-muted" id="dl-adv-summary">Default owner check · 5 RPCs</div>
+            </div>
+            <span class="material-icons-round dl-adv-chev" id="dl-adv-chev">expand_more</span>
+          </div>
+          <div class="dl-adv-body" id="dl-adv-body" hidden>
+            <div class="dl-sublabel dl-row dl-between">
+              <span>Owner function</span><span class="dl-chip dl-chip-warn">Optional</span>
+            </div>
+            <input type="text" class="dl-input" id="del-ownerFunction"
+              placeholder="ownerAtIndex(uint256) or nextOwnerIndex()"
+              autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+            <div class="dl-helper">Leave blank for the default, <code>nextOwnerIndex()</code>.</div>
+            <div id="del-owner-fn-status" class="dl-status" style="display:none;"></div>
+
+            <div class="dl-sublabel dl-row dl-between">
+              <span>RPC URLs, one per line</span>
+              <span class="dl-link" id="dl-rpc-reveal" onclick="dlToggleRpcReveal()">Reveal</span>
+            </div>
+            <textarea class="dl-textarea dl-masked" id="del-rpcUrls" spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off">https://base-mainnet.g.alchemy.com/v2/4Oc_WOXAqH_o6A9K2g5kPveiDofz_E5Q
 https://base-mainnet.g.alchemy.com/v2/N1ew1Lwn_-52DrYiECH_1
 https://base-mainnet.g.alchemy.com/v2/DEnZ44mHX1MaVB8gQh1ku
 https://base-mainnet.g.alchemy.com/v2/s-tyoqpIgcYFI7vKBzy0q
 https://base-mainnet.g.alchemy.com/v2/c3MzGKxN8rb3JyyY1AcQ7gU31VnOwnt2</textarea>
-          <div class="del-helper">Multiple RPCs = faster parallel processing</div>
+            <div class="dl-helper" id="dl-rpc-summary">5 RPCs · more RPCs mean faster parallel processing</div>
+          </div>
         </div>
         <input type="hidden" id="del-rpcUrl" value="">
 
-        <!-- Next nav -->
-        <div class="del-step-nav">
-          <button class="del-step-nav-next" onclick="delGoToStep(2)">
-            <span>Wallets</span>
+        <div class="del-step-nav dl-nav">
+          <button class="dl-btn dl-btn-primary" onclick="delGoToStep(2)">
+            <span>Continue to wallets</span>
             <span class="material-icons-round">arrow_forward</span>
           </button>
         </div>
       </div>
 
-      <!-- ════════════════════
-           STEP 2 — WALLETS
-           ════════════════════ -->
+      <!-- ════ STEP 2 — WALLETS ════ -->
       <div class="del-step-panel" id="del-panel-2">
 
+        <div class="dl-tiles">
+          <button type="button" class="dl-tile" onclick="dlPasteKeys()">
+            <span class="material-icons-round">key</span>
+            <div class="dl-strong">Paste keys</div>
+            <div class="dl-muted">Lines, list, or commas</div>
+          </button>
+          <button type="button" class="dl-tile" onclick="openDelGroupDrawer()">
+            <span class="material-icons-round">folder_open</span>
+            <div class="dl-strong">From group</div>
+            <div class="dl-muted" id="del-group-trigger-meta">Pick saved groups</div>
+          </button>
+        </div>
+        <div id="del-group-import-status" class="dl-status" style="display:none;"></div>
 
-        <div style="margin-bottom:12px;">
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
-            <div class="del-config-label" style="margin-bottom:0;">Private Keys (one per line)</div>
-            <button id="del-pk-toggle" onclick="delPkToggle()" style="display:flex;align-items:center;gap:4px;background:var(--bg-raised);border:1px solid var(--border-subtle);border-radius:8px;padding:5px 10px;cursor:pointer;font-family:var(--font-mono);font-size:10px;font-weight:700;color:var(--text-secondary);transition:all 0.2s;outline:none;">
-              <span class="material-icons-round" id="del-pk-icon" style="font-size:14px;">visibility</span>
+        <div class="dl-row dl-between dl-list-head">
+          <div class="dl-strong">Wallets</div>
+          <div class="dl-row" style="gap:8px;">
+            <span id="del-keyCountBadge" style="display:none;"><span class="dl-chip dl-chip-accent"><span id="del-keyCountNum">0</span> detected</span></span>
+            <button type="button" id="del-pk-toggle" class="dl-eye" onclick="delPkToggle()">
+              <span class="material-icons-round" id="del-pk-icon">visibility</span>
               <span id="del-pk-lbl">Show</span>
             </button>
           </div>
-          <!-- Masked overlay (shown when hidden) -->
-          <div id="del-pk-masked" onclick="document.getElementById('del-pk-toggle').click()" style="display:block;min-height:110px;background:var(--bg-raised);border:1.5px solid var(--border-subtle);border-radius:12px;padding:10px 12px;font-family:var(--font-mono);font-size:11px;cursor:pointer;overflow-y:auto;max-height:200px;" title="Click to show keys">
-            <div id="del-pk-masked-rows" style="display:flex;flex-direction:column;gap:6px;">
-              <div style="color:var(--text-muted);font-size:10px;letter-spacing:1px;">Paste keys to see addresses…</div>
-            </div>
-          </div>
-          <!-- Actual textarea (hidden by default) -->
-          <textarea class="del-config-textarea" id="del-privateKeys" placeholder="0xabc123...&#10;0xdef456...&#10;&#10;Supports: line by line, Python list, comma separated" style="min-height:110px;display:none;"></textarea>
-          <div class="del-helper">Supports: line by line, Python list, or comma separated</div>
-          <div id="del-keyCountBadge" style="display:none;margin-top:8px;">
-            <div class="del-key-pill">
-              <span class="material-icons-round">key</span>
-              <span id="del-keyCountNum">0</span> key(s) detected
-            </div>
-          </div>
         </div>
 
-        <!-- Group import -->
-        <div style="margin-bottom:12px;">
-          <div class="del-config-label">Import from Group</div>
-          <button onclick="openDelGroupDrawer()" style="width:100%;padding:12px 16px;background:var(--bg-raised);border:1.5px dashed rgba(99,102,241,0.4);border-radius:12px;color:var(--text-secondary);font-family:var(--font-display);font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:10px;transition:all 0.2s ease;" ontouchstart="this.style.borderStyle='solid';this.style.background='rgba(99,102,241,0.08)'" ontouchend="this.style.borderStyle='dashed';this.style.background='var(--bg-raised)'">
-            <div style="width:32px;height:32px;border-radius:9px;background:rgba(99,102,241,0.15);border:1px solid rgba(99,102,241,0.3);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-              <span class="material-icons-round" style="font-size:16px;color:var(--accent-primary);">folder_open</span>
-            </div>
-            <div style="flex:1;text-align:left;">
-              <div style="font-size:12px;font-weight:700;color:var(--text-primary);">Select Wallet Group</div>
-              <div id="del-group-trigger-meta" style="font-size:10px;color:var(--text-muted);font-family:var(--font-mono);margin-top:1px;">Tap to choose groups →</div>
-            </div>
-            <span class="material-icons-round" style="font-size:18px;color:var(--text-muted);">chevron_right</span>
-          </button>
-          <div id="del-group-import-status" style="display:none;margin-top:8px;font-size:10px;font-family:var(--font-mono);color:var(--accent-green);"></div>
+        <!-- Masked list (default) -->
+        <div id="del-pk-masked" class="dl-card dl-pk-masked" onclick="document.getElementById('del-pk-toggle').click()" title="Tap to edit keys">
+          <div id="del-pk-masked-rows">
+            <div class="dl-muted">Paste keys to see addresses…</div>
+          </div>
+        </div>
+        <!-- Editable textarea (hidden by default) -->
+        <textarea class="dl-textarea" id="del-privateKeys" placeholder="0xabc123...&#10;0xdef456...&#10;&#10;Supports: line by line, Python list, comma separated" style="min-height:140px;display:none;" spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off"></textarea>
+
+        <div class="dl-row dl-privacy">
+          <span class="material-icons-round">lock</span>
+          <span>Keys stay on this device and stay masked.</span>
         </div>
 
-        <!-- Nav -->
-        <div class="del-step-nav">
-          <div class="del-step-nav-back" onclick="delGoToStep(1)">
+        <div class="del-step-nav dl-nav">
+          <div class="del-step-nav-back dl-back" onclick="delGoToStep(1)">
             <span class="material-icons-round">arrow_back</span>
           </div>
-          <button class="del-step-nav-next" onclick="delGoToStep(3)">
-            <span>Execute</span>
-            <span class="material-icons-round">rocket_launch</span>
+          <button class="dl-btn dl-btn-primary" onclick="delGoToStep(3)">
+            <span>Continue to execute</span>
+            <span class="material-icons-round">arrow_forward</span>
           </button>
         </div>
       </div>
 
-      <!-- ════════════════════
-           STEP 3 — EXECUTE
-           ════════════════════ -->
+      <!-- ════ STEP 3 — EXECUTE ════ -->
       <div class="del-step-panel" id="del-panel-3">
 
-
-        <!-- Stats row -->
-        <div class="del-stats-row">
-          <div class="del-stat-card">
-            <div class="del-stat-label">TOTAL</div>
-            <div class="del-stat-value" id="del-totalWallets">0</div>
+        <div class="dl-card dl-ring-card">
+          <div class="dl-ring">
+            <svg width="88" height="88" viewBox="0 0 88 88" aria-hidden="true">
+              <circle cx="44" cy="44" r="36" fill="none" stroke="var(--border-subtle)" stroke-width="7"></circle>
+              <circle id="del-ring" cx="44" cy="44" r="36" fill="none" stroke="var(--accent-primary)" stroke-width="7" stroke-linecap="round" stroke-dasharray="226" stroke-dashoffset="226" transform="rotate(-90 44 44)"></circle>
+            </svg>
+            <div class="dl-ring-pct" id="del-ring-pct">0%</div>
           </div>
-          <div class="del-stat-card">
-            <div class="del-stat-label">OK</div>
-            <div class="del-stat-value" id="del-successCount" style="color:var(--accent-green)">0</div>
-          </div>
-          <div class="del-stat-card">
-            <div class="del-stat-label">FAIL</div>
-            <div class="del-stat-value" id="del-failCount" style="color:var(--accent-red)">0</div>
-          </div>
-          <div class="del-stat-card">
-            <div class="del-stat-label">SKIP</div>
-            <div class="del-stat-value" id="del-skipCount" style="color:var(--accent-amber)">0</div>
+          <div class="dl-stats">
+            <div><div class="dl-stat-label">Total</div><div class="dl-stat-value" id="del-totalWallets">0</div></div>
+            <div><div class="dl-stat-label">Done</div><div class="dl-stat-value" id="del-successCount" style="color:var(--accent-green)">0</div></div>
+            <div><div class="dl-stat-label">Failed</div><div class="dl-stat-value" id="del-failCount" style="color:var(--accent-red)">0</div></div>
+            <div><div class="dl-stat-label">Skipped</div><div class="dl-stat-value" id="del-skipCount" style="color:var(--accent-amber)">0</div></div>
           </div>
         </div>
 
-        <!-- Action buttons -->
-        <div class="del-btn-col">
-          <button class="del-btn del-btn-delegate" id="del-btnDelegate">
-            <span class="material-icons-round" style="font-size:17px;">rocket_launch</span>
-            Start Delegation
+        <div class="dl-actions">
+          <button class="dl-btn dl-btn-primary dl-only-delegate" id="del-btnDelegate">
+            <span class="material-icons-round">rocket_launch</span>
+            Start delegation
           </button>
-          <div class="del-btn-grid-2">
-            <button class="del-btn del-btn-outline" id="del-btnCheckWallets" style="height:48px;">
-              <span class="material-icons-round" style="font-size:16px;">search</span>
-              Check
+          <button class="dl-btn dl-btn-danger dl-only-revoke" id="del-btnRevokeBatch">
+            <span class="material-icons-round">cancel</span>
+            Revoke all
+          </button>
+          <div class="dl-grid2">
+            <button class="dl-btn dl-btn-ghost" id="del-btnCheckWallets">
+              <span class="material-icons-round">search</span>
+              Check status
             </button>
-            <button class="del-btn del-btn-amber" id="del-btnCheckAndRedelegate" style="height:48px;">
-              <span class="material-icons-round" style="font-size:16px;">refresh</span>
+            <button class="dl-btn dl-btn-ghost dl-only-delegate" id="del-btnCheckAndRedelegate">
+              <span class="material-icons-round">refresh</span>
               Re-delegate
             </button>
           </div>
-          <button class="del-btn del-btn-danger" id="del-btnRevokeBatch">
-            <span class="material-icons-round" style="font-size:17px;">cancel</span>
-            Revoke All
+          <button class="dl-btn dl-btn-text dl-only-delegate" onclick="delSetMode('r')">
+            Need to remove delegation? Switch to Revoke
+          </button>
+          <button class="dl-btn dl-btn-text dl-only-revoke" onclick="delSetMode('d')">
+            Switch back to Delegate
           </button>
         </div>
-        <!-- Nav -->
-        <div class="del-step-nav">
-          <div class="del-step-nav-back" onclick="delGoToStep(2)">
+
+        <div class="del-step-nav dl-nav">
+          <div class="del-step-nav-back dl-back" onclick="delGoToStep(2)">
             <span class="material-icons-round">arrow_back</span>
           </div>
-          <div style="flex:1;font-size:10px;font-family:var(--font-mono);color:var(--text-muted);text-align:center;padding:0 8px;">
-            All set — hit Start Delegation ↑
-          </div>
+          <div class="dl-hint">Review the wallets, then start.</div>
         </div>
       </div>
 

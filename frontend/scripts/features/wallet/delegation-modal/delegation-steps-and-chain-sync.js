@@ -4,7 +4,7 @@
 //  STEP-BAR NAVIGATION — EIP-7702
 // ══════════════════════════════════════
 var _delCurrentStep = 1;
-var _delStepLabels = ['', 'STEP 1 OF 3 — NETWORK', 'STEP 2 OF 3 — WALLETS', 'STEP 3 OF 3 — EXECUTE'];
+var _delStepLabels = ['', 'Step 1 of 3 · Network', 'Step 2 of 3 · Wallets', 'Step 3 of 3 · Execute'];
 
 function delGoToStep(n) {
   if (n < 1 || n > 3) return;
@@ -41,6 +41,10 @@ function delGoToStep(n) {
   // Update header sub-label
   var lbl = document.getElementById('del-header-step-label');
   if (lbl) lbl.textContent = _delStepLabels[n] || '';
+
+  // Progress bar under the step tabs
+  var prog = document.getElementById('dl-prog-fill');
+  if (prog) prog.style.width = (n / 3 * 100) + '%';
 
   // Scroll body to top
   var body = document.getElementById('del-modal-body-scroll');
