@@ -285,6 +285,7 @@ function switchPage(page) {
   try { if (typeof closeWgDetailUI   === 'function') { const _wgdo = document.getElementById('wgd-overlay');   if (_wgdo && _wgdo.classList.contains('open'))  closeWgDetailUI();   } } catch(_) {}
   try { if (typeof closeWgManager    === 'function') { const _wgmo = document.getElementById('wgm-overlay');   if (_wgmo && _wgmo.classList.contains('open'))  closeWgManager();    } } catch(_) {}
   try { if (typeof closeWgEditModal  === 'function') { const _wgeo = document.getElementById('wg-edit-overlay'); if (_wgeo && _wgeo.classList.contains('open')) closeWgEditModal();  } } catch(_) {}
+  try { if (typeof closeWgakModal    === 'function') { const _wgak = document.getElementById('wgak-overlay');  if (_wgak && _wgak.classList.contains('open'))  closeWgakModal();    } } catch(_) {}
   try { if (typeof closeWgekModal    === 'function') { const _wgek = document.getElementById('wgek-overlay');  if (_wgek && _wgek.classList.contains('open'))  closeWgekModal();    } } catch(_) {}
   try { const _wgds = document.getElementById('wgm-delete-sheet'); if (_wgds && _wgds.classList.contains('open')) { _wgds.classList.remove('open'); if (_wgds.parentNode) _wgds.parentNode.removeChild(_wgds); } } catch(_) {}
   document.getElementById('page-' + currentPage)?.classList.remove('active');

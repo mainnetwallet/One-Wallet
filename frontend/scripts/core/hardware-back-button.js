@@ -16,6 +16,7 @@
     { id: 'wg-keyinput-overlay',      close: () => typeof closeWgKeyInputUI      === 'function' && closeWgKeyInputUI()      },
     { id: 'wg-edit-overlay',          close: () => typeof closeWgEditModal       === 'function' && closeWgEditModal()       },
     { id: 'wgd-overlay',              close: () => typeof closeWgDetailUI        === 'function' && closeWgDetailUI()        },
+    { id: 'wgak-overlay',             close: () => typeof closeWgakModal         === 'function' && closeWgakModal()         },
     { id: 'wgek-overlay',             close: () => typeof closeWgekModal         === 'function' && closeWgekModal()         },
     { id: 'wgm-overlay',              close: () => typeof closeWgManager         === 'function' && closeWgManager()         },
     { id: 'wg-picker-overlay',        close: () => typeof closeWgPicker          === 'function' && closeWgPicker()          },
